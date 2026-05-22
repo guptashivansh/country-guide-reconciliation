@@ -20,6 +20,7 @@ CONTEXT_FIELDS = (
     "content_hash",
     "review_item_id",
     "failure",
+    "endpoint_count",
 )
 
 
