@@ -1,0 +1,62 @@
+from flask import Flask
+
+from app.api.routes import create_api_blueprint
+from app.extraction.content_chunker import ContentChunker
+from app.extraction.groq_extraction_service import GroqExtractionService
+from app.ingestion.html_ingestion_service import HtmlIngestionService
+from app.ingestion.ingestion_job_service import IngestionJobService
+from app.ingestion.source_snapshot_service import SourceSnapshotService
+from app.reconciliation.reconciliation_service import ReconciliationService
+from app.repositories.country_guide_repository import CountryGuideRepository
+from app.repositories.ingestion_job_repository import IngestionJobRepository
+from app.repositories.source_snapshot_repository import SourceSnapshotRepository
+from app.repositories.source_endpoint_repository import TrustedSourceEndpointRepository
+from app.review.review_service import ReviewService
+from app.services.source_registry_service import SourceRegistryService
+from app.utils.config import database_path, extraction_chunk_size, groq_api_key, load_env_file
+from app.utils.logging_config import configure_logging
+
+
+def build_services(db_path=None):
+    load_env_file()
+    configure_logging()
+
+    country_guide_repository = CountryGuideRepository(db_path or database_path())
+    source_snapshot_repository = SourceSnapshotRepository(db_path or database_path())
+    ingestion_job_repository = IngestionJobRepository(db_path or database_path())
+    source_endpoint_repository = TrustedSourceEndpointRepository()
+
+    return {
+        "country_guide_repository": country_guide_repository,
+        "source_snapshot_repository": source_snapshot_repository,
+        "ingestion_job_repository": ingestion_job_repository,
+        "review_service": ReviewService(country_guide_repository),
+        "source_registry_service": SourceRegistryService(source_endpoint_repository),
+        "ingestion_service": HtmlIngestionService(),
+        "source_snapshot_service": SourceSnapshotService(source_snapshot_repository),
+        "ingestion_job_service": IngestionJobService(ingestion_job_repository),
+        "extraction_service": GroqExtractionService(
+            groq_api_key(),
+            chunker=ContentChunker(max_chunk_size=extraction_chunk_size()),
+        ),
+        "reconciliation_service": ReconciliationService(country_guide_repository),
+    }
+
+
+def create_app(db_path=None):
+    services = build_services(db_path)
+    services["country_guide_repository"].initialize_schema()
+    services["source_snapshot_repository"].initialize_schema()
+    services["ingestion_job_repository"].initialize_schema()
+    flask_app = Flask(__name__, template_folder="../templates")
+    flask_app.config["services"] = services
+    flask_app.register_blueprint(create_api_blueprint(
+        review_service=services["review_service"],
+        source_registry_service=services["source_registry_service"],
+        ingestion_service=services["ingestion_service"],
+        source_snapshot_service=services["source_snapshot_service"],
+        ingestion_job_service=services["ingestion_job_service"],
+        extraction_service=services["extraction_service"],
+        reconciliation_service=services["reconciliation_service"],
+    ))
+    return flask_app
