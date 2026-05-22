@@ -13,7 +13,7 @@ from app.repositories.source_snapshot_repository import SourceSnapshotRepository
 from app.repositories.source_endpoint_repository import TrustedSourceEndpointRepository
 from app.review.review_service import ReviewService
 from app.services.source_registry_service import SourceRegistryService
-from app.utils.config import database_path, extraction_chunk_size, groq_api_key, load_env_file
+from app.utils.config import database_path, extraction_chunk_size, groq_api_key, load_env_file, official_sources_json_url
 from app.utils.logging_config import configure_logging
 
 
@@ -24,7 +24,8 @@ def build_services(db_path=None):
     country_guide_repository = CountryGuideRepository(db_path or database_path())
     source_snapshot_repository = SourceSnapshotRepository(db_path or database_path())
     ingestion_job_repository = IngestionJobRepository(db_path or database_path())
-    source_endpoint_repository = TrustedSourceEndpointRepository()
+    source_endpoint_repository = TrustedSourceEndpointRepository(json_url=official_sources_json_url())
+    source_endpoint_repository.list_active_source_endpoints()
 
     return {
         "country_guide_repository": country_guide_repository,
