@@ -26,3 +26,10 @@ def groq_api_key():
 
 def extraction_chunk_size():
     return int(os.environ.get("EXTRACTION_CHUNK_SIZE", "6000"))
+
+
+def official_sources_json_url():
+    return os.environ.get(
+        "OFFICIAL_SOURCES_JSON_URL",
+        "https://raw.githubusercontent.com/guptashivansh/compliance-data/main/data/official-sources.json",
+    )
