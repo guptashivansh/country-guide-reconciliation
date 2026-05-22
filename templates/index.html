@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Country Guide Reconciliation</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --border: #1e1e2e;
+    --accent: #6ee7b7;
+    --accent-dim: rgba(110,231,183,0.1);
+    --warn: #fbbf24;
+    --warn-dim: rgba(251,191,36,0.1);
+    --danger: #f87171;
+    --danger-dim: rgba(248,113,113,0.1);
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --card: #0f0f18;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 20px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 100;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-mark {
+    width: 32px;
+    height: 32px;
+    background: var(--accent);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+
+  .logo-text {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+
+  .logo-sub {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .sync-btn {
+    background: var(--accent);
+    color: #000;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .sync-btn:hover { opacity: 0.85; transform: translateY(-1px); }
+  .sync-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px;
+    background: var(--bg);
+  }
+
+  .tab {
+    padding: 16px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  .tab-badge {
+    background: var(--danger);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-left: 8px;
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* MAIN CONTENT */
+  main { padding: 32px 40px; max-width: 1400px; }
+
+  /* STATUS BAR */
+  .status-bar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 24px;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .status-item { color: var(--muted); }
+  .status-item span { color: var(--text); }
+
+  /* SECTION TITLE */
+  .section-title {
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 6px;
+    letter-spacing: -0.5px;
+  }
+
+  .section-sub {
+    color: var(--muted);
+    font-size: 13px;
+    font-family: 'DM Mono', monospace;
+    margin-bottom: 24px;
+  }
+
+  /* REVIEW CARDS */
+  .review-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .review-card:hover { border-color: #2e2e4e; }
+
+  .card-header {
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .card-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .severity-badge {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'DM Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .severity-critical { background: var(--danger-dim); color: var(--danger); border: 1px solid rgba(248,113,113,0.3); }
+  .severity-major { background: var(--warn-dim); color: var(--warn); border: 1px solid rgba(251,191,36,0.3); }
+  .severity-minor { background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(110,231,183,0.3); }
+
+  .confidence-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .conf-track {
+    width: 80px;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .conf-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.6s ease;
+  }
+
+  /* DIFF VIEW */
+  .diff-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+
+  .diff-col {
+    padding: 20px 24px;
+  }
+
+  .diff-col:first-child {
+    border-right: 1px solid var(--border);
+  }
+
+  .diff-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-family: 'DM Mono', monospace;
+    margin-bottom: 10px;
+  }
+
+  .diff-old .diff-label { color: var(--danger); }
+  .diff-new .diff-label { color: var(--accent); }
+
+  .diff-value {
+    font-size: 15px;
+    line-height: 1.6;
+    font-weight: 600;
+  }
+
+  .diff-old .diff-value {
+    color: #94a3b8;
+    text-decoration: line-through;
+    text-decoration-color: var(--danger);
+  }
+
+  .diff-new .diff-value { color: var(--text); }
+
+  /* SOURCE */
+  .source-section {
+    padding: 14px 24px;
+    border-top: 1px solid var(--border);
+    background: rgba(255,255,255,0.02);
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .source-icon {
+    font-size: 14px;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+
+  .source-text {
+    font-size: 12px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    line-height: 1.5;
+  }
+
+  .source-url {
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 11px;
+    display: block;
+    margin-top: 4px;
+  }
+
+  /* ACTION AREA */
+  .card-actions {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .comment-input {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .comment-input:focus { border-color: var(--accent); }
+  .comment-input::placeholder { color: var(--muted); }
+
+  .btn-approve {
+    background: var(--accent-dim);
+    color: var(--accent);
+    border: 1px solid rgba(110,231,183,0.3);
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .btn-approve:hover { background: rgba(110,231,183,0.2); }
+
+  .btn-reject {
+    background: var(--danger-dim);
+    color: var(--danger);
+    border: 1px solid rgba(248,113,113,0.3);
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .btn-reject:hover { background: rgba(248,113,113,0.2); }
+
+  /* GUIDE TABLE */
+  .guide-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+
+  .guide-table th {
+    text-align: left;
+    padding: 12px 16px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    font-weight: 500;
+  }
+
+  .guide-table td {
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  .guide-table tr:last-child td { border-bottom: none; }
+  .guide-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .section-pill {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    background: var(--accent-dim);
+    color: var(--accent);
+    padding: 4px 10px;
+    border-radius: 6px;
+    display: inline-block;
+  }
+
+  /* AUDIT */
+  .audit-row {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 13px;
+  }
+
+  .audit-decision {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+
+  .audit-approved { background: var(--accent-dim); color: var(--accent); }
+  .audit-rejected { background: var(--danger-dim); color: var(--danger); }
+
+  .audit-meta { color: var(--muted); font-family: 'DM Mono', monospace; font-size: 11px; margin-top: 4px; }
+
+  /* EMPTY STATE */
+  .empty {
+    text-align: center;
+    padding: 80px 40px;
+    color: var(--muted);
+  }
+
+  .empty-icon { font-size: 48px; margin-bottom: 16px; }
+  .empty-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; color: var(--text); }
+  .empty-sub { font-size: 14px; font-family: 'DM Mono', monospace; }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    z-index: 1000;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.3s ease;
+    max-width: 320px;
+  }
+
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.success { border-left: 3px solid var(--accent); }
+  .toast.error { border-left: 3px solid var(--danger); }
+
+  /* SPINNER */
+  .spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(0,0,0,0.3);
+    border-top-color: #000;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .hidden { display: none !important; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-mark">🌏</div>
+    <div>
+      <div class="logo-text">GuideSync</div>
+      <div class="logo-sub">Country Guide Reconciliation</div>
+    </div>
+  </div>
+  <button class="sync-btn" id="syncBtn" onclick="triggerSync()">
+    <span id="syncIcon">⟳</span>
+    <span id="syncText">Sync Now</span>
+  </button>
+</header>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('review')">
+    Review Queue <span class="tab-badge hidden" id="queueBadge">0</span>
+  </div>
+  <div class="tab" onclick="showTab('guide')">Live Guide</div>
+  <div class="tab" onclick="showTab('audit')">Audit Log</div>
+</div>
+
+<main>
+
+  <!-- STATUS BAR -->
+  <div class="status-bar">
+    <div class="status-dot"></div>
+    <div class="status-item">Country: <span>🇮🇳 India</span></div>
+    <div class="status-item">Pending: <span id="pendingCount">—</span></div>
+    <div class="status-item">Last Sync: <span id="lastSync">—</span></div>
+    <div class="status-item">Sources: <span>2 trusted sources</span></div>
+  </div>
+
+  <!-- REVIEW TAB -->
+  <div class="tab-content active" id="tab-review">
+    <div class="section-title">Review Queue</div>
+    <div class="section-sub">Changes detected from official sources — approve or reject each</div>
+    <div id="reviewList"></div>
+  </div>
+
+  <!-- GUIDE TAB -->
+  <div class="tab-content" id="tab-guide">
+    <div class="section-title">Live Country Guide</div>
+    <div class="section-sub">Currently published values — updated only on approval</div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;">
+      <table class="guide-table">
+        <thead>
+          <tr>
+            <th>Section</th>
+            <th>Current Value</th>
+            <th>Source</th>
+            <th>Last Updated</th>
+          </tr>
+        </thead>
+        <tbody id="guideBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- AUDIT TAB -->
+  <div class="tab-content" id="tab-audit">
+    <div class="section-title">Audit Log</div>
+    <div class="section-sub">Immutable record of all approvals and rejections</div>
+    <div id="auditList"></div>
+  </div>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  let activeTab = 'review';
+
+  function showTab(tab) {
+    activeTab = tab;
+    document.querySelectorAll('.tab').forEach((t, i) => {
+      t.classList.toggle('active', ['review','guide','audit'][i] === tab);
+    });
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+    if (tab === 'guide') loadGuide();
+    if (tab === 'audit') loadAudit();
+    if (tab === 'review') loadQueue();
+  }
+
+  function toast(msg, type = 'success') {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.className = `toast ${type} show`;
+    setTimeout(() => el.classList.remove('show'), 3500);
+  }
+
+  function severityClass(s) {
+    return `severity-${s || 'minor'}`;
+  }
+
+	  function confidenceColor(c) {
+	    if (c >= 0.85) return 'var(--accent)';
+	    if (c >= 0.6) return 'var(--warn)';
+	    return 'var(--danger)';
+	  }
+
+	  function normalizeSeverity(value) {
+	    return ['critical', 'major', 'minor'].includes(value) ? value : 'minor';
+	  }
+
+	  function escapeHtml(value) {
+	    return String(value ?? '').replace(/[&<>"']/g, char => ({
+	      '&': '&amp;',
+	      '<': '&lt;',
+	      '>': '&gt;',
+	      '"': '&quot;',
+	      "'": '&#39;'
+	    })[char]);
+	  }
+
+	  function safeHttpUrl(value) {
+	    try {
+	      const url = new URL(value, window.location.origin);
+	      return ['http:', 'https:'].includes(url.protocol) ? escapeHtml(url.href) : '#';
+	    } catch (e) {
+	      return '#';
+	    }
+	  }
+
+  // ── LOAD QUEUE ──
+  async function loadQueue() {
+    const res = await fetch('/api/queue');
+    const items = await res.json();
+
+    const badge = document.getElementById('queueBadge');
+    const pendingCount = document.getElementById('pendingCount');
+    pendingCount.textContent = items.length;
+
+    if (items.length > 0) {
+      badge.textContent = items.length;
+      badge.classList.remove('hidden');
+    } else {
+      badge.classList.add('hidden');
+    }
+
+    const list = document.getElementById('reviewList');
+
+    if (items.length === 0) {
+      list.innerHTML = `
+        <div class="empty">
+          <div class="empty-icon">✅</div>
+          <div class="empty-title">All clear</div>
+          <div class="empty-sub">No pending changes. Click "Sync Now" to check for updates.</div>
+        </div>`;
+      return;
+    }
+
+	    list.innerHTML = items.map(item => {
+	      const id = Number(item.id);
+	      const confidence = Math.max(0, Math.min(1, Number(item.confidence || 0)));
+	      const severity = normalizeSeverity(item.severity);
+	      const sourceUrl = safeHttpUrl(item.source_url);
+	      return `
+	      <div class="review-card" id="card-${id}">
+	        <div class="card-header">
+	          <div class="card-meta">
+	            <span class="section-label">${escapeHtml(item.section).replace(/_/g,' ')}</span>
+	            <span class="severity-badge ${severityClass(severity)}">${escapeHtml(severity)}</span>
+	          </div>
+	          <div class="confidence-bar">
+	            <span>Confidence</span>
+	            <div class="conf-track">
+	              <div class="conf-fill" style="width:${confidence*100}%;background:${confidenceColor(confidence)}"></div>
+	            </div>
+	            <span style="color:${confidenceColor(confidence)}">${Math.round(confidence*100)}%</span>
+	          </div>
+	        </div>
+
+        <div class="diff-grid">
+	          <div class="diff-col diff-old">
+	            <div class="diff-label">Current Value</div>
+	            <div class="diff-value">${escapeHtml(item.old_value)}</div>
+	          </div>
+	          <div class="diff-col diff-new">
+	            <div class="diff-label">Proposed Change</div>
+	            <div class="diff-value">${escapeHtml(item.new_value)}</div>
+	          </div>
+	        </div>
+
+        <div class="source-section">
+	          <div class="source-icon">📄</div>
+	          <div>
+	            <div class="source-text">${escapeHtml(item.source_paragraph || 'Extracted from official source')}</div>
+	            <a class="source-url" href="${sourceUrl}" target="_blank" rel="noopener noreferrer">↗ ${escapeHtml(item.source_url)}</a>
+	          </div>
+	        </div>
+
+	        <div class="card-actions">
+	          <input class="comment-input" id="comment-${id}" placeholder="Add reviewer comment (optional)..." />
+	          <button class="btn-approve" onclick="decide(${id}, 'approve')">✓ Approve</button>
+	          <button class="btn-reject" onclick="decide(${id}, 'reject')">✗ Reject</button>
+	        </div>
+	      </div>
+	      `;
+	    }).join('');
+	  }
+
+  // ── DECIDE ──
+  async function decide(id, action) {
+    const comment = document.getElementById(`comment-${id}`).value;
+    const res = await fetch(`/api/${action}/${id}`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ comment })
+    });
+	    const data = await res.json();
+	    if (data.success) {
+	      document.getElementById(`card-${id}`).style.opacity = '0.3';
+	      document.getElementById(`card-${id}`).style.pointerEvents = 'none';
+	      toast(data.message, action === 'approve' ? 'success' : 'error');
+	      setTimeout(loadQueue, 800);
+	    } else {
+	      toast(data.message || 'Decision failed', 'error');
+	    }
+	  }
+
+  // ── LOAD GUIDE ──
+  async function loadGuide() {
+    const res = await fetch('/api/guide');
+    const items = await res.json();
+    const tbody = document.getElementById('guideBody');
+	    tbody.innerHTML = items.map(item => {
+	      const sourceUrl = safeHttpUrl(item.source_url);
+	      return `
+	      <tr>
+	        <td><span class="section-pill">${escapeHtml(item.section).replace(/_/g,' ')}</span></td>
+	        <td style="font-weight:600">${escapeHtml(item.value)}</td>
+	        <td><a href="${sourceUrl}" target="_blank" rel="noopener noreferrer" style="color:var(--accent);font-size:12px;font-family:'DM Mono',monospace;">↗ Source</a></td>
+	        <td style="color:var(--muted);font-size:12px;font-family:'DM Mono',monospace;">${escapeHtml(item.last_updated ? item.last_updated.split('T')[0] : '—')}</td>
+	      </tr>
+	      `;
+	    }).join('');
+	  }
+
+  // ── LOAD AUDIT ──
+  async function loadAudit() {
+    const res = await fetch('/api/audit');
+    const items = await res.json();
+    const list = document.getElementById('auditList');
+    if (items.length === 0) {
+      list.innerHTML = `<div class="empty"><div class="empty-icon">📋</div><div class="empty-title">No audit entries yet</div><div class="empty-sub">Decisions will appear here after you approve or reject changes.</div></div>`;
+      return;
+    }
+	    list.innerHTML = items.map(item => `
+	      <div class="audit-row">
+	        <span class="audit-decision audit-${escapeHtml(item.decision)}">${escapeHtml(item.decision)}</span>
+	        <div style="flex:1">
+	          <div><strong>${escapeHtml(item.section).replace(/_/g,' ')}</strong> — ${escapeHtml(item.country)}</div>
+	          <div class="audit-meta">${escapeHtml(item.old_value)} → ${escapeHtml(item.new_value)}</div>
+	          ${item.reviewer_comment ? `<div class="audit-meta" style="color:var(--text);margin-top:4px;">"${escapeHtml(item.reviewer_comment)}"</div>` : ''}
+	        </div>
+	        <div style="color:var(--muted);font-size:11px;font-family:'DM Mono',monospace;text-align:right;">
+	          ${escapeHtml(item.timestamp ? item.timestamp.split('T')[0] : '—')}<br>
+	          ${escapeHtml(item.timestamp ? item.timestamp.split('T')[1].split('.')[0] : '')}
+	        </div>
+	      </div>
+	    `).join('');
+  }
+
+  // ── SYNC ──
+  async function triggerSync() {
+    const btn = document.getElementById('syncBtn');
+    const icon = document.getElementById('syncIcon');
+    const text = document.getElementById('syncText');
+
+    btn.disabled = true;
+    icon.innerHTML = '<span class="spinner"></span>';
+    text.textContent = 'Syncing...';
+
+    document.getElementById('lastSync').textContent = 'Running...';
+
+    try {
+      const res = await fetch('/api/sync', { method: 'POST' });
+      const data = await res.json();
+      toast(data.message, data.changes_queued > 0 ? 'success' : 'success');
+      document.getElementById('lastSync').textContent = new Date().toLocaleTimeString();
+      loadQueue();
+    } catch (e) {
+      toast('Sync failed — check your connection', 'error');
+    } finally {
+      btn.disabled = false;
+      icon.textContent = '⟳';
+      text.textContent = 'Sync Now';
+    }
+  }
+
+  // ── INIT ──
+  loadQueue();
+</script>
+</body>
+</html>
