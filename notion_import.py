@@ -13,7 +13,9 @@ import sys
 
 from app.ingestion.notion_ingestion_service import NotionIngestionService
 from app.repositories.country_guide_repository import CountryGuideRepository
-from app.utils.config import database_path, load_env_file
+from app.repositories.provenance_repository import ProvenanceRepository
+from app.services.provenance_service import ProvenanceService
+from app.utils.config import database_path, load_env_file, parser_version
 from app.utils.logging_config import configure_logging
 
 NOTION_PAGE_ID = "7ed6a2f53972448db2cb107a8d20b661"
@@ -153,8 +155,13 @@ def main():
     load_env_file()
     configure_logging()
 
-    repo = CountryGuideRepository(database_path())
+    db = database_path()
+    repo = CountryGuideRepository(db)
     repo.initialize_schema()
+
+    provenance_repo = ProvenanceRepository(db)
+    provenance_repo.initialize_schema()
+    provenance_service = ProvenanceService(provenance_repo, parser_version=parser_version())
 
     notion_service = NotionIngestionService(
         page_id=NOTION_PAGE_ID,
@@ -193,6 +200,7 @@ def main():
                     value=value,
                     source_url=NOTION_SOURCE_URL,
                 )
+                provenance_service.record_seed(country, section, value, NOTION_SOURCE_URL)
             print(f"  Written to DB.")
 
         total_rules += len(sections)

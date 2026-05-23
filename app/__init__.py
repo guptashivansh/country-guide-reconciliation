@@ -15,6 +15,9 @@ from app.repositories.provenance_repository import ProvenanceRepository
 from app.review.review_service import ReviewService
 from app.services.source_registry_service import SourceRegistryService
 from app.services.provenance_service import ProvenanceService
+from app.services.temporal_rule_service import TemporalRuleService
+from app.drift.detector import DriftDetector
+from app.drift.repository import DriftRepository
 from app.utils.config import database_path, extraction_chunk_size, groq_api_keys, load_env_file, official_sources_json_url, slack_webhook_url, sync_cron_schedule, parser_version
 from app.utils.logging_config import configure_logging
 
@@ -31,6 +34,9 @@ def build_services(db_path=None):
 
     provenance_repository = ProvenanceRepository(db_path or database_path())
     provenance_service = ProvenanceService(provenance_repository, parser_version=parser_version())
+    temporal_rule_service = TemporalRuleService(country_guide_repository)
+    drift_repository = DriftRepository(db_path or database_path())
+    drift_detector = DriftDetector(drift_repository)
 
     return {
         "country_guide_repository": country_guide_repository,
@@ -38,6 +44,8 @@ def build_services(db_path=None):
         "ingestion_job_repository": ingestion_job_repository,
         "provenance_repository": provenance_repository,
         "provenance_service": provenance_service,
+        "temporal_rule_service": temporal_rule_service,
+        "drift_detector": drift_detector,
         "review_service": ReviewService(country_guide_repository, provenance_service=provenance_service),
         "source_registry_service": SourceRegistryService(source_endpoint_repository),
         "ingestion_service": HtmlIngestionService(),
@@ -67,8 +75,9 @@ def create_app(db_path=None):
         ingestion_job_service=services["ingestion_job_service"],
         extraction_service=services["extraction_service"],
         reconciliation_service=services["reconciliation_service"],
-        country_guide_repository=services["country_guide_repository"],
         provenance_service=services["provenance_service"],
+        temporal_rule_service=services["temporal_rule_service"],
+        drift_detector=services["drift_detector"],
     ))
 
     cron = sync_cron_schedule()

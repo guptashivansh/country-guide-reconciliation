@@ -39,10 +39,11 @@ def _review_payload():
         "comment": data.get("notes", data.get("comment", "")),
         "assignee": data.get("assignee", ""),
         "rationale": data.get("rationale", ""),
+        "effective_date": data.get("effective_date"),
     }
 
 
-def create_api_blueprint(review_service, source_registry_service, ingestion_service, source_snapshot_service, ingestion_job_service, extraction_service, reconciliation_service, country_guide_repository, provenance_service=None):
+def create_api_blueprint(review_service, source_registry_service, ingestion_service, source_snapshot_service, ingestion_job_service, extraction_service, reconciliation_service, provenance_service=None, temporal_rule_service=None, drift_detector=None):
     routes = Blueprint("country_guide_routes", __name__)
 
     @routes.route("/")
@@ -51,26 +52,21 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
 
     @routes.route("/guide")
     def guide_list():
-        rows = country_guide_repository.connect().execute(
-            "SELECT country, COUNT(*) as n, MAX(last_updated) as updated FROM country_guide GROUP BY country ORDER BY country"
-        ).fetchall()
         countries = [
-            {"name": c, "flag": FLAGS.get(c, "🌐"), "rule_count": n, "last_updated": _fmt_date(u)}
-            for c, n, u in rows
+            {"name": r["country"], "flag": FLAGS.get(r["country"], "🌐"),
+             "rule_count": r["rule_count"], "last_updated": _fmt_date(r["last_updated"])}
+            for r in review_service.list_countries_summary()
         ]
         return render_template("guide_list.html", countries=countries)
 
     @routes.route("/guide/<country>")
     def guide_country(country):
-        rows = country_guide_repository.connect().execute(
-            "SELECT section, value, last_updated FROM country_guide WHERE country = ? ORDER BY section",
-            (country,)
-        ).fetchall()
+        rows = review_service.get_country_sections(country)
         if not rows:
             abort(404)
 
-        rules_by_section = {s: {"section": s, "value": v, "last_updated": _fmt_date(u)} for s, v, u in rows}
-        last_updated = _fmt_date(max(u for _, _, u in rows))
+        rules_by_section = {r["section"]: {"section": r["section"], "value": r["value"], "last_updated": _fmt_date(r["last_updated"])} for r in rows}
+        last_updated = _fmt_date(max(r["last_updated"] for r in rows))
 
         groups = []
         for g in SECTION_GROUPS:
@@ -168,6 +164,7 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
             country,
             comment=body.get("comment", "Bulk approval: non-critical pending items"),
             rationale=body.get("rationale", "Bulk approved — non-critical"),
+            effective_date=body.get("effective_date"),
         )
         approved = result["approved"]
         if approved == 0:
@@ -175,6 +172,7 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
         return jsonify({
             "success": True,
             "approved": approved,
+            "effective_date": body.get("effective_date"),
             "message": f"{approved} non-critical change{'s' if approved != 1 else ''} approved for {country}",
         })
 
@@ -186,6 +184,7 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
             payload["comment"],
             payload["assignee"],
             payload["rationale"],
+            payload["effective_date"],
         )
         if not result:
             return jsonify({"success": False, "message": "Pending item not found"}), 404
@@ -194,6 +193,9 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
             "success": True,
             "status": result["status"],
             "reviewed_at": result["reviewed_at"],
+            "effective_date": result.get("effective_date"),
+            "version_number": result.get("version_number"),
+            "approval_reference": result.get("approval_reference"),
             "message": f"'{result['section']}' approved and published to live guide"
         })
 
@@ -268,5 +270,40 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
             return jsonify({"error": "provenance service not configured"}), 503
         history = provenance_service.get_history(country, section)
         return jsonify({"country": country, "section": section, "history": history})
+
+    @routes.route("/api/drift")
+    def get_drift_all():
+        if not drift_detector:
+            return jsonify({"error": "drift detector not configured"}), 503
+        reports = drift_detector.detect_all()
+        return jsonify([r.to_dict() for r in reports])
+
+    @routes.route("/api/drift/<country>")
+    def get_drift_country(country):
+        if not drift_detector:
+            return jsonify({"error": "drift detector not configured"}), 503
+        report = drift_detector.detect(country)
+        return jsonify(report.to_dict())
+
+    @routes.route("/api/guide/<country>/<section>/history")
+    def get_rule_version_history(country, section):
+        if not temporal_rule_service:
+            return jsonify({"error": "temporal rule service not configured"}), 503
+        return jsonify(temporal_rule_service.build_timeline(country, section))
+
+    @routes.route("/api/guide/<country>/<section>/at")
+    def get_rule_at_date(country, section):
+        if not temporal_rule_service:
+            return jsonify({"error": "temporal rule service not configured"}), 503
+        as_of_date = request.args.get("date") or request.args.get("as_of")
+        if not as_of_date:
+            return jsonify({"error": "date query parameter is required"}), 400
+        try:
+            rule = temporal_rule_service.get_rule_at_date(country, section, as_of_date)
+        except ValueError as exc:
+            return jsonify({"error": str(exc)}), 400
+        if not rule:
+            return jsonify({"error": f"No rule found for {country}/{section} at {as_of_date}"}), 404
+        return jsonify({"country": country, "section": section, "as_of_date": as_of_date, "rule": rule})
 
     return routes

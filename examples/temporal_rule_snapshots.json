@@ -1,0 +1,38 @@
+{
+  "country": "India",
+  "section": "termination_notice",
+  "snapshots": [
+    {
+      "version_number": 1,
+      "value": "30 days notice or pay in lieu",
+      "source_url": "https://labour.gov.in/",
+      "source_hash": "sha256:old-rule",
+      "effective_date": "2024-01-01",
+      "created_at": "2024-01-02T09:00:00",
+      "superseded_at": "2024-06-01T00:00:00",
+      "approval_reference": "initial-import"
+    },
+    {
+      "version_number": 2,
+      "value": "45 days notice or pay in lieu",
+      "source_url": "https://labour.gov.in/",
+      "source_hash": "sha256:new-rule",
+      "effective_date": "2024-06-01",
+      "created_at": "2024-06-03T14:25:00",
+      "superseded_at": null,
+      "approval_reference": "review_queue:12"
+    }
+  ],
+  "example_queries": [
+    {
+      "question": "What was the termination notice rule on 2024-05-15?",
+      "request": "GET /api/guide/India/termination_notice/at?date=2024-05-15",
+      "expected_version_number": 1
+    },
+    {
+      "question": "What is the version history for this rule?",
+      "request": "GET /api/guide/India/termination_notice/history",
+      "expected_versions": [1, 2]
+    }
+  ]
+}
