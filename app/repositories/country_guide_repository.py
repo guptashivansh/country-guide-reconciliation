@@ -199,7 +199,8 @@ class CountryGuideRepository:
         conn = self.connect()
         c = conn.cursor()
         c.execute("""
-            SELECT country, section, old_value, new_value, source_url, source_hash
+            SELECT country, section, old_value, new_value, source_url, source_hash,
+                   source_paragraph, confidence, source_snapshot_id, created_at
             FROM review_queue
             WHERE id=? AND status IN ('pending', 'escalated')
         """, (item_id,))
@@ -208,7 +209,8 @@ class CountryGuideRepository:
             conn.close()
             return None
 
-        country, section, old_value, new_value, source_url, source_hash = item
+        country, section, old_value, new_value, source_url, source_hash, \
+            source_paragraph, confidence, source_snapshot_id, created_at = item
         timestamp = datetime.now().isoformat()
         c.execute('''
             INSERT INTO country_guide (country, section, value, source_url, source_hash, last_updated)
@@ -232,7 +234,13 @@ class CountryGuideRepository:
 
         conn.commit()
         conn.close()
-        return {"country": country, "section": section, "status": "approved", "reviewed_at": timestamp}
+        return {
+            "country": country, "section": section, "status": "approved", "reviewed_at": timestamp,
+            "item_id": item_id, "new_value": new_value, "source_url": source_url,
+            "source_hash": source_hash, "source_paragraph": source_paragraph,
+            "confidence": confidence, "source_snapshot_id": source_snapshot_id,
+            "reviewer_assignee": assignee, "reviewer_rationale": rationale, "reviewer_comment": comment,
+        }
 
     def reject_pending_review_item(self, item_id, comment, assignee="", rationale=""):
         conn = self.connect()
@@ -294,7 +302,8 @@ class CountryGuideRepository:
         conn = self.connect()
         c = conn.cursor()
         c.execute("""
-            SELECT id, country, section, old_value, new_value, source_url, source_hash
+            SELECT id, country, section, old_value, new_value, source_url, source_hash,
+                   source_paragraph, confidence, source_snapshot_id
             FROM review_queue
             WHERE country = ? AND status IN ('pending', 'escalated')
               AND (severity IS NULL OR LOWER(severity) != 'critical')
@@ -307,8 +316,10 @@ class CountryGuideRepository:
             return {"approved": 0}
 
         timestamp = datetime.now().isoformat()
+        approved_items = []
         for row in rows:
-            item_id, country_val, section, old_value, new_value, source_url, source_hash = row
+            item_id, country_val, section, old_value, new_value, source_url, source_hash, \
+                source_paragraph, confidence, source_snapshot_id = row
             c.execute('''
                 INSERT INTO country_guide (country, section, value, source_url, source_hash, last_updated)
                 VALUES (?, ?, ?, ?, ?, ?)
@@ -326,10 +337,18 @@ class CountryGuideRepository:
                 (action, country, section, old_value, new_value, decision, reviewer_comment, timestamp, reviewer_rationale)
                 VALUES ('REVIEW', ?, ?, ?, ?, 'approved', ?, ?, ?)
             ''', (country_val, section, old_value, new_value, comment, timestamp, rationale))
+            approved_items.append({
+                "item_id": item_id, "country": country_val, "section": section,
+                "new_value": new_value, "source_url": source_url, "source_hash": source_hash,
+                "source_paragraph": source_paragraph, "confidence": confidence,
+                "source_snapshot_id": source_snapshot_id,
+                "reviewer_assignee": "", "reviewer_rationale": rationale, "reviewer_comment": comment,
+                "reviewed_at": timestamp,
+            })
 
         conn.commit()
         conn.close()
-        return {"approved": len(rows)}
+        return {"approved": len(rows), "items": approved_items}
 
     def escalate_review_item(self, item_id, comment, assignee="", rationale=""):
         conn = self.connect()
