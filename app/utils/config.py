@@ -51,3 +51,7 @@ def slack_webhook_url():
 def sync_cron_schedule():
     """5-field cron expression controlling when the scheduled sync runs. Empty string disables it."""
     return os.environ.get("SYNC_CRON_SCHEDULE", "")
+
+
+def parser_version():
+    return os.environ.get("PARSER_VERSION", "groq/llama-3.3-70b-versatile/v1")

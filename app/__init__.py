@@ -11,9 +11,11 @@ from app.repositories.country_guide_repository import CountryGuideRepository
 from app.repositories.ingestion_job_repository import IngestionJobRepository
 from app.repositories.source_snapshot_repository import SourceSnapshotRepository
 from app.repositories.source_endpoint_repository import TrustedSourceEndpointRepository
+from app.repositories.provenance_repository import ProvenanceRepository
 from app.review.review_service import ReviewService
 from app.services.source_registry_service import SourceRegistryService
-from app.utils.config import database_path, extraction_chunk_size, groq_api_keys, load_env_file, official_sources_json_url, slack_webhook_url, sync_cron_schedule
+from app.services.provenance_service import ProvenanceService
+from app.utils.config import database_path, extraction_chunk_size, groq_api_keys, load_env_file, official_sources_json_url, slack_webhook_url, sync_cron_schedule, parser_version
 from app.utils.logging_config import configure_logging
 
 
@@ -27,11 +29,16 @@ def build_services(db_path=None):
     source_endpoint_repository = TrustedSourceEndpointRepository(json_url=official_sources_json_url())
     source_endpoint_repository.list_active_source_endpoints()
 
+    provenance_repository = ProvenanceRepository(db_path or database_path())
+    provenance_service = ProvenanceService(provenance_repository, parser_version=parser_version())
+
     return {
         "country_guide_repository": country_guide_repository,
         "source_snapshot_repository": source_snapshot_repository,
         "ingestion_job_repository": ingestion_job_repository,
-        "review_service": ReviewService(country_guide_repository),
+        "provenance_repository": provenance_repository,
+        "provenance_service": provenance_service,
+        "review_service": ReviewService(country_guide_repository, provenance_service=provenance_service),
         "source_registry_service": SourceRegistryService(source_endpoint_repository),
         "ingestion_service": HtmlIngestionService(),
         "source_snapshot_service": SourceSnapshotService(source_snapshot_repository),
@@ -49,6 +56,7 @@ def create_app(db_path=None):
     services["country_guide_repository"].initialize_schema()
     services["source_snapshot_repository"].initialize_schema()
     services["ingestion_job_repository"].initialize_schema()
+    services["provenance_repository"].initialize_schema()
     flask_app = Flask(__name__, template_folder="../templates")
     flask_app.config["services"] = services
     flask_app.register_blueprint(create_api_blueprint(
@@ -60,6 +68,7 @@ def create_app(db_path=None):
         extraction_service=services["extraction_service"],
         reconciliation_service=services["reconciliation_service"],
         country_guide_repository=services["country_guide_repository"],
+        provenance_service=services["provenance_service"],
     ))
 
     cron = sync_cron_schedule()

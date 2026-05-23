@@ -42,7 +42,7 @@ def _review_payload():
     }
 
 
-def create_api_blueprint(review_service, source_registry_service, ingestion_service, source_snapshot_service, ingestion_job_service, extraction_service, reconciliation_service, country_guide_repository):
+def create_api_blueprint(review_service, source_registry_service, ingestion_service, source_snapshot_service, ingestion_job_service, extraction_service, reconciliation_service, country_guide_repository, provenance_service=None):
     routes = Blueprint("country_guide_routes", __name__)
 
     @routes.route("/")
@@ -252,5 +252,21 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
             "reviewed_at": result["reviewed_at"],
             "message": f"'{result['section']}' escalated for compliance review"
         })
+
+    @routes.route("/api/provenance/<country>/<section>")
+    def get_provenance(country, section):
+        if not provenance_service:
+            return jsonify({"error": "provenance service not configured"}), 503
+        chain = provenance_service.get_chain(country, section)
+        if not chain:
+            return jsonify({"error": f"No provenance found for {country}/{section}"}), 404
+        return jsonify(chain)
+
+    @routes.route("/api/provenance/<country>/<section>/history")
+    def get_provenance_history(country, section):
+        if not provenance_service:
+            return jsonify({"error": "provenance service not configured"}), 503
+        history = provenance_service.get_history(country, section)
+        return jsonify({"country": country, "section": section, "history": history})
 
     return routes

@@ -5,8 +5,9 @@ logger = logging.getLogger(__name__)
 
 
 class ReviewService:
-    def __init__(self, country_guide_repository):
+    def __init__(self, country_guide_repository, provenance_service=None):
         self.country_guide_repository = country_guide_repository
+        self.provenance_service = provenance_service
 
     def list_country_guide_entries(self):
         return self.country_guide_repository.list_country_guide_entries()
@@ -33,6 +34,8 @@ class ReviewService:
             "Approved review item",
             extra={"stage": "review", "review_item_id": item_id, "section": result["section"]},
         )
+        if self.provenance_service:
+            self.provenance_service.record_approval(result)
         return result
 
     def reject_review_item(self, item_id, comment, assignee="", rationale=""):
@@ -81,6 +84,8 @@ class ReviewService:
             "Bulk approval complete",
             extra={"stage": "review", "country": country, "approved": result["approved"]},
         )
+        if self.provenance_service and result.get("items"):
+            self.provenance_service.record_bulk_approval(result["items"])
         return result
 
     def escalate_review_item(self, item_id, comment, assignee="", rationale=""):
