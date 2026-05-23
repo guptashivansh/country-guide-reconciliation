@@ -13,7 +13,7 @@ from app.repositories.source_snapshot_repository import SourceSnapshotRepository
 from app.repositories.source_endpoint_repository import TrustedSourceEndpointRepository
 from app.review.review_service import ReviewService
 from app.services.source_registry_service import SourceRegistryService
-from app.utils.config import database_path, extraction_chunk_size, groq_api_key, load_env_file, official_sources_json_url
+from app.utils.config import database_path, extraction_chunk_size, groq_api_keys, load_env_file, official_sources_json_url
 from app.utils.logging_config import configure_logging
 
 
@@ -37,7 +37,7 @@ def build_services(db_path=None):
         "source_snapshot_service": SourceSnapshotService(source_snapshot_repository),
         "ingestion_job_service": IngestionJobService(ingestion_job_repository),
         "extraction_service": GroqExtractionService(
-            groq_api_key(),
+            groq_api_keys(),
             chunker=ContentChunker(max_chunk_size=extraction_chunk_size()),
         ),
         "reconciliation_service": ReconciliationService(country_guide_repository),
@@ -59,5 +59,6 @@ def create_app(db_path=None):
         ingestion_job_service=services["ingestion_job_service"],
         extraction_service=services["extraction_service"],
         reconciliation_service=services["reconciliation_service"],
+        country_guide_repository=services["country_guide_repository"],
     ))
     return flask_app

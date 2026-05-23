@@ -93,6 +93,111 @@
   .sync-btn:hover { opacity: 0.85; transform: translateY(-1px); }
   .sync-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
+  /* SYNC MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    width: 380px;
+    max-width: 90vw;
+  }
+
+  .modal-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .modal-sub {
+    font-size: 12px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    margin-bottom: 20px;
+  }
+
+  .country-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .country-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: border-color 0.15s;
+    user-select: none;
+  }
+
+  .country-chip input[type=checkbox] { display: none; }
+
+  .country-chip.selected {
+    border-color: var(--accent);
+    background: var(--accent-dim);
+    color: var(--accent);
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .modal-select-all {
+    font-size: 12px;
+    color: var(--accent);
+    cursor: pointer;
+    font-family: 'DM Mono', monospace;
+    background: none;
+    border: none;
+    padding: 0;
+    margin-bottom: 12px;
+  }
+
+  .btn-primary {
+    flex: 1;
+    background: var(--accent);
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    padding: 12px;
+    font-weight: 700;
+    font-family: 'Syne', sans-serif;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .btn-cancel {
+    background: var(--card);
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 20px;
+    font-family: 'Syne', sans-serif;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
   /* TABS */
   .tabs {
     display: flex;
@@ -132,36 +237,93 @@
   /* MAIN CONTENT */
   main { padding: 32px 40px; max-width: 1400px; }
 
-  /* STATUS BAR */
-  .status-bar {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 16px 24px;
-    margin-bottom: 28px;
+  /* METRICS BAR */
+  .metrics-header {
     display: flex;
     align-items: center;
-    gap: 24px;
-    font-family: 'DM Mono', monospace;
-    font-size: 13px;
+    gap: 8px;
+    margin-bottom: 12px;
   }
 
   .status-dot {
-    width: 8px;
-    height: 8px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
     background: var(--accent);
-    box-shadow: 0 0 8px var(--accent);
+    box-shadow: 0 0 6px var(--accent);
     animation: pulse 2s infinite;
+    flex-shrink: 0;
   }
 
   @keyframes pulse {
     0%, 100% { opacity: 1; }
-    50% { opacity: 0.4; }
+    50% { opacity: 0.35; }
   }
 
-  .status-item { color: var(--muted); }
-  .status-item span { color: var(--text); }
+  .metrics-live-label {
+    font-size: 9px;
+    font-family: 'DM Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--muted);
+  }
+
+  .metrics-bar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+
+  .metric-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px 12px;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+
+  .metric-card.metric-ok  { border-top-color: var(--accent); }
+  .metric-card.metric-warn { border-top-color: var(--warn); }
+  .metric-card.metric-danger { border-top-color: var(--danger); }
+
+  .metric-value {
+    font-size: 26px;
+    font-weight: 800;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: -1px;
+    line-height: 1;
+    margin-bottom: 7px;
+    color: var(--text);
+  }
+
+  .metric-card.metric-ok .metric-value { color: var(--accent); }
+  .metric-card.metric-warn .metric-value { color: var(--warn); }
+  .metric-card.metric-danger .metric-value { color: var(--danger); }
+
+  .metric-label {
+    font-size: 9px;
+    font-family: 'DM Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 1.4px;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  .metric-value-sm {
+    font-size: 15px;
+    letter-spacing: 0;
+  }
+
+  @media (max-width: 1100px) {
+    .metrics-bar { grid-template-columns: repeat(4, 1fr); }
+  }
+
+  @media (max-width: 760px) {
+    .metrics-bar { grid-template-columns: repeat(2, 1fr); }
+  }
 
   /* SECTION TITLE */
   .section-title {
@@ -176,6 +338,128 @@
     font-size: 13px;
     font-family: 'DM Mono', monospace;
     margin-bottom: 24px;
+  }
+
+  /* REVIEW FILTERS */
+  .queue-filter-bar {
+    position: sticky;
+    top: 73px;
+    z-index: 70;
+    background: rgba(15,15,24,0.96);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 14px 28px rgba(0,0,0,0.26);
+    backdrop-filter: blur(14px);
+    margin-bottom: 16px;
+    padding: 12px;
+  }
+
+  .filter-strip {
+    display: grid;
+    grid-template-columns: 132px minmax(0, 1fr) auto;
+    gap: 12px;
+    align-items: end;
+  }
+
+  .filter-summary {
+    align-self: stretch;
+    border-right: 1px solid var(--border);
+    display: grid;
+    gap: 3px;
+    padding-right: 12px;
+  }
+
+  .filter-summary span {
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .filter-summary strong {
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.4;
+  }
+
+  .filter-grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(105px, 1fr));
+    gap: 8px;
+  }
+
+  .filter-field {
+    display: grid;
+    gap: 5px;
+    min-width: 0;
+  }
+
+  .filter-label {
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .filter-select {
+    appearance: none;
+    background:
+      linear-gradient(45deg, transparent 50%, #94a3b8 50%) calc(100% - 14px) calc(50% - 2px) / 5px 5px no-repeat,
+      linear-gradient(135deg, #94a3b8 50%, transparent 50%) calc(100% - 9px) calc(50% - 2px) / 5px 5px no-repeat,
+      var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    height: 34px;
+    outline: none;
+    padding: 0 25px 0 10px;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+    width: 100%;
+  }
+
+  .filter-select:hover {
+    border-color: #334155;
+  }
+
+  .filter-select:focus,
+  .filter-reset:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(110,231,183,0.14);
+  }
+
+  .filter-reset {
+    align-items: center;
+    background: rgba(148,163,184,0.1);
+    border: 1px solid rgba(148,163,184,0.26);
+    border-radius: 8px;
+    color: #cbd5e1;
+    cursor: pointer;
+    display: inline-flex;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    height: 34px;
+    justify-content: center;
+    letter-spacing: 0.8px;
+    min-width: 74px;
+    outline: none;
+    padding: 0 12px;
+    text-transform: uppercase;
+    transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+    white-space: nowrap;
+  }
+
+  .filter-reset:hover {
+    background: rgba(148,163,184,0.16);
+    border-color: rgba(148,163,184,0.38);
   }
 
   /* REVIEW CARDS */
@@ -202,6 +486,7 @@
     display: flex;
     align-items: center;
     gap: 12px;
+    flex-wrap: wrap;
   }
 
   .section-label {
@@ -226,6 +511,102 @@
   .severity-critical { background: var(--danger-dim); color: var(--danger); border: 1px solid rgba(248,113,113,0.3); }
   .severity-major { background: var(--warn-dim); color: var(--warn); border: 1px solid rgba(251,191,36,0.3); }
   .severity-minor { background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(110,231,183,0.3); }
+
+  .change-badge {
+    align-items: center;
+    border-radius: 6px;
+    display: inline-flex;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    gap: 6px;
+    letter-spacing: 0.6px;
+    padding: 4px 9px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .change-icon {
+    align-items: center;
+    border-radius: 4px;
+    display: inline-flex;
+    font-size: 11px;
+    height: 14px;
+    justify-content: center;
+    line-height: 1;
+    width: 14px;
+  }
+
+  .change-added {
+    background: rgba(110,231,183,0.11);
+    border: 1px solid rgba(110,231,183,0.34);
+    color: var(--accent);
+  }
+
+  .change-removed {
+    background: rgba(248,113,113,0.12);
+    border: 1px solid rgba(248,113,113,0.36);
+    color: var(--danger);
+  }
+
+  .change-modified {
+    background: rgba(96,165,250,0.12);
+    border: 1px solid rgba(96,165,250,0.34);
+    color: #93c5fd;
+  }
+
+  .change-clarification {
+    background: rgba(165,180,252,0.12);
+    border: 1px solid rgba(165,180,252,0.34);
+    color: #c7d2fe;
+  }
+
+  .change-unverified {
+    background: rgba(251,191,36,0.12);
+    border: 1px solid rgba(251,191,36,0.38);
+    color: var(--warn);
+  }
+
+  .change-deprecated {
+    background: rgba(148,163,184,0.13);
+    border: 1px solid rgba(148,163,184,0.34);
+    color: #cbd5e1;
+  }
+
+  .state-badge {
+    border-radius: 999px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    padding: 4px 9px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .state-pending {
+    background: rgba(148,163,184,0.12);
+    border: 1px solid rgba(148,163,184,0.3);
+    color: #cbd5e1;
+  }
+
+  .state-approved {
+    background: rgba(110,231,183,0.12);
+    border: 1px solid rgba(110,231,183,0.36);
+    color: var(--accent);
+  }
+
+  .state-rejected {
+    background: rgba(248,113,113,0.12);
+    border: 1px solid rgba(248,113,113,0.36);
+    color: var(--danger);
+  }
+
+  .state-escalated {
+    background: rgba(251,191,36,0.12);
+    border: 1px solid rgba(251,191,36,0.38);
+    color: var(--warn);
+  }
 
   .confidence-bar {
     display: flex;
@@ -256,14 +637,20 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 0;
+    background: rgba(255,255,255,0.01);
   }
 
   .diff-col {
     padding: 20px 24px;
+    animation: diffAppear 0.34s ease both;
   }
 
   .diff-col:first-child {
     border-right: 1px solid var(--border);
+  }
+
+  .diff-col:nth-child(2) {
+    animation-delay: 0.05s;
   }
 
   .diff-label {
@@ -279,61 +666,511 @@
   .diff-new .diff-label { color: var(--accent); }
 
   .diff-value {
+    background: rgba(10,10,15,0.46);
+    border: 1px solid rgba(30,30,46,0.86);
+    border-radius: 8px;
+    color: #cbd5e1;
     font-size: 15px;
-    line-height: 1.6;
+    line-height: 1.75;
     font-weight: 600;
+    min-height: 96px;
+    padding: 14px 15px;
+    overflow-wrap: anywhere;
+    white-space: normal;
   }
 
   .diff-old .diff-value {
-    color: #94a3b8;
-    text-decoration: line-through;
-    text-decoration-color: var(--danger);
+    border-left: 3px solid rgba(248,113,113,0.34);
   }
 
-  .diff-new .diff-value { color: var(--text); }
+  .diff-new .diff-value {
+    border-left: 3px solid rgba(110,231,183,0.34);
+    color: var(--text);
+  }
 
-  /* SOURCE */
-  .source-section {
-    padding: 14px 24px;
+  .semantic-diff {
+    font-variant-ligatures: none;
+  }
+
+  .diff-token {
+    border-radius: 4px;
+    padding: 1px 2px;
+    margin: 0 1px;
+    transition: background 0.24s ease, color 0.24s ease, box-shadow 0.24s ease;
+  }
+
+  .diff-token-added {
+    background: rgba(110,231,183,0.16);
+    color: #a7f3d0;
+    box-shadow: inset 0 0 0 1px rgba(110,231,183,0.24);
+  }
+
+  .diff-token-removed {
+    background: rgba(248,113,113,0.15);
+    color: #fecaca;
+    text-decoration: line-through;
+    text-decoration-color: rgba(248,113,113,0.82);
+    box-shadow: inset 0 0 0 1px rgba(248,113,113,0.22);
+  }
+
+  .diff-token-modified {
+    box-shadow:
+      inset 0 -1px 0 rgba(251,191,36,0.72),
+      inset 0 0 0 1px rgba(251,191,36,0.22);
+  }
+
+  .diff-placeholder {
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+  }
+
+  @keyframes diffAppear {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .diff-col {
+      animation: none;
+    }
+
+    .diff-token {
+      transition: none;
+    }
+  }
+
+  /* AI REVIEW */
+  .ai-review-panel {
     border-top: 1px solid var(--border);
-    background: rgba(255,255,255,0.02);
+    background:
+      linear-gradient(180deg, rgba(99,102,241,0.07), rgba(15,15,24,0)),
+      rgba(255,255,255,0.015);
+    padding: 14px 24px;
+  }
+
+  .ai-review-header {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 12px;
+  }
+
+  .ai-review-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .ai-kicker {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: #a5b4fc;
+  }
+
+  .ai-model-pill {
+    border: 1px solid rgba(165,180,252,0.28);
+    background: rgba(99,102,241,0.1);
+    color: #c7d2fe;
+    border-radius: 999px;
+    padding: 3px 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .impact-badge {
+    border-radius: 999px;
+    padding: 5px 10px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .impact-critical {
+    background: rgba(248,113,113,0.14);
+    color: var(--danger);
+    border: 1px solid rgba(248,113,113,0.42);
+  }
+
+  .impact-moderate {
+    background: rgba(251,191,36,0.13);
+    color: var(--warn);
+    border: 1px solid rgba(251,191,36,0.4);
+  }
+
+  .impact-low {
+    background: rgba(110,231,183,0.11);
+    color: var(--accent);
+    border: 1px solid rgba(110,231,183,0.36);
+  }
+
+  .impact-informational {
+    background: rgba(148,163,184,0.12);
+    color: #cbd5e1;
+    border: 1px solid rgba(148,163,184,0.3);
+  }
+
+  .ai-review-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 220px;
+    gap: 16px;
+  }
+
+  .ai-summary-copy {
+    color: #cbd5e1;
+    font-size: 13px;
+    line-height: 1.55;
+    font-weight: 600;
+  }
+
+  .ai-review-meta {
+    border-left: 1px solid var(--border);
+    padding-left: 16px;
+    display: grid;
+    gap: 8px;
+  }
+
+  .ai-meta-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .ai-meta-row span:last-child {
+    color: var(--text);
+    text-align: right;
+  }
+
+  /* SOURCE EVIDENCE */
+  .source-evidence {
+    border-top: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(14,165,233,0.055), rgba(255,255,255,0.012));
+  }
+
+  .source-evidence summary {
+    list-style: none;
+  }
+
+  .source-evidence summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .source-evidence-toggle {
+    padding: 13px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .source-evidence-toggle:hover {
+    background: rgba(255,255,255,0.02);
+  }
+
+  .source-evidence-heading {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .source-evidence-title {
+    align-items: center;
+    color: #93c5fd;
+    display: flex;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    gap: 8px;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+  }
+
+  .source-evidence-icon {
+    color: #bfdbfe;
+    font-size: 12px;
+  }
+
+  .source-evidence-preview {
+    color: #94a3b8;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    line-height: 1.45;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .source-evidence-action {
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .source-evidence[open] .source-evidence-action::before {
+    content: "Collapse excerpt";
+  }
+
+  .source-evidence:not([open]) .source-evidence-action::before {
+    content: "Expand excerpt";
+  }
+
+  .source-evidence-body {
+    border-top: 1px solid rgba(30,30,46,0.82);
+    padding: 14px 24px 16px;
+  }
+
+  .source-snippet {
+    background: rgba(2,6,23,0.42);
+    border: 1px solid rgba(147,197,253,0.2);
+    border-left: 3px solid rgba(147,197,253,0.54);
+    border-radius: 8px;
+    color: #dbeafe;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    line-height: 1.7;
+    margin: 0;
+    max-height: 240px;
+    overflow: auto;
+    padding: 13px 14px;
+    white-space: pre-wrap;
+  }
+
+  .source-attribution {
+    align-items: center;
+    color: var(--muted);
+    display: flex;
+    flex-wrap: wrap;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    gap: 8px;
+    line-height: 1.5;
+    margin-top: 10px;
+  }
+
+  .source-attribution a {
+    color: #93c5fd;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(147,197,253,0.35);
+  }
+
+  .source-attribution a:hover {
+    color: #bfdbfe;
+    border-bottom-color: #bfdbfe;
+  }
+
+  .source-attribution-divider {
+    color: #334155;
+  }
+
+  /* PROVENANCE */
+  .provenance-drawer {
+    border-top: 1px solid var(--border);
+    background: rgba(255,255,255,0.012);
+  }
+
+  .provenance-drawer summary {
+    list-style: none;
+  }
+
+  .provenance-drawer summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .provenance-toggle {
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .provenance-toggle:hover {
+    background: rgba(255,255,255,0.02);
+  }
+
+  .provenance-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .provenance-caret {
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    transition: transform 0.2s ease;
+  }
+
+  .provenance-drawer[open] .provenance-caret {
+    transform: rotate(90deg);
+  }
+
+  .provenance-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: #94a3b8;
+  }
+
+  .trust-badge {
+    border-radius: 6px;
+    padding: 4px 9px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .trust-verified {
+    background: rgba(110,231,183,0.12);
+    color: var(--accent);
+    border: 1px solid rgba(110,231,183,0.36);
+  }
+
+  .trust-trusted {
+    background: rgba(96,165,250,0.12);
+    color: #93c5fd;
+    border: 1px solid rgba(96,165,250,0.35);
+  }
+
+  .trust-review-required {
+    background: rgba(251,191,36,0.12);
+    color: var(--warn);
+    border: 1px solid rgba(251,191,36,0.38);
+  }
+
+  .provenance-body {
+    border-top: 1px solid var(--border);
+    padding: 14px 24px 16px;
+  }
+
+  .provenance-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 12px;
   }
 
-  .source-icon {
-    font-size: 14px;
-    margin-top: 2px;
-    flex-shrink: 0;
+  .provenance-field {
+    min-width: 0;
   }
 
-  .source-text {
-    font-size: 12px;
+  .provenance-field-wide {
+    grid-column: span 2;
+  }
+
+  .provenance-key {
     color: var(--muted);
     font-family: 'DM Mono', monospace;
-    line-height: 1.5;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+    text-transform: uppercase;
   }
 
-  .source-url {
-    color: var(--accent);
-    text-decoration: none;
+  .provenance-value {
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
     font-size: 11px;
-    display: block;
-    margin-top: 4px;
+    line-height: 1.45;
+    min-height: 20px;
+    overflow-wrap: anywhere;
+  }
+
+  .provenance-value .trust-badge {
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+  }
+
+  .provenance-link {
+    color: #93c5fd;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(147,197,253,0.35);
+  }
+
+  .provenance-link:hover {
+    color: #bfdbfe;
+    border-bottom-color: #bfdbfe;
   }
 
   /* ACTION AREA */
   .card-actions {
     padding: 16px 24px;
     border-top: 1px solid var(--border);
-    display: flex;
-    align-items: center;
+    display: grid;
     gap: 12px;
   }
 
+  .workflow-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 16px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    line-height: 1.5;
+  }
+
+  .workflow-meta span {
+    color: #94a3b8;
+  }
+
+  .workflow-controls {
+    display: grid;
+    grid-template-columns: 170px 1fr 1fr;
+    gap: 10px;
+  }
+
+  .workflow-field {
+    display: grid;
+    gap: 5px;
+    min-width: 0;
+  }
+
+  .workflow-label {
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .workflow-select,
   .comment-input {
-    flex: 1;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 8px;
@@ -343,10 +1180,28 @@
     font-size: 12px;
     outline: none;
     transition: border-color 0.2s;
+    width: 100%;
   }
 
+  .workflow-select {
+    appearance: none;
+  }
+
+  .workflow-select:focus,
   .comment-input:focus { border-color: var(--accent); }
   .comment-input::placeholder { color: var(--muted); }
+
+  .workflow-notes {
+    display: grid;
+    gap: 5px;
+  }
+
+  .workflow-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+  }
 
   .btn-approve {
     background: var(--accent-dim);
@@ -379,6 +1234,38 @@
   }
 
   .btn-reject:hover { background: rgba(248,113,113,0.2); }
+
+  .btn-escalate {
+    background: var(--warn-dim);
+    color: var(--warn);
+    border: 1px solid rgba(251,191,36,0.3);
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .btn-escalate:hover { background: rgba(251,191,36,0.18); }
+
+  .btn-assign {
+    background: rgba(148,163,184,0.1);
+    color: #cbd5e1;
+    border: 1px solid rgba(148,163,184,0.28);
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .btn-assign:hover { background: rgba(148,163,184,0.16); }
 
   /* GUIDE TABLE */
   .guide-table {
@@ -443,6 +1330,7 @@
 
   .audit-approved { background: var(--accent-dim); color: var(--accent); }
   .audit-rejected { background: var(--danger-dim); color: var(--danger); }
+  .audit-escalated { background: var(--warn-dim); color: var(--warn); }
 
   .audit-meta { color: var(--muted); font-family: 'DM Mono', monospace; font-size: 11px; margin-top: 4px; }
 
@@ -495,6 +1383,266 @@
   .hidden { display: none !important; }
   .tab-content { display: none; }
   .tab-content.active { display: block; }
+
+  @media (max-width: 760px) {
+    header, .tabs, main { padding-left: 20px; padding-right: 20px; }
+    .card-header, .ai-review-header, .source-evidence-toggle { align-items: flex-start; flex-direction: column; }
+    .diff-grid, .ai-review-grid, .provenance-grid, .workflow-controls, .filter-strip, .filter-grid { grid-template-columns: 1fr; }
+    .filter-summary { border-right: none; border-bottom: 1px solid var(--border); padding-bottom: 10px; padding-right: 0; }
+    .diff-col:first-child { border-right: none; border-bottom: 1px solid var(--border); }
+    .ai-review-meta { border-left: none; border-top: 1px solid var(--border); padding-left: 0; padding-top: 12px; }
+    .provenance-field-wide { grid-column: span 1; }
+    .source-evidence-preview { white-space: normal; }
+    .workflow-actions { align-items: stretch; flex-direction: column; width: 100%; }
+    .comment-input, .btn-approve, .btn-reject, .btn-escalate, .btn-assign { width: 100%; }
+  }
+
+  @media (min-width: 761px) and (max-width: 1180px) {
+    .filter-strip { grid-template-columns: 132px minmax(0, 1fr); }
+    .filter-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .filter-reset { grid-column: 2; justify-self: end; }
+  }
+
+  /* ── PREVIEW BUTTON ── */
+  .btn-preview {
+    background: rgba(110,231,183,0.06);
+    color: var(--accent);
+    border: 1px solid rgba(110,231,183,0.22);
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .btn-preview:hover { background: rgba(110,231,183,0.13); border-color: rgba(110,231,183,0.4); }
+
+  /* ── PUBLICATION PREVIEW OVERLAY ── */
+  .preview-overlay {
+    position: fixed;
+    inset: 0;
+    background: #0d1117;
+    z-index: 800;
+    flex-direction: column;
+    display: none;
+  }
+  .preview-overlay.open { display: flex; }
+
+  .preview-topbar {
+    flex-shrink: 0;
+    background: #161b22;
+    border-bottom: 1px solid #30363d;
+    padding: 14px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .preview-close-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    color: #8b949e;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    cursor: pointer;
+    padding: 8px 14px;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .preview-close-btn:hover { color: #f0f6fc; border-color: #8b949e; }
+
+  .preview-topbar-title { font-size: 15px; font-weight: 700; color: #f0f6fc; }
+  .preview-topbar-sub { font-size: 11px; color: #8b949e; font-family: 'DM Mono', monospace; margin-top: 2px; }
+
+  .preview-mode-toggle {
+    display: inline-flex;
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .preview-mode-btn {
+    padding: 7px 18px;
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    border: none;
+    background: transparent;
+    color: #8b949e;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .preview-mode-btn.active { background: #21262d; color: #f0f6fc; }
+
+  .preview-publish-btn {
+    background: var(--accent);
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    padding: 9px 22px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    white-space: nowrap;
+  }
+  .preview-publish-btn:hover { opacity: 0.85; }
+  .preview-publish-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .preview-layout {
+    flex: 1;
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 0;
+    max-width: 1080px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 40px 32px;
+    align-content: start;
+  }
+
+  .preview-sidebar { position: sticky; top: 0; align-self: start; padding-right: 28px; }
+  .preview-nav-label {
+    font-size: 9px;
+    font-family: 'DM Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #484f58;
+    margin-bottom: 10px;
+  }
+  .preview-nav-item {
+    display: block;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-family: 'DM Mono', monospace;
+    color: #8b949e;
+    cursor: pointer;
+    transition: all 0.12s;
+    margin-bottom: 2px;
+  }
+  .preview-nav-item:hover { background: #21262d; color: #f0f6fc; }
+  .preview-nav-item.has-change { color: var(--accent); font-weight: 700; }
+
+  .preview-content { min-width: 0; }
+
+  /* Notion-style document */
+  .notion-doc-header { margin-bottom: 40px; }
+  .notion-doc-flag { font-size: 52px; margin-bottom: 14px; }
+  .notion-doc-title { font-size: 34px; font-weight: 800; color: #f0f6fc; letter-spacing: -0.5px; margin-bottom: 6px; }
+  .notion-doc-meta { font-size: 12px; color: #484f58; font-family: 'DM Mono', monospace; }
+
+  .notion-group { margin-bottom: 36px; }
+  .notion-group-label {
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #484f58;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #21262d;
+  }
+
+  .notion-block {
+    border-radius: 8px;
+    border: 1px solid #21262d;
+    background: #161b22;
+    padding: 18px 22px;
+    margin-bottom: 10px;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .notion-block.is-changed { border-color: rgba(110,231,183,0.4); background: rgba(110,231,183,0.03); }
+  .notion-block.is-new     { border-color: rgba(99,102,241,0.45); background: rgba(99,102,241,0.04); }
+
+  .notion-block-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+  .notion-block-label {
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #484f58;
+  }
+  .notion-block.is-changed .notion-block-label { color: var(--accent); }
+  .notion-block.is-new     .notion-block-label { color: #a5b4fc; }
+
+  .notion-change-pill {
+    font-size: 9px;
+    font-family: 'DM Mono', monospace;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    padding: 2px 9px;
+    border-radius: 10px;
+  }
+  .notion-change-pill.pill-updated { background: rgba(110,231,183,0.14); color: var(--accent); border: 1px solid rgba(110,231,183,0.3); }
+  .notion-change-pill.pill-new     { background: rgba(99,102,241,0.14); color: #a5b4fc;      border: 1px solid rgba(99,102,241,0.32); }
+
+  .notion-conf {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    color: #484f58;
+  }
+  .notion-conf-track { width: 44px; height: 3px; background: #21262d; border-radius: 2px; overflow: hidden; }
+  .notion-conf-fill  { height: 100%; border-radius: 2px; }
+
+  .notion-block-body { font-size: 14px; line-height: 1.85; color: #8b949e; white-space: pre-wrap; }
+  .notion-block.is-changed .notion-block-body { color: #e6edf3; }
+  .notion-block.is-new     .notion-block-body { color: #e8eaf6; }
+
+  .notion-block-foot {
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid #21262d;
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    color: #30363d;
+  }
+
+  /* Publish confirm */
+  .pub-confirm-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+  }
+  .pub-confirm-section {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--accent);
+    margin-bottom: 5px;
+  }
+  .pub-confirm-value { font-size: 12px; color: var(--muted); line-height: 1.55; }
+  .pub-confirm-warning {
+    margin-top: 14px;
+    padding: 10px 14px;
+    background: rgba(248,113,113,0.05);
+    border: 1px solid rgba(248,113,113,0.2);
+    border-radius: 8px;
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    color: #f87171;
+    line-height: 1.5;
+  }
 </style>
 </head>
 <body>
@@ -507,11 +1655,25 @@
       <div class="logo-sub">Country Guide Reconciliation</div>
     </div>
   </div>
-  <button class="sync-btn" id="syncBtn" onclick="triggerSync()">
+  <button class="sync-btn" id="syncBtn" onclick="openSyncModal()">
     <span id="syncIcon">⟳</span>
     <span id="syncText">Sync Now</span>
   </button>
 </header>
+
+<!-- SYNC MODAL -->
+<div class="modal-overlay" id="syncModal" onclick="closeSyncModalOnOverlay(event)">
+  <div class="modal">
+    <div class="modal-title">Sync Official Sources</div>
+    <div class="modal-sub">Select countries to fetch and reconcile</div>
+    <button class="modal-select-all" onclick="toggleSelectAll()">Select all</button>
+    <div class="country-grid" id="countryGrid"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeSyncModal()">Cancel</button>
+      <button class="btn-primary" id="startSyncBtn" onclick="triggerSync()">Start Sync</button>
+    </div>
+  </div>
+</div>
 
 <div class="tabs">
   <div class="tab active" onclick="showTab('review')">
@@ -523,19 +1685,81 @@
 
 <main>
 
-  <!-- STATUS BAR -->
-  <div class="status-bar">
+  <!-- METRICS BAR -->
+  <div class="metrics-header">
     <div class="status-dot"></div>
-    <div class="status-item">Country: <span>🇮🇳 India</span></div>
-    <div class="status-item">Pending: <span id="pendingCount">—</span></div>
-    <div class="status-item">Last Sync: <span id="lastSync">—</span></div>
-    <div class="status-item">Sources: <span>2 trusted sources</span></div>
+    <span class="metrics-live-label">Compliance Operations · Live</span>
+  </div>
+  <div class="metrics-bar">
+    <div class="metric-card" id="mc-sources">
+      <div class="metric-value" id="m-sources">—</div>
+      <div class="metric-label">Sources Monitored</div>
+    </div>
+    <div class="metric-card" id="mc-pending">
+      <div class="metric-value" id="m-pending">—</div>
+      <div class="metric-label">Pending Reviews</div>
+    </div>
+    <div class="metric-card" id="mc-critical">
+      <div class="metric-value" id="m-critical">—</div>
+      <div class="metric-label">Critical Changes</div>
+    </div>
+    <div class="metric-card" id="mc-confidence">
+      <div class="metric-value" id="m-confidence">—</div>
+      <div class="metric-label">Avg Confidence</div>
+    </div>
+    <div class="metric-card" id="mc-failures">
+      <div class="metric-value" id="m-failures">—</div>
+      <div class="metric-label">Crawl Failures</div>
+    </div>
+    <div class="metric-card" id="mc-last-sync">
+      <div class="metric-value metric-value-sm" id="m-last-sync">—</div>
+      <div class="metric-label">Last Successful Sync</div>
+    </div>
+    <div class="metric-card" id="mc-trusted">
+      <div class="metric-value" id="m-trusted">—</div>
+      <div class="metric-label">Trusted Sources</div>
+    </div>
   </div>
 
   <!-- REVIEW TAB -->
   <div class="tab-content active" id="tab-review">
     <div class="section-title">Review Queue</div>
     <div class="section-sub">Changes detected from official sources — approve or reject each</div>
+    <div class="queue-filter-bar" id="queueFilterBar" aria-label="Review queue filters">
+      <div class="filter-strip">
+        <div class="filter-summary">
+          <span>Triage view</span>
+          <strong id="filterCount">0 shown</strong>
+        </div>
+        <div class="filter-grid">
+          <label class="filter-field" for="filterSeverity">
+            <span class="filter-label">Severity</span>
+            <select class="filter-select" id="filterSeverity" aria-label="Filter by severity"></select>
+          </label>
+          <label class="filter-field" for="filterConfidence">
+            <span class="filter-label">Confidence</span>
+            <select class="filter-select" id="filterConfidence" aria-label="Filter by confidence"></select>
+          </label>
+          <label class="filter-field" for="filterCountry">
+            <span class="filter-label">Country</span>
+            <select class="filter-select" id="filterCountry" aria-label="Filter by country"></select>
+          </label>
+          <label class="filter-field" for="filterSourceType">
+            <span class="filter-label">Source type</span>
+            <select class="filter-select" id="filterSourceType" aria-label="Filter by source type"></select>
+          </label>
+          <label class="filter-field" for="filterChangeType">
+            <span class="filter-label">Change type</span>
+            <select class="filter-select" id="filterChangeType" aria-label="Filter by change type"></select>
+          </label>
+          <label class="filter-field" for="filterStatus">
+            <span class="filter-label">Review status</span>
+            <select class="filter-select" id="filterStatus" aria-label="Filter by review status"></select>
+          </label>
+        </div>
+        <button class="filter-reset" id="resetFilters" type="button">Reset</button>
+      </div>
+    </div>
     <div id="reviewList"></div>
   </div>
 
@@ -569,8 +1793,88 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- ── PUBLICATION PREVIEW OVERLAY ── -->
+<div class="preview-overlay" id="previewOverlay">
+  <div class="preview-topbar">
+    <div style="display:flex;align-items:center;gap:14px;min-width:0;">
+      <button class="preview-close-btn" onclick="closePreview()">← Close Preview</button>
+      <div style="min-width:0;">
+        <div class="preview-topbar-title" id="previewTitle">Publication Preview</div>
+        <div class="preview-topbar-sub" id="previewSub">Showing post-publish state</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
+      <div class="preview-mode-toggle">
+        <button class="preview-mode-btn active" id="modeAfter" onclick="setPreviewMode('after')">After</button>
+        <button class="preview-mode-btn" id="modeBefore" onclick="setPreviewMode('before')">Before</button>
+      </div>
+      <button class="preview-publish-btn" id="previewPublishBtn" onclick="openPublishConfirm()">Publish This Change</button>
+    </div>
+  </div>
+  <div class="preview-layout">
+    <aside class="preview-sidebar" id="previewSidebar"></aside>
+    <div class="preview-content" id="previewContent"></div>
+  </div>
+</div>
+
+<!-- ── PUBLISH CONFIRMATION MODAL ── -->
+<div class="modal-overlay" id="publishConfirmModal" onclick="if(event.target===this)closePublishConfirm()">
+  <div class="modal">
+    <div class="modal-title">Confirm Publication</div>
+    <div class="modal-sub" id="publishConfirmSub">Review the change you are about to publish to the live guide.</div>
+    <div id="publishConfirmList"></div>
+    <div class="pub-confirm-warning">⚠ This will immediately update the live country guide and is logged to the audit trail.</div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closePublishConfirm()">Cancel</button>
+      <button class="btn-primary" id="publishConfirmBtn" onclick="confirmPublish()">Confirm & Publish</button>
+    </div>
+  </div>
+</div>
+
 <script>
   let activeTab = 'review';
+  let reviewQueueItems = [];
+  let queueFiltersBound = false;
+
+  const QUEUE_FILTER_IDS = [
+    'filterSeverity',
+    'filterConfidence',
+    'filterCountry',
+    'filterSourceType',
+    'filterChangeType',
+    'filterStatus'
+  ];
+
+  const STATIC_FILTER_OPTIONS = {
+    filterSeverity: [
+      { value: '', label: 'Any severity' },
+      { value: 'critical', label: 'Critical' },
+      { value: 'major', label: 'Major' },
+      { value: 'minor', label: 'Minor' }
+    ],
+    filterConfidence: [
+      { value: '', label: 'Any confidence' },
+      { value: 'high', label: 'High 85%+' },
+      { value: 'medium', label: 'Medium 60-84%' },
+      { value: 'low', label: 'Low <60%' }
+    ],
+    filterChangeType: [
+      { value: '', label: 'Any change' },
+      { value: 'Added', label: 'Added' },
+      { value: 'Removed', label: 'Removed' },
+      { value: 'Modified', label: 'Modified' },
+      { value: 'Clarification', label: 'Clarification' },
+      { value: 'Unverified', label: 'Unverified' },
+      { value: 'Deprecated', label: 'Deprecated' }
+    ],
+    filterStatus: [
+      { value: '', label: 'Any status' },
+      { value: 'pending', label: 'Pending' },
+      { value: 'approved', label: 'Approved' },
+      { value: 'rejected', label: 'Rejected' },
+      { value: 'escalated', label: 'Escalated' }
+    ]
+  };
 
   function showTab(tab) {
     activeTab = tab;
@@ -605,6 +1909,204 @@
 	    return ['critical', 'major', 'minor'].includes(value) ? value : 'minor';
 	  }
 
+	  function formatSectionName(value) {
+	    return String(value || 'policy').replace(/_/g, ' ');
+	  }
+
+	  function impactAssessment(item, confidence) {
+	    const severity = normalizeSeverity(item.severity);
+	    const oldValue = String(item.old_value || '').trim().toLowerCase();
+	    const newValue = String(item.new_value || '').trim();
+	    const isNewControl = oldValue === 'not previously recorded';
+	    const isLongChange = newValue.length > 160;
+
+	    if (severity === 'critical') return 'Critical';
+	    if (severity === 'major' || confidence < 0.7 || isLongChange) return 'Moderate';
+	    if (severity === 'minor' && isNewControl) return 'Informational';
+	    return 'Low';
+	  }
+
+	  function impactClass(impact) {
+	    return `impact-${String(impact || 'low').toLowerCase()}`;
+	  }
+
+	  function aiSummary(item, impact, confidence) {
+	    const section = formatSectionName(item.section);
+	    const oldValue = String(item.old_value || '').trim();
+	    const isNewControl = oldValue.toLowerCase() === 'not previously recorded';
+	    const sourceText = String(item.source_paragraph || '').trim();
+	    const confidenceCopy = confidence >= 0.85 ? 'high extraction confidence' : confidence >= 0.6 ? 'medium extraction confidence' : 'low extraction confidence';
+	    const actionCopy = {
+	      Critical: 'Review before publishing because this may affect employee entitlements or statutory exposure.',
+	      Moderate: 'Validate with the source excerpt and update operational guidance if confirmed.',
+	      Low: 'Confirm the wording change and publish if it matches current operating practice.',
+	      Informational: 'Triage as a newly captured reference before treating it as an active policy change.'
+	    }[impact] || 'Review the change before publishing.';
+
+	    if (isNewControl) {
+	      return `${section} is newly detected in the source set with ${confidenceCopy}. ${actionCopy}`;
+	    }
+
+	    if (sourceText) {
+	      return `${section} changes from the current guide value to the proposed source-backed wording with ${confidenceCopy}. ${actionCopy}`;
+	    }
+
+	    return `${section} has a detected compliance wording change with ${confidenceCopy}. ${actionCopy}`;
+	  }
+
+	  function sourceHost(value) {
+	    try {
+	      return new URL(value, window.location.origin).host || 'Internal source';
+	    } catch (e) {
+	      return 'Internal source';
+	    }
+	  }
+
+	  function sourceType(value) {
+	    const url = String(value || '').toLowerCase();
+	    if (url.includes('.pdf')) return 'Official PDF';
+	    if (url.includes('.gov') || url.includes('labour.gov') || url.includes('epfindia')) return 'Government website';
+	    if (url.startsWith('https://')) return 'Verified web source';
+	    return 'Unclassified source';
+	  }
+
+	  function sourceSnippetText(item) {
+	    return String(item.source_paragraph || '').trim() || 'No exact source excerpt was captured for this change.';
+	  }
+
+	  function sourceSnippetPreview(value) {
+	    const compact = String(value || '').replace(/\s+/g, ' ').trim();
+	    return compact.length > 150 ? `${compact.slice(0, 150)}...` : compact;
+	  }
+
+	  function shouldCollapseSourceSnippet(value) {
+	    const text = String(value || '');
+	    return text.length > 260 || text.split(/\r?\n/).length > 3;
+	  }
+
+	  function formatTimestamp(value) {
+	    const date = new Date(value);
+	    if (Number.isNaN(date.getTime())) return 'Not recorded';
+	    return date.toLocaleString(undefined, {
+	      year: 'numeric',
+	      month: 'short',
+	      day: '2-digit',
+	      hour: '2-digit',
+	      minute: '2-digit'
+	    });
+	  }
+
+	  function reviewTimestamp(value) {
+	    const date = new Date(value);
+	    if (Number.isNaN(date.getTime())) return 'Not recorded';
+	    return date.toLocaleString(undefined, {
+	      month: 'short',
+	      day: '2-digit',
+	      hour: '2-digit',
+	      minute: '2-digit'
+	    });
+	  }
+
+	  function approvalState(value) {
+	    const normalized = String(value || 'pending').toLowerCase();
+	    return ['pending', 'approved', 'rejected', 'escalated'].includes(normalized) ? normalized : 'pending';
+	  }
+
+	  function stateLabel(value) {
+	    return approvalState(value).replace(/^./, char => char.toUpperCase());
+	  }
+
+	  function stateClass(value) {
+	    return `state-${approvalState(value)}`;
+	  }
+
+	  function semanticMatchScore(item, confidence) {
+	    const hasEvidence = String(item.source_paragraph || '').trim().length > 0;
+	    const score = confidence + (hasEvidence ? 0.05 : -0.08);
+	    return Math.max(0, Math.min(1, score));
+	  }
+
+	  function sourceTrustLevel(item, confidence) {
+	    const url = String(item.source_url || '').toLowerCase();
+	    if (confidence < 0.6) return 'REVIEW REQUIRED';
+	    if (url.includes('.gov') || url.includes('labour.gov') || url.includes('epfindia')) return 'VERIFIED';
+	    if (url.startsWith('https://') && confidence >= 0.7) return 'TRUSTED';
+	    return 'REVIEW REQUIRED';
+	  }
+
+	  function trustClass(level) {
+	    return `trust-${String(level || 'review-required').toLowerCase().replace(/\s+/g, '-')}`;
+	  }
+
+	  function normalizedPolicyText(value) {
+	    return String(value || '').trim().toLowerCase();
+	  }
+
+	  function changedTokenRatio(oldValue, newValue) {
+	    const oldTokens = tokenizePolicyText(oldValue);
+	    const newTokens = tokenizePolicyText(newValue);
+	    const totalTokens = Math.max(oldTokens.length, newTokens.length, 1);
+	    const matchedTokens = matchingTokenPairs(oldTokens, newTokens).length;
+	    return 1 - (matchedTokens / totalTokens);
+	  }
+
+	  function classifyChange(item, confidence, semanticScore) {
+	    const oldValue = normalizedPolicyText(item.old_value);
+	    const newValue = normalizedPolicyText(item.new_value);
+	    const combined = `${oldValue} ${newValue}`;
+
+	    if (confidence < 0.6 || semanticScore < 0.55) return 'Unverified';
+	    if (/\b(deprecated|superseded|repealed|withdrawn|abolished|no longer in force)\b/.test(combined)) return 'Deprecated';
+	    if (!oldValue || oldValue === 'not previously recorded') return 'Added';
+	    if (!newValue || newValue === 'not previously recorded' || /\bremoved\b|\bdeleted\b|\bnot applicable\b/.test(newValue)) return 'Removed';
+	    if (normalizeSeverity(item.severity) === 'minor' && changedTokenRatio(item.old_value, item.new_value) <= 0.35) return 'Clarification';
+	    return 'Modified';
+	  }
+
+	  function changeClass(type) {
+	    return `change-${String(type || 'modified').toLowerCase().replace(/\s+/g, '-')}`;
+	  }
+
+	  function changeIcon(type) {
+	    return {
+	      Added: '+',
+	      Removed: '-',
+	      Modified: '~',
+	      Clarification: 'i',
+	      Unverified: '?',
+	      Deprecated: '!'
+	    }[type] || '~';
+	  }
+
+	  const REVIEWERS = [
+	    'Unassigned',
+	    'APAC Compliance Lead',
+	    'Legal Ops',
+	    'Payroll Compliance',
+	    'Policy Owner'
+	  ];
+
+	  const APPROVE_RATIONALES = [
+	    'Source verified',
+	    'Matches statutory update',
+	    'Operational wording accepted',
+	    'No material risk'
+	  ];
+
+	  const REJECT_RATIONALES = [
+	    'Source mismatch',
+	    'Insufficient evidence',
+	    'Conflicts with current policy',
+	    'Duplicate or stale change'
+	  ];
+
+	  function renderSelectOptions(options, selectedValue = '') {
+	    return options.map(option => {
+	      const selected = option === selectedValue ? ' selected' : '';
+	      return `<option value="${escapeHtml(option)}"${selected}>${escapeHtml(option)}</option>`;
+	    }).join('');
+	  }
+
 	  function escapeHtml(value) {
 	    return String(value ?? '').replace(/[&<>"']/g, char => ({
 	      '&': '&amp;',
@@ -613,6 +2115,117 @@
 	      '"': '&quot;',
 	      "'": '&#39;'
 	    })[char]);
+	  }
+
+	  function tokenizePolicyText(value) {
+	    const matches = String(value ?? '').trim().match(/[A-Za-z0-9]+(?:[.'’/-][A-Za-z0-9]+)*%?|[^\sA-Za-z0-9]/g);
+	    return (matches || []).map(text => ({
+	      text,
+	      key: text.toLowerCase()
+	    }));
+	  }
+
+	  function matchingTokenPairs(oldTokens, newTokens) {
+	    const oldLength = oldTokens.length;
+	    const newLength = newTokens.length;
+	    const Row = Math.min(oldLength, newLength) > 65535 ? Uint32Array : Uint16Array;
+	    const dp = Array.from({ length: oldLength + 1 }, () => new Row(newLength + 1));
+
+	    for (let i = oldLength - 1; i >= 0; i -= 1) {
+	      for (let j = newLength - 1; j >= 0; j -= 1) {
+	        dp[i][j] = oldTokens[i].key === newTokens[j].key
+	          ? dp[i + 1][j + 1] + 1
+	          : Math.max(dp[i + 1][j], dp[i][j + 1]);
+	      }
+	    }
+
+	    const pairs = [];
+	    let i = 0;
+	    let j = 0;
+	    while (i < oldLength && j < newLength) {
+	      if (oldTokens[i].key === newTokens[j].key) {
+	        pairs.push({ oldIndex: i, newIndex: j });
+	        i += 1;
+	        j += 1;
+	      } else if (dp[i + 1][j] >= dp[i][j + 1]) {
+	        i += 1;
+	      } else {
+	        j += 1;
+	      }
+	    }
+	    return pairs;
+	  }
+
+	  function annotateDiffTokens(oldTokens, newTokens) {
+	    const pairs = matchingTokenPairs(oldTokens, newTokens);
+	    const oldAnnotated = [];
+	    const newAnnotated = [];
+	    let oldIndex = 0;
+	    let newIndex = 0;
+
+	    function appendRun(target, tokens, state) {
+	      tokens.forEach(token => target.push({ ...token, state }));
+	    }
+
+	    pairs.forEach(pair => {
+	      const removedRun = oldTokens.slice(oldIndex, pair.oldIndex);
+	      const addedRun = newTokens.slice(newIndex, pair.newIndex);
+	      const isModification = removedRun.length > 0 && addedRun.length > 0;
+
+	      appendRun(oldAnnotated, removedRun, isModification ? 'removed modified' : 'removed');
+	      appendRun(newAnnotated, addedRun, isModification ? 'added modified' : 'added');
+	      appendRun(oldAnnotated, [oldTokens[pair.oldIndex]], 'unchanged');
+	      appendRun(newAnnotated, [newTokens[pair.newIndex]], 'unchanged');
+
+	      oldIndex = pair.oldIndex + 1;
+	      newIndex = pair.newIndex + 1;
+	    });
+
+	    const trailingRemoved = oldTokens.slice(oldIndex);
+	    const trailingAdded = newTokens.slice(newIndex);
+	    const trailingModification = trailingRemoved.length > 0 && trailingAdded.length > 0;
+	    appendRun(oldAnnotated, trailingRemoved, trailingModification ? 'removed modified' : 'removed');
+	    appendRun(newAnnotated, trailingAdded, trailingModification ? 'added modified' : 'added');
+
+	    return { oldAnnotated, newAnnotated };
+	  }
+
+	  function shouldInsertTokenSpace(tokens, index) {
+	    if (index === 0) return false;
+	    const previous = tokens[index - 1].text;
+	    const current = tokens[index].text;
+	    if (/^[,.;:!?%)]$/.test(current)) return false;
+	    if (/^[(]$/.test(previous)) return false;
+	    if (current === '/' || previous === '/') return false;
+	    if (current === '-' || previous === '-') return false;
+	    if (current === "'" || current === '’' || previous === "'" || previous === '’') return false;
+	    return true;
+	  }
+
+	  function renderSemanticTokens(tokens, emptyLabel) {
+	    if (!tokens.length) {
+	      return `<span class="diff-placeholder">${escapeHtml(emptyLabel)}</span>`;
+	    }
+
+	    return tokens.map((token, index) => {
+	      const classes = ['diff-token'];
+	      if (token.state.includes('added')) classes.push('diff-token-added');
+	      if (token.state.includes('removed')) classes.push('diff-token-removed');
+	      if (token.state.includes('modified')) classes.push('diff-token-modified');
+	      const leadingSpace = shouldInsertTokenSpace(tokens, index) ? ' ' : '';
+	      return `${leadingSpace}<span class="${classes.join(' ')}">${escapeHtml(token.text)}</span>`;
+	    }).join('');
+	  }
+
+	  function semanticDiff(oldValue, newValue) {
+	    const oldTokens = tokenizePolicyText(oldValue);
+	    const newTokens = tokenizePolicyText(newValue);
+	    const { oldAnnotated, newAnnotated } = annotateDiffTokens(oldTokens, newTokens);
+
+	    return {
+	      oldHtml: renderSemanticTokens(oldAnnotated, 'No current policy text recorded'),
+	      newHtml: renderSemanticTokens(newAnnotated, 'No proposed policy text recorded')
+	    };
 	  }
 
 	  function safeHttpUrl(value) {
@@ -624,98 +2237,383 @@
 	    }
 	  }
 
+  function boundedConfidence(item) {
+    return Math.max(0, Math.min(1, Number(item.confidence || 0)));
+  }
+
+  function confidenceBucket(confidence) {
+    if (confidence >= 0.85) return 'high';
+    if (confidence >= 0.6) return 'medium';
+    return 'low';
+  }
+
+  function queueItemMeta(item) {
+    const confidence = boundedConfidence(item);
+    const semanticScore = semanticMatchScore(item, confidence);
+    return {
+      severity: normalizeSeverity(item.severity),
+      confidence,
+      confidenceBucket: confidenceBucket(confidence),
+      country: String(item.country || 'Unknown'),
+      sourceType: sourceType(item.source_url),
+      changeType: classifyChange(item, confidence, semanticScore),
+      status: approvalState(item.status)
+    };
+  }
+
+  function uniqueSorted(values) {
+    return Array.from(new Set(values.filter(Boolean))).sort((a, b) => a.localeCompare(b));
+  }
+
+  function setFilterOptions(id, options, selectedValue = '') {
+    const select = document.getElementById(id);
+    if (!select) return;
+    select.innerHTML = options.map(option => {
+      const selected = option.value === selectedValue ? ' selected' : '';
+      return `<option value="${escapeHtml(option.value)}"${selected}>${escapeHtml(option.label)}</option>`;
+    }).join('');
+    if (!options.some(option => option.value === select.value)) {
+      select.value = '';
+    }
+  }
+
+  function bindQueueFilters() {
+    if (queueFiltersBound) return;
+    QUEUE_FILTER_IDS.forEach(id => {
+      document.getElementById(id)?.addEventListener('change', renderQueue);
+    });
+    document.getElementById('resetFilters')?.addEventListener('click', resetQueueFilters);
+    document.getElementById('queueFilterBar')?.addEventListener('keydown', event => {
+      if (event.key === 'Escape') resetQueueFilters();
+    });
+    queueFiltersBound = true;
+  }
+
+  function populateQueueFilters(items) {
+    const selected = Object.fromEntries(QUEUE_FILTER_IDS.map(id => [
+      id,
+      document.getElementById(id)?.value || ''
+    ]));
+    const countries = uniqueSorted(items.map(item => queueItemMeta(item).country));
+    const sourceTypes = uniqueSorted(items.map(item => queueItemMeta(item).sourceType));
+
+    setFilterOptions('filterSeverity', STATIC_FILTER_OPTIONS.filterSeverity, selected.filterSeverity);
+    setFilterOptions('filterConfidence', STATIC_FILTER_OPTIONS.filterConfidence, selected.filterConfidence);
+    setFilterOptions('filterChangeType', STATIC_FILTER_OPTIONS.filterChangeType, selected.filterChangeType);
+    setFilterOptions('filterStatus', STATIC_FILTER_OPTIONS.filterStatus, selected.filterStatus);
+    setFilterOptions('filterCountry', [
+      { value: '', label: 'Any country' },
+      ...countries.map(country => ({ value: country, label: country }))
+    ], selected.filterCountry);
+    setFilterOptions('filterSourceType', [
+      { value: '', label: 'Any source' },
+      ...sourceTypes.map(type => ({ value: type, label: type }))
+    ], selected.filterSourceType);
+    bindQueueFilters();
+  }
+
+  function currentQueueFilters() {
+    return {
+      severity: document.getElementById('filterSeverity')?.value || '',
+      confidence: document.getElementById('filterConfidence')?.value || '',
+      country: document.getElementById('filterCountry')?.value || '',
+      sourceType: document.getElementById('filterSourceType')?.value || '',
+      changeType: document.getElementById('filterChangeType')?.value || '',
+      status: document.getElementById('filterStatus')?.value || ''
+    };
+  }
+
+  function filterQueueItems(items) {
+    const filters = currentQueueFilters();
+    return items.filter(item => {
+      const meta = queueItemMeta(item);
+      return (!filters.severity || meta.severity === filters.severity)
+        && (!filters.confidence || meta.confidenceBucket === filters.confidence)
+        && (!filters.country || meta.country === filters.country)
+        && (!filters.sourceType || meta.sourceType === filters.sourceType)
+        && (!filters.changeType || meta.changeType === filters.changeType)
+        && (!filters.status || meta.status === filters.status);
+    });
+  }
+
+  function updateFilterSummary(filteredCount, totalCount) {
+    const el = document.getElementById('filterCount');
+    if (!el) return;
+    el.textContent = filteredCount === totalCount
+      ? `${totalCount} shown`
+      : `${filteredCount} of ${totalCount} shown`;
+  }
+
+  function resetQueueFilters() {
+    QUEUE_FILTER_IDS.forEach(id => {
+      const select = document.getElementById(id);
+      if (select) select.value = '';
+    });
+    renderQueue();
+  }
+
+  function emptyQueueHtml(title, sub, marker = '0') {
+    return `
+      <div class="empty">
+        <div class="empty-icon">${escapeHtml(marker)}</div>
+        <div class="empty-title">${escapeHtml(title)}</div>
+        <div class="empty-sub">${escapeHtml(sub)}</div>
+      </div>`;
+  }
+
+  function renderReviewCard(item) {
+    const id = Number(item.id);
+    const confidence = boundedConfidence(item);
+    const severity = normalizeSeverity(item.severity);
+    const impact = impactAssessment(item, confidence);
+    const state = approvalState(item.status);
+    const sectionName = formatSectionName(item.section);
+    const semanticScore = semanticMatchScore(item, confidence);
+    const trustLevel = sourceTrustLevel(item, confidence);
+    const changeType = classifyChange(item, confidence, semanticScore);
+    const diff = semanticDiff(item.old_value, item.new_value);
+    const sourceSnippet = sourceSnippetText(item);
+    const sourceSnippetOpen = shouldCollapseSourceSnippet(sourceSnippet) ? '' : ' open';
+    const sourceUrl = safeHttpUrl(item.source_url);
+    const sourceDisplay = sourceHost(item.source_url);
+
+    return `
+      <div class="review-card" id="card-${id}">
+        <div class="card-header">
+          <div class="card-meta">
+            <span class="section-label">${escapeHtml(sectionName)}</span>
+            <span class="severity-badge ${severityClass(severity)}">${escapeHtml(severity)}</span>
+            <span class="change-badge ${changeClass(changeType)}"><span class="change-icon">${escapeHtml(changeIcon(changeType))}</span>${escapeHtml(changeType)}</span>
+            <span class="state-badge ${stateClass(state)}" id="state-${id}">${escapeHtml(stateLabel(state))}</span>
+          </div>
+          <div class="confidence-bar">
+            <span>Confidence</span>
+            <div class="conf-track">
+              <div class="conf-fill" style="width:${confidence*100}%;background:${confidenceColor(confidence)}"></div>
+            </div>
+            <span style="color:${confidenceColor(confidence)}">${Math.round(confidence*100)}%</span>
+          </div>
+        </div>
+
+        <div class="diff-grid">
+          <div class="diff-col diff-old">
+            <div class="diff-label">Current Value</div>
+            <div class="diff-value semantic-diff">${diff.oldHtml}</div>
+          </div>
+          <div class="diff-col diff-new">
+            <div class="diff-label">Proposed Change</div>
+            <div class="diff-value semantic-diff">${diff.newHtml}</div>
+          </div>
+        </div>
+
+        <div class="ai-review-panel">
+          <div class="ai-review-header">
+            <div class="ai-review-title">
+              <span class="ai-kicker">AI Summary</span>
+              <span class="ai-model-pill">Policy Copilot</span>
+            </div>
+            <span class="impact-badge ${impactClass(impact)}">Impact Assessment: ${escapeHtml(impact)}</span>
+          </div>
+          <div class="ai-review-grid">
+            <div class="ai-summary-copy">${escapeHtml(aiSummary(item, impact, confidence))}</div>
+            <div class="ai-review-meta">
+              <div class="ai-meta-row"><span>Risk tier</span><span>${escapeHtml(impact)}</span></div>
+              <div class="ai-meta-row"><span>Workflow</span><span>Reviewer approval</span></div>
+              <div class="ai-meta-row"><span>Signal</span><span>${Math.round(confidence*100)}% match</span></div>
+            </div>
+          </div>
+        </div>
+
+        <details class="source-evidence"${sourceSnippetOpen}>
+          <summary class="source-evidence-toggle">
+            <div class="source-evidence-heading">
+              <div class="source-evidence-title"><span class="source-evidence-icon">"</span>Source Evidence</div>
+              <div class="source-evidence-preview">${escapeHtml(sourceSnippetPreview(sourceSnippet))}</div>
+            </div>
+            <span class="source-evidence-action"></span>
+          </summary>
+          <div class="source-evidence-body">
+            <pre class="source-snippet">${escapeHtml(sourceSnippet)}</pre>
+            <div class="source-attribution">
+              <span>Extracted from <a href="${sourceUrl}" target="_blank" rel="noopener noreferrer">${escapeHtml(sourceDisplay)}</a></span>
+              <span class="source-attribution-divider">/</span>
+              <span>${escapeHtml(sourceType(item.source_url))}</span>
+              <span class="source-attribution-divider">/</span>
+              <span>${escapeHtml(formatTimestamp(item.created_at))}</span>
+            </div>
+          </div>
+        </details>
+
+        <details class="provenance-drawer">
+          <summary class="provenance-toggle">
+            <div class="provenance-title">
+              <span class="provenance-caret">›</span>
+              <span class="provenance-label">Provenance</span>
+            </div>
+            <span class="trust-badge ${trustClass(trustLevel)}">${escapeHtml(trustLevel)}</span>
+          </summary>
+          <div class="provenance-body">
+            <div class="provenance-grid">
+              <div class="provenance-field provenance-field-wide">
+                <div class="provenance-key">Source URL</div>
+                <div class="provenance-value"><a class="provenance-link" href="${sourceUrl}" target="_blank" rel="noopener noreferrer">${escapeHtml(item.source_url || 'Not recorded')}</a></div>
+              </div>
+              <div class="provenance-field">
+                <div class="provenance-key">Source type</div>
+                <div class="provenance-value">${escapeHtml(sourceType(item.source_url))}</div>
+              </div>
+              <div class="provenance-field">
+                <div class="provenance-key">Crawl timestamp</div>
+                <div class="provenance-value">${escapeHtml(formatTimestamp(item.created_at))}</div>
+              </div>
+              <div class="provenance-field">
+                <div class="provenance-key">Extracted section title</div>
+                <div class="provenance-value">${escapeHtml(sectionName)}</div>
+              </div>
+              <div class="provenance-field">
+                <div class="provenance-key">Parser confidence</div>
+                <div class="provenance-value">${Math.round(confidence*100)}%</div>
+              </div>
+              <div class="provenance-field">
+                <div class="provenance-key">Semantic match score</div>
+                <div class="provenance-value">${Math.round(semanticScore*100)}%</div>
+              </div>
+              <div class="provenance-field">
+                <div class="provenance-key">Model version</div>
+                <div class="provenance-value">llama-3.3-70b-versatile</div>
+              </div>
+              <div class="provenance-field">
+                <div class="provenance-key">Source trust level</div>
+                <div class="provenance-value"><span class="trust-badge ${trustClass(trustLevel)}">${escapeHtml(trustLevel)}</span></div>
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <div class="card-actions">
+          <div class="workflow-meta">
+            <div>Queued <span>${escapeHtml(reviewTimestamp(item.created_at))}</span></div>
+            <div>Review update <span id="reviewedAt-${id}">${escapeHtml(item.reviewed_at ? reviewTimestamp(item.reviewed_at) : 'Awaiting decision')}</span></div>
+          </div>
+          <div class="workflow-controls">
+            <label class="workflow-field">
+              <span class="workflow-label">Reviewer</span>
+              <select class="workflow-select" id="assignee-${id}">
+                ${renderSelectOptions(REVIEWERS, item.reviewer_assignee || 'Unassigned')}
+              </select>
+            </label>
+            <label class="workflow-field">
+              <span class="workflow-label">Approve rationale</span>
+              <select class="workflow-select" id="approveRationale-${id}">
+                ${renderSelectOptions(APPROVE_RATIONALES, item.reviewer_rationale || 'Source verified')}
+              </select>
+            </label>
+            <label class="workflow-field">
+              <span class="workflow-label">Reject rationale</span>
+              <select class="workflow-select" id="rejectRationale-${id}">
+                ${renderSelectOptions(REJECT_RATIONALES, item.reviewer_rationale || 'Insufficient evidence')}
+              </select>
+            </label>
+          </div>
+          <label class="workflow-notes">
+            <span class="workflow-label">Reviewer notes</span>
+            <input class="comment-input" id="notes-${id}" value="${escapeHtml(item.reviewer_notes || '')}" placeholder="Optional reviewer notes..." />
+          </label>
+          <div class="workflow-actions">
+            <button class="btn-assign" onclick="decide(${id}, 'assign')">Save assignment</button>
+            <button class="btn-escalate" onclick="decide(${id}, 'escalate')">Escalate</button>
+            <button class="btn-preview" onclick="openPreviewById(${id})">👁 Preview</button>
+            <button class="btn-approve" onclick="decide(${id}, 'approve')">✓ Approve</button>
+            <button class="btn-reject" onclick="decide(${id}, 'reject')">✗ Reject</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderQueue() {
+    const list = document.getElementById('reviewList');
+    if (!list) return;
+    const filteredItems = filterQueueItems(reviewQueueItems);
+    updateFilterSummary(filteredItems.length, reviewQueueItems.length);
+
+    if (reviewQueueItems.length === 0) {
+      list.innerHTML = emptyQueueHtml(
+        'All clear',
+        'No pending changes. Click "Sync Now" to check for updates.',
+        'OK'
+      );
+      return;
+    }
+
+    if (filteredItems.length === 0) {
+      list.innerHTML = emptyQueueHtml(
+        'No matching changes',
+        'Adjust filters to expand the review queue view.',
+        '0'
+      );
+      return;
+    }
+
+    list.innerHTML = filteredItems.map(renderReviewCard).join('');
+  }
+
   // ── LOAD QUEUE ──
   async function loadQueue() {
     const res = await fetch('/api/queue');
-    const items = await res.json();
+    reviewQueueItems = await res.json();
 
     const badge = document.getElementById('queueBadge');
-    const pendingCount = document.getElementById('pendingCount');
-    pendingCount.textContent = items.length;
 
-    if (items.length > 0) {
-      badge.textContent = items.length;
+    if (reviewQueueItems.length > 0) {
+      badge.textContent = reviewQueueItems.length;
       badge.classList.remove('hidden');
     } else {
       badge.classList.add('hidden');
     }
 
-    const list = document.getElementById('reviewList');
-
-    if (items.length === 0) {
-      list.innerHTML = `
-        <div class="empty">
-          <div class="empty-icon">✅</div>
-          <div class="empty-title">All clear</div>
-          <div class="empty-sub">No pending changes. Click "Sync Now" to check for updates.</div>
-        </div>`;
-      return;
-    }
-
-	    list.innerHTML = items.map(item => {
-	      const id = Number(item.id);
-	      const confidence = Math.max(0, Math.min(1, Number(item.confidence || 0)));
-	      const severity = normalizeSeverity(item.severity);
-	      const sourceUrl = safeHttpUrl(item.source_url);
-	      return `
-	      <div class="review-card" id="card-${id}">
-	        <div class="card-header">
-	          <div class="card-meta">
-	            <span class="section-label">${escapeHtml(item.section).replace(/_/g,' ')}</span>
-	            <span class="severity-badge ${severityClass(severity)}">${escapeHtml(severity)}</span>
-	          </div>
-	          <div class="confidence-bar">
-	            <span>Confidence</span>
-	            <div class="conf-track">
-	              <div class="conf-fill" style="width:${confidence*100}%;background:${confidenceColor(confidence)}"></div>
-	            </div>
-	            <span style="color:${confidenceColor(confidence)}">${Math.round(confidence*100)}%</span>
-	          </div>
-	        </div>
-
-        <div class="diff-grid">
-	          <div class="diff-col diff-old">
-	            <div class="diff-label">Current Value</div>
-	            <div class="diff-value">${escapeHtml(item.old_value)}</div>
-	          </div>
-	          <div class="diff-col diff-new">
-	            <div class="diff-label">Proposed Change</div>
-	            <div class="diff-value">${escapeHtml(item.new_value)}</div>
-	          </div>
-	        </div>
-
-        <div class="source-section">
-	          <div class="source-icon">📄</div>
-	          <div>
-	            <div class="source-text">${escapeHtml(item.source_paragraph || 'Extracted from official source')}</div>
-	            <a class="source-url" href="${sourceUrl}" target="_blank" rel="noopener noreferrer">↗ ${escapeHtml(item.source_url)}</a>
-	          </div>
-	        </div>
-
-	        <div class="card-actions">
-	          <input class="comment-input" id="comment-${id}" placeholder="Add reviewer comment (optional)..." />
-	          <button class="btn-approve" onclick="decide(${id}, 'approve')">✓ Approve</button>
-	          <button class="btn-reject" onclick="decide(${id}, 'reject')">✗ Reject</button>
-	        </div>
-	      </div>
-	      `;
-	    }).join('');
-	  }
+    populateQueueFilters(reviewQueueItems);
+    renderQueue();
+  }
 
   // ── DECIDE ──
   async function decide(id, action) {
-    const comment = document.getElementById(`comment-${id}`).value;
+    const assignee = document.getElementById(`assignee-${id}`).value;
+    const notes = document.getElementById(`notes-${id}`).value;
+    const approveRationale = document.getElementById(`approveRationale-${id}`).value;
+    const rejectRationale = document.getElementById(`rejectRationale-${id}`).value;
+    const rationale = action === 'approve'
+      ? approveRationale
+      : action === 'reject'
+        ? rejectRationale
+        : action === 'escalate'
+          ? `Escalated: ${rejectRationale}`
+          : '';
     const res = await fetch(`/api/${action}/${id}`, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ comment })
+      body: JSON.stringify({ assignee, rationale, notes })
     });
 	    const data = await res.json();
 	    if (data.success) {
-	      document.getElementById(`card-${id}`).style.opacity = '0.3';
-	      document.getElementById(`card-${id}`).style.pointerEvents = 'none';
-	      toast(data.message, action === 'approve' ? 'success' : 'error');
-	      setTimeout(loadQueue, 800);
+	      const state = document.getElementById(`state-${id}`);
+	      const reviewedAt = document.getElementById(`reviewedAt-${id}`);
+	      if (state && data.status) {
+	        state.className = `state-badge ${stateClass(data.status)}`;
+	        state.textContent = stateLabel(data.status);
+	      }
+	      if (reviewedAt && data.reviewed_at) reviewedAt.textContent = reviewTimestamp(data.reviewed_at);
+	      toast(data.message, action === 'reject' ? 'error' : 'success');
+	      if (action === 'assign') {
+	        return;
+	      }
+	      if (action === 'escalate') {
+	        setTimeout(loadQueue, 600);
+	      } else {
+	        document.getElementById(`card-${id}`).style.opacity = '0.3';
+	        document.getElementById(`card-${id}`).style.pointerEvents = 'none';
+	        setTimeout(loadQueue, 800);
+	      }
 	    } else {
 	      toast(data.message || 'Decision failed', 'error');
 	    }
@@ -754,6 +2652,8 @@
 	        <div style="flex:1">
 	          <div><strong>${escapeHtml(item.section).replace(/_/g,' ')}</strong> — ${escapeHtml(item.country)}</div>
 	          <div class="audit-meta">${escapeHtml(item.old_value)} → ${escapeHtml(item.new_value)}</div>
+	          ${item.reviewer_rationale ? `<div class="audit-meta">Rationale: ${escapeHtml(item.reviewer_rationale)}</div>` : ''}
+	          ${item.reviewer_assignee ? `<div class="audit-meta">Reviewer: ${escapeHtml(item.reviewer_assignee)}</div>` : ''}
 	          ${item.reviewer_comment ? `<div class="audit-meta" style="color:var(--text);margin-top:4px;">"${escapeHtml(item.reviewer_comment)}"</div>` : ''}
 	        </div>
 	        <div style="color:var(--muted);font-size:11px;font-family:'DM Mono',monospace;text-align:right;">
@@ -764,23 +2664,68 @@
 	    `).join('');
   }
 
-  // ── SYNC ──
+  // ── SYNC MODAL ──
+  const COUNTRIES = ['India','Australia','Singapore','South Africa','UAE','New Zealand','Philippines','Pakistan'];
+  const FLAGS = {India:'🇮🇳',Australia:'🇦🇺',Singapore:'🇸🇬','South Africa':'🇿🇦',UAE:'🇦🇪','New Zealand':'🇳🇿',Philippines:'🇵🇭',Pakistan:'🇵🇰'};
+
+  function openSyncModal() {
+    const grid = document.getElementById('countryGrid');
+    grid.innerHTML = COUNTRIES.map(c => `
+      <div class="country-chip selected" id="chip-${c}" onclick="toggleChip('${c}')">
+        <span>${FLAGS[c] || ''}</span> ${c}
+      </div>
+    `).join('');
+    document.getElementById('syncModal').classList.add('open');
+  }
+
+  function closeSyncModal() {
+    document.getElementById('syncModal').classList.remove('open');
+  }
+
+  function closeSyncModalOnOverlay(e) {
+    if (e.target === document.getElementById('syncModal')) closeSyncModal();
+  }
+
+  function toggleChip(country) {
+    document.getElementById(`chip-${country}`).classList.toggle('selected');
+    const anySelected = COUNTRIES.some(c => document.getElementById(`chip-${c}`).classList.contains('selected'));
+    document.getElementById('startSyncBtn').disabled = !anySelected;
+  }
+
+  function toggleSelectAll() {
+    const allSelected = COUNTRIES.every(c => document.getElementById(`chip-${c}`).classList.contains('selected'));
+    COUNTRIES.forEach(c => {
+      const chip = document.getElementById(`chip-${c}`);
+      allSelected ? chip.classList.remove('selected') : chip.classList.add('selected');
+    });
+    document.getElementById('startSyncBtn').disabled = allSelected;
+    document.querySelector('.modal-select-all').textContent = allSelected ? 'Select all' : 'Deselect all';
+  }
+
   async function triggerSync() {
+    const selected = COUNTRIES.filter(c => document.getElementById(`chip-${c}`)?.classList.contains('selected'));
+    if (!selected.length) return;
+
+    closeSyncModal();
+
     const btn = document.getElementById('syncBtn');
     const icon = document.getElementById('syncIcon');
     const text = document.getElementById('syncText');
 
     btn.disabled = true;
     icon.innerHTML = '<span class="spinner"></span>';
-    text.textContent = 'Syncing...';
-
-    document.getElementById('lastSync').textContent = 'Running...';
+    text.textContent = `Syncing ${selected.length === COUNTRIES.length ? 'all' : selected.length} countr${selected.length === 1 ? 'y' : 'ies'}...`;
+    document.getElementById('m-last-sync').textContent = 'Running…';
 
     try {
-      const res = await fetch('/api/sync', { method: 'POST' });
+      const res = await fetch('/api/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ countries: selected }),
+      });
       const data = await res.json();
-      toast(data.message, data.changes_queued > 0 ? 'success' : 'success');
-      document.getElementById('lastSync').textContent = new Date().toLocaleTimeString();
+      toast(data.message, 'success');
+      loadMetrics();
       loadQueue();
     } catch (e) {
       toast('Sync failed — check your connection', 'error');
@@ -791,7 +2736,269 @@
     }
   }
 
+  // ── PUBLICATION PREVIEW ──
+  const PREVIEW_GROUPS = [
+    {id:"leave",        label:"Leave & Time Off",            sections:["annual_leave","sick_leave","maternity_leave","public_holidays"]},
+    {id:"hours",        label:"Working Hours",                sections:["working_hours","overtime","probation"]},
+    {id:"compensation", label:"Compensation",                 sections:["minimum_wage","income_tax","payroll_tax","withholding_tax"]},
+    {id:"benefits",     label:"Benefits & Social Security",   sections:["health_insurance","social_security","pension","employee_benefits"]},
+    {id:"employment",   label:"Employment Terms",             sections:["termination_notice","employer_obligations","industrial_relations"]},
+    {id:"immigration",  label:"Immigration",                  sections:["work_permit","work_visa","expatriate_employment"]},
+    {id:"safety",       label:"Workplace Safety",             sections:["workplace_safety","osh_obligations"]},
+  ];
+
+  let _previewItem = null;
+  let _previewCurrentGuide = {};   // { section: entry } for that country, live state
+  let _previewMode = 'after';      // 'before' | 'after'
+  let _pendingPublishId = null;
+
+  async function openPreviewById(id) {
+    const item = reviewQueueItems.find(i => i.id === id);
+    if (!item) return;
+
+    const btn = document.querySelector(`#card-${id} .btn-preview`);
+    if (btn) { btn.textContent = '…'; btn.disabled = true; }
+
+    try {
+      const res = await fetch('/api/guide');
+      const all = await res.json();
+      _previewCurrentGuide = {};
+      all.filter(e => e.country === item.country).forEach(e => { _previewCurrentGuide[e.section] = e; });
+    } finally {
+      if (btn) { btn.textContent = '👁 Preview'; btn.disabled = false; }
+    }
+
+    _previewItem = item;
+    _previewMode = 'after';
+    _renderPreview();
+    document.getElementById('previewOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closePreview() {
+    document.getElementById('previewOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function setPreviewMode(mode) {
+    _previewMode = mode;
+    document.getElementById('modeAfter').className  = `preview-mode-btn ${mode === 'after'  ? 'active' : ''}`;
+    document.getElementById('modeBefore').className = `preview-mode-btn ${mode === 'before' ? 'active' : ''}`;
+    _renderPreview();
+  }
+
+  function _buildGuideForMode() {
+    if (_previewMode === 'before') return _previewCurrentGuide;
+    const after = Object.assign({}, _previewCurrentGuide);
+    const item = _previewItem;
+    after[item.section] = {
+      section: item.section,
+      value: item.new_value,
+      source_url: item.source_url,
+      last_updated: new Date().toISOString(),
+      _isChanged: true,
+      _isNew: !(item.section in _previewCurrentGuide),
+      _confidence: item.confidence,
+    };
+    return after;
+  }
+
+  function _renderPreview() {
+    if (!_previewItem) return;
+    const item = _previewItem;
+    const isAfter = _previewMode === 'after';
+    const guide = _buildGuideForMode();
+    const flag = FLAGS[item.country] || '🌐';
+
+    // Topbar copy
+    document.getElementById('previewTitle').textContent = `${flag} ${item.country} — Publication Preview`;
+    document.getElementById('previewSub').textContent = isAfter
+      ? `After — how the guide will read once "${item.section.replace(/_/g,' ')}" is published`
+      : `Before — current live guide for ${item.country}`;
+    document.getElementById('previewPublishBtn').style.display = isAfter ? '' : 'none';
+    document.getElementById('modeAfter').className  = `preview-mode-btn ${isAfter  ? 'active' : ''}`;
+    document.getElementById('modeBefore').className = `preview-mode-btn ${!isAfter ? 'active' : ''}`;
+
+    // Sidebar
+    let sideHtml = `<div class="preview-nav-label">Contents</div>`;
+    PREVIEW_GROUPS.forEach(g => {
+      const hasSections = g.sections.some(s => s in guide);
+      if (!hasSections) return;
+      const hasChange = isAfter && g.sections.includes(item.section);
+      sideHtml += `<div class="preview-nav-item ${hasChange ? 'has-change' : ''}"
+        onclick="document.getElementById('pvgrp-${g.id}')?.scrollIntoView({behavior:'smooth',block:'start'})"
+      >${escapeHtml(g.label)}</div>`;
+    });
+    document.getElementById('previewSidebar').innerHTML = sideHtml;
+
+    // Document body
+    const sectionCount = Object.keys(guide).length;
+    let html = `
+      <div class="notion-doc-header">
+        <div class="notion-doc-flag">${flag}</div>
+        <div class="notion-doc-title">${escapeHtml(item.country)} Employment Guide</div>
+        <div class="notion-doc-meta">${sectionCount} section${sectionCount !== 1 ? 's' : ''} · ${isAfter ? 'Post-publish preview' : 'Current live guide'}</div>
+      </div>`;
+
+    PREVIEW_GROUPS.forEach(g => {
+      const secs = g.sections.filter(s => s in guide);
+      if (!secs.length) return;
+
+      html += `<div class="notion-group" id="pvgrp-${g.id}">`;
+      html += `<div class="notion-group-label">${escapeHtml(g.label)}</div>`;
+
+      secs.forEach(s => {
+        const entry = guide[s];
+        const changed = isAfter && entry._isChanged;
+        const isNew   = isAfter && entry._isNew;
+        const conf    = entry._confidence != null ? Math.round(entry._confidence * 100) : null;
+        const confColor = conf == null ? '#484f58' : conf >= 85 ? 'var(--accent)' : conf >= 60 ? 'var(--warn)' : 'var(--danger)';
+        const blockClass = `notion-block${isNew ? ' is-new' : changed ? ' is-changed' : ''}`;
+
+        html += `
+          <div class="${blockClass}">
+            <div class="notion-block-header">
+              <span class="notion-block-label">${escapeHtml(s.replace(/_/g,' '))}</span>
+              ${isNew    ? '<span class="notion-change-pill pill-new">New Section</span>' : ''}
+              ${changed && !isNew ? '<span class="notion-change-pill pill-updated">Updated</span>' : ''}
+              ${conf != null ? `
+                <div class="notion-conf">
+                  <div class="notion-conf-track">
+                    <div class="notion-conf-fill" style="width:${conf}%;background:${confColor}"></div>
+                  </div>
+                  <span style="color:${confColor}">${conf}%</span>
+                </div>` : ''}
+            </div>
+            <div class="notion-block-body">${escapeHtml(entry.value || 'No data available.')}</div>
+            <div class="notion-block-foot">
+              ${entry.source_url ? `↗ ${escapeHtml(entry.source_url)}` : ''}
+              ${entry.last_updated ? ` · ${entry.last_updated.split('T')[0]}` : ''}
+            </div>
+          </div>`;
+      });
+      html += `</div>`;
+    });
+
+    document.getElementById('previewContent').innerHTML = html;
+  }
+
+  // ── PUBLISH CONFIRM ──
+  function openPublishConfirm() {
+    if (!_previewItem) return;
+    const item = _previewItem;
+    _pendingPublishId = item.id;
+
+    document.getElementById('publishConfirmSub').textContent =
+      `Publishing 1 change to the ${item.country} guide`;
+
+    const preview = (item.new_value || '').trim();
+    document.getElementById('publishConfirmList').innerHTML = `
+      <div class="pub-confirm-item">
+        <div class="pub-confirm-section">${escapeHtml(item.section.replace(/_/g,' '))}</div>
+        <div class="pub-confirm-value">${escapeHtml(preview.length > 200 ? preview.slice(0, 200) + '…' : preview)}</div>
+      </div>`;
+
+    document.getElementById('publishConfirmModal').classList.add('open');
+  }
+
+  function closePublishConfirm() {
+    document.getElementById('publishConfirmModal').classList.remove('open');
+    _pendingPublishId = null;
+  }
+
+  async function confirmPublish() {
+    if (!_pendingPublishId) return;
+    const btn = document.getElementById('publishConfirmBtn');
+    btn.disabled = true;
+    btn.textContent = 'Publishing…';
+
+    try {
+      const res = await fetch(`/api/approve/${_pendingPublishId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ comment: 'Published via publication preview', rationale: 'Source verified' }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        closePublishConfirm();
+        closePreview();
+        toast(data.message, 'success');
+        loadQueue();
+        loadMetrics();
+      } else {
+        toast(data.message || 'Publish failed', 'error');
+      }
+    } catch {
+      toast('Publish failed — check your connection', 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Confirm & Publish';
+      _pendingPublishId = null;
+    }
+  }
+
+  // ── METRICS ──
+  function formatLastSync(iso) {
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return iso;
+    const diffMin = Math.floor((Date.now() - d) / 60000);
+    if (diffMin < 1) return 'Just now';
+    if (diffMin < 60) return `${diffMin}m ago`;
+    const diffH = Math.floor(diffMin / 60);
+    if (diffH < 24) return `${diffH}h ago`;
+    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+      + ' ' + d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+  }
+
+  async function loadMetrics() {
+    try {
+      const res = await fetch('/api/metrics');
+      const m = await res.json();
+
+      // Sources monitored — neutral accent
+      document.getElementById('m-sources').textContent = m.sources_monitored ?? '—';
+      document.getElementById('mc-sources').className = 'metric-card metric-ok';
+
+      // Pending reviews — warn if any, ok if clear
+      const pending = m.pending_reviews ?? 0;
+      document.getElementById('m-pending').textContent = pending;
+      document.getElementById('mc-pending').className =
+        `metric-card ${pending > 5 ? 'metric-danger' : pending > 0 ? 'metric-warn' : 'metric-ok'}`;
+
+      // Critical changes — danger if any
+      const critical = m.critical_changes ?? 0;
+      document.getElementById('m-critical').textContent = critical;
+      document.getElementById('mc-critical').className =
+        `metric-card ${critical > 0 ? 'metric-danger' : 'metric-ok'}`;
+
+      // Avg confidence
+      const conf = m.avg_confidence;
+      document.getElementById('m-confidence').textContent = conf != null ? `${conf}%` : '—';
+      document.getElementById('mc-confidence').className =
+        `metric-card ${conf == null ? '' : conf >= 85 ? 'metric-ok' : conf >= 60 ? 'metric-warn' : 'metric-danger'}`;
+
+      // Crawl failures — danger if any
+      const failures = m.crawl_failures ?? 0;
+      document.getElementById('m-failures').textContent = failures;
+      document.getElementById('mc-failures').className =
+        `metric-card ${failures > 0 ? 'metric-danger' : 'metric-ok'}`;
+
+      // Last successful sync
+      document.getElementById('m-last-sync').textContent =
+        m.last_successful_sync ? formatLastSync(m.last_successful_sync) : 'Never';
+      document.getElementById('mc-last-sync').className =
+        `metric-card ${m.last_successful_sync ? 'metric-ok' : ''}`;
+
+      // Trusted source count — neutral accent
+      document.getElementById('m-trusted').textContent = m.trusted_source_count ?? '—';
+      document.getElementById('mc-trusted').className = 'metric-card metric-ok';
+    } catch (e) {
+      console.error('Metrics load failed', e);
+    }
+  }
+
   // ── INIT ──
+  loadMetrics();
   loadQueue();
 </script>
 </body>
