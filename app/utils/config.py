@@ -42,3 +42,12 @@ def official_sources_json_url():
         "OFFICIAL_SOURCES_JSON_URL",
         "https://raw.githubusercontent.com/guptashivansh/compliance-data/main/data/official-sources.json",
     )
+
+
+def slack_webhook_url():
+    return os.environ.get("SLACK_WEBHOOK_URL", "")
+
+
+def sync_cron_schedule():
+    """5-field cron expression controlling when the scheduled sync runs. Empty string disables it."""
+    return os.environ.get("SYNC_CRON_SCHEDULE", "")

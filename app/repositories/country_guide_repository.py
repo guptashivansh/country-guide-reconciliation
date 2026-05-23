@@ -289,6 +289,48 @@ class CountryGuideRepository:
         conn.close()
         return {"country": country, "section": section, "status": status, "reviewed_at": timestamp}
 
+    def bulk_approve_non_critical(self, country, comment="", rationale=""):
+        """Approve all pending/escalated non-critical items for a country in one transaction."""
+        conn = self.connect()
+        c = conn.cursor()
+        c.execute("""
+            SELECT id, country, section, old_value, new_value, source_url, source_hash
+            FROM review_queue
+            WHERE country = ? AND status IN ('pending', 'escalated')
+              AND (severity IS NULL OR LOWER(severity) != 'critical')
+            ORDER BY section
+        """, (country,))
+        rows = c.fetchall()
+
+        if not rows:
+            conn.close()
+            return {"approved": 0}
+
+        timestamp = datetime.now().isoformat()
+        for row in rows:
+            item_id, country_val, section, old_value, new_value, source_url, source_hash = row
+            c.execute('''
+                INSERT INTO country_guide (country, section, value, source_url, source_hash, last_updated)
+                VALUES (?, ?, ?, ?, ?, ?)
+                ON CONFLICT(country, section) DO UPDATE SET
+                    value=excluded.value, source_url=excluded.source_url,
+                    source_hash=excluded.source_hash, last_updated=excluded.last_updated
+            ''', (country_val, section, new_value, source_url, source_hash, timestamp))
+            c.execute("""
+                UPDATE review_queue
+                SET status='approved', reviewed_at=?, reviewer_comment=?, reviewer_rationale=?
+                WHERE id=?
+            """, (timestamp, comment, rationale, item_id))
+            c.execute('''
+                INSERT INTO audit_log
+                (action, country, section, old_value, new_value, decision, reviewer_comment, timestamp, reviewer_rationale)
+                VALUES ('REVIEW', ?, ?, ?, ?, 'approved', ?, ?, ?)
+            ''', (country_val, section, old_value, new_value, comment, timestamp, rationale))
+
+        conn.commit()
+        conn.close()
+        return {"approved": len(rows)}
+
     def escalate_review_item(self, item_id, comment, assignee="", rationale=""):
         conn = self.connect()
         c = conn.cursor()

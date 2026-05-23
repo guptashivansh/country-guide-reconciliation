@@ -860,6 +860,79 @@
     text-align: right;
   }
 
+  .reviewer-recommendation {
+    align-items: center;
+    background: rgba(2,6,23,0.28);
+    border: 1px solid rgba(148,163,184,0.18);
+    border-radius: 10px;
+    display: grid;
+    gap: 12px;
+    grid-template-columns: 190px minmax(0, 1fr) auto;
+    margin-top: 12px;
+    padding: 11px 12px;
+  }
+
+  .recommendation-badge {
+    border-radius: 7px;
+    display: inline-flex;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    justify-content: center;
+    letter-spacing: 0.8px;
+    padding: 5px 9px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .recommendation-auto {
+    background: rgba(110,231,183,0.11);
+    border: 1px solid rgba(110,231,183,0.34);
+    color: var(--accent);
+  }
+
+  .recommendation-escalate {
+    background: rgba(248,113,113,0.12);
+    border: 1px solid rgba(248,113,113,0.36);
+    color: var(--danger);
+  }
+
+  .recommendation-manual {
+    background: rgba(251,191,36,0.11);
+    border: 1px solid rgba(251,191,36,0.34);
+    color: var(--warn);
+  }
+
+  .recommendation-copy {
+    min-width: 0;
+  }
+
+  .recommendation-kicker {
+    color: #94a3b8;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.1px;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+  }
+
+  .recommendation-rationale {
+    color: #cbd5e1;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.45;
+  }
+
+  .recommendation-factors {
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    line-height: 1.45;
+    text-align: right;
+    white-space: nowrap;
+  }
+
   /* SOURCE EVIDENCE */
   .source-evidence {
     border-top: 1px solid var(--border);
@@ -1387,10 +1460,11 @@
   @media (max-width: 760px) {
     header, .tabs, main { padding-left: 20px; padding-right: 20px; }
     .card-header, .ai-review-header, .source-evidence-toggle { align-items: flex-start; flex-direction: column; }
-    .diff-grid, .ai-review-grid, .provenance-grid, .workflow-controls, .filter-strip, .filter-grid { grid-template-columns: 1fr; }
+    .diff-grid, .ai-review-grid, .reviewer-recommendation, .provenance-grid, .workflow-controls, .filter-strip, .filter-grid { grid-template-columns: 1fr; }
     .filter-summary { border-right: none; border-bottom: 1px solid var(--border); padding-bottom: 10px; padding-right: 0; }
     .diff-col:first-child { border-right: none; border-bottom: 1px solid var(--border); }
     .ai-review-meta { border-left: none; border-top: 1px solid var(--border); padding-left: 0; padding-top: 12px; }
+    .recommendation-factors { text-align: left; white-space: normal; }
     .provenance-field-wide { grid-column: span 1; }
     .source-evidence-preview { white-space: normal; }
     .workflow-actions { align-items: stretch; flex-direction: column; width: 100%; }
@@ -1418,6 +1492,50 @@
     white-space: nowrap;
   }
   .btn-preview:hover { background: rgba(110,231,183,0.13); border-color: rgba(110,231,183,0.4); }
+
+  /* ── BULK APPROVE BAR ── */
+  .bulk-approve-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    background: rgba(110,231,183,0.05);
+    border: 1px solid rgba(110,231,183,0.22);
+    border-radius: 10px;
+    padding: 13px 18px;
+    margin-bottom: 14px;
+  }
+
+  .bulk-approve-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 3px;
+  }
+
+  .bulk-approve-sub {
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    color: var(--muted);
+  }
+
+  .btn-bulk-approve {
+    background: var(--accent-dim);
+    color: var(--accent);
+    border: 1px solid rgba(110,231,183,0.35);
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .btn-bulk-approve:hover { background: rgba(110,231,183,0.16); }
+  .btn-bulk-approve:disabled { opacity: 0.4; cursor: not-allowed; }
 
   /* ── PUBLICATION PREVIEW OVERLAY ── */
   .preview-overlay {
@@ -1760,6 +1878,13 @@
         <button class="filter-reset" id="resetFilters" type="button">Reset</button>
       </div>
     </div>
+    <div class="bulk-approve-bar hidden" id="bulkApproveBar">
+      <div>
+        <div class="bulk-approve-title" id="bulkApproveTitle"></div>
+        <div class="bulk-approve-sub" id="bulkApproveSub"></div>
+      </div>
+      <button class="btn-bulk-approve" onclick="openBulkApproveConfirm()">✓ Bulk Approve</button>
+    </div>
     <div id="reviewList"></div>
   </div>
 
@@ -1814,6 +1939,20 @@
   <div class="preview-layout">
     <aside class="preview-sidebar" id="previewSidebar"></aside>
     <div class="preview-content" id="previewContent"></div>
+  </div>
+</div>
+
+<!-- ── BULK APPROVE CONFIRMATION MODAL ── -->
+<div class="modal-overlay" id="bulkApproveModal" onclick="if(event.target===this)closeBulkApproveModal()">
+  <div class="modal">
+    <div class="modal-title">Bulk Approve Non-Critical Changes</div>
+    <div class="modal-sub" id="bulkConfirmSub"></div>
+    <div id="bulkConfirmList" style="max-height:260px;overflow-y:auto;margin-bottom:4px;"></div>
+    <div class="pub-confirm-warning">Critical severity items are excluded. Each change will be published to the live guide and logged to the audit trail.</div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeBulkApproveModal()">Cancel</button>
+      <button class="btn-primary" id="bulkApproveConfirmBtn" onclick="confirmBulkApprove()">Confirm & Approve All</button>
+    </div>
   </div>
 </div>
 
@@ -1952,6 +2091,62 @@
 	    }
 
 	    return `${section} has a detected compliance wording change with ${confidenceCopy}. ${actionCopy}`;
+	  }
+
+	  function recommendationClass(type) {
+	    return {
+	      auto: 'recommendation-auto',
+	      escalate: 'recommendation-escalate',
+	      manual: 'recommendation-manual'
+	    }[type] || 'recommendation-manual';
+	  }
+
+	  function reviewerRecommendation(item, confidence, impact, semanticScore, trustLevel, changeType) {
+	    const severity = normalizeSeverity(item.severity);
+	    const trust = String(trustLevel || '').toUpperCase();
+	    const sourceIsTrusted = trust === 'VERIFIED' || trust === 'TRUSTED';
+	    const lowConfidence = confidence < 0.6 || semanticScore < 0.55 || changeType === 'Unverified';
+	    const highRisk = severity === 'critical' || impact === 'Critical' || changeType === 'Deprecated';
+	    const materialRemoval = changeType === 'Removed' && severity !== 'minor';
+	    const lowRiskHighConfidence = sourceIsTrusted
+	      && confidence >= 0.88
+	      && semanticScore >= 0.85
+	      && ['Low', 'Informational'].includes(impact)
+	      && ['Added', 'Modified', 'Clarification'].includes(changeType);
+
+	    if (highRisk || materialRemoval) {
+	      return {
+	        type: 'escalate',
+	        label: 'Escalation recommended',
+	        rationale: 'High-impact or lifecycle-sensitive policy movement detected; route to accountable compliance owner before publishing.',
+	        factors: `${Math.round(confidence * 100)}% parser / ${Math.round(semanticScore * 100)}% semantic`
+	      };
+	    }
+
+	    if (lowConfidence || !sourceIsTrusted) {
+	      return {
+	        type: 'manual',
+	        label: 'Manual review required',
+	        rationale: 'Evidence quality or source trust is below automation threshold; validate source excerpt and policy intent manually.',
+	        factors: `${trustLevel} / ${Math.round(confidence * 100)}% parser`
+	      };
+	    }
+
+	    if (lowRiskHighConfidence) {
+	      return {
+	        type: 'auto',
+	        label: 'Auto-approve recommended',
+	        rationale: 'Trusted source, strong semantic match, and low operational impact indicate the change is suitable for accelerated approval.',
+	        factors: `${Math.round(confidence * 100)}% parser / ${impact} impact`
+	      };
+	    }
+
+	    return {
+	      type: 'manual',
+	      label: 'Manual review required',
+	      rationale: 'Confidence is acceptable, but impact or wording complexity requires reviewer confirmation before publication.',
+	      factors: `${changeType} / ${Math.round(semanticScore * 100)}% semantic`
+	    };
 	  }
 
 	  function sourceHost(value) {
@@ -2371,6 +2566,7 @@
     const semanticScore = semanticMatchScore(item, confidence);
     const trustLevel = sourceTrustLevel(item, confidence);
     const changeType = classifyChange(item, confidence, semanticScore);
+    const recommendation = reviewerRecommendation(item, confidence, impact, semanticScore, trustLevel, changeType);
     const diff = semanticDiff(item.old_value, item.new_value);
     const sourceSnippet = sourceSnippetText(item);
     const sourceSnippetOpen = shouldCollapseSourceSnippet(sourceSnippet) ? '' : ' open';
@@ -2421,6 +2617,14 @@
               <div class="ai-meta-row"><span>Workflow</span><span>Reviewer approval</span></div>
               <div class="ai-meta-row"><span>Signal</span><span>${Math.round(confidence*100)}% match</span></div>
             </div>
+          </div>
+          <div class="reviewer-recommendation">
+            <span class="recommendation-badge ${recommendationClass(recommendation.type)}">${escapeHtml(recommendation.label)}</span>
+            <div class="recommendation-copy">
+              <div class="recommendation-kicker">Reviewer recommendation</div>
+              <div class="recommendation-rationale">${escapeHtml(recommendation.rationale)}</div>
+            </div>
+            <div class="recommendation-factors">${escapeHtml(recommendation.factors)}</div>
           </div>
         </div>
 
@@ -2556,6 +2760,7 @@
     }
 
     list.innerHTML = filteredItems.map(renderReviewCard).join('');
+    updateBulkApproveBar();
   }
 
   // ── LOAD QUEUE ──
@@ -2994,6 +3199,84 @@
       document.getElementById('mc-trusted').className = 'metric-card metric-ok';
     } catch (e) {
       console.error('Metrics load failed', e);
+    }
+  }
+
+  // ── BULK APPROVE ──
+  let _bulkApproveCountry = null;
+  let _bulkApproveItems = [];
+
+  function updateBulkApproveBar() {
+    const bar = document.getElementById('bulkApproveBar');
+    const titleEl = document.getElementById('bulkApproveTitle');
+    const subEl = document.getElementById('bulkApproveSub');
+    if (!bar) return;
+
+    const country = currentQueueFilters().country;
+    if (!country) { bar.classList.add('hidden'); return; }
+
+    const eligible = reviewQueueItems.filter(item => {
+      const meta = queueItemMeta(item);
+      return meta.country === country
+        && meta.severity !== 'critical'
+        && (meta.status === 'pending' || meta.status === 'escalated');
+    });
+
+    if (!eligible.length) { bar.classList.add('hidden'); return; }
+
+    _bulkApproveCountry = country;
+    _bulkApproveItems = eligible;
+    const flag = FLAGS[country] || '🌐';
+    titleEl.textContent = `${eligible.length} non-critical pending item${eligible.length !== 1 ? 's' : ''} for ${flag} ${country}`;
+    subEl.textContent = 'Minor and major severity only — critical changes are excluded.';
+    bar.classList.remove('hidden');
+  }
+
+  function openBulkApproveConfirm() {
+    if (!_bulkApproveCountry || !_bulkApproveItems.length) return;
+    const country = _bulkApproveCountry;
+    const items = _bulkApproveItems;
+    const flag = FLAGS[country] || '🌐';
+
+    document.getElementById('bulkConfirmSub').textContent =
+      `Approving ${items.length} non-critical change${items.length !== 1 ? 's' : ''} for ${flag} ${country}`;
+
+    document.getElementById('bulkConfirmList').innerHTML = items.map(item => `
+      <div class="pub-confirm-item">
+        <div class="pub-confirm-section" style="display:flex;align-items:center;gap:8px;">
+          <span class="severity-badge ${severityClass(normalizeSeverity(item.severity))}" style="font-size:10px;padding:2px 7px">${escapeHtml(normalizeSeverity(item.severity))}</span>
+          ${escapeHtml(item.section.replace(/_/g, ' '))}
+        </div>
+        <div class="pub-confirm-value">${escapeHtml((item.new_value || '').trim().slice(0, 130))}${(item.new_value || '').length > 130 ? '…' : ''}</div>
+      </div>`).join('');
+
+    document.getElementById('bulkApproveModal').classList.add('open');
+  }
+
+  function closeBulkApproveModal() {
+    document.getElementById('bulkApproveModal').classList.remove('open');
+  }
+
+  async function confirmBulkApprove() {
+    if (!_bulkApproveCountry) return;
+    const btn = document.getElementById('bulkApproveConfirmBtn');
+    btn.disabled = true;
+    btn.textContent = 'Approving…';
+    try {
+      const res = await fetch('/api/bulk-approve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ country: _bulkApproveCountry }),
+      });
+      const data = await res.json();
+      closeBulkApproveModal();
+      toast(data.message, data.success ? 'success' : 'error');
+      if (data.success) { loadQueue(); loadMetrics(); }
+    } catch {
+      toast('Bulk approve failed — check your connection', 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Confirm & Approve All';
     }
   }
 

@@ -13,7 +13,7 @@ from app.repositories.source_snapshot_repository import SourceSnapshotRepository
 from app.repositories.source_endpoint_repository import TrustedSourceEndpointRepository
 from app.review.review_service import ReviewService
 from app.services.source_registry_service import SourceRegistryService
-from app.utils.config import database_path, extraction_chunk_size, groq_api_keys, load_env_file, official_sources_json_url
+from app.utils.config import database_path, extraction_chunk_size, groq_api_keys, load_env_file, official_sources_json_url, slack_webhook_url, sync_cron_schedule
 from app.utils.logging_config import configure_logging
 
 
@@ -61,4 +61,10 @@ def create_app(db_path=None):
         reconciliation_service=services["reconciliation_service"],
         country_guide_repository=services["country_guide_repository"],
     ))
+
+    cron = sync_cron_schedule()
+    if cron:
+        from app.services.scheduler_service import start_scheduler
+        start_scheduler(flask_app, services, cron, slack_webhook_url())
+
     return flask_app
