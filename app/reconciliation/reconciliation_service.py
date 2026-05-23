@@ -1,14 +1,19 @@
 import logging
 
 from app.models.workflow_results import FailureDetail, ReconciliationResult
+from app.reconciliation.semantic_reconciliation_service import SemanticReconciliationEngine
 
 
 logger = logging.getLogger(__name__)
 
 
 class ReconciliationService:
-    def __init__(self, country_guide_repository):
+    def __init__(self, country_guide_repository, semantic_engine=None):
         self.country_guide_repository = country_guide_repository
+        self.semantic_engine = semantic_engine or SemanticReconciliationEngine()
+
+    def reconcile_canonical_rules(self, old_rule, new_rule):
+        return self.semantic_engine.reconcile(old_rule, new_rule)
 
     def reconcile_extracted_rules(self, country, extracted_data, source_url, source_hash, source_snapshot_id):
         changes_found = 0
@@ -31,6 +36,7 @@ class ReconciliationService:
                 confidence = item.get("confidence", 0.5)
                 severity = item.get("severity", "minor")
                 source_paragraph = item.get("source_paragraph", "")
+                effective_date = item.get("effective_date")
 
                 if not section or not new_value:
                     skipped_count += 1
@@ -62,6 +68,30 @@ class ReconciliationService:
                     )
                     continue
 
+                materiality_level = None
+                change_type = None
+                try:
+                    sem = self.semantic_engine.reconcile(
+                        {"section": section, "value": old_value},
+                        {"section": section, "value": new_value},
+                    )
+                    materiality_level = sem.materiality_level
+                    change_type = sem.change_type
+                    logger.info(
+                        "Semantic classification complete",
+                        extra={
+                            "stage": "reconciliation",
+                            "section": section,
+                            "materiality": materiality_level,
+                            "change_type": change_type,
+                        },
+                    )
+                except Exception as e:
+                    logger.warning(
+                        "Semantic classification failed — enqueuing without classification",
+                        extra={"stage": "reconciliation", "section": section, "error": str(e)},
+                    )
+
                 self.country_guide_repository.enqueue_review_item(
                     country=country,
                     section=section,
@@ -73,6 +103,9 @@ class ReconciliationService:
                     source_paragraph=source_paragraph,
                     source_hash=source_hash,
                     source_snapshot_id=source_snapshot_id,
+                    effective_date=effective_date,
+                    materiality_level=materiality_level,
+                    change_type=change_type,
                 )
                 changes_found += 1
                 logger.info(

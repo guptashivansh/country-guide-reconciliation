@@ -12,18 +12,30 @@ class ReviewService:
     def list_country_guide_entries(self):
         return self.country_guide_repository.list_country_guide_entries()
 
+    def list_countries_summary(self):
+        return self.country_guide_repository.list_countries_summary()
+
+    def get_country_sections(self, country):
+        return self.country_guide_repository.get_country_sections(country)
+
     def list_pending_review_items(self):
         return self.country_guide_repository.list_pending_review_items()
 
     def list_audit_entries(self):
         return self.country_guide_repository.list_audit_entries()
 
-    def approve_review_item(self, item_id, comment, assignee="", rationale=""):
+    def approve_review_item(self, item_id, comment, assignee="", rationale="", effective_date=None):
         logger.info(
             "Approving review item",
             extra={"stage": "review", "review_item_id": item_id},
         )
-        result = self.country_guide_repository.approve_pending_review_item(item_id, comment, assignee, rationale)
+        result = self.country_guide_repository.approve_pending_review_item(
+            item_id,
+            comment,
+            assignee,
+            rationale,
+            effective_date,
+        )
         if not result:
             logger.warning(
                 "Approve failed because pending review item was not found",
@@ -74,12 +86,12 @@ class ReviewService:
         )
         return result
 
-    def bulk_approve_non_critical(self, country, comment="", rationale=""):
+    def bulk_approve_non_critical(self, country, comment="", rationale="", effective_date=None):
         logger.info(
             "Bulk approving non-critical items",
             extra={"stage": "review", "country": country},
         )
-        result = self.country_guide_repository.bulk_approve_non_critical(country, comment, rationale)
+        result = self.country_guide_repository.bulk_approve_non_critical(country, comment, rationale, effective_date)
         logger.info(
             "Bulk approval complete",
             extra={"stage": "review", "country": country, "approved": result["approved"]},

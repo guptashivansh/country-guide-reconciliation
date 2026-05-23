@@ -1,5 +1,5 @@
 import sqlite3
-from datetime import datetime
+from datetime import date, datetime
 
 
 class CountryGuideRepository:
@@ -8,6 +8,132 @@ class CountryGuideRepository:
 
     def connect(self):
         return sqlite3.connect(self.db_path)
+
+    def _now(self):
+        return datetime.now().isoformat()
+
+    def _normalize_effective_date(self, effective_date, created_at=None):
+        if isinstance(effective_date, datetime):
+            return effective_date.date().isoformat()
+        if isinstance(effective_date, date):
+            return effective_date.isoformat()
+        if effective_date:
+            return str(effective_date).strip()[:10]
+        timestamp = created_at or self._now()
+        return str(timestamp)[:10]
+
+    def _superseded_at_for_effective_date(self, effective_date):
+        return f"{self._normalize_effective_date(effective_date)}T00:00:00"
+
+    def _next_version_number(self, cursor, country, section):
+        cursor.execute(
+            "SELECT COALESCE(MAX(version_number), 0) FROM country_guide_versions WHERE country=? AND section=?",
+            (country, section),
+        )
+        return int(cursor.fetchone()[0] or 0) + 1
+
+    def _version_row(self, row):
+        return {
+            "id": row[0],
+            "country": row[1],
+            "section": row[2],
+            "value": row[3],
+            "source_url": row[4],
+            "source_hash": row[5],
+            "effective_date": row[6],
+            "created_at": row[7],
+            "superseded_at": row[8],
+            "version_number": row[9],
+            "approval_reference": row[10],
+        }
+
+    def _publish_rule_version(
+        self,
+        cursor,
+        country,
+        section,
+        value,
+        source_url,
+        source_hash="",
+        effective_date=None,
+        created_at=None,
+        approval_reference=None,
+    ):
+        created_at = created_at or self._now()
+        effective_date = self._normalize_effective_date(effective_date, created_at)
+        approval_reference = approval_reference or "direct_upsert"
+        source_url = source_url or ""
+        source_hash = source_hash or ""
+
+        cursor.execute("""
+            SELECT value, source_url, source_hash, version_number
+            FROM country_guide
+            WHERE country=? AND section=?
+        """, (country, section))
+        current = cursor.fetchone()
+
+        if current and current[0] == value and (current[1] or "") == source_url and (current[2] or "") == source_hash:
+            current_version = current[3] or 1
+            cursor.execute("""
+                UPDATE country_guide
+                SET last_updated=?, effective_date=COALESCE(effective_date, ?),
+                    created_at=COALESCE(created_at, ?), version_number=COALESCE(version_number, ?),
+                    approval_reference=COALESCE(approval_reference, ?)
+                WHERE country=? AND section=?
+            """, (created_at, effective_date, created_at, current_version, approval_reference, country, section))
+            return current_version
+
+        version_number = self._next_version_number(cursor, country, section)
+        if current:
+            cursor.execute("""
+                UPDATE country_guide_versions
+                SET superseded_at=COALESCE(superseded_at, ?)
+                WHERE country=? AND section=? AND superseded_at IS NULL
+            """, (self._superseded_at_for_effective_date(effective_date), country, section))
+
+        cursor.execute('''
+            INSERT INTO country_guide_versions
+            (country, section, value, source_url, source_hash, effective_date, created_at,
+             superseded_at, version_number, approval_reference)
+            VALUES (?, ?, ?, ?, ?, ?, ?, NULL, ?, ?)
+        ''', (
+            country,
+            section,
+            value,
+            source_url,
+            source_hash,
+            effective_date,
+            created_at,
+            version_number,
+            approval_reference,
+        ))
+        cursor.execute('''
+            INSERT INTO country_guide
+            (country, section, value, source_url, source_hash, last_updated,
+             effective_date, created_at, version_number, approval_reference)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(country, section) DO UPDATE SET
+                value=excluded.value,
+                source_url=excluded.source_url,
+                source_hash=excluded.source_hash,
+                last_updated=excluded.last_updated,
+                effective_date=excluded.effective_date,
+                created_at=COALESCE(country_guide.created_at, excluded.created_at),
+                version_number=excluded.version_number,
+                approval_reference=excluded.approval_reference
+        ''', (
+            country,
+            section,
+            value,
+            source_url,
+            source_hash,
+            created_at,
+            effective_date,
+            created_at,
+            version_number,
+            approval_reference,
+        ))
+        return version_number
 
     def initialize_schema(self):
         conn = self.connect()
@@ -25,6 +151,64 @@ class CountryGuideRepository:
                 UNIQUE(country, section)
             )
         ''')
+
+        c.execute("PRAGMA table_info(country_guide)")
+        guide_columns = {row[1] for row in c.fetchall()}
+        if "effective_date" not in guide_columns:
+            c.execute("ALTER TABLE country_guide ADD COLUMN effective_date TEXT")
+        if "created_at" not in guide_columns:
+            c.execute("ALTER TABLE country_guide ADD COLUMN created_at TEXT")
+        if "version_number" not in guide_columns:
+            c.execute("ALTER TABLE country_guide ADD COLUMN version_number INTEGER")
+        if "approval_reference" not in guide_columns:
+            c.execute("ALTER TABLE country_guide ADD COLUMN approval_reference TEXT")
+
+        c.execute('''
+            CREATE TABLE IF NOT EXISTS country_guide_versions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                country TEXT NOT NULL,
+                section TEXT NOT NULL,
+                value TEXT NOT NULL,
+                source_url TEXT,
+                source_hash TEXT,
+                effective_date TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                superseded_at TEXT,
+                version_number INTEGER NOT NULL,
+                approval_reference TEXT,
+                metadata TEXT DEFAULT '{}',
+                UNIQUE(country, section, version_number)
+            )
+        ''')
+        c.execute('''
+            CREATE INDEX IF NOT EXISTS idx_country_guide_versions_lookup
+            ON country_guide_versions(country, section, effective_date, superseded_at)
+        ''')
+        c.execute('''
+            CREATE INDEX IF NOT EXISTS idx_country_guide_versions_history
+            ON country_guide_versions(country, section, version_number)
+        ''')
+
+        migration_timestamp = self._now()
+        c.execute("""
+            UPDATE country_guide
+            SET created_at=COALESCE(created_at, last_updated, ?),
+                effective_date=COALESCE(effective_date, substr(COALESCE(last_updated, ?), 1, 10)),
+                version_number=COALESCE(version_number, 1),
+                approval_reference=COALESCE(approval_reference, 'initial_migration')
+        """, (migration_timestamp, migration_timestamp))
+        c.execute("""
+            INSERT OR IGNORE INTO country_guide_versions
+            (country, section, value, source_url, source_hash, effective_date, created_at,
+             superseded_at, version_number, approval_reference)
+            SELECT country, section, value, source_url, source_hash,
+                   COALESCE(effective_date, substr(COALESCE(last_updated, ?), 1, 10)),
+                   COALESCE(created_at, last_updated, ?),
+                   NULL,
+                   COALESCE(version_number, 1),
+                   COALESCE(approval_reference, 'initial_migration')
+            FROM country_guide
+        """, (migration_timestamp, migration_timestamp))
 
         c.execute('''
             CREATE TABLE IF NOT EXISTS review_queue (
@@ -54,6 +238,12 @@ class CountryGuideRepository:
             c.execute("ALTER TABLE review_queue ADD COLUMN reviewer_assignee TEXT")
         if "reviewer_rationale" not in review_columns:
             c.execute("ALTER TABLE review_queue ADD COLUMN reviewer_rationale TEXT")
+        if "effective_date" not in review_columns:
+            c.execute("ALTER TABLE review_queue ADD COLUMN effective_date TEXT")
+        if "materiality_level" not in review_columns:
+            c.execute("ALTER TABLE review_queue ADD COLUMN materiality_level TEXT")
+        if "change_type" not in review_columns:
+            c.execute("ALTER TABLE review_queue ADD COLUMN change_type TEXT")
 
         c.execute('''
             CREATE TABLE IF NOT EXISTS audit_log (
@@ -91,24 +281,63 @@ class CountryGuideRepository:
 
         conn = self.connect()
         c = conn.cursor()
+        timestamp = self._now()
         for country, section, value, url, source_hash in initial_data:
-            c.execute('''
-                INSERT OR IGNORE INTO country_guide (country, section, value, source_url, source_hash, last_updated)
-                VALUES (?, ?, ?, ?, ?, ?)
-            ''', (country, section, value, url, source_hash, datetime.now().isoformat()))
+            self._publish_rule_version(
+                c,
+                country,
+                section,
+                value,
+                url,
+                source_hash,
+                effective_date=timestamp[:10],
+                created_at=timestamp,
+                approval_reference="initial_seed",
+            )
 
         conn.commit()
         conn.close()
 
+    def list_countries_summary(self):
+        conn = self.connect()
+        c = conn.cursor()
+        c.execute("""
+            SELECT country, COUNT(*) as n, MAX(last_updated) as updated
+            FROM country_guide
+            GROUP BY country
+            ORDER BY country
+        """)
+        rows = c.fetchall()
+        conn.close()
+        return [{"country": r[0], "rule_count": r[1], "last_updated": r[2]} for r in rows]
+
+    def get_country_sections(self, country):
+        conn = self.connect()
+        c = conn.cursor()
+        c.execute(
+            "SELECT section, value, last_updated FROM country_guide WHERE country = ? ORDER BY section",
+            (country,),
+        )
+        rows = c.fetchall()
+        conn.close()
+        return [{"section": r[0], "value": r[1], "last_updated": r[2]} for r in rows]
+
     def list_country_guide_entries(self):
         conn = self.connect()
         c = conn.cursor()
-        c.execute("SELECT country, section, value, source_url, last_updated FROM country_guide ORDER BY country, section")
+        c.execute("""
+            SELECT country, section, value, source_url, last_updated, effective_date,
+                   created_at, version_number, approval_reference
+            FROM country_guide
+            ORDER BY country, section
+        """)
         rows = c.fetchall()
         conn.close()
         return [{
             "country": r[0], "section": r[1], "value": r[2],
-            "source_url": r[3], "last_updated": r[4]
+            "source_url": r[3], "last_updated": r[4],
+            "effective_date": r[5], "created_at": r[6],
+            "version_number": r[7], "approval_reference": r[8],
         } for r in rows]
 
     def list_pending_review_items(self):
@@ -116,7 +345,8 @@ class CountryGuideRepository:
         c = conn.cursor()
         c.execute("""
             SELECT id, country, section, old_value, new_value, severity, confidence, source_url, source_paragraph,
-                   created_at, source_snapshot_id, status, reviewed_at, reviewer_comment, reviewer_assignee, reviewer_rationale
+                   created_at, source_snapshot_id, status, reviewed_at, reviewer_comment, reviewer_assignee,
+                   reviewer_rationale, effective_date, materiality_level, change_type
             FROM review_queue WHERE status IN ('pending', 'escalated')
             ORDER BY
                 CASE status WHEN 'escalated' THEN 0 ELSE 1 END,
@@ -134,6 +364,9 @@ class CountryGuideRepository:
             "status": r[11], "reviewed_at": r[12],
             "reviewer_notes": r[13], "reviewer_assignee": r[14],
             "reviewer_rationale": r[15],
+            "effective_date": r[16],
+            "materiality_level": r[17],
+            "change_type": r[18],
         } for r in rows]
 
     def list_audit_entries(self, limit=50):
@@ -150,18 +383,19 @@ class CountryGuideRepository:
             "reviewer_rationale": r[10] if len(r) > 10 else None,
         } for r in rows]
 
-    def upsert_guide_entry(self, country, section, value, source_url, source_hash=""):
+    def upsert_guide_entry(self, country, section, value, source_url, source_hash="", effective_date=None, approval_reference=None):
         conn = self.connect()
         c = conn.cursor()
-        c.execute('''
-            INSERT INTO country_guide (country, section, value, source_url, source_hash, last_updated)
-            VALUES (?, ?, ?, ?, ?, ?)
-            ON CONFLICT(country, section) DO UPDATE SET
-                value=excluded.value,
-                source_url=excluded.source_url,
-                source_hash=excluded.source_hash,
-                last_updated=excluded.last_updated
-        ''', (country, section, value, source_url, source_hash, datetime.now().isoformat()))
+        self._publish_rule_version(
+            c,
+            country,
+            section,
+            value,
+            source_url,
+            source_hash,
+            effective_date=effective_date,
+            approval_reference=approval_reference,
+        )
         conn.commit()
         conn.close()
 
@@ -172,6 +406,51 @@ class CountryGuideRepository:
         row = c.fetchone()
         conn.close()
         return row[0] if row else "Not previously recorded"
+
+    def get_current_rule(self, country, section):
+        conn = self.connect()
+        c = conn.cursor()
+        c.execute("""
+            SELECT country, section, value, source_url, source_hash, effective_date, created_at,
+                   NULL as superseded_at, version_number, approval_reference
+            FROM country_guide
+            WHERE country=? AND section=?
+        """, (country, section))
+        row = c.fetchone()
+        conn.close()
+        return self._version_row((None,) + row) if row else None
+
+    def list_rule_versions(self, country, section):
+        conn = self.connect()
+        c = conn.cursor()
+        c.execute("""
+            SELECT id, country, section, value, source_url, source_hash, effective_date,
+                   created_at, superseded_at, version_number, approval_reference
+            FROM country_guide_versions
+            WHERE country=? AND section=?
+            ORDER BY version_number ASC
+        """, (country, section))
+        rows = c.fetchall()
+        conn.close()
+        return [self._version_row(row) for row in rows]
+
+    def get_rule_at_date(self, country, section, as_of_date):
+        query_date = self._normalize_effective_date(as_of_date)
+        conn = self.connect()
+        c = conn.cursor()
+        c.execute("""
+            SELECT id, country, section, value, source_url, source_hash, effective_date,
+                   created_at, superseded_at, version_number, approval_reference
+            FROM country_guide_versions
+            WHERE country=? AND section=?
+              AND date(effective_date) <= date(?)
+              AND (superseded_at IS NULL OR date(superseded_at) > date(?))
+            ORDER BY date(effective_date) DESC, version_number DESC
+            LIMIT 1
+        """, (country, section, query_date, query_date))
+        row = c.fetchone()
+        conn.close()
+        return self._version_row(row) if row else None
 
     def pending_review_exists(self, country, section):
         conn = self.connect()
@@ -184,23 +463,39 @@ class CountryGuideRepository:
         conn.close()
         return exists
 
-    def enqueue_review_item(self, country, section, old_value, new_value, severity, confidence, source_url, source_paragraph, source_hash, source_snapshot_id):
+    def enqueue_review_item(self, country, section, old_value, new_value, severity, confidence, source_url, source_paragraph, source_hash, source_snapshot_id, effective_date=None, materiality_level=None, change_type=None):
         conn = self.connect()
         c = conn.cursor()
         c.execute('''
             INSERT INTO review_queue
-            (country, section, old_value, new_value, severity, confidence, source_url, source_paragraph, status, created_at, source_hash, source_snapshot_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?)
-        ''', (country, section, old_value, new_value, severity, confidence, source_url, source_paragraph, datetime.now().isoformat(), source_hash, source_snapshot_id))
+            (country, section, old_value, new_value, severity, confidence, source_url, source_paragraph,
+             status, created_at, source_hash, source_snapshot_id, effective_date, materiality_level, change_type)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?, ?, ?, ?)
+        ''', (
+            country,
+            section,
+            old_value,
+            new_value,
+            severity,
+            confidence,
+            source_url,
+            source_paragraph,
+            self._now(),
+            source_hash,
+            source_snapshot_id,
+            self._normalize_effective_date(effective_date) if effective_date else None,
+            materiality_level,
+            change_type,
+        ))
         conn.commit()
         conn.close()
 
-    def approve_pending_review_item(self, item_id, comment, assignee="", rationale=""):
+    def approve_pending_review_item(self, item_id, comment, assignee="", rationale="", effective_date=None):
         conn = self.connect()
         c = conn.cursor()
         c.execute("""
             SELECT country, section, old_value, new_value, source_url, source_hash,
-                   source_paragraph, confidence, source_snapshot_id, created_at
+                   source_paragraph, confidence, source_snapshot_id, created_at, effective_date
             FROM review_queue
             WHERE id=? AND status IN ('pending', 'escalated')
         """, (item_id,))
@@ -210,22 +505,27 @@ class CountryGuideRepository:
             return None
 
         country, section, old_value, new_value, source_url, source_hash, \
-            source_paragraph, confidence, source_snapshot_id, created_at = item
-        timestamp = datetime.now().isoformat()
-        c.execute('''
-            INSERT INTO country_guide (country, section, value, source_url, source_hash, last_updated)
-            VALUES (?, ?, ?, ?, ?, ?)
-            ON CONFLICT(country, section) DO UPDATE SET
-                value=excluded.value,
-                source_url=excluded.source_url,
-                source_hash=excluded.source_hash,
-                last_updated=excluded.last_updated
-        ''', (country, section, new_value, source_url, source_hash, timestamp))
+            source_paragraph, confidence, source_snapshot_id, created_at, queued_effective_date = item
+        timestamp = self._now()
+        resolved_effective_date = self._normalize_effective_date(effective_date or queued_effective_date, timestamp)
+        approval_reference = f"review_queue:{item_id}"
+        version_number = self._publish_rule_version(
+            c,
+            country,
+            section,
+            new_value,
+            source_url,
+            source_hash,
+            effective_date=resolved_effective_date,
+            created_at=timestamp,
+            approval_reference=approval_reference,
+        )
         c.execute("""
             UPDATE review_queue
-            SET status='approved', reviewed_at=?, reviewer_comment=?, reviewer_assignee=?, reviewer_rationale=?
+            SET status='approved', reviewed_at=?, reviewer_comment=?, reviewer_assignee=?,
+                reviewer_rationale=?, effective_date=?
             WHERE id=?
-        """, (timestamp, comment, assignee, rationale, item_id))
+        """, (timestamp, comment, assignee, rationale, resolved_effective_date, item_id))
         c.execute('''
             INSERT INTO audit_log
             (action, country, section, old_value, new_value, decision, reviewer_comment, timestamp, reviewer_assignee, reviewer_rationale)
@@ -240,6 +540,8 @@ class CountryGuideRepository:
             "source_hash": source_hash, "source_paragraph": source_paragraph,
             "confidence": confidence, "source_snapshot_id": source_snapshot_id,
             "reviewer_assignee": assignee, "reviewer_rationale": rationale, "reviewer_comment": comment,
+            "effective_date": resolved_effective_date, "version_number": version_number,
+            "approval_reference": approval_reference,
         }
 
     def reject_pending_review_item(self, item_id, comment, assignee="", rationale=""):
@@ -256,7 +558,7 @@ class CountryGuideRepository:
             return None
 
         country, section, old_value, new_value = item
-        timestamp = datetime.now().isoformat()
+        timestamp = self._now()
         c.execute("""
             UPDATE review_queue
             SET status='rejected', reviewed_at=?, reviewer_comment=?, reviewer_assignee=?, reviewer_rationale=?
@@ -286,7 +588,7 @@ class CountryGuideRepository:
             return None
 
         country, section, status = item
-        timestamp = datetime.now().isoformat()
+        timestamp = self._now()
         c.execute("""
             UPDATE review_queue
             SET reviewed_at=?, reviewer_comment=?, reviewer_assignee=?
@@ -297,13 +599,13 @@ class CountryGuideRepository:
         conn.close()
         return {"country": country, "section": section, "status": status, "reviewed_at": timestamp}
 
-    def bulk_approve_non_critical(self, country, comment="", rationale=""):
+    def bulk_approve_non_critical(self, country, comment="", rationale="", effective_date=None):
         """Approve all pending/escalated non-critical items for a country in one transaction."""
         conn = self.connect()
         c = conn.cursor()
         c.execute("""
             SELECT id, country, section, old_value, new_value, source_url, source_hash,
-                   source_paragraph, confidence, source_snapshot_id
+                   source_paragraph, confidence, source_snapshot_id, effective_date
             FROM review_queue
             WHERE country = ? AND status IN ('pending', 'escalated')
               AND (severity IS NULL OR LOWER(severity) != 'critical')
@@ -315,23 +617,29 @@ class CountryGuideRepository:
             conn.close()
             return {"approved": 0}
 
-        timestamp = datetime.now().isoformat()
+        timestamp = self._now()
         approved_items = []
         for row in rows:
             item_id, country_val, section, old_value, new_value, source_url, source_hash, \
-                source_paragraph, confidence, source_snapshot_id = row
-            c.execute('''
-                INSERT INTO country_guide (country, section, value, source_url, source_hash, last_updated)
-                VALUES (?, ?, ?, ?, ?, ?)
-                ON CONFLICT(country, section) DO UPDATE SET
-                    value=excluded.value, source_url=excluded.source_url,
-                    source_hash=excluded.source_hash, last_updated=excluded.last_updated
-            ''', (country_val, section, new_value, source_url, source_hash, timestamp))
+                source_paragraph, confidence, source_snapshot_id, queued_effective_date = row
+            resolved_effective_date = self._normalize_effective_date(effective_date or queued_effective_date, timestamp)
+            approval_reference = f"review_queue:{item_id}"
+            version_number = self._publish_rule_version(
+                c,
+                country_val,
+                section,
+                new_value,
+                source_url,
+                source_hash,
+                effective_date=resolved_effective_date,
+                created_at=timestamp,
+                approval_reference=approval_reference,
+            )
             c.execute("""
                 UPDATE review_queue
-                SET status='approved', reviewed_at=?, reviewer_comment=?, reviewer_rationale=?
+                SET status='approved', reviewed_at=?, reviewer_comment=?, reviewer_rationale=?, effective_date=?
                 WHERE id=?
-            """, (timestamp, comment, rationale, item_id))
+            """, (timestamp, comment, rationale, resolved_effective_date, item_id))
             c.execute('''
                 INSERT INTO audit_log
                 (action, country, section, old_value, new_value, decision, reviewer_comment, timestamp, reviewer_rationale)
@@ -343,7 +651,8 @@ class CountryGuideRepository:
                 "source_paragraph": source_paragraph, "confidence": confidence,
                 "source_snapshot_id": source_snapshot_id,
                 "reviewer_assignee": "", "reviewer_rationale": rationale, "reviewer_comment": comment,
-                "reviewed_at": timestamp,
+                "reviewed_at": timestamp, "effective_date": resolved_effective_date,
+                "version_number": version_number, "approval_reference": approval_reference,
             })
 
         conn.commit()
@@ -364,7 +673,7 @@ class CountryGuideRepository:
             return None
 
         country, section, old_value, new_value = item
-        timestamp = datetime.now().isoformat()
+        timestamp = self._now()
         c.execute("""
             UPDATE review_queue
             SET status='escalated', reviewed_at=?, reviewer_comment=?, reviewer_assignee=?, reviewer_rationale=?

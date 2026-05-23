@@ -340,24 +340,60 @@
     margin-bottom: 24px;
   }
 
+  .review-console-heading {
+    align-items: flex-end;
+    display: flex;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 18px;
+  }
+
+  .review-console-heading .section-sub {
+    margin-bottom: 0;
+  }
+
+  .console-kicker {
+    color: #94a3b8;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.8px;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+  }
+
+  .console-guardrail {
+    background: rgba(2,6,23,0.36);
+    border: 1px solid rgba(148,163,184,0.18);
+    border-radius: 8px;
+    color: #94a3b8;
+    flex-shrink: 0;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.7px;
+    padding: 8px 10px;
+    text-transform: uppercase;
+  }
+
   /* REVIEW FILTERS */
   .queue-filter-bar {
     position: sticky;
     top: 73px;
     z-index: 70;
-    background: rgba(15,15,24,0.96);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    box-shadow: 0 14px 28px rgba(0,0,0,0.26);
+    background: rgba(11,13,18,0.97);
+    border: 1px solid rgba(51,65,85,0.58);
+    border-radius: 10px;
+    box-shadow: 0 14px 28px rgba(0,0,0,0.22);
     backdrop-filter: blur(14px);
-    margin-bottom: 16px;
-    padding: 12px;
+    margin-bottom: 12px;
+    padding: 10px;
   }
 
   .filter-strip {
     display: grid;
-    grid-template-columns: 132px minmax(0, 1fr) auto;
-    gap: 12px;
+    grid-template-columns: 128px minmax(0, 1fr) auto;
+    gap: 10px;
     align-items: end;
   }
 
@@ -381,7 +417,7 @@
   .filter-summary strong {
     color: var(--text);
     font-family: 'DM Mono', monospace;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 700;
     line-height: 1.4;
   }
@@ -412,13 +448,13 @@
     background:
       linear-gradient(45deg, transparent 50%, #94a3b8 50%) calc(100% - 14px) calc(50% - 2px) / 5px 5px no-repeat,
       linear-gradient(135deg, #94a3b8 50%, transparent 50%) calc(100% - 9px) calc(50% - 2px) / 5px 5px no-repeat,
-      var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
+      #10131b;
+    border: 1px solid rgba(51,65,85,0.62);
+    border-radius: 7px;
     color: var(--text);
     font-family: 'DM Mono', monospace;
     font-size: 11px;
-    height: 34px;
+    height: 32px;
     outline: none;
     padding: 0 25px 0 10px;
     transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
@@ -437,16 +473,16 @@
 
   .filter-reset {
     align-items: center;
-    background: rgba(148,163,184,0.1);
-    border: 1px solid rgba(148,163,184,0.26);
-    border-radius: 8px;
+    background: rgba(148,163,184,0.08);
+    border: 1px solid rgba(148,163,184,0.24);
+    border-radius: 7px;
     color: #cbd5e1;
     cursor: pointer;
     display: inline-flex;
     font-family: 'DM Mono', monospace;
     font-size: 10px;
     font-weight: 700;
-    height: 34px;
+    height: 32px;
     justify-content: center;
     letter-spacing: 0.8px;
     min-width: 74px;
@@ -464,22 +500,50 @@
 
   /* REVIEW CARDS */
   .review-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    margin-bottom: 16px;
+    background: #0d1018;
+    border: 1px solid rgba(51,65,85,0.55);
+    border-left: 3px solid rgba(148,163,184,0.34);
+    border-radius: 10px;
+    margin-bottom: 12px;
     overflow: hidden;
-    transition: border-color 0.2s;
+    transition: border-color 0.18s ease, transform 0.18s ease, background 0.18s ease;
   }
 
-  .review-card:hover { border-color: #2e2e4e; }
+  .review-card:hover {
+    background: #0f121b;
+    border-color: rgba(71,85,105,0.78);
+    transform: translateY(-1px);
+  }
+
+  .review-card.review-critical { border-left-color: var(--danger); }
+  .review-card.review-major { border-left-color: var(--warn); }
+  .review-card.review-minor { border-left-color: var(--accent); }
 
   .card-header {
-    padding: 20px 24px;
+    padding: 14px 18px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 1px solid var(--border);
+    gap: 18px;
+    border-bottom: 1px solid rgba(51,65,85,0.5);
+  }
+
+  .card-title-stack {
+    display: grid;
+    gap: 7px;
+    min-width: 0;
+  }
+
+  .card-eyebrow {
+    color: #64748b;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+    white-space: nowrap;
   }
 
   .card-meta {
@@ -491,8 +555,8 @@
 
   .section-label {
     font-family: 'DM Mono', monospace;
-    font-size: 13px;
-    font-weight: 500;
+    font-size: 12px;
+    font-weight: 700;
     color: var(--text);
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -511,6 +575,213 @@
   .severity-critical { background: var(--danger-dim); color: var(--danger); border: 1px solid rgba(248,113,113,0.3); }
   .severity-major { background: var(--warn-dim); color: var(--warn); border: 1px solid rgba(251,191,36,0.3); }
   .severity-minor { background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(110,231,183,0.3); }
+
+  /* ── DRIFT PANEL ── */
+  .drift-header { display:flex; align-items:flex-start; justify-content:space-between; gap:24px; margin-bottom:20px; }
+  .drift-summary-pills { display:flex; gap:8px; }
+  .drift-summary-pill { display:flex; flex-direction:column; align-items:center; padding:10px 20px; border-radius:10px; min-width:76px; }
+  .dsp-critical { background:rgba(185,28,28,0.12); border:1px solid rgba(185,28,28,0.28); }
+  .dsp-warning  { background:rgba(217,119,6,0.10);  border:1px solid rgba(217,119,6,0.26);  }
+  .dsp-stable   { background:rgba(110,231,183,0.08);border:1px solid rgba(110,231,183,0.22); }
+  .dsp-count { font-family:'DM Mono',monospace; font-size:22px; font-weight:700; line-height:1; }
+  .dsp-label { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:1px; text-transform:uppercase; margin-top:4px; }
+  .dsp-critical .dsp-count { color:var(--danger); }   .dsp-critical .dsp-label { color:rgba(248,113,113,0.6); }
+  .dsp-warning  .dsp-count { color:var(--warn); }     .dsp-warning  .dsp-label { color:rgba(251,191,36,0.6);  }
+  .dsp-stable   .dsp-count { color:var(--accent); }   .dsp-stable   .dsp-label { color:rgba(110,231,183,0.6); }
+
+  .drift-filter-pills { display:flex; align-items:center; gap:6px; margin-bottom:16px; flex-wrap:wrap; }
+  .dfp { padding:5px 13px; border-radius:20px; font-family:'DM Mono',monospace; font-size:11px; font-weight:600; letter-spacing:0.3px; cursor:pointer; border:1px solid var(--border); background:transparent; color:var(--muted); transition:all 0.15s; }
+  .dfp:hover { border-color:rgba(110,231,183,0.4); color:var(--accent); }
+  .dfp.active { border-color:var(--accent); color:var(--accent); background:var(--accent-dim); }
+  .dfp[data-filter="critical"].active { border-color:var(--danger); color:var(--danger); background:var(--danger-dim); }
+  .dfp[data-filter="warning"].active  { border-color:var(--warn); color:var(--warn); background:var(--warn-dim); }
+
+  .drift-country-table { width:100%; border-collapse:collapse; font-size:13px; }
+  .drift-country-table thead { position:sticky; top:0; z-index:10; background:var(--surface); }
+  .drift-country-table th { padding:11px 16px; text-align:left; font-size:10px; font-weight:700; letter-spacing:0.8px; text-transform:uppercase; color:var(--muted); border-bottom:1px solid var(--border); white-space:nowrap; user-select:none; }
+  .drift-country-table td { padding:13px 16px; border-bottom:1px solid rgba(30,30,46,0.7); vertical-align:middle; }
+  .dct-sortable { cursor:pointer; }
+  .dct-sortable:hover { color:var(--text); }
+  .dct-sorted { color:var(--accent) !important; }
+  .dct-sort-icon { display:inline-block; margin-left:4px; font-size:9px; opacity:0.55; }
+  .dct-sorted .dct-sort-icon { opacity:1; }
+
+  .drift-country-row { cursor:pointer; transition:background 0.12s ease; border-left:3px solid transparent; }
+  .drift-country-row:hover td { background:rgba(255,255,255,0.022); }
+  .drift-country-row.row-critical { border-left-color:var(--danger); }
+  .drift-country-row.row-warning  { border-left-color:var(--warn); }
+  .drift-country-row.row-stable   { border-left-color:var(--accent); }
+
+  .drift-sev-cell { display:flex; align-items:center; gap:8px; }
+  .drift-sev-dot  { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .dot-critical   { background:var(--danger); animation:pulse-crit 2.2s ease-in-out infinite; }
+  .dot-warning    { background:var(--warn); }
+  .dot-stable     { background:var(--accent); }
+  @keyframes pulse-crit { 0%,100%{box-shadow:0 0 3px rgba(248,113,113,0.4)} 50%{box-shadow:0 0 9px rgba(248,113,113,0.85)} }
+  .drift-sev-label { font-family:'DM Mono',monospace; font-size:11px; font-weight:700; letter-spacing:0.4px; text-transform:uppercase; }
+  .sev-critical .drift-sev-label { color:var(--danger); }
+  .sev-warning  .drift-sev-label { color:var(--warn); }
+  .sev-stable   .drift-sev-label { color:var(--accent); }
+
+  .drift-counts { display:flex; align-items:center; gap:5px; flex-wrap:wrap; }
+  .dc-badge { display:inline-flex; align-items:center; font-family:'DM Mono',monospace; font-size:10px; font-weight:700; padding:2px 7px; border-radius:5px; white-space:nowrap; }
+  .dc-crit { background:rgba(248,113,113,0.11); color:var(--danger); border:1px solid rgba(248,113,113,0.24); }
+  .dc-warn { background:rgba(251,191,36,0.10);  color:var(--warn);   border:1px solid rgba(251,191,36,0.24);  }
+  .dc-info { background:rgba(100,116,139,0.11); color:#94a3b8;       border:1px solid rgba(100,116,139,0.24); }
+
+  .drift-type-pills { display:flex; flex-wrap:wrap; gap:4px; }
+  .dtp { font-family:'DM Mono',monospace; font-size:9px; font-weight:600; padding:2px 7px; border-radius:4px; letter-spacing:0.3px; background:rgba(99,102,241,0.10); border:1px solid rgba(99,102,241,0.22); color:#a5b4fc; white-space:nowrap; cursor:default; }
+
+  .drift-action-text { font-size:12px; color:var(--text); max-width:220px; line-height:1.45; }
+  .drift-ts-cell { font-family:'DM Mono',monospace; font-size:11px; color:var(--muted); white-space:nowrap; }
+
+  .drift-expand-btn { background:none; border:none; color:var(--muted); cursor:pointer; font-size:16px; padding:4px 6px; border-radius:5px; transition:all 0.2s; display:flex; align-items:center; justify-content:center; line-height:1; }
+  .drift-expand-btn:hover { color:var(--text); background:rgba(255,255,255,0.06); }
+  .drift-expand-btn.open { color:var(--accent); transform:rotate(90deg); }
+
+  .drift-expand-row { background:rgba(10,10,20,0.5); }
+  .drift-expand-row td { padding:0 !important; border-bottom:1px solid var(--border) !important; }
+  .drift-expand-inner { padding:16px 20px 20px; border-top:1px solid rgba(30,30,46,0.8); }
+  .drift-expand-inner.hidden { display:none; }
+  .drift-expand-subhead { font-size:10px; font-weight:700; letter-spacing:0.8px; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
+
+  .drift-section-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:9px; }
+  .drift-section-card { background:var(--surface); border:1px solid var(--border); border-radius:9px; padding:12px 14px; display:flex; flex-direction:column; gap:6px; transition:border-color 0.15s; }
+  .drift-section-card:hover { border-color:rgba(110,231,183,0.22); }
+  .drift-section-card.sec-critical { border-left:2px solid var(--danger); }
+  .drift-section-card.sec-warning  { border-left:2px solid var(--warn); }
+  .drift-section-card.sec-info     { border-left:2px solid rgba(100,116,139,0.35); }
+  .dsc-header { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  .dsc-section { font-family:'DM Mono',monospace; font-size:11px; font-weight:700; color:var(--text); text-transform:uppercase; letter-spacing:0.4px; }
+  .dsc-evidence { font-size:11px; color:var(--muted); line-height:1.4; }
+  .dsc-action   { font-size:11px; color:#cbd5e1; line-height:1.4; }
+  .dsc-footer   { display:flex; align-items:center; gap:8px; margin-top:2px; }
+  .dsc-queue-link { font-family:'DM Mono',monospace; font-size:10px; color:var(--accent); text-decoration:none; padding:2px 7px; border-radius:4px; border:1px solid rgba(110,231,183,0.28); background:rgba(110,231,183,0.07); transition:background 0.15s; }
+  .dsc-queue-link:hover { background:rgba(110,231,183,0.15); }
+  .dsc-days { font-family:'DM Mono',monospace; font-size:10px; color:var(--muted); }
+
+  .drift-skeleton { display:none; padding:8px 0; }
+  .drift-skeleton.active { display:block; }
+  .drift-skel-row { display:flex; align-items:center; gap:14px; padding:15px 0; border-bottom:1px solid var(--border); }
+  .skel { border-radius:4px; background:linear-gradient(90deg,rgba(30,30,46,0.9) 25%,rgba(50,50,72,0.55) 50%,rgba(30,30,46,0.9) 75%); background-size:200% 100%; animation:skel-shimmer 1.5s ease-in-out infinite; }
+  @keyframes skel-shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+  .drift-empty { display:none; flex-direction:column; align-items:center; justify-content:center; padding:64px 20px; gap:10px; }
+  .drift-empty.show { display:flex; }
+  .drift-empty-icon  { font-size:30px; opacity:0.25; }
+  .drift-empty-title { font-size:15px; font-weight:700; color:var(--muted); }
+  .drift-empty-sub   { font-size:12px; color:rgba(100,116,139,0.65); text-align:center; max-width:300px; line-height:1.5; }
+
+  /* ── PIPELINE HEALTH ── */
+  .pipeline-header { display:flex; align-items:flex-start; justify-content:space-between; gap:24px; margin-bottom:20px; }
+
+  .pipeline-summary-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:20px; }
+  @media(max-width:900px){ .pipeline-summary-grid { grid-template-columns:repeat(2,1fr); } }
+  .psc { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px 20px; position:relative; overflow:hidden; }
+  .psc-value { font-family:'DM Mono',monospace; font-size:26px; font-weight:700; line-height:1; margin-bottom:5px; }
+  .psc-label { font-size:10px; font-weight:700; letter-spacing:0.7px; text-transform:uppercase; color:var(--muted); }
+  .psc-sub   { font-family:'DM Mono',monospace; font-size:10px; color:var(--muted); margin-top:4px; }
+  .psc-ok      { border-top:2px solid var(--accent);  } .psc-ok      .psc-value { color:var(--accent);  }
+  .psc-danger  { border-top:2px solid var(--danger);  } .psc-danger  .psc-value { color:var(--danger);  }
+  .psc-warn    { border-top:2px solid var(--warn);    } .psc-warn    .psc-value { color:var(--warn);    }
+  .psc-neutral { border-top:2px solid #4f6890;        } .psc-neutral .psc-value { color:#93c5fd;        }
+  .psc-dim     { border-top:2px solid rgba(100,116,139,0.4); } .psc-dim .psc-value { color:var(--muted); }
+
+  .pipeline-filter-bar { display:flex; align-items:center; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
+  .pf-search { position:relative; }
+  .pf-search-icon { position:absolute; left:9px; top:50%; transform:translateY(-50%); color:var(--muted); font-size:11px; pointer-events:none; }
+  .pf-search input { background:var(--surface); border:1px solid var(--border); border-radius:7px; color:var(--text); font-family:'DM Mono',monospace; font-size:12px; padding:6px 10px 6px 27px; width:230px; outline:none; transition:border-color 0.15s; }
+  .pf-search input:focus { border-color:rgba(110,231,183,0.4); }
+  .pf-search input::placeholder { color:var(--muted); }
+  .pf-divider { width:1px; height:22px; background:var(--border); flex-shrink:0; }
+  .pf-pills { display:flex; gap:4px; }
+  .pfp { padding:5px 11px; border-radius:6px; font-family:'DM Mono',monospace; font-size:11px; font-weight:600; cursor:pointer; border:1px solid var(--border); background:transparent; color:var(--muted); transition:all 0.15s; }
+  .pfp:hover { color:var(--text); border-color:rgba(255,255,255,0.14); }
+  .pfp.active                    { background:rgba(110,231,183,0.09); border-color:rgba(110,231,183,0.32); color:var(--accent); }
+  .pfp[data-state="failed"].active  { background:var(--danger-dim);              border-color:rgba(248,113,113,0.32); color:var(--danger); }
+  .pfp[data-state="running"].active { background:rgba(96,165,250,0.09);          border-color:rgba(96,165,250,0.32);  color:#93c5fd; }
+  .pfp[data-state="queued"].active  { background:rgba(100,116,139,0.11);         border-color:rgba(100,116,139,0.28); color:#94a3b8; }
+  .pipeline-count-label { font-family:'DM Mono',monospace; font-size:11px; color:var(--muted); margin-left:auto; }
+
+  .pipeline-table { width:100%; border-collapse:collapse; }
+  .pipeline-table thead { position:sticky; top:0; z-index:10; background:var(--surface); }
+  .pipeline-table th { padding:10px 14px; text-align:left; font-size:10px; font-weight:700; letter-spacing:0.8px; text-transform:uppercase; color:var(--muted); border-bottom:1px solid var(--border); white-space:nowrap; user-select:none; }
+  .pipeline-table td { padding:10px 14px; border-bottom:1px solid rgba(30,30,46,0.65); vertical-align:middle; }
+  .pt-sortable { cursor:pointer; } .pt-sortable:hover { color:var(--text); }
+  .pt-sorted { color:var(--accent) !important; }
+  .pt-sort-icon { display:inline-block; margin-left:4px; font-size:9px; opacity:0.5; }
+  .pt-sorted .pt-sort-icon { opacity:1; }
+
+  .pipeline-row { cursor:default; transition:background 0.1s; }
+  .pipeline-row:hover td { background:rgba(255,255,255,0.018); }
+  .pipeline-row.row-reconciled td:first-child { border-left:2px solid var(--accent); }
+  .pipeline-row.row-failed  td:first-child    { border-left:2px solid var(--danger); }
+  .pipeline-row.row-running td:first-child    { border-left:2px solid #60a5fa; }
+  .pipeline-row.row-queued  td:first-child    { border-left:2px solid rgba(100,116,139,0.4); }
+
+  .pip-status { display:inline-flex; align-items:center; gap:7px; }
+  .pip-dot    { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+  .pip-dot-success { background:var(--accent); }
+  .pip-dot-running { background:#60a5fa; animation:pip-blink 1.5s ease-in-out infinite; }
+  .pip-dot-failed  { background:var(--danger); }
+  .pip-dot-queued  { background:rgba(100,116,139,0.55); }
+  @keyframes pip-blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .pip-status-label { font-family:'DM Mono',monospace; font-size:11px; font-weight:700; letter-spacing:0.3px; text-transform:uppercase; }
+  .pip-lbl-success { color:var(--accent); }
+  .pip-lbl-running { color:#93c5fd; }
+  .pip-lbl-failed  { color:var(--danger); }
+  .pip-lbl-queued  { color:#64748b; }
+
+  .pip-source { font-family:'DM Mono',monospace; font-size:11px; max-width:280px; overflow:hidden; }
+  .pip-source-host { color:var(--text); font-weight:600; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .pip-source-path { color:var(--muted); display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:10px; margin-top:1px; }
+
+  .pip-stages { display:flex; align-items:center; gap:2px; }
+  .pip-stage  { width:8px; height:8px; border-radius:2px; }
+  .pip-stage-done { background:rgba(110,231,183,0.5); }
+  .pip-stage-cur  { background:var(--accent); }
+  .pip-stage-fail { background:var(--danger); }
+  .pip-stage-none { background:rgba(100,116,139,0.18); }
+  .pip-stage-sep  { width:4px; height:1px; background:rgba(100,116,139,0.2); align-self:center; }
+
+  .pip-ts  { font-family:'DM Mono',monospace; font-size:11px; color:var(--muted); white-space:nowrap; }
+  .pip-dur { font-family:'DM Mono',monospace; font-size:11px; white-space:nowrap; }
+  .pip-dur.fast { color:var(--accent); } .pip-dur.slow { color:var(--warn); } .pip-dur.norm { color:var(--text); }
+  .pip-snap { font-family:'DM Mono',monospace; font-size:11px; color:#a5b4fc; }
+  .pip-snap-none { color:var(--muted); }
+
+  .pip-exp-btn { background:none; border:none; color:var(--muted); cursor:pointer; font-size:15px; padding:3px 5px; border-radius:4px; transition:all 0.2s; display:flex; align-items:center; }
+  .pip-exp-btn:hover { color:var(--text); background:rgba(255,255,255,0.06); }
+  .pip-exp-btn.open { color:var(--danger); transform:rotate(90deg); }
+  .pip-exp-btn.invisible { visibility:hidden; }
+
+  .pip-detail-row { background:rgba(8,5,16,0.65); }
+  .pip-detail-row td { padding:0 !important; border-bottom:1px solid var(--border) !important; }
+  .pip-detail-inner { padding:14px 16px 18px 48px; border-top:1px solid rgba(30,30,46,0.9); display:none; }
+  .pip-detail-inner.open { display:block; }
+  .pip-error-pre { background:rgba(248,113,113,0.06); border:1px solid rgba(248,113,113,0.18); border-radius:7px; padding:11px 14px; font-family:'DM Mono',monospace; font-size:11px; color:#fca5a5; line-height:1.55; white-space:pre-wrap; word-break:break-all; margin-bottom:12px; }
+  .pip-detail-meta { display:flex; gap:24px; flex-wrap:wrap; margin-bottom:12px; }
+  .pip-dm { display:flex; flex-direction:column; gap:3px; }
+  .pip-dm-key { font-size:9px; font-weight:700; letter-spacing:0.8px; text-transform:uppercase; color:var(--muted); }
+  .pip-dm-val { font-family:'DM Mono',monospace; font-size:11px; color:var(--text); }
+  .pip-retry-btn { padding:5px 13px; background:rgba(248,113,113,0.08); border:1px solid rgba(248,113,113,0.25); border-radius:6px; color:var(--danger); font-family:'DM Mono',monospace; font-size:11px; font-weight:700; cursor:not-allowed; opacity:0.6; }
+
+  .pipeline-pagination { display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-top:1px solid var(--border); }
+  .pp-pages { display:flex; gap:4px; }
+  .pp-btn { padding:4px 10px; border-radius:5px; font-family:'DM Mono',monospace; font-size:11px; font-weight:600; cursor:pointer; border:1px solid var(--border); background:transparent; color:var(--muted); transition:all 0.12s; }
+  .pp-btn:hover:not(:disabled):not(.active) { color:var(--text); border-color:rgba(255,255,255,0.16); }
+  .pp-btn.active { background:rgba(110,231,183,0.09); border-color:var(--accent); color:var(--accent); }
+  .pp-btn:disabled { opacity:0.3; cursor:default; }
+  .pp-info { font-family:'DM Mono',monospace; font-size:11px; color:var(--muted); }
+
+  .pipeline-skeleton { display:none; }
+  .pipeline-skeleton.active { display:block; }
+  .pip-skel-row { display:flex; align-items:center; gap:12px; padding:13px 0; border-bottom:1px solid var(--border); }
+  .pipeline-empty { display:none; flex-direction:column; align-items:center; justify-content:center; padding:60px 20px; gap:10px; }
+  .pipeline-empty.show { display:flex; }
+  .pipeline-empty-icon  { font-family:'DM Mono',monospace; font-size:22px; opacity:0.22; letter-spacing:-1px; }
+  .pipeline-empty-title { font-size:15px; font-weight:700; color:var(--muted); }
+  .pipeline-empty-sub   { font-size:12px; color:rgba(100,116,139,0.65); text-align:center; max-width:320px; line-height:1.5; }
 
   .change-badge {
     align-items: center;
@@ -573,6 +844,42 @@
     color: #cbd5e1;
   }
 
+  /* ── MATERIALITY BADGES ── */
+  .mat-badge {
+    align-items: center;
+    border-radius: 4px;
+    cursor: default;
+    display: inline-flex;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.7px;
+    padding: 3px 7px;
+    text-transform: uppercase;
+    transition: opacity 0.15s ease;
+    white-space: nowrap;
+  }
+  .mat-badge:hover { opacity: 0.75; }
+  .mat-badge:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+  .mat-low           { background: rgba(100,116,139,0.13); color: #94a3b8; border: 1px solid rgba(100,116,139,0.27); }
+  .mat-moderate      { background: rgba(217,119,6,0.12);   color: #f59e0b; border: 1px solid rgba(217,119,6,0.30);  }
+  .mat-high          { background: rgba(234,88,12,0.13);   color: #fb923c; border: 1px solid rgba(234,88,12,0.32);  }
+  .mat-critical      { background: rgba(185,28,28,0.15);   color: #f87171; border: 1px solid rgba(185,28,28,0.38);  }
+  .mat-informational { background: rgba(100,116,139,0.09); color: #64748b; border: 1px solid rgba(100,116,139,0.20); }
+
+  /* Semantic-engine change-type pill: text-only, indigo tint */
+  .change-semantic {
+    background: rgba(99,102,241,0.10);
+    border: 1px solid rgba(99,102,241,0.26);
+    color: #a5b4fc;
+    cursor: default;
+    max-width: 128px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+  .change-semantic:hover { background: rgba(99,102,241,0.18); border-color: rgba(99,102,241,0.44); }
+
   .state-badge {
     border-radius: 999px;
     font-family: 'DM Mono', monospace;
@@ -613,8 +920,9 @@
     align-items: center;
     gap: 8px;
     font-family: 'DM Mono', monospace;
-    font-size: 12px;
+    font-size: 11px;
     color: var(--muted);
+    flex-shrink: 0;
   }
 
   .conf-track {
@@ -637,16 +945,16 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 0;
-    background: rgba(255,255,255,0.01);
+    background: #090b11;
   }
 
   .diff-col {
-    padding: 20px 24px;
+    padding: 14px 18px 16px;
     animation: diffAppear 0.34s ease both;
   }
 
   .diff-col:first-child {
-    border-right: 1px solid var(--border);
+    border-right: 1px solid rgba(51,65,85,0.52);
   }
 
   .diff-col:nth-child(2) {
@@ -654,28 +962,44 @@
   }
 
   .diff-label {
-    font-size: 11px;
+    align-items: center;
+    display: flex;
+    font-size: 10px;
     font-weight: 700;
+    gap: 8px;
     text-transform: uppercase;
-    letter-spacing: 1.5px;
+    letter-spacing: 1.4px;
     font-family: 'DM Mono', monospace;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
+  }
+
+  .diff-label::before {
+    border-radius: 3px;
+    content: "";
+    display: inline-block;
+    height: 8px;
+    width: 8px;
   }
 
   .diff-old .diff-label { color: var(--danger); }
   .diff-new .diff-label { color: var(--accent); }
+  .diff-old .diff-label::before { background: var(--danger); }
+  .diff-new .diff-label::before { background: var(--accent); }
 
   .diff-value {
-    background: rgba(10,10,15,0.46);
-    border: 1px solid rgba(30,30,46,0.86);
-    border-radius: 8px;
+    background: rgba(2,6,23,0.5);
+    border: 1px solid rgba(51,65,85,0.5);
+    border-radius: 7px;
     color: #cbd5e1;
-    font-size: 15px;
-    line-height: 1.75;
+    font-size: 14px;
+    line-height: 1.72;
     font-weight: 600;
-    min-height: 96px;
-    padding: 14px 15px;
+    max-height: 320px;
+    min-height: 88px;
+    overflow: auto;
     overflow-wrap: anywhere;
+    padding: 12px 13px;
+    scrollbar-color: rgba(100,116,139,0.42) transparent;
     white-space: normal;
   }
 
@@ -748,11 +1072,11 @@
 
   /* AI REVIEW */
   .ai-review-panel {
-    border-top: 1px solid var(--border);
+    border-top: 1px solid rgba(51,65,85,0.52);
     background:
-      linear-gradient(180deg, rgba(99,102,241,0.07), rgba(15,15,24,0)),
+      linear-gradient(180deg, rgba(99,102,241,0.05), rgba(15,15,24,0)),
       rgba(255,255,255,0.015);
-    padding: 14px 24px;
+    padding: 13px 18px;
   }
 
   .ai-review-header {
@@ -760,7 +1084,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
   }
 
   .ai-review-title {
@@ -776,13 +1100,13 @@
     font-weight: 700;
     letter-spacing: 1.4px;
     text-transform: uppercase;
-    color: #a5b4fc;
+    color: #93c5fd;
   }
 
   .ai-model-pill {
-    border: 1px solid rgba(165,180,252,0.28);
-    background: rgba(99,102,241,0.1);
-    color: #c7d2fe;
+    border: 1px solid rgba(147,197,253,0.26);
+    background: rgba(14,165,233,0.08);
+    color: #bfdbfe;
     border-radius: 999px;
     padding: 3px 8px;
     font-family: 'DM Mono', monospace;
@@ -792,7 +1116,7 @@
   }
 
   .impact-badge {
-    border-radius: 999px;
+    border-radius: 7px;
     padding: 5px 10px;
     font-family: 'DM Mono', monospace;
     font-size: 10px;
@@ -828,20 +1152,20 @@
 
   .ai-review-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 220px;
-    gap: 16px;
+    grid-template-columns: minmax(0, 1fr) 230px;
+    gap: 14px;
   }
 
   .ai-summary-copy {
     color: #cbd5e1;
     font-size: 13px;
-    line-height: 1.55;
+    line-height: 1.5;
     font-weight: 600;
   }
 
   .ai-review-meta {
-    border-left: 1px solid var(--border);
-    padding-left: 16px;
+    border-left: 1px solid rgba(51,65,85,0.52);
+    padding-left: 14px;
     display: grid;
     gap: 8px;
   }
@@ -862,25 +1186,25 @@
 
   .reviewer-recommendation {
     align-items: center;
-    background: rgba(2,6,23,0.28);
-    border: 1px solid rgba(148,163,184,0.18);
-    border-radius: 10px;
+    background: rgba(2,6,23,0.34);
+    border: 1px solid rgba(148,163,184,0.2);
+    border-radius: 8px;
     display: grid;
-    gap: 12px;
-    grid-template-columns: 190px minmax(0, 1fr) auto;
-    margin-top: 12px;
-    padding: 11px 12px;
+    gap: 10px;
+    grid-template-columns: 182px minmax(0, 1fr) auto;
+    margin-top: 10px;
+    padding: 10px 11px;
   }
 
   .recommendation-badge {
-    border-radius: 7px;
+    border-radius: 6px;
     display: inline-flex;
     font-family: 'DM Mono', monospace;
     font-size: 10px;
     font-weight: 700;
     justify-content: center;
     letter-spacing: 0.8px;
-    padding: 5px 9px;
+    padding: 5px 8px;
     text-transform: uppercase;
     white-space: nowrap;
   }
@@ -935,8 +1259,8 @@
 
   /* SOURCE EVIDENCE */
   .source-evidence {
-    border-top: 1px solid var(--border);
-    background: linear-gradient(180deg, rgba(14,165,233,0.055), rgba(255,255,255,0.012));
+    border-top: 1px solid rgba(51,65,85,0.52);
+    background: linear-gradient(180deg, rgba(14,165,233,0.035), rgba(255,255,255,0.01));
   }
 
   .source-evidence summary {
@@ -948,7 +1272,7 @@
   }
 
   .source-evidence-toggle {
-    padding: 13px 24px;
+    padding: 11px 18px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -969,7 +1293,7 @@
 
   .source-evidence-title {
     align-items: center;
-    color: #93c5fd;
+    color: #bfdbfe;
     display: flex;
     font-family: 'DM Mono', monospace;
     font-size: 10px;
@@ -1014,14 +1338,14 @@
 
   .source-evidence-body {
     border-top: 1px solid rgba(30,30,46,0.82);
-    padding: 14px 24px 16px;
+    padding: 13px 18px 15px;
   }
 
   .source-snippet {
     background: rgba(2,6,23,0.42);
     border: 1px solid rgba(147,197,253,0.2);
     border-left: 3px solid rgba(147,197,253,0.54);
-    border-radius: 8px;
+    border-radius: 7px;
     color: #dbeafe;
     font-family: 'DM Mono', monospace;
     font-size: 12px;
@@ -1062,7 +1386,7 @@
 
   /* PROVENANCE */
   .provenance-drawer {
-    border-top: 1px solid var(--border);
+    border-top: 1px solid rgba(51,65,85,0.52);
     background: rgba(255,255,255,0.012);
   }
 
@@ -1075,7 +1399,7 @@
   }
 
   .provenance-toggle {
-    padding: 12px 24px;
+    padding: 11px 18px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -1145,8 +1469,8 @@
   }
 
   .provenance-body {
-    border-top: 1px solid var(--border);
-    padding: 14px 24px 16px;
+    border-top: 1px solid rgba(51,65,85,0.52);
+    padding: 13px 18px 15px;
   }
 
   .provenance-grid {
@@ -1201,10 +1525,27 @@
 
   /* ACTION AREA */
   .card-actions {
-    padding: 16px 24px;
-    border-top: 1px solid var(--border);
+    padding: 13px 18px 15px;
+    border-top: 1px solid rgba(51,65,85,0.52);
     display: grid;
     gap: 12px;
+    background: rgba(2,6,23,0.18);
+  }
+
+  .workflow-head {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .workflow-title {
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
   }
 
   .workflow-meta {
@@ -1223,7 +1564,7 @@
 
   .workflow-controls {
     display: grid;
-    grid-template-columns: 170px 1fr 1fr;
+    grid-template-columns: 180px minmax(0, 1fr) minmax(0, 1fr);
     gap: 10px;
   }
 
@@ -1244,10 +1585,10 @@
 
   .workflow-select,
   .comment-input {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 10px 14px;
+    background: #10131b;
+    border: 1px solid rgba(51,65,85,0.62);
+    border-radius: 7px;
+    padding: 9px 11px;
     color: var(--text);
     font-family: 'DM Mono', monospace;
     font-size: 12px;
@@ -1273,15 +1614,23 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 10px;
+    gap: 8px;
+  }
+
+  .btn-approve,
+  .btn-reject,
+  .btn-escalate,
+  .btn-assign,
+  .btn-preview {
+    min-height: 34px;
   }
 
   .btn-approve {
-    background: var(--accent-dim);
-    color: var(--accent);
-    border: 1px solid rgba(110,231,183,0.3);
-    padding: 10px 20px;
-    border-radius: 8px;
+    background: rgba(110,231,183,0.16);
+    color: #bbf7d0;
+    border: 1px solid rgba(110,231,183,0.42);
+    padding: 9px 18px;
+    border-radius: 7px;
     font-family: 'Syne', sans-serif;
     font-weight: 700;
     font-size: 13px;
@@ -1296,8 +1645,8 @@
     background: var(--danger-dim);
     color: var(--danger);
     border: 1px solid rgba(248,113,113,0.3);
-    padding: 10px 20px;
-    border-radius: 8px;
+    padding: 9px 16px;
+    border-radius: 7px;
     font-family: 'Syne', sans-serif;
     font-weight: 700;
     font-size: 13px;
@@ -1312,8 +1661,8 @@
     background: var(--warn-dim);
     color: var(--warn);
     border: 1px solid rgba(251,191,36,0.3);
-    padding: 10px 18px;
-    border-radius: 8px;
+    padding: 9px 16px;
+    border-radius: 7px;
     font-family: 'Syne', sans-serif;
     font-weight: 700;
     font-size: 13px;
@@ -1328,8 +1677,8 @@
     background: rgba(148,163,184,0.1);
     color: #cbd5e1;
     border: 1px solid rgba(148,163,184,0.28);
-    padding: 10px 18px;
-    border-radius: 8px;
+    padding: 9px 16px;
+    border-radius: 7px;
     font-family: 'Syne', sans-serif;
     font-weight: 700;
     font-size: 13px;
@@ -1459,16 +1808,18 @@
 
   @media (max-width: 760px) {
     header, .tabs, main { padding-left: 20px; padding-right: 20px; }
-    .card-header, .ai-review-header, .source-evidence-toggle { align-items: flex-start; flex-direction: column; }
+    .review-console-heading, .card-header, .ai-review-header, .workflow-head, .source-evidence-toggle { align-items: flex-start; flex-direction: column; }
     .diff-grid, .ai-review-grid, .reviewer-recommendation, .provenance-grid, .workflow-controls, .filter-strip, .filter-grid { grid-template-columns: 1fr; }
     .filter-summary { border-right: none; border-bottom: 1px solid var(--border); padding-bottom: 10px; padding-right: 0; }
     .diff-col:first-child { border-right: none; border-bottom: 1px solid var(--border); }
     .ai-review-meta { border-left: none; border-top: 1px solid var(--border); padding-left: 0; padding-top: 12px; }
     .recommendation-factors { text-align: left; white-space: normal; }
+    .console-guardrail, .confidence-bar { width: 100%; }
+    .card-eyebrow { white-space: normal; }
     .provenance-field-wide { grid-column: span 1; }
     .source-evidence-preview { white-space: normal; }
     .workflow-actions { align-items: stretch; flex-direction: column; width: 100%; }
-    .comment-input, .btn-approve, .btn-reject, .btn-escalate, .btn-assign { width: 100%; }
+    .comment-input, .btn-approve, .btn-reject, .btn-escalate, .btn-preview, .btn-assign { width: 100%; }
   }
 
   @media (min-width: 761px) and (max-width: 1180px) {
@@ -1479,11 +1830,11 @@
 
   /* ── PREVIEW BUTTON ── */
   .btn-preview {
-    background: rgba(110,231,183,0.06);
-    color: var(--accent);
-    border: 1px solid rgba(110,231,183,0.22);
-    padding: 10px 16px;
-    border-radius: 8px;
+    background: rgba(96,165,250,0.08);
+    color: #bfdbfe;
+    border: 1px solid rgba(96,165,250,0.26);
+    padding: 9px 14px;
+    border-radius: 7px;
     font-family: 'Syne', sans-serif;
     font-weight: 700;
     font-size: 13px;
@@ -1491,7 +1842,7 @@
     transition: all 0.2s;
     white-space: nowrap;
   }
-  .btn-preview:hover { background: rgba(110,231,183,0.13); border-color: rgba(110,231,183,0.4); }
+  .btn-preview:hover { background: rgba(96,165,250,0.14); border-color: rgba(96,165,250,0.42); }
 
   /* ── BULK APPROVE BAR ── */
   .bulk-approve-bar {
@@ -1499,11 +1850,11 @@
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    background: rgba(110,231,183,0.05);
-    border: 1px solid rgba(110,231,183,0.22);
+    background: rgba(110,231,183,0.045);
+    border: 1px solid rgba(110,231,183,0.2);
     border-radius: 10px;
-    padding: 13px 18px;
-    margin-bottom: 14px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
   }
 
   .bulk-approve-title {
@@ -1520,11 +1871,11 @@
   }
 
   .btn-bulk-approve {
-    background: var(--accent-dim);
-    color: var(--accent);
-    border: 1px solid rgba(110,231,183,0.35);
-    padding: 10px 20px;
-    border-radius: 8px;
+    background: rgba(110,231,183,0.14);
+    color: #bbf7d0;
+    border: 1px solid rgba(110,231,183,0.38);
+    padding: 9px 18px;
+    border-radius: 7px;
     font-family: 'Syne', sans-serif;
     font-weight: 700;
     font-size: 13px;
@@ -1799,6 +2150,8 @@
   </div>
   <div class="tab" onclick="showTab('guide')">Live Guide</div>
   <div class="tab" onclick="showTab('audit')">Audit Log</div>
+  <div class="tab" onclick="showTab('drift')">Drift Monitor <span class="tab-badge hidden" id="driftBadge">0</span></div>
+  <div class="tab" onclick="showTab('pipeline')">Pipeline <span class="tab-badge hidden" id="pipelineBadge">0</span></div>
 </div>
 
 <main>
@@ -1841,8 +2194,14 @@
 
   <!-- REVIEW TAB -->
   <div class="tab-content active" id="tab-review">
-    <div class="section-title">Review Queue</div>
-    <div class="section-sub">Changes detected from official sources — approve or reject each</div>
+    <div class="review-console-heading">
+      <div>
+        <div class="console-kicker">Compliance operations console</div>
+        <div class="section-title">Review Queue</div>
+        <div class="section-sub">Source-backed policy changes requiring reviewer disposition</div>
+      </div>
+      <div class="console-guardrail">AI advisory only · reviewer-controlled publish</div>
+    </div>
     <div class="queue-filter-bar" id="queueFilterBar" aria-label="Review queue filters">
       <div class="filter-strip">
         <div class="filter-summary">
@@ -1883,7 +2242,7 @@
         <div class="bulk-approve-title" id="bulkApproveTitle"></div>
         <div class="bulk-approve-sub" id="bulkApproveSub"></div>
       </div>
-      <button class="btn-bulk-approve" onclick="openBulkApproveConfirm()">✓ Bulk Approve</button>
+      <button class="btn-bulk-approve" onclick="openBulkApproveConfirm()">Bulk Approve</button>
     </div>
     <div id="reviewList"></div>
   </div>
@@ -1912,6 +2271,170 @@
     <div class="section-title">Audit Log</div>
     <div class="section-sub">Immutable record of all approvals and rejections</div>
     <div id="auditList"></div>
+  </div>
+
+  <!-- DRIFT MONITOR TAB -->
+  <div class="tab-content" id="tab-drift">
+
+    <!-- Header row -->
+    <div class="drift-header">
+      <div>
+        <div class="console-kicker">Compliance health</div>
+        <div class="section-title">Drift Monitor</div>
+        <div class="section-sub">Country-level compliance drift across published rules</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <div class="drift-summary-pills">
+          <div class="drift-summary-pill dsp-critical">
+            <span class="dsp-count" id="driftSumCrit">—</span>
+            <span class="dsp-label">Critical</span>
+          </div>
+          <div class="drift-summary-pill dsp-warning">
+            <span class="dsp-count" id="driftSumWarn">—</span>
+            <span class="dsp-label">Warning</span>
+          </div>
+          <div class="drift-summary-pill dsp-stable">
+            <span class="dsp-count" id="driftSumStable">—</span>
+            <span class="dsp-label">Stable</span>
+          </div>
+        </div>
+        <button class="btn-assign" style="flex-shrink:0" onclick="loadDrift()">↺ Refresh</button>
+      </div>
+    </div>
+
+    <!-- Filter pills -->
+    <div class="drift-filter-pills">
+      <span class="filter-label" style="line-height:28px;margin-right:2px;font-size:10px">Filter:</span>
+      <button class="dfp active" data-filter="all"      onclick="setDriftFilter('all')">All countries</button>
+      <button class="dfp"        data-filter="critical" onclick="setDriftFilter('critical')">Critical</button>
+      <button class="dfp"        data-filter="warning"  onclick="setDriftFilter('warning')">Warning</button>
+      <button class="dfp"        data-filter="stable"   onclick="setDriftFilter('stable')">Stable</button>
+      <span class="drift-ts-cell" id="driftShownCount" style="margin-left:auto;line-height:28px"></span>
+    </div>
+
+    <!-- Skeleton loader -->
+    <div id="driftSkeleton" class="drift-skeleton active">
+      <div class="drift-skel-row"><div class="skel" style="width:150px;height:16px;flex-shrink:0"></div><div class="skel" style="width:70px;height:13px;flex-shrink:0"></div><div class="skel" style="width:130px;height:13px;flex-shrink:0"></div><div class="skel" style="flex-grow:1;height:13px"></div><div class="skel" style="width:72px;height:11px;flex-shrink:0"></div></div>
+      <div class="drift-skel-row"><div class="skel" style="width:130px;height:16px;flex-shrink:0"></div><div class="skel" style="width:70px;height:13px;flex-shrink:0"></div><div class="skel" style="width:160px;height:13px;flex-shrink:0"></div><div class="skel" style="flex-grow:1;height:13px"></div><div class="skel" style="width:72px;height:11px;flex-shrink:0"></div></div>
+      <div class="drift-skel-row"><div class="skel" style="width:170px;height:16px;flex-shrink:0"></div><div class="skel" style="width:70px;height:13px;flex-shrink:0"></div><div class="skel" style="width:110px;height:13px;flex-shrink:0"></div><div class="skel" style="flex-grow:1;height:13px"></div><div class="skel" style="width:72px;height:11px;flex-shrink:0"></div></div>
+      <div class="drift-skel-row"><div class="skel" style="width:140px;height:16px;flex-shrink:0"></div><div class="skel" style="width:70px;height:13px;flex-shrink:0"></div><div class="skel" style="width:145px;height:13px;flex-shrink:0"></div><div class="skel" style="flex-grow:1;height:13px"></div><div class="skel" style="width:72px;height:11px;flex-shrink:0"></div></div>
+    </div>
+
+    <!-- Country table -->
+    <div id="driftTableWrap" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;">
+      <table class="drift-country-table">
+        <thead>
+          <tr>
+            <th class="dct-sortable" data-col="country" onclick="sortDriftBy('country')" style="min-width:160px">Country <span class="dct-sort-icon">↕</span></th>
+            <th class="dct-sortable dct-sorted" data-col="severity" onclick="sortDriftBy('severity')" style="min-width:100px">Status <span class="dct-sort-icon">↓</span></th>
+            <th style="min-width:150px">Issues</th>
+            <th style="min-width:150px">Drift Types</th>
+            <th style="min-width:200px">Top Action</th>
+            <th class="dct-sortable" data-col="last" onclick="sortDriftBy('last')" style="min-width:100px">Detected <span class="dct-sort-icon">↕</span></th>
+            <th style="width:44px"></th>
+          </tr>
+        </thead>
+        <tbody id="driftCountryBody"></tbody>
+      </table>
+    </div>
+
+    <!-- Empty state -->
+    <div id="driftEmpty" class="drift-empty">
+      <div class="drift-empty-icon">✓</div>
+      <div class="drift-empty-title">No drift detected</div>
+      <div class="drift-empty-sub">All country guides match current filter criteria. Run a sync to refresh drift detection.</div>
+    </div>
+
+  </div>
+
+  <!-- PIPELINE HEALTH TAB -->
+  <div class="tab-content" id="tab-pipeline">
+
+    <div class="pipeline-header">
+      <div>
+        <div class="console-kicker">Ingestion observability</div>
+        <div class="section-title">Pipeline Health</div>
+        <div class="section-sub">Real-time ingestion job status and failure diagnostics</div>
+      </div>
+      <button class="btn-assign" onclick="loadPipeline()">↺ Refresh</button>
+    </div>
+
+    <!-- Summary cards -->
+    <div class="pipeline-summary-grid">
+      <div class="psc psc-ok">
+        <div class="psc-value" id="pscRate">—</div>
+        <div class="psc-label">Success Rate</div>
+        <div class="psc-sub" id="pscRateSub"></div>
+      </div>
+      <div class="psc psc-danger">
+        <div class="psc-value" id="pscFailed">—</div>
+        <div class="psc-label">Failed Jobs</div>
+        <div class="psc-sub" id="pscFailedSub"></div>
+      </div>
+      <div class="psc psc-neutral">
+        <div class="psc-value" id="pscDuration">—</div>
+        <div class="psc-label">Avg Duration</div>
+        <div class="psc-sub" id="pscDurationSub">reconciled jobs</div>
+      </div>
+      <div class="psc psc-dim">
+        <div class="psc-value" id="pscActive">—</div>
+        <div class="psc-label">Active Jobs</div>
+        <div class="psc-sub" id="pscActiveSub">queued + running</div>
+      </div>
+    </div>
+
+    <!-- Filter bar -->
+    <div class="pipeline-filter-bar">
+      <div class="pf-search">
+        <span class="pf-search-icon">⌕</span>
+        <input type="text" id="pipelineSearch" placeholder="Search URL or error…" oninput="_pipelineApplyFilters()" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="pf-divider"></div>
+      <div class="pf-pills">
+        <button class="pfp active" data-state="all"        onclick="setPipelineFilter('all')">All</button>
+        <button class="pfp"        data-state="reconciled" onclick="setPipelineFilter('reconciled')">Success</button>
+        <button class="pfp"        data-state="running"    onclick="setPipelineFilter('running')">Running</button>
+        <button class="pfp"        data-state="failed"     onclick="setPipelineFilter('failed')">Failed</button>
+        <button class="pfp"        data-state="queued"     onclick="setPipelineFilter('queued')">Queued</button>
+      </div>
+      <span class="pipeline-count-label" id="pipelineCountLabel"></span>
+    </div>
+
+    <!-- Skeleton -->
+    <div id="pipelineSkeleton" class="pipeline-skeleton active">
+      <div class="pip-skel-row"><div class="skel" style="width:60px;height:13px;flex-shrink:0"></div><div class="skel" style="width:220px;height:13px;flex-shrink:0"></div><div class="skel" style="width:80px;height:11px;flex-shrink:0"></div><div class="skel" style="flex-grow:1;height:11px"></div><div class="skel" style="width:55px;height:11px;flex-shrink:0"></div></div>
+      <div class="pip-skel-row"><div class="skel" style="width:60px;height:13px;flex-shrink:0"></div><div class="skel" style="width:260px;height:13px;flex-shrink:0"></div><div class="skel" style="width:80px;height:11px;flex-shrink:0"></div><div class="skel" style="flex-grow:1;height:11px"></div><div class="skel" style="width:55px;height:11px;flex-shrink:0"></div></div>
+      <div class="pip-skel-row"><div class="skel" style="width:60px;height:13px;flex-shrink:0"></div><div class="skel" style="width:190px;height:13px;flex-shrink:0"></div><div class="skel" style="width:80px;height:11px;flex-shrink:0"></div><div class="skel" style="flex-grow:1;height:11px"></div><div class="skel" style="width:55px;height:11px;flex-shrink:0"></div></div>
+      <div class="pip-skel-row"><div class="skel" style="width:60px;height:13px;flex-shrink:0"></div><div class="skel" style="width:240px;height:13px;flex-shrink:0"></div><div class="skel" style="width:80px;height:11px;flex-shrink:0"></div><div class="skel" style="flex-grow:1;height:11px"></div><div class="skel" style="width:55px;height:11px;flex-shrink:0"></div></div>
+      <div class="pip-skel-row"><div class="skel" style="width:60px;height:13px;flex-shrink:0"></div><div class="skel" style="width:200px;height:13px;flex-shrink:0"></div><div class="skel" style="width:80px;height:11px;flex-shrink:0"></div><div class="skel" style="flex-grow:1;height:11px"></div><div class="skel" style="width:55px;height:11px;flex-shrink:0"></div></div>
+    </div>
+
+    <!-- Table -->
+    <div id="pipelineTableWrap" style="display:none;background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;">
+      <table class="pipeline-table">
+        <thead>
+          <tr>
+            <th style="width:100px">Status</th>
+            <th class="pt-sortable" data-col="url" onclick="sortPipeline('url')" style="min-width:200px">Source <span class="pt-sort-icon">↕</span></th>
+            <th style="min-width:110px">Stage</th>
+            <th class="pt-sortable" data-col="started" onclick="sortPipeline('started')" style="min-width:100px">Started <span class="pt-sort-icon">↕</span></th>
+            <th class="pt-sortable" data-col="duration" onclick="sortPipeline('duration')" style="min-width:80px">Duration <span class="pt-sort-icon">↕</span></th>
+            <th style="min-width:80px">Snapshot</th>
+            <th style="width:36px"></th>
+          </tr>
+        </thead>
+        <tbody id="pipelineBody"></tbody>
+      </table>
+      <div class="pipeline-pagination" id="pipelinePagination"></div>
+    </div>
+
+    <!-- Empty -->
+    <div id="pipelineEmpty" class="pipeline-empty">
+      <div class="pipeline-empty-icon">[ ]</div>
+      <div class="pipeline-empty-title">No jobs found</div>
+      <div class="pipeline-empty-sub">Run a sync to populate the ingestion pipeline, or adjust your filters.</div>
+    </div>
+
   </div>
 
 </main>
@@ -2018,13 +2541,15 @@
   function showTab(tab) {
     activeTab = tab;
     document.querySelectorAll('.tab').forEach((t, i) => {
-      t.classList.toggle('active', ['review','guide','audit'][i] === tab);
+      t.classList.toggle('active', ['review','guide','audit','drift','pipeline'][i] === tab);
     });
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
     document.getElementById('tab-' + tab).classList.add('active');
-    if (tab === 'guide') loadGuide();
-    if (tab === 'audit') loadAudit();
-    if (tab === 'review') loadQueue();
+    if (tab === 'guide')    loadGuide();
+    if (tab === 'audit')    loadAudit();
+    if (tab === 'review')   loadQueue();
+    if (tab === 'drift')    loadDrift();
+    if (tab === 'pipeline') loadPipeline();
   }
 
   function toast(msg, type = 'success') {
@@ -2312,6 +2837,40 @@
 	    })[char]);
 	  }
 
+	  function backendChangeType(raw) {
+	    const map = {
+	      NUMERIC_THRESHOLD_CHANGE: { label: 'Threshold',    tooltip: 'Numeric threshold change' },
+	      ELIGIBILITY_CHANGE:       { label: 'Eligibility',  tooltip: 'Eligibility change' },
+	      REQUIREMENT_ADDED:        { label: 'Req. Added',   tooltip: 'Requirement added' },
+	      REQUIREMENT_REMOVED:      { label: 'Req. Removed', tooltip: 'Requirement removed' },
+	      TIMELINE_CHANGE:          { label: 'Timeline',     tooltip: 'Timeline / deadline change' },
+	      NON_MATERIAL_FORMATTING:  { label: 'Formatting',   tooltip: 'Non-material formatting change' },
+	    };
+	    return raw ? (map[raw] || { label: raw.replace(/_/g, ' ').toLowerCase(), tooltip: raw }) : null;
+	  }
+
+	  function backendMaterialityImpact(raw) {
+	    const map = {
+	      CRITICAL:      'Critical',
+	      HIGH:          'High',
+	      MODERATE:      'Moderate',
+	      LOW:           'Low',
+	      INFORMATIONAL: 'Informational',
+	    };
+	    return raw ? (map[raw] || null) : null;
+	  }
+
+	  function materialityCls(label) {
+	    const map = {
+	      Critical:      'mat-critical',
+	      High:          'mat-high',
+	      Moderate:      'mat-moderate',
+	      Low:           'mat-low',
+	      Informational: 'mat-informational',
+	    };
+	    return map[label] || 'mat-low';
+	  }
+
 	  function tokenizePolicyText(value) {
 	    const matches = String(value ?? '').trim().match(/[A-Za-z0-9]+(?:[.'’/-][A-Za-z0-9]+)*%?|[^\sA-Za-z0-9]/g);
 	    return (matches || []).map(text => ({
@@ -2560,10 +3119,12 @@
     const id = Number(item.id);
     const confidence = boundedConfidence(item);
     const severity = normalizeSeverity(item.severity);
-    const impact = impactAssessment(item, confidence);
+    const semanticScore = semanticMatchScore(item, confidence);
+    const backendCT = backendChangeType(item.change_type);
+    const backendMat = backendMaterialityImpact(item.materiality_level);
+    const impact = backendMat || impactAssessment(item, confidence);
     const state = approvalState(item.status);
     const sectionName = formatSectionName(item.section);
-    const semanticScore = semanticMatchScore(item, confidence);
     const trustLevel = sourceTrustLevel(item, confidence);
     const changeType = classifyChange(item, confidence, semanticScore);
     const recommendation = reviewerRecommendation(item, confidence, impact, semanticScore, trustLevel, changeType);
@@ -2574,13 +3135,20 @@
     const sourceDisplay = sourceHost(item.source_url);
 
     return `
-      <div class="review-card" id="card-${id}">
+      <div class="review-card review-${severity} status-${state}" id="card-${id}">
         <div class="card-header">
-          <div class="card-meta">
-            <span class="section-label">${escapeHtml(sectionName)}</span>
-            <span class="severity-badge ${severityClass(severity)}">${escapeHtml(severity)}</span>
-            <span class="change-badge ${changeClass(changeType)}"><span class="change-icon">${escapeHtml(changeIcon(changeType))}</span>${escapeHtml(changeType)}</span>
-            <span class="state-badge ${stateClass(state)}" id="state-${id}">${escapeHtml(stateLabel(state))}</span>
+          <div class="card-title-stack">
+            <div class="card-eyebrow">Packet #${id} · ${escapeHtml(item.country || 'Unassigned country')} · ${escapeHtml(sourceDisplay)}</div>
+            <div class="card-meta">
+              <span class="section-label">${escapeHtml(sectionName)}</span>
+              <span class="severity-badge ${severityClass(severity)}">${escapeHtml(severity)}</span>
+              ${backendMat ? `<span class="mat-badge ${materialityCls(backendMat)}" title="Materiality: ${escapeHtml(backendMat)}" tabindex="0" aria-label="Materiality ${escapeHtml(backendMat)}">${escapeHtml(backendMat)}</span>` : ''}
+              ${backendCT
+                ? `<span class="change-badge change-semantic" title="${escapeHtml(backendCT.tooltip)} — semantic engine" tabindex="0" aria-label="${escapeHtml(backendCT.tooltip)}">${escapeHtml(backendCT.label)}</span>`
+                : `<span class="change-badge ${changeClass(changeType)}"><span class="change-icon">${escapeHtml(changeIcon(changeType))}</span>${escapeHtml(changeType)}</span>`
+              }
+              <span class="state-badge ${stateClass(state)}" id="state-${id}">${escapeHtml(stateLabel(state))}</span>
+            </div>
           </div>
           <div class="confidence-bar">
             <span>Confidence</span>
@@ -2606,15 +3174,15 @@
           <div class="ai-review-header">
             <div class="ai-review-title">
               <span class="ai-kicker">AI Summary</span>
-              <span class="ai-model-pill">Policy Copilot</span>
+              <span class="ai-model-pill">Governance Engine</span>
             </div>
-            <span class="impact-badge ${impactClass(impact)}">Impact Assessment: ${escapeHtml(impact)}</span>
+            <span class="impact-badge ${impactClass(impact)}">${backendMat ? 'Materiality' : 'Impact'}: ${escapeHtml(impact)}</span>
           </div>
           <div class="ai-review-grid">
             <div class="ai-summary-copy">${escapeHtml(aiSummary(item, impact, confidence))}</div>
             <div class="ai-review-meta">
               <div class="ai-meta-row"><span>Risk tier</span><span>${escapeHtml(impact)}</span></div>
-              <div class="ai-meta-row"><span>Workflow</span><span>Reviewer approval</span></div>
+              <div class="ai-meta-row"><span>Classified by</span><span>${backendCT ? 'Semantic engine' : 'Heuristic'}</span></div>
               <div class="ai-meta-row"><span>Signal</span><span>${Math.round(confidence*100)}% match</span></div>
             </div>
           </div>
@@ -2695,9 +3263,12 @@
         </details>
 
         <div class="card-actions">
-          <div class="workflow-meta">
-            <div>Queued <span>${escapeHtml(reviewTimestamp(item.created_at))}</span></div>
-            <div>Review update <span id="reviewedAt-${id}">${escapeHtml(item.reviewed_at ? reviewTimestamp(item.reviewed_at) : 'Awaiting decision')}</span></div>
+          <div class="workflow-head">
+            <div class="workflow-title">Reviewer disposition</div>
+            <div class="workflow-meta">
+              <div>Queued <span>${escapeHtml(reviewTimestamp(item.created_at))}</span></div>
+              <div>Review update <span id="reviewedAt-${id}">${escapeHtml(item.reviewed_at ? reviewTimestamp(item.reviewed_at) : 'Awaiting decision')}</span></div>
+            </div>
           </div>
           <div class="workflow-controls">
             <label class="workflow-field">
@@ -2726,9 +3297,9 @@
           <div class="workflow-actions">
             <button class="btn-assign" onclick="decide(${id}, 'assign')">Save assignment</button>
             <button class="btn-escalate" onclick="decide(${id}, 'escalate')">Escalate</button>
-            <button class="btn-preview" onclick="openPreviewById(${id})">👁 Preview</button>
-            <button class="btn-approve" onclick="decide(${id}, 'approve')">✓ Approve</button>
-            <button class="btn-reject" onclick="decide(${id}, 'reject')">✗ Reject</button>
+            <button class="btn-preview" onclick="openPreviewById(${id})">Preview</button>
+            <button class="btn-approve" onclick="decide(${id}, 'approve')">Approve</button>
+            <button class="btn-reject" onclick="decide(${id}, 'reject')">Reject</button>
           </div>
         </div>
       </div>
@@ -2740,6 +3311,7 @@
     if (!list) return;
     const filteredItems = filterQueueItems(reviewQueueItems);
     updateFilterSummary(filteredItems.length, reviewQueueItems.length);
+    updateBulkApproveBar();
 
     if (reviewQueueItems.length === 0) {
       list.innerHTML = emptyQueueHtml(
@@ -2760,7 +3332,6 @@
     }
 
     list.innerHTML = filteredItems.map(renderReviewCard).join('');
-    updateBulkApproveBar();
   }
 
   // ── LOAD QUEUE ──
@@ -2970,7 +3541,7 @@
       _previewCurrentGuide = {};
       all.filter(e => e.country === item.country).forEach(e => { _previewCurrentGuide[e.section] = e; });
     } finally {
-      if (btn) { btn.textContent = '👁 Preview'; btn.disabled = false; }
+      if (btn) { btn.textContent = 'Preview'; btn.disabled = false; }
     }
 
     _previewItem = item;
@@ -3278,6 +3849,583 @@
       btn.disabled = false;
       btn.textContent = 'Confirm & Approve All';
     }
+  }
+
+  // ── DRIFT MONITOR ──
+  let _driftReports  = [];
+  let _driftSort     = { col: 'severity', dir: 'desc' };
+  let _driftFilter   = 'all';
+  let _driftExpanded = new Set();
+
+  const _DRIFT_SHORT = {
+    PENDING_CHANGE:     'Pending',
+    ESCALATED_ITEM:     'Escalated',
+    MISSING_SECTION:    'Missing',
+    STALE_VERIFICATION: 'Stale',
+    NO_PROVENANCE:      'No Prov.',
+  };
+  const _DRIFT_FULL = {
+    PENDING_CHANGE:     'Unresolved pending change in review queue',
+    ESCALATED_ITEM:     'Escalated compliance item requiring immediate action',
+    MISSING_SECTION:    'Section not found in source — may need re-ingestion',
+    STALE_VERIFICATION: 'Rule not re-verified recently against source',
+    NO_PROVENANCE:      'No source provenance record for this rule',
+  };
+
+  function _driftId(country) {
+    return (country || '').replace(/\s+/g, '-').replace(/[^A-Za-z0-9-]/g, '');
+  }
+
+  function _driftSevClasses(sev) {
+    if (sev === 'CRITICAL') return { row: 'row-critical', cell: 'sev-critical', dot: 'dot-critical' };
+    if (sev === 'WARNING')  return { row: 'row-warning',  cell: 'sev-warning',  dot: 'dot-warning'  };
+    return                         { row: 'row-stable',   cell: 'sev-stable',   dot: 'dot-stable'   };
+  }
+
+  function _driftTs(ts) {
+    if (!ts) return '—';
+    const d = new Date(ts);
+    if (isNaN(d)) return '—';
+    const diffH = Math.floor((Date.now() - d) / 3600000);
+    if (diffH < 1)  return 'Just now';
+    if (diffH < 24) return `${diffH}h ago`;
+    const diffD = Math.floor(diffH / 24);
+    if (diffD < 7)  return `${diffD}d ago`;
+    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  }
+
+  function _driftSortVal(r, col) {
+    if (col === 'severity') return { CRITICAL: 0, WARNING: 1, INFO: 2, STABLE: 3 }[r.severity] ?? 9;
+    if (col === 'country')  return r.country || '';
+    if (col === 'issues')   return (r.affected_sections || []).length;
+    if (col === 'last')     return r.generated_at || '';
+    return 0;
+  }
+
+  async function loadDrift() {
+    _driftExpanded.clear();
+    const wrap  = document.getElementById('driftTableWrap');
+    const skel  = document.getElementById('driftSkeleton');
+    const empty = document.getElementById('driftEmpty');
+    wrap.style.display = 'none';
+    skel.classList.add('active');
+    empty.classList.remove('show');
+
+    try {
+      const res = await fetch('/api/drift');
+      _driftReports = await res.json();
+      _driftUpdateSummary();
+      _driftRender();
+    } catch (e) {
+      console.error('loadDrift error', e);
+      skel.classList.remove('active');
+      empty.querySelector('.drift-empty-title').textContent = 'Failed to load drift data';
+      empty.querySelector('.drift-empty-sub').textContent   = 'Check your connection and try refreshing.';
+      empty.classList.add('show');
+    }
+  }
+
+  function _driftUpdateSummary() {
+    const crit   = _driftReports.filter(r => r.severity === 'CRITICAL').length;
+    const warn   = _driftReports.filter(r => r.severity === 'WARNING').length;
+    const stable = _driftReports.filter(r => r.severity !== 'CRITICAL' && r.severity !== 'WARNING').length;
+    document.getElementById('driftSumCrit').textContent   = crit;
+    document.getElementById('driftSumWarn').textContent   = warn;
+    document.getElementById('driftSumStable').textContent = stable;
+    const badge = document.getElementById('driftBadge');
+    if (crit > 0) { badge.textContent = crit; badge.classList.remove('hidden'); }
+    else            badge.classList.add('hidden');
+  }
+
+  function _driftRender() {
+    const skel  = document.getElementById('driftSkeleton');
+    const wrap  = document.getElementById('driftTableWrap');
+    const empty = document.getElementById('driftEmpty');
+    const tbody = document.getElementById('driftCountryBody');
+
+    skel.classList.remove('active');
+
+    let reports = [..._driftReports];
+    if (_driftFilter === 'critical') reports = reports.filter(r => r.severity === 'CRITICAL');
+    if (_driftFilter === 'warning')  reports = reports.filter(r => r.severity === 'WARNING');
+    if (_driftFilter === 'stable')   reports = reports.filter(r => r.severity !== 'CRITICAL' && r.severity !== 'WARNING');
+
+    reports.sort((a, b) => {
+      const av = _driftSortVal(a, _driftSort.col);
+      const bv = _driftSortVal(b, _driftSort.col);
+      const cmp = av < bv ? -1 : av > bv ? 1 : 0;
+      return _driftSort.dir === 'asc' ? cmp : -cmp;
+    });
+
+    const shown = `${reports.length} countr${reports.length !== 1 ? 'ies' : 'y'}`;
+    document.getElementById('driftShownCount').textContent = shown;
+
+    if (!reports.length) {
+      wrap.style.display = 'none';
+      empty.querySelector('.drift-empty-title').textContent = 'No drift detected';
+      empty.querySelector('.drift-empty-sub').textContent   = 'All country guides match current filter criteria.';
+      empty.classList.add('show');
+      return;
+    }
+
+    empty.classList.remove('show');
+    wrap.style.display = '';
+    tbody.innerHTML = reports.map(_driftCountryRow).join('');
+
+    // Restore previously expanded rows
+    _driftExpanded.forEach(c => {
+      const inner = document.getElementById(`dexp-${_driftId(c)}`);
+      const btn   = document.getElementById(`dbtn-${_driftId(c)}`);
+      if (inner) inner.classList.remove('hidden');
+      if (btn)   btn.classList.add('open');
+    });
+  }
+
+  function _driftCountryRow(report) {
+    const country  = report.country || '';
+    const cid      = _driftId(country);
+    const sev      = report.severity || 'STABLE';
+    const cls      = _driftSevClasses(sev);
+    const flag     = FLAGS[country] || '🌐';
+    const sections = report.affected_sections || [];
+
+    const crit = sections.filter(s => s.severity === 'CRITICAL').length;
+    const warn = sections.filter(s => s.severity === 'WARNING').length;
+    const info = sections.filter(s => s.severity === 'INFO').length;
+
+    const countBadges = [
+      crit ? `<span class="dc-badge dc-crit">${crit} critical</span>` : '',
+      warn ? `<span class="dc-badge dc-warn">${warn} warn</span>`     : '',
+      info ? `<span class="dc-badge dc-info">${info} info</span>`     : '',
+    ].filter(Boolean).join('') || '<span style="color:var(--muted);font-size:11px">—</span>';
+
+    const types = [...new Set(sections.map(s => s.drift_type).filter(Boolean))];
+    const typePills = types.map(t =>
+      `<span class="dtp" title="${escapeHtml(_DRIFT_FULL[t] || t)}">${escapeHtml(_DRIFT_SHORT[t] || t)}</span>`
+    ).join('') || '<span style="color:var(--muted);font-size:11px">—</span>';
+
+    const action = String(report.recommended_action || '—');
+    const actionShort = action.length > 75 ? action.slice(0, 75) + '…' : action;
+
+    return `
+      <tr class="drift-country-row ${cls.row}" onclick="toggleDriftExpand('${escapeHtml(country).replace(/'/g,"\\'")}')">
+        <td>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:17px;line-height:1;flex-shrink:0">${flag}</span>
+            <div>
+              <div style="font-weight:700;font-size:13px">${escapeHtml(country)}</div>
+              <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:2px">${sections.length} issue${sections.length !== 1 ? 's' : ''}</div>
+            </div>
+          </div>
+        </td>
+        <td>
+          <div class="drift-sev-cell ${cls.cell}">
+            <span class="drift-sev-dot ${cls.dot}"></span>
+            <span class="drift-sev-label">${escapeHtml(sev)}</span>
+          </div>
+        </td>
+        <td><div class="drift-counts">${countBadges}</div></td>
+        <td><div class="drift-type-pills">${typePills}</div></td>
+        <td><div class="drift-action-text">${escapeHtml(actionShort)}</div></td>
+        <td><span class="drift-ts-cell">${_driftTs(report.generated_at)}</span></td>
+        <td>
+          <button class="drift-expand-btn" id="dbtn-${cid}"
+            title="Expand ${escapeHtml(country)}" tabindex="0"
+            onclick="event.stopPropagation();toggleDriftExpand('${escapeHtml(country).replace(/'/g,"\\'")}')">›</button>
+        </td>
+      </tr>
+      <tr class="drift-expand-row">
+        <td colspan="7">
+          <div class="drift-expand-inner hidden" id="dexp-${cid}">
+            <div class="drift-expand-subhead">Affected sections — ${escapeHtml(country)}</div>
+            ${_driftSectionGrid(sections)}
+          </div>
+        </td>
+      </tr>`;
+  }
+
+  function _driftSectionGrid(sections) {
+    if (!sections.length) return '<p style="color:var(--muted);font-size:12px">No section data available.</p>';
+    const sorted = [...sections].sort((a, b) => {
+      const o = { CRITICAL: 0, WARNING: 1, INFO: 2 };
+      return (o[a.severity] ?? 9) - (o[b.severity] ?? 9);
+    });
+    const cards = sorted.map(s => {
+      const secCls   = s.severity === 'CRITICAL' ? 'sec-critical' : s.severity === 'WARNING' ? 'sec-warning' : 'sec-info';
+      const section  = String(s.section || '—').replace(/_/g, ' ');
+      const typeShort = _DRIFT_SHORT[s.drift_type] || s.drift_type || '—';
+      const typeFull  = _DRIFT_FULL[s.drift_type]  || s.drift_type || '—';
+      const evidence  = String(s.evidence || '').slice(0, 110);
+      const action    = String(s.recommended_action || '').slice(0, 80);
+      const queueLink = s.pending_item_id
+        ? `<a class="dsc-queue-link" href="#" onclick="event.preventDefault();showTab('review')" title="Jump to review queue">Queue #${s.pending_item_id}</a>`
+        : '';
+      const days = s.days_pending != null ? `<span class="dsc-days">${s.days_pending}d pending</span>` : '';
+      return `
+        <div class="drift-section-card ${secCls}">
+          <div class="dsc-header">
+            <span class="dsc-section">${escapeHtml(section)}</span>
+            <span class="dtp" title="${escapeHtml(typeFull)}">${escapeHtml(typeShort)}</span>
+          </div>
+          ${evidence ? `<div class="dsc-evidence">${escapeHtml(evidence)}</div>` : ''}
+          ${action   ? `<div class="dsc-action">${escapeHtml(action)}</div>`   : ''}
+          ${(queueLink || days) ? `<div class="dsc-footer">${queueLink}${days}</div>` : ''}
+        </div>`;
+    }).join('');
+    return `<div class="drift-section-grid">${cards}</div>`;
+  }
+
+  function toggleDriftExpand(country) {
+    const cid   = _driftId(country);
+    const inner = document.getElementById(`dexp-${cid}`);
+    const btn   = document.getElementById(`dbtn-${cid}`);
+    if (!inner) return;
+    const isOpen = !inner.classList.contains('hidden');
+    inner.classList.toggle('hidden', isOpen);
+    btn && btn.classList.toggle('open', !isOpen);
+    if (isOpen) _driftExpanded.delete(country);
+    else        _driftExpanded.add(country);
+  }
+
+  function setDriftFilter(f) {
+    _driftFilter = f;
+    document.querySelectorAll('.dfp').forEach(el =>
+      el.classList.toggle('active', el.dataset.filter === f)
+    );
+    _driftRender();
+  }
+
+  function sortDriftBy(col) {
+    _driftSort.dir = (_driftSort.col === col && _driftSort.dir === 'desc') ? 'asc' : 'desc';
+    _driftSort.col = col;
+    document.querySelectorAll('.dct-sortable').forEach(th => {
+      const active = th.dataset.col === col;
+      th.classList.toggle('dct-sorted', active);
+      const icon = th.querySelector('.dct-sort-icon');
+      if (icon) icon.textContent = active ? (_driftSort.dir === 'asc' ? '↑' : '↓') : '↕';
+    });
+    _driftRender();
+  }
+
+  // ── PIPELINE HEALTH ──
+  const _PIP_STAGES = ['queued','fetched','normalized','extracted','reconciled'];
+  const _PIP_RUNNING = new Set(['fetched','normalized','extracted']);
+
+  let _pipJobs      = [];      // raw from API
+  let _pipFiltered  = [];      // after search + state filter
+  let _pipPage      = 0;
+  const _PIP_PAGE_SIZE = 10;
+  let _pipSort      = { col: 'started', dir: 'desc' };
+  let _pipStateFilter = 'all';
+  let _pipExpanded  = new Set();
+
+  // ── helpers ──────────────────────────────────────────────────────────
+
+  function _pipDisplayState(state) {
+    if (state === 'reconciled')           return { key: 'reconciled', label: 'SUCCESS',  dot: 'pip-dot-success', lbl: 'pip-lbl-success', row: 'row-reconciled' };
+    if (_PIP_RUNNING.has(state))          return { key: 'running',    label: 'RUNNING',  dot: 'pip-dot-running', lbl: 'pip-lbl-running', row: 'row-running'    };
+    if (state === 'failed')               return { key: 'failed',     label: 'FAILED',   dot: 'pip-dot-failed',  lbl: 'pip-lbl-failed',  row: 'row-failed'     };
+    /* queued */                           return { key: 'queued',     label: 'QUEUED',   dot: 'pip-dot-queued',  lbl: 'pip-lbl-queued',  row: 'row-queued'     };
+  }
+
+  function _pipDuration(job) {
+    const start = job.queued_at;
+    const end   = job.reconciled_at || job.failed_at;
+    if (!start || !end) return null;
+    const ms = new Date(end) - new Date(start);
+    if (isNaN(ms) || ms < 0) return null;
+    return ms;
+  }
+
+  function _pipFmtDuration(ms) {
+    if (ms == null) return { text: '—', cls: '' };
+    if (ms < 1000)  return { text: `${ms}ms`,               cls: 'fast' };
+    if (ms < 5000)  return { text: `${(ms/1000).toFixed(1)}s`, cls: 'fast' };
+    if (ms < 60000) return { text: `${(ms/1000).toFixed(1)}s`, cls: ms < 15000 ? 'norm' : 'slow' };
+    const m = Math.floor(ms/60000), s = Math.floor((ms%60000)/1000);
+    return { text: `${m}m ${s}s`, cls: 'slow' };
+  }
+
+  function _pipRelTs(iso) {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    if (isNaN(d)) return '—';
+    const diffS = Math.floor((Date.now() - d) / 1000);
+    if (diffS < 60)   return `${diffS}s ago`;
+    if (diffS < 3600) return `${Math.floor(diffS/60)}m ago`;
+    if (diffS < 86400)return `${Math.floor(diffS/3600)}h ago`;
+    return d.toLocaleDateString(undefined,{month:'short',day:'numeric'}) + ' ' +
+           d.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});
+  }
+
+  function _pipParseUrl(url) {
+    if (!url) return { host: '—', path: '' };
+    try {
+      const u = new URL(url);
+      return { host: u.hostname, path: u.pathname + u.search };
+    } catch { return { host: url.slice(0,40), path: '' }; }
+  }
+
+  function _pipStageMinibar(job) {
+    const curIdx = _PIP_STAGES.indexOf(job.state);
+    return _PIP_STAGES.map((s, i) => {
+      let cls;
+      if (job.state === 'failed' && i <= curIdx) cls = i < curIdx ? 'pip-stage-done' : 'pip-stage-fail';
+      else if (i < curIdx)  cls = 'pip-stage-done';
+      else if (i === curIdx) cls = 'pip-stage-cur';
+      else                   cls = 'pip-stage-none';
+      const sep = i < _PIP_STAGES.length - 1 ? '<span class="pip-stage-sep"></span>' : '';
+      return `<span class="pip-stage ${cls}" title="${escapeHtml(s)}"></span>${sep}`;
+    }).join('');
+  }
+
+  function _pipSortVal(job, col) {
+    if (col === 'url')      return (job.source_url || '').toLowerCase();
+    if (col === 'started')  return job.queued_at || '';
+    if (col === 'duration') return _pipDuration(job) ?? -1;
+    return '';
+  }
+
+  // ── summary cards ──────────────────────────────────────────────────
+
+  function _pipUpdateSummary(jobs) {
+    const total      = jobs.length;
+    const reconciled = jobs.filter(j => j.state === 'reconciled').length;
+    const failed     = jobs.filter(j => j.state === 'failed').length;
+    const active     = jobs.filter(j => j.state === 'queued' || _PIP_RUNNING.has(j.state)).length;
+
+    const rate = total ? Math.round(reconciled / total * 100) : 0;
+    const rateCls = rate >= 80 ? 'psc-ok' : rate >= 50 ? 'psc-warn' : 'psc-danger';
+    const rateCard = document.getElementById('pscRate').parentElement;
+    rateCard.className = `psc ${rateCls}`;
+    document.getElementById('pscRate').textContent     = total ? `${rate}%` : '—';
+    document.getElementById('pscRateSub').textContent  = total ? `${reconciled} of ${total} jobs` : '';
+
+    const failCls = failed === 0 ? 'psc-ok' : 'psc-danger';
+    document.getElementById('pscFailed').parentElement.className = `psc ${failCls}`;
+    document.getElementById('pscFailed').textContent    = failed;
+    document.getElementById('pscFailedSub').textContent = failed ? `of ${total} total` : 'all clear';
+
+    const durations = jobs.filter(j => j.state === 'reconciled').map(_pipDuration).filter(d => d != null);
+    const avgMs = durations.length ? Math.round(durations.reduce((a,b) => a+b, 0) / durations.length) : null;
+    const dur = _pipFmtDuration(avgMs);
+    document.getElementById('pscDuration').textContent    = dur.text;
+    document.getElementById('pscDurationSub').textContent = durations.length ? `${durations.length} reconciled jobs` : 'no completed jobs';
+
+    document.getElementById('pscActive').textContent    = active;
+    document.getElementById('pscActiveSub').textContent = active ? 'in progress now' : 'pipeline idle';
+    if (active > 0) document.getElementById('pscActive').parentElement.className = 'psc psc-neutral';
+    else            document.getElementById('pscActive').parentElement.className = 'psc psc-dim';
+
+    // Tab badge: count failures
+    const badge = document.getElementById('pipelineBadge');
+    if (failed > 0) { badge.textContent = failed; badge.classList.remove('hidden'); }
+    else              badge.classList.add('hidden');
+  }
+
+  // ── load + render ──────────────────────────────────────────────────
+
+  async function loadPipeline() {
+    _pipExpanded.clear();
+    const skel  = document.getElementById('pipelineSkeleton');
+    const wrap  = document.getElementById('pipelineTableWrap');
+    const empty = document.getElementById('pipelineEmpty');
+    skel.classList.add('active');
+    wrap.style.display = 'none';
+    empty.classList.remove('show');
+
+    try {
+      const res = await fetch('/api/ingestion-jobs');
+      _pipJobs = await res.json();
+      _pipUpdateSummary(_pipJobs);
+      _pipelineApplyFilters();
+    } catch (e) {
+      console.error('loadPipeline error', e);
+      skel.classList.remove('active');
+      empty.querySelector('.pipeline-empty-title').textContent = 'Failed to load jobs';
+      empty.querySelector('.pipeline-empty-sub').textContent   = 'Check your connection and try refreshing.';
+      empty.classList.add('show');
+    }
+  }
+
+  function _pipelineApplyFilters() {
+    const q     = (document.getElementById('pipelineSearch').value || '').toLowerCase().trim();
+    const filt  = _pipStateFilter;
+
+    _pipFiltered = _pipJobs.filter(j => {
+      const ds = _pipDisplayState(j.state);
+      if (filt !== 'all' && ds.key !== filt) return false;
+      if (q) {
+        const url = (j.source_url || '').toLowerCase();
+        const err = (j.failure_reason || '').toLowerCase();
+        if (!url.includes(q) && !err.includes(q)) return false;
+      }
+      return true;
+    });
+
+    _pipFiltered.sort((a, b) => {
+      const av = _pipSortVal(a, _pipSort.col);
+      const bv = _pipSortVal(b, _pipSort.col);
+      const cmp = av < bv ? -1 : av > bv ? 1 : 0;
+      return _pipSort.dir === 'asc' ? cmp : -cmp;
+    });
+
+    _pipPage = 0;
+    _pipRender();
+  }
+
+  function setPipelineFilter(state) {
+    _pipStateFilter = state;
+    document.querySelectorAll('.pfp').forEach(el =>
+      el.classList.toggle('active', el.dataset.state === state)
+    );
+    _pipelineApplyFilters();
+  }
+
+  function sortPipeline(col) {
+    _pipSort.dir = (_pipSort.col === col && _pipSort.dir === 'desc') ? 'asc' : 'desc';
+    _pipSort.col = col;
+    document.querySelectorAll('.pt-sortable').forEach(th => {
+      const active = th.dataset.col === col;
+      th.classList.toggle('pt-sorted', active);
+      const icon = th.querySelector('.pt-sort-icon');
+      if (icon) icon.textContent = active ? (_pipSort.dir === 'asc' ? '↑' : '↓') : '↕';
+    });
+    _pipelineApplyFilters();
+  }
+
+  function _pipRender() {
+    const skel  = document.getElementById('pipelineSkeleton');
+    const wrap  = document.getElementById('pipelineTableWrap');
+    const empty = document.getElementById('pipelineEmpty');
+    const tbody = document.getElementById('pipelineBody');
+
+    skel.classList.remove('active');
+
+    const total = _pipFiltered.length;
+    document.getElementById('pipelineCountLabel').textContent =
+      `${total} job${total !== 1 ? 's' : ''}`;
+
+    if (!total) {
+      wrap.style.display = 'none';
+      empty.querySelector('.pipeline-empty-title').textContent = 'No jobs found';
+      empty.querySelector('.pipeline-empty-sub').textContent =
+        _pipStateFilter !== 'all' || document.getElementById('pipelineSearch').value
+          ? 'Try adjusting your search or filter.'
+          : 'Run a sync to populate the ingestion pipeline.';
+      empty.classList.add('show');
+      return;
+    }
+
+    empty.classList.remove('show');
+    wrap.style.display = '';
+
+    const start = _pipPage * _PIP_PAGE_SIZE;
+    const page  = _pipFiltered.slice(start, start + _PIP_PAGE_SIZE);
+
+    tbody.innerHTML = page.map(_pipRow).join('');
+
+    // Restore expanded rows
+    _pipExpanded.forEach(id => {
+      const inner = document.getElementById(`pip-detail-${id}`);
+      const btn   = document.getElementById(`pip-btn-${id}`);
+      if (inner) inner.classList.add('open');
+      if (btn)   btn.classList.add('open');
+    });
+
+    _pipRenderPagination(total);
+  }
+
+  function _pipRow(job) {
+    const ds    = _pipDisplayState(job.state);
+    const { host, path } = _pipParseUrl(job.source_url);
+    const ms    = _pipDuration(job);
+    const dur   = _pipFmtDuration(ms);
+    const ts    = _pipRelTs(job.queued_at);
+    const snap  = job.source_snapshot_id;
+    const hasDetail = job.state === 'failed' || job.failure_reason;
+    const btn   = hasDetail
+      ? `<button class="pip-exp-btn" id="pip-btn-${job.id}" onclick="togglePipExpand(${job.id})" title="Show error detail">›</button>`
+      : `<button class="pip-exp-btn invisible" tabindex="-1">›</button>`;
+
+    return `
+      <tr class="pipeline-row ${ds.row}">
+        <td>
+          <div class="pip-status">
+            <span class="pip-dot ${ds.dot}"></span>
+            <span class="pip-status-label ${ds.lbl}">${ds.label}</span>
+          </div>
+        </td>
+        <td>
+          <div class="pip-source" title="${escapeHtml(job.source_url || '')}">
+            <span class="pip-source-host">${escapeHtml(host)}</span>
+            <span class="pip-source-path">${escapeHtml(path)}</span>
+          </div>
+        </td>
+        <td>
+          <div class="pip-stages">${_pipStageMinibar(job)}</div>
+        </td>
+        <td><span class="pip-ts" title="${escapeHtml(job.queued_at || '')}">${ts}</span></td>
+        <td><span class="pip-dur ${dur.cls}">${dur.text}</span></td>
+        <td>${snap ? `<span class="pip-snap">#${snap}</span>` : '<span class="pip-snap-none">—</span>'}</td>
+        <td>${btn}</td>
+      </tr>
+      ${hasDetail ? `
+      <tr class="pip-detail-row">
+        <td colspan="7">
+          <div class="pip-detail-inner" id="pip-detail-${job.id}">
+            ${job.failure_reason ? `<div class="pip-error-pre">${escapeHtml(job.failure_reason)}</div>` : ''}
+            <div class="pip-detail-meta">
+              <div class="pip-dm"><div class="pip-dm-key">Job ID</div><div class="pip-dm-val">#${job.id}</div></div>
+              <div class="pip-dm"><div class="pip-dm-key">Queued</div><div class="pip-dm-val">${escapeHtml(job.queued_at || '—')}</div></div>
+              <div class="pip-dm"><div class="pip-dm-key">Failed at</div><div class="pip-dm-val">${escapeHtml(job.failed_at || '—')}</div></div>
+              <div class="pip-dm"><div class="pip-dm-key">State</div><div class="pip-dm-val">${escapeHtml(job.state || '—')}</div></div>
+              <div class="pip-dm"><div class="pip-dm-key">Snapshot ID</div><div class="pip-dm-val">${snap ? `#${snap}` : '—'}</div></div>
+            </div>
+            <button class="pip-retry-btn" title="Retry not yet implemented" disabled>↻ Retry Job</button>
+          </div>
+        </td>
+      </tr>` : ''}`;
+  }
+
+  function togglePipExpand(id) {
+    const inner = document.getElementById(`pip-detail-${id}`);
+    const btn   = document.getElementById(`pip-btn-${id}`);
+    if (!inner) return;
+    const open = inner.classList.toggle('open');
+    btn && btn.classList.toggle('open', open);
+    if (open) _pipExpanded.add(id);
+    else      _pipExpanded.delete(id);
+  }
+
+  function _pipRenderPagination(total) {
+    const pages = Math.ceil(total / _PIP_PAGE_SIZE);
+    const el    = document.getElementById('pipelinePagination');
+    if (pages <= 1) { el.innerHTML = ''; return; }
+
+    const start = _pipPage * _PIP_PAGE_SIZE + 1;
+    const end   = Math.min(start + _PIP_PAGE_SIZE - 1, total);
+
+    const pageNums = Array.from({ length: pages }, (_, i) => {
+      const active = i === _pipPage ? 'active' : '';
+      return `<button class="pp-btn ${active}" onclick="_pipGoPage(${i})">${i + 1}</button>`;
+    }).join('');
+
+    el.innerHTML = `
+      <span class="pp-info">${start}–${end} of ${total}</span>
+      <div class="pp-pages">
+        <button class="pp-btn" onclick="_pipGoPage(${_pipPage - 1})" ${_pipPage === 0 ? 'disabled' : ''}>‹</button>
+        ${pageNums}
+        <button class="pp-btn" onclick="_pipGoPage(${_pipPage + 1})" ${_pipPage >= pages - 1 ? 'disabled' : ''}>›</button>
+      </div>`;
+  }
+
+  function _pipGoPage(p) {
+    const pages = Math.ceil(_pipFiltered.length / _PIP_PAGE_SIZE);
+    if (p < 0 || p >= pages) return;
+    _pipPage = p;
+    _pipRender();
+    document.getElementById('pipelineTableWrap').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   // ── INIT ──

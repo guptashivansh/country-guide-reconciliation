@@ -1,0 +1,76 @@
+[
+  {
+    "name": "numeric_threshold_change",
+    "old_rule": {
+      "rule_id": "SG-CPF-001",
+      "country": "Singapore",
+      "section": "social_security",
+      "text": "Employers must contribute CPF at 17 percent for eligible employees.",
+      "numeric_thresholds": [
+        {"label": "cpf employer contribution", "value": 17, "unit": "percent"}
+      ],
+      "requirements": ["Employers must contribute CPF for eligible employees."]
+    },
+    "new_rule": {
+      "rule_id": "SG-CPF-001",
+      "country": "Singapore",
+      "section": "social_security",
+      "text": "Employers must contribute CPF at 18 percent for eligible employees.",
+      "numeric_thresholds": [
+        {"label": "cpf employer contribution", "value": 18, "unit": "percent"}
+      ],
+      "requirements": ["Employers must contribute CPF for eligible employees."]
+    },
+    "expected_change_type": "NUMERIC_THRESHOLD_CHANGE"
+  },
+  {
+    "name": "eligibility_change",
+    "old_rule": {
+      "rule_id": "SG-CPF-002",
+      "country": "Singapore",
+      "section": "social_security",
+      "text": "CPF contributions apply to Singapore Citizens.",
+      "eligibility": ["Singapore Citizens"]
+    },
+    "new_rule": {
+      "rule_id": "SG-CPF-002",
+      "country": "Singapore",
+      "section": "social_security",
+      "text": "CPF contributions apply to Singapore Citizens and Singapore Permanent Residents.",
+      "eligibility": ["Singapore Citizens", "Singapore Permanent Residents"]
+    },
+    "expected_change_type": "ELIGIBILITY_CHANGE"
+  },
+  {
+    "name": "timeline_change",
+    "old_rule": {
+      "rule_id": "IN-TERM-001",
+      "country": "India",
+      "section": "termination_notice",
+      "text": "Employer must provide notice within 30 days before termination."
+    },
+    "new_rule": {
+      "rule_id": "IN-TERM-001",
+      "country": "India",
+      "section": "termination_notice",
+      "text": "Employer must provide notice within 45 days before termination."
+    },
+    "expected_change_type": "TIMELINE_CHANGE"
+  },
+  {
+    "name": "formatting_only",
+    "old_rule": {
+      "rule_id": "AU-LEAVE-001",
+      "country": "Australia",
+      "section": "annual_leave",
+      "text": "Employees are entitled to paid annual leave."
+    },
+    "new_rule": {
+      "rule_id": "AU-LEAVE-001",
+      "country": "Australia",
+      "section": "annual_leave",
+      "text": "Employees are entitled to paid annual leave!"
+    },
+    "expected_change_type": "NON_MATERIAL_FORMATTING"
+  }
+]
