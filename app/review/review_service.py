@@ -17,12 +17,12 @@ class ReviewService:
     def list_audit_entries(self):
         return self.country_guide_repository.list_audit_entries()
 
-    def approve_review_item(self, item_id, comment):
+    def approve_review_item(self, item_id, comment, assignee="", rationale=""):
         logger.info(
             "Approving review item",
             extra={"stage": "review", "review_item_id": item_id},
         )
-        result = self.country_guide_repository.approve_pending_review_item(item_id, comment)
+        result = self.country_guide_repository.approve_pending_review_item(item_id, comment, assignee, rationale)
         if not result:
             logger.warning(
                 "Approve failed because pending review item was not found",
@@ -35,12 +35,12 @@ class ReviewService:
         )
         return result
 
-    def reject_review_item(self, item_id, comment):
+    def reject_review_item(self, item_id, comment, assignee="", rationale=""):
         logger.info(
             "Rejecting review item",
             extra={"stage": "review", "review_item_id": item_id},
         )
-        result = self.country_guide_repository.reject_pending_review_item(item_id, comment)
+        result = self.country_guide_repository.reject_pending_review_item(item_id, comment, assignee, rationale)
         if not result:
             logger.warning(
                 "Reject failed because pending review item was not found",
@@ -49,6 +49,42 @@ class ReviewService:
             return None
         logger.info(
             "Rejected review item",
+            extra={"stage": "review", "review_item_id": item_id, "section": result["section"]},
+        )
+        return result
+
+    def assign_review_item(self, item_id, comment, assignee=""):
+        logger.info(
+            "Assigning review item",
+            extra={"stage": "review", "review_item_id": item_id},
+        )
+        result = self.country_guide_repository.update_review_assignment(item_id, comment, assignee)
+        if not result:
+            logger.warning(
+                "Assign failed because pending review item was not found",
+                extra={"stage": "review", "review_item_id": item_id},
+            )
+            return None
+        logger.info(
+            "Assigned review item",
+            extra={"stage": "review", "review_item_id": item_id, "section": result["section"]},
+        )
+        return result
+
+    def escalate_review_item(self, item_id, comment, assignee="", rationale=""):
+        logger.info(
+            "Escalating review item",
+            extra={"stage": "review", "review_item_id": item_id},
+        )
+        result = self.country_guide_repository.escalate_review_item(item_id, comment, assignee, rationale)
+        if not result:
+            logger.warning(
+                "Escalate failed because pending review item was not found",
+                extra={"stage": "review", "review_item_id": item_id},
+            )
+            return None
+        logger.info(
+            "Escalated review item",
             extra={"stage": "review", "review_item_id": item_id, "section": result["section"]},
         )
         return result

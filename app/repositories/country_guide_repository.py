@@ -50,6 +50,10 @@ class CountryGuideRepository:
             c.execute("ALTER TABLE review_queue ADD COLUMN source_hash TEXT")
         if "source_snapshot_id" not in review_columns:
             c.execute("ALTER TABLE review_queue ADD COLUMN source_snapshot_id INTEGER")
+        if "reviewer_assignee" not in review_columns:
+            c.execute("ALTER TABLE review_queue ADD COLUMN reviewer_assignee TEXT")
+        if "reviewer_rationale" not in review_columns:
+            c.execute("ALTER TABLE review_queue ADD COLUMN reviewer_rationale TEXT")
 
         c.execute('''
             CREATE TABLE IF NOT EXISTS audit_log (
@@ -64,6 +68,13 @@ class CountryGuideRepository:
                 timestamp TEXT
             )
         ''')
+
+        c.execute("PRAGMA table_info(audit_log)")
+        audit_columns = {row[1] for row in c.fetchall()}
+        if "reviewer_assignee" not in audit_columns:
+            c.execute("ALTER TABLE audit_log ADD COLUMN reviewer_assignee TEXT")
+        if "reviewer_rationale" not in audit_columns:
+            c.execute("ALTER TABLE audit_log ADD COLUMN reviewer_rationale TEXT")
 
         conn.commit()
         conn.close()
@@ -104,9 +115,11 @@ class CountryGuideRepository:
         conn = self.connect()
         c = conn.cursor()
         c.execute("""
-            SELECT id, country, section, old_value, new_value, severity, confidence, source_url, source_paragraph, created_at, source_snapshot_id
-            FROM review_queue WHERE status='pending'
+            SELECT id, country, section, old_value, new_value, severity, confidence, source_url, source_paragraph,
+                   created_at, source_snapshot_id, status, reviewed_at, reviewer_comment, reviewer_assignee, reviewer_rationale
+            FROM review_queue WHERE status IN ('pending', 'escalated')
             ORDER BY
+                CASE status WHEN 'escalated' THEN 0 ELSE 1 END,
                 CASE severity WHEN 'critical' THEN 1 WHEN 'major' THEN 2 ELSE 3 END,
                 confidence DESC
         """)
@@ -118,6 +131,9 @@ class CountryGuideRepository:
             "confidence": r[6], "source_url": r[7],
             "source_paragraph": r[8], "created_at": r[9],
             "source_snapshot_id": r[10],
+            "status": r[11], "reviewed_at": r[12],
+            "reviewer_notes": r[13], "reviewer_assignee": r[14],
+            "reviewer_rationale": r[15],
         } for r in rows]
 
     def list_audit_entries(self, limit=50):
@@ -129,8 +145,25 @@ class CountryGuideRepository:
         return [{
             "id": r[0], "action": r[1], "country": r[2], "section": r[3],
             "old_value": r[4], "new_value": r[5], "decision": r[6],
-            "reviewer_comment": r[7], "timestamp": r[8]
+            "reviewer_comment": r[7], "timestamp": r[8],
+            "reviewer_assignee": r[9] if len(r) > 9 else None,
+            "reviewer_rationale": r[10] if len(r) > 10 else None,
         } for r in rows]
+
+    def upsert_guide_entry(self, country, section, value, source_url, source_hash=""):
+        conn = self.connect()
+        c = conn.cursor()
+        c.execute('''
+            INSERT INTO country_guide (country, section, value, source_url, source_hash, last_updated)
+            VALUES (?, ?, ?, ?, ?, ?)
+            ON CONFLICT(country, section) DO UPDATE SET
+                value=excluded.value,
+                source_url=excluded.source_url,
+                source_hash=excluded.source_hash,
+                last_updated=excluded.last_updated
+        ''', (country, section, value, source_url, source_hash, datetime.now().isoformat()))
+        conn.commit()
+        conn.close()
 
     def get_current_value(self, country, section):
         conn = self.connect()
@@ -145,7 +178,7 @@ class CountryGuideRepository:
         c = conn.cursor()
         c.execute("""
             SELECT id FROM review_queue
-            WHERE country=? AND section=? AND status='pending'
+            WHERE country=? AND section=? AND status IN ('pending', 'escalated')
         """, (country, section))
         exists = c.fetchone() is not None
         conn.close()
@@ -162,13 +195,13 @@ class CountryGuideRepository:
         conn.commit()
         conn.close()
 
-    def approve_pending_review_item(self, item_id, comment):
+    def approve_pending_review_item(self, item_id, comment, assignee="", rationale=""):
         conn = self.connect()
         c = conn.cursor()
         c.execute("""
             SELECT country, section, old_value, new_value, source_url, source_hash
             FROM review_queue
-            WHERE id=? AND status='pending'
+            WHERE id=? AND status IN ('pending', 'escalated')
         """, (item_id,))
         item = c.fetchone()
         if not item:
@@ -186,24 +219,28 @@ class CountryGuideRepository:
                 source_hash=excluded.source_hash,
                 last_updated=excluded.last_updated
         ''', (country, section, new_value, source_url, source_hash, timestamp))
-        c.execute("UPDATE review_queue SET status='approved', reviewed_at=?, reviewer_comment=? WHERE id=?",
-                  (timestamp, comment, item_id))
+        c.execute("""
+            UPDATE review_queue
+            SET status='approved', reviewed_at=?, reviewer_comment=?, reviewer_assignee=?, reviewer_rationale=?
+            WHERE id=?
+        """, (timestamp, comment, assignee, rationale, item_id))
         c.execute('''
-            INSERT INTO audit_log (action, country, section, old_value, new_value, decision, reviewer_comment, timestamp)
-            VALUES ('REVIEW', ?, ?, ?, ?, 'approved', ?, ?)
-        ''', (country, section, old_value, new_value, comment, timestamp))
+            INSERT INTO audit_log
+            (action, country, section, old_value, new_value, decision, reviewer_comment, timestamp, reviewer_assignee, reviewer_rationale)
+            VALUES ('REVIEW', ?, ?, ?, ?, 'approved', ?, ?, ?, ?)
+        ''', (country, section, old_value, new_value, comment, timestamp, assignee, rationale))
 
         conn.commit()
         conn.close()
-        return {"country": country, "section": section}
+        return {"country": country, "section": section, "status": "approved", "reviewed_at": timestamp}
 
-    def reject_pending_review_item(self, item_id, comment):
+    def reject_pending_review_item(self, item_id, comment, assignee="", rationale=""):
         conn = self.connect()
         c = conn.cursor()
         c.execute("""
             SELECT country, section, old_value, new_value
             FROM review_queue
-            WHERE id=? AND status='pending'
+            WHERE id=? AND status IN ('pending', 'escalated')
         """, (item_id,))
         item = c.fetchone()
         if not item:
@@ -212,13 +249,72 @@ class CountryGuideRepository:
 
         country, section, old_value, new_value = item
         timestamp = datetime.now().isoformat()
-        c.execute("UPDATE review_queue SET status='rejected', reviewed_at=?, reviewer_comment=? WHERE id=?",
-                  (timestamp, comment, item_id))
+        c.execute("""
+            UPDATE review_queue
+            SET status='rejected', reviewed_at=?, reviewer_comment=?, reviewer_assignee=?, reviewer_rationale=?
+            WHERE id=?
+        """, (timestamp, comment, assignee, rationale, item_id))
         c.execute('''
-            INSERT INTO audit_log (action, country, section, old_value, new_value, decision, reviewer_comment, timestamp)
-            VALUES ('REVIEW', ?, ?, ?, ?, 'rejected', ?, ?)
-        ''', (country, section, old_value, new_value, comment, timestamp))
+            INSERT INTO audit_log
+            (action, country, section, old_value, new_value, decision, reviewer_comment, timestamp, reviewer_assignee, reviewer_rationale)
+            VALUES ('REVIEW', ?, ?, ?, ?, 'rejected', ?, ?, ?, ?)
+        ''', (country, section, old_value, new_value, comment, timestamp, assignee, rationale))
 
         conn.commit()
         conn.close()
-        return {"country": country, "section": section}
+        return {"country": country, "section": section, "status": "rejected", "reviewed_at": timestamp}
+
+    def update_review_assignment(self, item_id, comment, assignee=""):
+        conn = self.connect()
+        c = conn.cursor()
+        c.execute("""
+            SELECT country, section, status
+            FROM review_queue
+            WHERE id=? AND status IN ('pending', 'escalated')
+        """, (item_id,))
+        item = c.fetchone()
+        if not item:
+            conn.close()
+            return None
+
+        country, section, status = item
+        timestamp = datetime.now().isoformat()
+        c.execute("""
+            UPDATE review_queue
+            SET reviewed_at=?, reviewer_comment=?, reviewer_assignee=?
+            WHERE id=?
+        """, (timestamp, comment, assignee, item_id))
+
+        conn.commit()
+        conn.close()
+        return {"country": country, "section": section, "status": status, "reviewed_at": timestamp}
+
+    def escalate_review_item(self, item_id, comment, assignee="", rationale=""):
+        conn = self.connect()
+        c = conn.cursor()
+        c.execute("""
+            SELECT country, section, old_value, new_value
+            FROM review_queue
+            WHERE id=? AND status IN ('pending', 'escalated')
+        """, (item_id,))
+        item = c.fetchone()
+        if not item:
+            conn.close()
+            return None
+
+        country, section, old_value, new_value = item
+        timestamp = datetime.now().isoformat()
+        c.execute("""
+            UPDATE review_queue
+            SET status='escalated', reviewed_at=?, reviewer_comment=?, reviewer_assignee=?, reviewer_rationale=?
+            WHERE id=?
+        """, (timestamp, comment, assignee, rationale, item_id))
+        c.execute('''
+            INSERT INTO audit_log
+            (action, country, section, old_value, new_value, decision, reviewer_comment, timestamp, reviewer_assignee, reviewer_rationale)
+            VALUES ('REVIEW', ?, ?, ?, ?, 'escalated', ?, ?, ?, ?)
+        ''', (country, section, old_value, new_value, comment, timestamp, assignee, rationale))
+
+        conn.commit()
+        conn.close()
+        return {"country": country, "section": section, "status": "escalated", "reviewed_at": timestamp}

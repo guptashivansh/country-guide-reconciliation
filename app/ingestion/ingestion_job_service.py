@@ -50,5 +50,5 @@ class IngestionJobService:
             extra={"stage": "failed", "ingestion_job_id": job_id, "failure": failure_reason},
         )
 
-    def list_recent_jobs(self):
-        return self.ingestion_job_repository.list_recent_jobs()
+    def list_recent_jobs(self, limit=25):
+        return self.ingestion_job_repository.list_recent_jobs(limit=limit)

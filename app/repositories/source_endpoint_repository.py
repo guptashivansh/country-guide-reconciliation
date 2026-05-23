@@ -33,7 +33,8 @@ class TrustedSourceEndpointRepository:
             if authority is None or not authority.get("is_active", False):
                 continue
 
-            country_name = country_map.get(se.get("country_id"), "")
+            country_id = authority.get("country_id", "")
+            country_name = country_map.get(country_id, "")
             authority_name = authority.get("name", "")
             sections = tuple(se.get("sections_covered", []))
 

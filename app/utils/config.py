@@ -24,6 +24,15 @@ def groq_api_key():
     return os.environ.get("GROQ_API_KEY")
 
 
+def groq_api_keys():
+    """Return list of Groq API keys. Reads GROQ_API_KEYS (comma-separated) with GROQ_API_KEY as fallback."""
+    multi = os.environ.get("GROQ_API_KEYS", "")
+    keys = [k.strip().strip("'").strip('"') for k in multi.split(",") if k.strip()]
+    if not keys and groq_api_key():
+        keys = [groq_api_key()]
+    return keys
+
+
 def extraction_chunk_size():
     return int(os.environ.get("EXTRACTION_CHUNK_SIZE", "6000"))
 
