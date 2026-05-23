@@ -71,6 +71,18 @@ class ReviewService:
         )
         return result
 
+    def bulk_approve_non_critical(self, country, comment="", rationale=""):
+        logger.info(
+            "Bulk approving non-critical items",
+            extra={"stage": "review", "country": country},
+        )
+        result = self.country_guide_repository.bulk_approve_non_critical(country, comment, rationale)
+        logger.info(
+            "Bulk approval complete",
+            extra={"stage": "review", "country": country, "approved": result["approved"]},
+        )
+        return result
+
     def escalate_review_item(self, item_id, comment, assignee="", rationale=""):
         logger.info(
             "Escalating review item",

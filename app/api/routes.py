@@ -2,6 +2,9 @@ import logging
 from datetime import datetime
 
 from flask import Blueprint, abort, jsonify, render_template, request
+from app.services.sync_service import run_sync
+from app.services.slack_service import send_sync_alert
+from app.utils.config import slack_webhook_url
 
 
 logger = logging.getLogger(__name__)
@@ -131,116 +134,48 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
 
     @routes.route("/api/sync", methods=["POST"])
     def sync():
-        total_changes = 0
         body = request.get_json(silent=True) or {}
-        selected_countries = set(body.get("countries") or [])
+        selected_countries = list(body.get("countries") or [])
 
-        all_endpoints = source_registry_service.list_trusted_source_endpoints()
-        endpoints = [e for e in all_endpoints if not selected_countries or e.country in selected_countries]
+        services = {
+            "source_registry_service": source_registry_service,
+            "ingestion_service": ingestion_service,
+            "source_snapshot_service": source_snapshot_service,
+            "ingestion_job_service": ingestion_job_service,
+            "extraction_service": extraction_service,
+            "reconciliation_service": reconciliation_service,
+        }
+        result = run_sync(services, countries=selected_countries or None)
+        send_sync_alert(slack_webhook_url(), result, triggered_by="manual")
 
-        logger.info("Country guide sync started", extra={"stage": "sync", "countries": list(selected_countries) or "all"})
-
-        for source_endpoint in endpoints:
-            job_id = ingestion_job_service.create_job(source_endpoint.url)
-            try:
-                logger.info(
-                    "Processing source endpoint",
-                    extra={"stage": "sync", "source_url": source_endpoint.url, "ingestion_job_id": job_id},
-                )
-                ingestion_result = ingestion_service.fetch_clean_text(source_endpoint.url)
-
-                if not ingestion_result.succeeded:
-                    failure_reason = ingestion_result.failure.reason if ingestion_result.failure else "source fetch failed"
-                    logger.warning(
-                        "Source endpoint returned no content",
-                        extra={
-                            "stage": "ingestion_fetch",
-                            "source_url": source_endpoint.url,
-                            "ingestion_job_id": job_id,
-                            "result_status": ingestion_result.status,
-                            "failure": failure_reason,
-                            "failure_type": ingestion_result.failure.type if ingestion_result.failure else None,
-                        },
-                    )
-                    ingestion_job_service.mark_failed(job_id, failure_reason)
-                    continue
-
-                ingestion_job_service.mark_fetched(job_id)
-                snapshot_id = source_snapshot_service.persist_snapshot(
-                    source_url=source_endpoint.url,
-                    raw_text=ingestion_result.raw_text,
-                    content_hash=ingestion_result.content_hash,
-                )
-                ingestion_job_service.mark_normalized(job_id, snapshot_id)
-
-                extraction_result = extraction_service.extract_employment_rules(
-                    content=ingestion_result.raw_text,
-                    source_url=source_endpoint.url,
-                    country=source_endpoint.country,
-                    sections=source_endpoint.sections,
-                )
-                if extraction_result.succeeded:
-                    source_snapshot_service.mark_extraction_succeeded(snapshot_id)
-                    ingestion_job_service.mark_extracted(job_id)
-                else:
-                    failure_reason = extraction_result.failure.reason if extraction_result.failure else "extraction returned no valid rules"
-                    source_snapshot_service.mark_extraction_failed(snapshot_id)
-                    ingestion_job_service.mark_failed(job_id, failure_reason)
-                    continue
-                logger.info(
-                    "Extraction produced validated rules",
-                    extra={
-                        "stage": "extraction",
-                        "source_url": source_endpoint.url,
-                        "ingestion_job_id": job_id,
-                        "source_snapshot_id": snapshot_id,
-                        "extraction_count": len(extraction_result.rules),
-                        "result_status": extraction_result.status,
-                    },
-                )
-
-                reconciliation_result = reconciliation_service.reconcile_extracted_rules(
-                    country=source_endpoint.country,
-                    extracted_data=extraction_result.rules,
-                    source_url=source_endpoint.url,
-                    source_hash=ingestion_result.content_hash,
-                    source_snapshot_id=snapshot_id,
-                )
-                if not reconciliation_result.succeeded:
-                    failure_reason = reconciliation_result.failure.reason if reconciliation_result.failure else "reconciliation failed"
-                    ingestion_job_service.mark_failed(job_id, failure_reason)
-                    continue
-
-                changes_queued = reconciliation_result.changes_queued
-                total_changes += changes_queued
-                ingestion_job_service.mark_reconciled(job_id)
-                logger.info(
-                    "Source endpoint processed",
-                    extra={
-                        "stage": "sync",
-                        "source_url": source_endpoint.url,
-                        "ingestion_job_id": job_id,
-                        "source_snapshot_id": snapshot_id,
-                        "extraction_count": len(extraction_result.rules),
-                        "changes_queued": changes_queued,
-                        "result_status": reconciliation_result.status,
-                    },
-                )
-            except Exception as e:
-                logger.error(
-                    "Source endpoint processing failed",
-                    extra={"stage": "sync", "source_url": source_endpoint.url, "ingestion_job_id": job_id, "failure": str(e)},
-                )
-                ingestion_job_service.mark_failed(job_id, str(e))
-
-        logger.info(
-            "Country guide sync completed",
-            extra={"stage": "sync", "changes_queued": total_changes},
-        )
+        total_changes = result["total_changes"]
         return jsonify({
             "success": True,
             "changes_queued": total_changes,
+            "endpoints_processed": result["endpoints_processed"],
+            "failures": result["failures"],
             "message": f"{total_changes} change(s) queued for review" if total_changes > 0 else "No changes detected"
+        })
+
+    @routes.route("/api/bulk-approve", methods=["POST"])
+    def bulk_approve():
+        body = request.get_json(silent=True) or {}
+        country = body.get("country", "").strip()
+        if not country:
+            return jsonify({"success": False, "message": "country is required"}), 400
+
+        result = review_service.bulk_approve_non_critical(
+            country,
+            comment=body.get("comment", "Bulk approval: non-critical pending items"),
+            rationale=body.get("rationale", "Bulk approved — non-critical"),
+        )
+        approved = result["approved"]
+        if approved == 0:
+            return jsonify({"success": True, "approved": 0, "message": f"No eligible non-critical items for {country}"})
+        return jsonify({
+            "success": True,
+            "approved": approved,
+            "message": f"{approved} non-critical change{'s' if approved != 1 else ''} approved for {country}",
         })
 
     @routes.route("/api/approve/<int:item_id>", methods=["POST"])
