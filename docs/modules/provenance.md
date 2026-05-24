@@ -27,7 +27,7 @@ In regulated environments, it is not enough to know that a compliance rule exist
 
 ## 5. Functional Overview
 
-![Provenance Audit Trail — Immutable timeline of every review decision with reviewer identity, rationale, and timestamps](../assets/screenshots/provenance_audit_trail.png)
+![Provenance Audit Trail — Immutable timeline of every review decision with reviewer identity, rationale, and timestamps](../assets/screenshots/provenance_audit_trail.png){ loading=lazy }
 
 
 The provenance system records a linked chain for every published rule:
@@ -172,7 +172,7 @@ Every provenance record includes `parser_version` (default: `"groq/llama-3.3-70b
 | `GET /api/provenance/<country>/<section>` | GET | Single provenance chain for a rule |
 | `GET /api/provenance/<country>/<section>/history` | GET | Full provenance history (all versions) |
 
-![Provenance Tracking — Source-to-rule traceability cards with confidence bars, parser version, and reviewer metadata](../assets/screenshots/provenance_tracking.png)
+![Provenance Tracking — Source-to-rule traceability cards with confidence bars, parser version, and reviewer metadata](../assets/screenshots/provenance_tracking.png){ loading=lazy }
 
 ## 10. Auditability & Traceability
 

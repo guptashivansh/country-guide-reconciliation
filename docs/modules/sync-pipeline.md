@@ -25,7 +25,7 @@ Compliance teams cannot manually track regulatory changes across dozens of gover
 
 ## 5. Functional Overview
 
-![CMS Synchronization — Country-scoped sync with source selection](../assets/screenshots/cms_synchronization.png)
+![CMS Synchronization — Country-scoped sync with source selection](../assets/screenshots/cms_synchronization.png){ loading=lazy }
 
 
 The sync pipeline is a sequential, source-by-source orchestration that:
