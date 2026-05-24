@@ -1433,7 +1433,7 @@
 </tbody>
 </table>
 <h2 id="10-database-design-implications">10. Database Design Implications<a class="headerlink" href="#10-database-design-implications" title="Permanent link">&para;</a></h2>
-<p><strong><code>source_snapshots</code></strong>: Stores the raw text of every crawled page. This grows linearly with (sources × sync frequency). For 8 countries × 3 sources each × daily sync = ~24 snapshots/day, or ~8,760/year. At ~6KB average, this is ~50MB/year — manageable for SQLite.</p>
+<p><strong><code>source_snapshots</code></strong>: Stores the raw text of every crawled page. This grows linearly with (sources × sync frequency). For 87 countries × 3 sources each × daily sync = ~261 snapshots/day, or ~95K/year. At ~6KB average, this is ~570MB/year — manageable for SQLite or PostgreSQL.</p>
 <p><strong><code>ingestion_jobs</code></strong>: One row per source per sync. The <code>list_recent_jobs(limit=25)</code> query keeps the API lightweight; historical jobs remain queryable for debugging.</p>
 <h2 id="11-risk-mitigation">11. Risk Mitigation<a class="headerlink" href="#11-risk-mitigation" title="Permanent link">&para;</a></h2>
 <table>

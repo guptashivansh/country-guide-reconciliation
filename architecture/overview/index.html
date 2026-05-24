@@ -1309,7 +1309,7 @@
 <h3 id="sqlite-as-default-database">SQLite as Default Database<a class="headerlink" href="#sqlite-as-default-database" title="Permanent link">&para;</a></h3>
 <p><strong>Decision</strong>: Use SQLite for development and single-instance deployments; PostgreSQL adapter available for production.</p>
 <p><strong>Tradeoff</strong>: SQLite provides zero-ops simplicity and ACID compliance, but limits concurrent write throughput. The <code>app/utils/db.py</code> dual-backend adapter transparently rewrites SQL syntax (<code>?</code> to <code>%s</code>, <code>AUTOINCREMENT</code> to <code>SERIAL</code>, <code>date()</code> to <code>::date</code>) so the same repository code runs on both backends.</p>
-<p><strong>Why</strong>: Data volumes are modest (hundreds of rules across 8 countries); SQLite is appropriate and eliminates infrastructure overhead. The adapter ensures a migration path when scale demands it.</p>
+<p><strong>Why</strong>: Data volumes are modest (hundreds of rules across 87 countries); SQLite is appropriate and eliminates infrastructure overhead. The adapter ensures a migration path when scale demands it.</p>
 <h3 id="deterministic-semantic-engine-no-llm-for-reconciliation">Deterministic Semantic Engine (No LLM for Reconciliation)<a class="headerlink" href="#deterministic-semantic-engine-no-llm-for-reconciliation" title="Permanent link">&para;</a></h3>
 <p><strong>Decision</strong>: The reconciliation engine uses regex patterns and string similarity — not the LLM — to classify changes.</p>
 <p><strong>Tradeoff</strong>: A regex-based engine is less flexible than LLM-based classification but is deterministic, fast, and fully auditable. The same input always produces the same classification, which is critical for compliance governance where reviewers must trust the system's assessments.</p>
@@ -1374,7 +1374,7 @@
 <tbody>
 <tr>
 <td>Countries</td>
-<td>8</td>
+<td>87</td>
 <td>Source registry is additive; no code changes needed</td>
 </tr>
 <tr>
