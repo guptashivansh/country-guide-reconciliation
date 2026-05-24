@@ -122,26 +122,40 @@ class DriftRepository:
                 placeholders = ",".join("?" * len(linked))
                 fallback_rows = conn.execute(
                     f"""
-                    SELECT section, id, source_url, reviewed_at, crawled_at,
-                           extraction_confidence, parser_version, reviewer_action,
-                           MAX(created_at) AS created_at
-                    FROM rule_provenance
-                    WHERE country = ? AND section NOT IN ({placeholders})
-                    GROUP BY section
+                    SELECT rp.section, rp.id, rp.source_url, rp.reviewed_at,
+                           rp.crawled_at, rp.extraction_confidence,
+                           rp.parser_version, rp.reviewer_action,
+                           rp.created_at
+                    FROM rule_provenance rp
+                    INNER JOIN (
+                        SELECT section, MAX(created_at) AS max_created
+                        FROM rule_provenance
+                        WHERE country = ? AND section NOT IN ({placeholders})
+                        GROUP BY section
+                    ) latest ON rp.section = latest.section
+                              AND rp.created_at = latest.max_created
+                    WHERE rp.country = ? AND rp.section NOT IN ({placeholders})
                     """,
-                    (country, *linked),
+                    (country, *linked, country, *linked),
                 ).fetchall()
             else:
                 fallback_rows = conn.execute(
                     """
-                    SELECT section, id, source_url, reviewed_at, crawled_at,
-                           extraction_confidence, parser_version, reviewer_action,
-                           MAX(created_at) AS created_at
-                    FROM rule_provenance
-                    WHERE country = ?
-                    GROUP BY section
+                    SELECT rp.section, rp.id, rp.source_url, rp.reviewed_at,
+                           rp.crawled_at, rp.extraction_confidence,
+                           rp.parser_version, rp.reviewer_action,
+                           rp.created_at
+                    FROM rule_provenance rp
+                    INNER JOIN (
+                        SELECT section, MAX(created_at) AS max_created
+                        FROM rule_provenance
+                        WHERE country = ?
+                        GROUP BY section
+                    ) latest ON rp.section = latest.section
+                              AND rp.created_at = latest.max_created
+                    WHERE rp.country = ?
                     """,
-                    (country,),
+                    (country, country),
                 ).fetchall()
             for r in fallback_rows:
                 result[r["section"]] = dict(r)
