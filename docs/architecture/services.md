@@ -1,12 +1,16 @@
-# Service Dependency Graph
+# Service Architecture
 
-## Service Architecture
+## Layered Design with Explicit Boundaries
 
-The platform follows a layered service architecture with dependency injection via the `build_services()` factory in `app/__init__.py`. Services are composed at startup and passed to the Flask blueprint.
+The service architecture enforces a strict separation between persistence, business logic, and external communication. This separation is not a code organization preference — it is a governance requirement. Repository methods own database transactions; services own governance logic; the API layer owns request validation. Mixing these responsibilities would make it possible to approve a rule without writing an audit log entry (if service logic were in the API layer) or to modify published rules without going through the governance gate (if the API layer could write directly to `country_guide`).
+
+---
+
+## Service Dependency Graph
 
 ```mermaid
 graph TD
-    subgraph "Repositories (Data Layer)"
+    subgraph "Repositories — Data Layer"
         CGR[CountryGuideRepository]
         SSR[SourceSnapshotRepository]
         IJR[IngestionJobRepository]
@@ -15,7 +19,7 @@ graph TD
         DR[DriftRepository]
     end
 
-    subgraph "Services (Business Logic)"
+    subgraph "Services — Business Logic"
         RS[ReviewService]
         SRS[SourceRegistryService]
         IS[HtmlIngestionService]
@@ -31,7 +35,7 @@ graph TD
         SLACK[SlackService]
     end
 
-    subgraph "Extraction Pipeline"
+    subgraph "Pipeline Components — Stateless"
         CC[ContentChunker]
         ERP[EmploymentRuleParser]
         ERA[EmploymentRuleAggregator]
@@ -79,75 +83,120 @@ graph TD
 
 ## Service Catalog
 
-### Data Layer (Repositories)
+### Data Layer — Repositories
 
-| Repository | Table(s) | Key Operations |
-|-----------|----------|----------------|
-| `CountryGuideRepository` | `country_guide`, `country_guide_versions`, `review_queue`, `audit_log` | Upsert rules, enqueue reviews, approve/reject, temporal queries |
-| `SourceSnapshotRepository` | `source_snapshots` | Create snapshots, update extraction status |
-| `IngestionJobRepository` | `ingestion_jobs` | Create jobs, transition state machine, list recent |
-| `ProvenanceRepository` | `rule_provenance` | Write provenance records, resolve chains, get history |
-| `TrustedSourceEndpointRepository` | External JSON | Fetch active source endpoints from GitHub |
-| `DriftRepository` | Read-only across `country_guide`, `review_queue`, `rule_provenance` | Aggregate data for drift analysis |
+Repositories own all SQL operations. No service or API handler writes SQL directly.
 
-### Business Logic Layer (Services)
+| Repository | Tables | Write Operations |
+|-----------|--------|-----------------|
+| `CountryGuideRepository` | `country_guide`, `country_guide_versions`, `review_queue`, `audit_log` | `approve_pending_review_item()` (4 writes in one transaction), `reject_pending_review_item()`, `escalate_review_item()`, `enqueue_review_item()` |
+| `SourceSnapshotRepository` | `source_snapshots` | `create_snapshot()`, `mark_extraction_succeeded()`, `mark_extraction_failed()` |
+| `IngestionJobRepository` | `ingestion_jobs` | `create_job()`, `mark_fetched()`, `mark_normalized()`, `mark_extracted()`, `mark_reconciled()`, `mark_failed()` |
+| `ProvenanceRepository` | `rule_provenance` | `write()` (INSERT only), `set_current()` (pointer update on `country_guide`) |
+| `TrustedSourceEndpointRepository` | External JSON | `list_active()` (read-only from GitHub-hosted JSON) |
+| `DriftRepository` | Read-only across `country_guide`, `review_queue`, `rule_provenance` | None — read-only |
 
-| Service | Dependencies | Responsibility |
-|---------|-------------|----------------|
-| `ReviewService` | `CountryGuideRepository`, `ProvenanceService` | Approve, reject, escalate, assign, bulk-approve review items |
-| `SourceRegistryService` | `TrustedSourceEndpointRepository` | List trusted government source endpoints |
-| `HtmlIngestionService` | None (stateless) | Fetch HTML, clean, truncate, hash |
-| `SourceSnapshotService` | `SourceSnapshotRepository` | Persist snapshots, track extraction status |
-| `IngestionJobService` | `IngestionJobRepository` | Lifecycle management for ingestion jobs |
-| `GroqExtractionService` | `ContentChunker`, `EmploymentRuleParser`, `EmploymentRuleAggregator` | LLM-based structured extraction with multi-key rotation |
-| `ReconciliationService` | `CountryGuideRepository`, `SemanticReconciliationEngine` | Compare extracted rules against live guide, enqueue changes |
-| `ProvenanceService` | `ProvenanceRepository` | Record approval/seed provenance with parser version |
-| `TemporalRuleService` | `CountryGuideRepository` | Point-in-time rule queries and version timelines |
-| `DriftDetector` | `DriftRepository` | Evaluate pending/canonical drift rules, generate reports |
-| `SlackService` | None (stateless functions) | Region-aware Slack notifications |
-| `SchedulerService` | `SyncService`, `SlackService` | APScheduler cron trigger for automated sync |
+**Transaction ownership:** `CountryGuideRepository.approve_pending_review_item()` is the most critical transaction in the system. It executes four writes (audit log, guide upsert, version insert, version supersede) atomically. The transaction boundary is at the repository level, not the service level.
 
-### Pipeline Components
+---
 
-| Component | Type | Responsibility |
-|-----------|------|----------------|
-| `ContentChunker` | Stateless | Split HTML into LLM-sized chunks (max 6000 chars) |
-| `EmploymentRuleParser` | Stateless | Parse and validate LLM JSON output into `EmploymentRule` models |
-| `EmploymentRuleAggregator` | Stateless | Deduplicate rules across chunks, keep highest confidence |
-| `SemanticReconciliationEngine` | Stateless | Classify changes by type and materiality using regex patterns |
+### Business Logic Layer — Services
+
+| Service | Transaction Guarantee | Governance Responsibility |
+|---------|----------------------|--------------------------|
+| `ReviewService` | Delegates to `CountryGuideRepository` + calls `ProvenanceService` in sequence | Validates review action, coordinates approval and provenance recording, exposes governed approval/reject/escalate/assign/bulk-approve interface |
+| `GroqExtractionService` | No database writes; reads only | Manages LLM API calls, key rotation, chunk processing, confidence aggregation |
+| `ReconciliationService` | Writes via `CountryGuideRepository.enqueue_review_item()` | Applies semantic diff engine, suppresses duplicates, creates review queue items |
+| `ProvenanceService` | Writes via `ProvenanceRepository.write()` and `set_current()` | Constructs and records provenance chains for approval, bulk-approval, and seed operations |
+| `TemporalRuleService` | No writes | Point-in-time rule queries and version timeline construction |
+| `DriftDetector` | No writes | Evaluates drift rules, deduplicates findings, aggregates reports |
+| `SyncService` | Coordinates across all pipeline services | Top-level orchestrator; does not hold database state; fault-isolates per-source failures |
+| `SchedulerService` | No writes | APScheduler cron configuration; triggers `SyncService` and `SlackService` |
+| `SlackService` | No writes | Stateless Slack notification functions with region routing |
+
+---
+
+### Pipeline Components — Stateless
+
+These components are pure functions with no database access. They can be safely tested in isolation with mock inputs.
+
+| Component | Input | Output | Governance Role |
+|-----------|-------|--------|-----------------|
+| `ContentChunker` | Raw text string | List of `{chunk_index, chunk_count, text}` | Ensures LLM context budget compliance |
+| `EmploymentRuleParser` | LLM JSON response string, allowed sections | List of validated `EmploymentRule` objects | Drops invalid extractions before they enter the governance pipeline |
+| `EmploymentRuleAggregator` | List of `EmploymentRule` objects from all chunks | Deduplicated list (highest confidence per section) | Resolves conflicting extractions from the same source |
+| `SemanticReconciliationEngine` | Old rule value, new rule value | `SemanticReconciliationResult` | Deterministic change classification with documented reasoning |
 
 ---
 
 ## Dependency Injection
 
-All services are constructed in `build_services()` and passed as a dictionary:
+All services are constructed in `build_services()` in `app/__init__.py` and passed as a typed dictionary to the Flask blueprint:
 
 ```python
 services = {
     "country_guide_repository": CountryGuideRepository(db_path),
-    "review_service": ReviewService(repo, provenance_service),
+    "source_snapshot_repository": SourceSnapshotRepository(db_path),
+    "ingestion_job_repository": IngestionJobRepository(db_path),
+    "provenance_repository": ProvenanceRepository(db_path),
+    "trusted_source_endpoint_repository": TrustedSourceEndpointRepository(source_registry_url),
+    "review_service": ReviewService(country_guide_repository, provenance_service),
     "extraction_service": GroqExtractionService(api_keys, parser, chunker, aggregator),
-    "reconciliation_service": ReconciliationService(repo, semantic_engine),
-    # ... 14 services total
+    "reconciliation_service": ReconciliationService(country_guide_repository, semantic_engine),
+    "provenance_service": ProvenanceService(provenance_repository, parser_version),
+    "temporal_rule_service": TemporalRuleService(country_guide_repository),
+    "drift_detector": DriftDetector(drift_repository),
+    "sync_service": SyncService(),
+    "scheduler_service": SchedulerService(sync_service, slack_service),
+    "slack_service": SlackService(webhook_urls),
 }
 ```
 
-The Flask blueprint receives all services via its factory function `create_api_blueprint(...)`, avoiding global state and enabling testing with mock dependencies.
+**Governance implication of dependency injection:** No service creates its own database connection or builds its own dependencies. All external dependencies (API keys, database paths, webhook URLs) are injected from environment variables at startup. This means the governance behavior of any service can be tested by injecting mock repositories — the governance logic is isolated from infrastructure concerns.
 
 ---
 
 ## Sync Pipeline Orchestration
 
-The `run_sync()` function in `sync_service.py` is the top-level orchestrator. It does not hold state — it receives the services dictionary and coordinates calls across ingestion, extraction, and reconciliation:
+`SyncService.run_sync()` is the only entry point for a full pipeline run. It does not hold state and it does not own transactions:
 
-```
-for each trusted source endpoint:
-    1. ingestion_job_service.create_job(url)
-    2. html_ingestion_service.fetch_clean_text(url)
-    3. source_snapshot_service.persist_snapshot(url, text, hash)
-    4. extraction_service.extract_employment_rules(text, url, country, sections)
-    5. reconciliation_service.reconcile_extracted_rules(country, rules, url, hash, snapshot_id)
-    6. Update job state at each transition
+```python
+def run_sync(services: dict, countries: list[str] | None = None) -> SyncResult:
+    endpoints = services["source_registry"].list_trusted_source_endpoints(countries)
+    for endpoint in endpoints:
+        job_id = services["ingestion_job_service"].create_job(endpoint.url)
+        try:
+            result = services["ingestion_service"].fetch_clean_text(endpoint.url)
+            if result.success:
+                snapshot = services["snapshot_service"].persist_snapshot(...)
+                services["ingestion_job_service"].mark_fetched(job_id, snapshot.id)
+                extraction = services["extraction_service"].extract_employment_rules(...)
+                if extraction.success:
+                    services["ingestion_job_service"].mark_extracted(job_id)
+                    changes = services["reconciliation_service"].reconcile_extracted_rules(...)
+                    services["ingestion_job_service"].mark_reconciled(job_id)
+                else:
+                    services["ingestion_job_service"].mark_failed(job_id, extraction.failure)
+            else:
+                services["ingestion_job_service"].mark_failed(job_id, result.failure)
+        except Exception as e:
+            services["ingestion_job_service"].mark_failed(job_id, str(e))
+            # Continue to next endpoint — fault isolation
 ```
 
-Failures at any stage mark the job as `failed` with a reason, but do not halt processing of other endpoints.
+**Fault isolation design:** The `except` block around each endpoint's processing ensures that an uncaught exception in one source's processing (network timeout, unexpected API response format) does not halt the entire sync cycle. The exception is recorded in the job's `failure_reason`, and processing continues to the next source endpoint.
+
+---
+
+## Service Boundary Enforcement
+
+The following operations are only available through specific service methods, never through direct repository access from the API layer:
+
+| Operation | Enforced Through | Why |
+|-----------|-----------------|-----|
+| Publishing a rule | `ReviewService.approve_review_item()` | Ensures audit log + provenance are always written with the approval |
+| Bulk approving rules | `ReviewService.bulk_approve_non_critical()` | Enforces critical-severity exclusion at service level |
+| Recording provenance | `ProvenanceService.record_approval()` | Ensures `parser_version` is always set from the service constructor |
+| Source endpoint list | `SourceRegistryService.list_trusted_source_endpoints()` | Ensures only active, authorized sources are processed |
+
+No Flask route handler writes directly to `country_guide`, `audit_log`, or `rule_provenance`. Routes call services; services call repositories; repositories execute transactions.

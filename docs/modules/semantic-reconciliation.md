@@ -1,139 +1,158 @@
 # Semantic Reconciliation Engine
 
-## 1. Feature Name
+## Design Rationale
 
-**Deterministic Semantic Change Classification & Materiality Assessment**
+When the extraction pipeline detects that a proposed rule value differs from the currently published rule, the raw text difference alone is uninformative. The string "15 days annual leave" → "fifteen days annual leave" is operationally irrelevant; the string "15 days annual leave" → "20 days annual leave" is a material compliance event. Without classification, every detected difference looks equally urgent, which means nothing is actually treated as urgent.
 
-## 2. Business Problem Solved
+The semantic reconciliation engine classifies every detected difference into a change type and a materiality level. This classification does three things:
 
-When a government source changes, the raw text diff is often unhelpful. A formatting change ("15 days" → "fifteen days") is noise; a threshold change ("15 days" → "20 days") is a compliance-critical event. The semantic reconciliation engine distinguishes between these automatically, assigning a change type and materiality level that determines reviewer priority.
+1. **Prioritizes reviewer attention** — CRITICAL changes surface at the top of the review queue; INFORMATIONAL changes appear at the bottom
+2. **Gates bulk approve eligibility** — Only items below the CRITICAL threshold can be bulk-approved
+3. **Provides documented reasoning** — Every classification has a `reasoning` field recording why the engine classified it as it did, enabling auditors to evaluate the classification
 
-## 3. Operational Pain Points Addressed
+The engine's critical design property is determinism. The same (old, new) pair always produces the same classification. Reproducibility is not a convenience — it is a governance requirement.
 
-- **Alert fatigue**: Without materiality classification, every detected change looks equally important, overwhelming reviewers
-- **Missed critical changes**: Numeric threshold changes (minimum wage, tax rates) can be buried in formatting noise
-- **Inconsistent triage**: Different analysts classify the same change differently; the engine provides deterministic, reproducible classification
-- **Audit defensibility**: Regulators may ask "how did you determine this change was material?" — the engine provides documented reasoning
+---
 
-## 4. User Personas Involved
+## Why the Engine Does Not Use an LLM
 
-| Persona | Interaction |
-|---------|-------------|
-| Compliance Analyst | Sees materiality badges (Critical/Moderate/Low) on review queue items |
-| Compliance Lead | Filters review queue by materiality to prioritize critical changes |
-| External Auditor | Examines classification reasoning attached to each change |
-| Platform Engineer | Tunes regex patterns and materiality thresholds |
+This decision is worth stating explicitly, because it may appear counterintuitive in a system that already uses an LLM for extraction.
 
-## 5. Functional Overview
+**LLMs are non-deterministic at temperature > 0.** Even at temperature=0.1, LLMs can produce different classifications for identical inputs across separate invocations. A compliance reviewer who sees "CRITICAL" for a change on Tuesday and "INFORMATIONAL" for the same change on Wednesday when re-processed has no basis for trusting the classification. An auditor who asks "why was this change classified as HIGH rather than CRITICAL?" cannot receive a reproducible, inspectable answer if the classification came from an LLM.
 
-![Semantic Diff Engine — Before/after comparison with word-level highlighting and change classification](../assets/screenshots/semantic_diff_engine.png){ loading=lazy }
+**Regex classification reasoning is auditable.** The `reasoning` field records the exact pattern match that produced the classification: "Numeric value '21000' changed to '23500' in high-impact domain 'minimum wage'." An auditor can verify this against the source text and the pattern library. LLM reasoning is opaque by comparison.
 
+**Regex classification is instantaneous.** Sub-millisecond classification means the reconciliation layer adds no meaningful latency to the sync pipeline. LLM classification would add seconds per change detection, multiplied across every source endpoint on every sync.
 
-The engine compares an old rule value against a new rule value and produces a `SemanticReconciliationResult` with:
+**The LLM is already upstream.** The extraction layer uses AI generalization to handle diverse HTML formats. By the time content reaches reconciliation, it is structured rule text — not raw HTML. Structured text comparison is exactly where deterministic pattern matching outperforms probabilistic inference.
 
-- **`semantic_change_detected`**: Boolean — is this a meaningful change?
-- **`materiality_level`**: CRITICAL / HIGH / MODERATE / LOW / INFORMATIONAL
-- **`change_type`**: NUMERIC_THRESHOLD_CHANGE / ELIGIBILITY_CHANGE / REQUIREMENT_ADDED / REQUIREMENT_REMOVED / TIMELINE_CHANGE / NON_MATERIAL_FORMATTING
-- **`human_readable_summary`**: Plain-English description of what changed
-- **`reasoning`**: Step-by-step explanation of how the classification was derived
+---
 
-## 6. End-to-End Workflow
+## Classification Cascade
 
-```mermaid
-flowchart TD
-    A[Old Rule Value] --> C[Semantic Engine]
-    B[New Rule Value] --> C
-    C --> D{Numeric Thresholds Changed?}
-    D -- Yes --> E[NUMERIC_THRESHOLD_CHANGE]
-    D -- No --> F{Eligibility Scope Changed?}
-    F -- Yes --> G[ELIGIBILITY_CHANGE]
-    F -- No --> H{Requirements Added/Removed?}
-    H -- Added --> I[REQUIREMENT_ADDED]
-    H -- Removed --> J[REQUIREMENT_REMOVED]
-    H -- No --> K{Timeline Changed?}
-    K -- Yes --> L[TIMELINE_CHANGE]
-    K -- No --> M[NON_MATERIAL_FORMATTING]
-
-    E --> N[Assess Materiality]
-    G --> N
-    I --> N
-    J --> N
-    L --> N
-    M --> O[INFORMATIONAL]
-
-    N --> P{High Impact Domain?}
-    P -- Yes --> Q[CRITICAL / HIGH]
-    P -- No --> R[MODERATE / LOW]
-```
-
-## 7. Technical Architecture
-
-### Regex Pattern Library
-
-The engine uses 5 compiled regex patterns to detect specific categories of semantic change:
-
-**`NUMERIC_PATTERN`** — Extracts numeric values with units and comparators:
+The engine applies pattern categories in priority order (highest materiality potential first). The first matching category determines the change type:
 
 ```
-Matches: "15 days", "≥ 3 months", "INR 21,000/month", "2.5%"
-Captures: (value, unit, comparator)
+1. Numeric threshold detection     → NUMERIC_THRESHOLD_CHANGE
+   ↓ (if no numeric change)
+2. Eligibility scope detection     → ELIGIBILITY_CHANGE
+   ↓ (if no eligibility change)
+3. Requirement language detection  → REQUIREMENT_ADDED or REQUIREMENT_REMOVED
+   ↓ (if no requirement change)
+4. Timeline/deadline detection     → TIMELINE_CHANGE
+   ↓ (if none of the above)
+5. Fallback                        → NON_MATERIAL_FORMATTING
 ```
 
-**`REQUIREMENT_PATTERN`** — Detects mandatory language:
+**Conservative fallback design:** If a change does not match any specific pattern, it falls through to `NON_MATERIAL_FORMATTING` with INFORMATIONAL materiality. This means the change still enters the review queue — it is not suppressed — but it is presented at the lowest priority. A reviewer who disagrees with the classification sees the before/after diff regardless and can escalate if they believe the change warrants higher priority.
+
+There is no category for "suppress entirely." Every detected semantic difference between an extracted rule and the published rule creates a review item.
+
+---
+
+## Pattern Library
+
+### NUMERIC_PATTERN
+
+Extracts numeric values with units and comparators from rule text.
+
+```
+Matches: "15 days", "≥ 3 months", "INR 21,000/month", "2.5%", "12 weeks", "30 calendar days"
+Captures: numeric value, unit, optional comparator
+```
+
+**Classification logic:** All numeric values are extracted from the old and new text and compared. If the sets differ, the change type is `NUMERIC_THRESHOLD_CHANGE`. If the change involves a high-impact domain (see HIGH_IMPACT_PATTERN), materiality escalates to CRITICAL or HIGH.
+
+### ELIGIBILITY_PATTERN
+
+Detects changes to the population of workers to whom a rule applies.
+
+```
+Keywords: "eligible", "applies to", "citizens", "residents", "employees",
+          "workers", "contractors", "covered under", "subject to"
+```
+
+**Classification logic:** Eligibility keywords present in the new text but absent from the old (or vice versa) indicate that the rule's scope has changed — a different set of workers is now covered. These changes are HIGH materiality regardless of domain, because an organization may be applying the rule to the wrong population.
+
+### REQUIREMENT_PATTERN
+
+Detects changes to mandatory obligation language.
 
 ```
 Keywords: "must", "shall", "required", "mandatory", "obligated", "compulsory"
 ```
 
-**`ELIGIBILITY_PATTERN`** — Detects scope changes:
+**Classification logic:** New mandatory language appearing in the new text is `REQUIREMENT_ADDED` (MODERATE materiality). Mandatory language disappearing from the text is `REQUIREMENT_REMOVED` (CRITICAL materiality). The asymmetry is deliberate: removing a requirement carries higher risk than adding one, because the organization may be relying on an obligation that no longer exists.
 
-```
-Keywords: "eligible", "applies to", "citizens", "residents", "employees",
-          "workers", "contractors", "covered under"
-```
+### HIGH_IMPACT_PATTERN
 
-**`HIGH_IMPACT_PATTERN`** — Flags regulated domains:
+Identifies regulated domains where numeric changes carry elevated risk.
 
 ```
 Keywords: "minimum wage", "tax", "pension", "termination", "severance",
-          "social security", "health insurance", "work permit"
+          "social security", "health insurance", "work permit", "visa"
 ```
 
-**`TIMELINE_CONTEXT_PATTERN`** — Detects deadline/notice changes:
+**Role in materiality escalation:** This pattern does not produce a change type independently. It is applied as a modifier during materiality assessment. A numeric change in a high-impact domain is CRITICAL; the same numeric change in a low-impact domain may be HIGH or MODERATE.
+
+### TIMELINE_CONTEXT_PATTERN
+
+Detects changes to deadlines, notice periods, and effective dates.
 
 ```
 Keywords: "deadline", "notice", "effective", "within", "before", "after",
-          "grace period", "expiry"
+          "grace period", "expiry", "by the end of"
 ```
 
-### Classification Cascade
+---
 
-The engine applies patterns in priority order (highest materiality first):
+## Materiality Framework
 
-1. **Numeric threshold extraction** — Extract all numbers from old and new text; compare sets
-2. **Eligibility scope analysis** — Detect additions/removals of scope keywords
-3. **Requirement language detection** — Check for new mandatory language or removal of existing requirements
-4. **Timeline comparison** — Compare deadline/notice period values
-5. **Fallback** — If none of the above trigger, classify as `NON_MATERIAL_FORMATTING`
-
-### Materiality Assessment
-
-After determining the change type, materiality is assigned based on domain impact:
-
-| Change Type | High-Impact Domain | Materiality |
-|------------|-------------------|-------------|
-| NUMERIC_THRESHOLD_CHANGE | minimum wage, tax rate | CRITICAL |
-| NUMERIC_THRESHOLD_CHANGE | leave days, notice period | HIGH |
+| Change Type | High-Impact Domain | Materiality Level |
+|------------|-------------------|------------------|
+| NUMERIC_THRESHOLD_CHANGE | minimum wage, tax, social security | CRITICAL |
+| NUMERIC_THRESHOLD_CHANGE | leave days, notice period, working hours | HIGH |
+| NUMERIC_THRESHOLD_CHANGE | other domains | MODERATE |
+| REQUIREMENT_REMOVED | any | CRITICAL |
 | ELIGIBILITY_CHANGE | any | HIGH |
 | REQUIREMENT_ADDED | any | MODERATE |
-| REQUIREMENT_REMOVED | any | CRITICAL |
 | TIMELINE_CHANGE | any | MODERATE |
 | NON_MATERIAL_FORMATTING | any | INFORMATIONAL |
 
-## 8. Data Flow
+### Why REQUIREMENT_REMOVED is CRITICAL
+
+Removing a mandatory obligation from a rule text means the organization was previously subject to that requirement. If the requirement is legitimately removed (the law changed), publication is straightforward. But if the requirement was removed from the source due to a website restructuring or extraction error, and the organization stops applying it based on this change, the compliance gap is direct and immediate. The CRITICAL classification ensures this change is individually reviewed.
+
+---
+
+## Reconciliation Result Object
+
+```python
+@dataclass
+class SemanticReconciliationResult:
+    semantic_change_detected: bool
+    materiality_level: str     # "CRITICAL" | "HIGH" | "MODERATE" | "LOW" | "INFORMATIONAL"
+    change_type: str           # See classification cascade above
+    human_readable_summary: str  # E.g., "Minimum wage increased from INR 21,000 to INR 23,500"
+    reasoning: str             # E.g., "Numeric value 21000 changed to 23500 in high-impact domain 'minimum wage'"
+```
+
+The `reasoning` field is stored with the review queue item. Reviewers can examine it to understand why the engine classified the change as it did. This is a governance transparency feature: the classification is not a black box.
+
+---
+
+## Duplicate Suppression
+
+The reconciliation service applies a duplicate suppression check before creating a review queue item. If a pending review item already exists for the same (country, section, new_value) triple, no new item is created. This prevents the review queue from accumulating identical items from repeated syncs on unchanged sources.
+
+**Behavior when a new extraction differs from both the pending item and the published rule:** A new review item is created, and the previous pending item is superseded. The system does not accumulate competing proposals for the same section.
+
+---
+
+## Data Flow
 
 ```
-ReconciliationService receives (old_value, new_value) pair
+ReconciliationService receives: (old_value, new_value, country, section, source_url, snapshot_id)
     ↓
 SemanticReconciliationEngine.reconcile(old_rule, new_rule)
     ↓
@@ -147,73 +166,41 @@ SemanticReconciliationResult {
     reasoning: "Numeric value 21000 changed to 23500 in high-impact domain 'minimum wage'"
 }
     ↓
-Stored in review_queue.materiality_level and review_queue.change_type
+review_queue INSERT (materiality_level, change_type, reasoning stored)
 ```
 
-## 9. Backend Components
+---
+
+## Governance Controls
+
+| Control | Implementation |
+|---------|---------------|
+| Critical changes require individual review | `bulk_approve_non_critical()` filters on `severity != 'critical'` at repository level |
+| Classification reasoning is preserved | `reasoning` field stored with every review queue item |
+| Classification is reproducible | Same (old, new) pair always produces same result from deterministic engine |
+| Fallback never suppresses a change | `NON_MATERIAL_FORMATTING` still enters review queue with INFORMATIONAL priority |
+| Reviewer sees diff regardless of classification | Before/after values are always displayed; classification is advisory, not filtering |
+
+---
+
+## Backend Components
 
 | Component | File | Responsibility |
 |-----------|------|----------------|
-| `SemanticReconciliationEngine` | `app/reconciliation/semantic_reconciliation_service.py` (391 lines) | Pattern matching, classification, materiality scoring |
-| `ReconciliationService` | `app/reconciliation/reconciliation_service.py` (166 lines) | Orchestrates comparison, deduplication, review enqueueing |
+| `SemanticReconciliationEngine` | `app/reconciliation/semantic_reconciliation_service.py` (391 lines) | Pattern matching, classification, materiality scoring, reasoning generation |
+| `ReconciliationService` | `app/reconciliation/reconciliation_service.py` (166 lines) | Orchestrates comparison, duplicate suppression, review queue insertion |
 | `MaterialityLevel` | `app/reconciliation/schemas.py` | Enum: CRITICAL, HIGH, MODERATE, LOW, INFORMATIONAL |
 | `ChangeType` | `app/reconciliation/schemas.py` | Enum: 6 change types |
-| `SemanticReconciliationResult` | `app/reconciliation/schemas.py` | Pydantic model for engine output |
+| `SemanticReconciliationResult` | `app/reconciliation/schemas.py` | Pydantic result model |
 
-![Materiality Classification — Severity badges and materiality chips on review queue items](../assets/screenshots/materiality_classification.png){ loading=lazy }
+---
 
-## 10. Database Design Implications
-
-Two columns on `review_queue` carry the semantic classification:
-
-- `materiality_level TEXT` — "CRITICAL", "HIGH", "MODERATE", "LOW", "INFORMATIONAL"
-- `change_type TEXT` — "NUMERIC_THRESHOLD_CHANGE", "ELIGIBILITY_CHANGE", etc.
-
-These columns drive:
-- **Queue ordering**: Critical items surface first
-- **Bulk approve eligibility**: Only non-critical items can be bulk-approved
-- **Dashboard filtering**: Reviewers can filter by materiality level
-- **Drift detection**: Drift rules reference materiality when assessing pending item urgency
-
-## 11. AI/LLM Usage
-
-**The semantic reconciliation engine deliberately does not use an LLM.** This is a key architectural decision:
-
-- **Determinism**: The same (old, new) pair always produces the same classification. LLMs may classify differently on consecutive runs.
-- **Speed**: Regex matching is sub-millisecond; LLM classification adds seconds per comparison.
-- **Auditability**: The reasoning field documents exactly which pattern matched and why. An LLM's reasoning is opaque.
-- **Cost**: Zero API calls for reconciliation, regardless of change volume.
-
-The LLM is used upstream (extraction only) where its generalization across diverse HTML formats is essential. Reconciliation operates on structured rule text where regex patterns are sufficient.
-
-## 12. Human-in-the-Loop Governance Controls
-
-- Materiality classification **guides** reviewers but does not auto-approve. Even INFORMATIONAL changes require explicit human action.
-- Bulk approve is restricted to non-critical items. Critical and high-materiality changes must be individually reviewed.
-- The `reasoning` field is stored with the review item so reviewers can evaluate the engine's classification before acting.
-
-## 13. Auditability & Traceability
-
-Every review queue item records:
-- The exact old and new text that were compared
-- The engine's classification (change_type + materiality_level)
-- The source URL and paragraph that triggered the change
-- The extraction confidence from the upstream LLM
-
-This means an auditor can reconstruct: "The engine detected a NUMERIC_THRESHOLD_CHANGE of CRITICAL materiality because the minimum wage value changed from 21,000 to 23,500 in the source paragraph from [ministry URL]."
-
-## 14. Risk Mitigation
+## Risk Mitigation
 
 | Risk | Mitigation |
 |------|-----------|
-| Regex misclassifies a critical change as informational | Human reviewer sees the before/after diff regardless of classification |
-| Pattern doesn't cover a new type of change | Falls through to NON_MATERIAL_FORMATTING; still surfaces in review queue |
-| Numeric extraction misreads a non-numeric context | Confidence score from extraction provides secondary signal |
-| Eligibility pattern false-positives on general text | Pattern keywords are scoped to employment/regulatory language |
-
-## 15. Future Enhancements
-
-- **LLM-assisted fallback**: Use the LLM as a secondary classifier when the regex engine produces NON_MATERIAL_FORMATTING but the text diff is large
-- **Jurisdiction-specific patterns**: Country-specific regex for local terminology (e.g., "EPF" for India, "CPF" for Singapore)
-- **Confidence scoring on classification**: Not just extraction confidence, but classification confidence based on pattern match strength
-- **Change type expansion**: Add PENALTY_CHANGE, EXEMPTION_CHANGE, DEFINITION_CHANGE as distinct types
+| Regex misclassifies a CRITICAL change as INFORMATIONAL | Reviewer sees the before/after diff regardless; INFORMATIONAL items are still surfaced in the review queue, not suppressed |
+| Pattern doesn't cover a novel change type | Falls through to NON_MATERIAL_FORMATTING; human reviewer evaluates; classification can be appealed by escalating the item |
+| Numeric extraction matches a non-numeric context (e.g., a phone number) | Pattern requires contextual unit tokens (days, months, %, INR, etc.) to qualify as a threshold change; bare numerics do not match |
+| High-impact domain pattern matches a benign context | High-impact keywords require proximity to numeric changes; keyword match alone does not escalate materiality |
+| Classification produces incorrect human_readable_summary | Summary is informational; the canonical evidence is always the source paragraph; summary errors do not affect governance decisions |

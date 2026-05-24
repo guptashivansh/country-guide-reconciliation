@@ -1,188 +1,268 @@
-# System Overview
+# Platform Architecture
 
-## 1. Feature Name
+## Governance Architecture Overview
 
-**AI-Powered Compliance Governance & Country Guide Reconciliation Platform**
+This system implements a provenance-first compliance governance pipeline. Its architecture reflects a specific set of engineering commitments about what the system guarantees, where human authority is mandatory, and what failure modes are acceptable versus unacceptable.
 
-## 2. Business Problem Solved
-
-Organizations operating across multiple jurisdictions must maintain accurate, up-to-date employment guides that reflect local labor laws. Regulatory changes are published across fragmented government sources — ministry of labor websites, official gazettes, immigration portals — with no centralized notification system. A single missed change can result in:
-
-- **Payroll liability**: Incorrect minimum wage or tax withholding calculations
-- **Employment disputes**: Stale leave entitlement or termination notice guidance
-- **Visa processing failures**: Outdated work permit requirements
-- **Audit failures**: Inability to demonstrate when and why a compliance rule was adopted
-
-This platform automates the detection, classification, review, and publication of regulatory changes with full provenance tracking and audit-ready governance.
-
-## 3. Operational Pain Points Addressed
-
-| Pain Point | How the Platform Addresses It |
-|------------|------------------------------|
-| Manual monitoring of government websites is slow and error-prone | Automated crawling on configurable schedules with snapshot tracking |
-| Analysts cannot distinguish material changes from formatting updates | Semantic reconciliation engine classifies change type and materiality |
-| No audit trail for who approved a compliance rule change and when | Immutable audit log + provenance chain from source to published rule |
-| Stale guides go undetected until a compliance incident occurs | Drift detection with tunable staleness thresholds and Slack alerts |
-| Compliance teams across regions operate in silos | Region-aware notifications route changes to APAC, EMEA, and Americas owners |
-| Point-in-time regulatory queries are impossible without version history | Temporal versioning with effective/superseded dates on every rule |
-
-## 4. User Personas
-
-| Persona | Role | Interaction |
-|---------|------|-------------|
-| **Compliance Analyst** | Reviews and approves/rejects detected changes | Ops dashboard, review queue, before/after diffs |
-| **Compliance Lead** | Monitors drift, escalations, and pipeline health | Metrics cards, drift reports, audit log |
-| **Regional Owner** | Accountable for country coverage within APAC/EMEA/Americas | Slack alerts, region-filtered dashboards |
-| **Client-Facing Advisor** | Consults published guides when advising employers | Country guide pages, temporal queries |
-| **Engineering / Platform Team** | Maintains the pipeline, sources, and extraction quality | API endpoints, ingestion job logs, provenance debugging |
-| **External Auditor** | Verifies compliance posture and decision provenance | Audit log, provenance chains, version history |
+The central architectural concern is not performance or developer ergonomics — it is **auditability under adversarial scrutiny**. Every design decision is evaluated against the question: "If an external auditor or regulator examined this system's behavior, would they find it defensible?"
 
 ---
 
-## 5. High-Level Architecture
+## System Invariants
+
+These properties hold regardless of configuration, load, or operational context. They are enforced at the code level and cannot be disabled:
+
+1. **No rule is published without human approval.** The `country_guide` table is only updated through `approve_pending_review_item()`. No API endpoint, background job, or migration script writes to `country_guide.value` directly.
+
+2. **No approval occurs without an audit record.** Approval and audit log insertion are executed within the same database transaction. A failure in audit log insertion rolls back the entire approval.
+
+3. **Audit records are never modified.** The `audit_log` table has no UPDATE or DELETE repository methods. The API exposes only GET endpoints against it.
+
+4. **Critical changes require individual review.** The `bulk_approve_non_critical()` operation enforces `severity != 'critical'` at the SQL level. This filter is in the repository, not in the API layer, ensuring it cannot be bypassed by API callers.
+
+5. **Every version of every rule is retained permanently.** `country_guide_versions` rows are never deleted. `superseded_at` is set when a new version is created; the row is not removed.
+
+6. **Provenance is recorded atomically with publication.** Provenance insertion and `current_provenance_id` update happen in the same transaction as rule publication. A rule without provenance is a system bug, not an expected state.
+
+---
+
+## Trust Boundary Model
+
+The system defines three trust zones with explicit boundary enforcement:
+
+```
+┌────────────────────────────────────────────────────────────────────┐
+│  UNTRUSTED ZONE: External Sources                                   │
+│                                                                     │
+│  Government websites, gazettes, immigration portals                │
+│  • Content is treated as adversarial input                         │
+│  • HTML is sanitized before processing                             │
+│  • LLM extraction does not execute any code                        │
+│  • Content is archived verbatim; processing is downstream          │
+└──────────────────────────────┬─────────────────────────────────────┘
+                               │ Sanitized text only crosses this boundary
+┌──────────────────────────────▼─────────────────────────────────────┐
+│  AI PROCESSING ZONE: Extraction & Classification                   │
+│                                                                     │
+│  LLM extraction (Groq LLaMA 3.3 70B, temperature=0.1)             │
+│  Deterministic semantic classification (regex engine)              │
+│  • AI output is NEVER published directly                           │
+│  • Every AI output carries a confidence score                      │
+│  • Classification decisions have documented reasoning              │
+│  • Extraction failures are explicit, not silent                    │
+└──────────────────────────────┬─────────────────────────────────────┘
+                               │ Proposed changes only — not published rules
+┌──────────────────────────────▼─────────────────────────────────────┐
+│  GOVERNANCE ZONE: Human Review & Authorization                     │
+│                                                                     │
+│  Review queue, approval workflow, escalation                       │
+│  • Mandatory human gate for all publication                        │
+│  • Reviewer identity and rationale recorded immutably              │
+│  • Critical changes require individual review                      │
+│  • Audit log is append-only                                        │
+└──────────────────────────────┬─────────────────────────────────────┘
+                               │ Approved, provenance-linked rules only
+┌──────────────────────────────▼─────────────────────────────────────┐
+│  AUTHORITATIVE ZONE: Published Rules & History                     │
+│                                                                     │
+│  country_guide, country_guide_versions, rule_provenance            │
+│  • Immutable version history                                       │
+│  • Complete provenance chains                                      │
+│  • Temporal queries with legal defensibility                       │
+│  • Audit log covering all transitions                              │
+└────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## High-Level Architecture
 
 ```
                     ┌─────────────────────────────────────────────────────┐
-                    │                  Official Sources                    │
-                    │   Ministry of Labor  │  Immigration Portal  │ Gazette│
+                    │          Official Government Sources                 │
+                    │  Ministry of Labor · Immigration Portal · Gazette   │
                     └──────────┬──────────────────────┬───────────────────┘
                                │                      │
                     ┌──────────▼──────────────────────▼───────────────────┐
                     │              INGESTION LAYER                        │
-                    │  HTML Fetcher  │  Notion Importer  │  PDF Intake    │
-                    │  Snapshot Storage  │  Content Hashing               │
+                    │  HTML Fetcher  │  Snapshot Archival  │  Content Hash│
+                    │  Ingestion Job State Machine                        │
                     └──────────┬──────────────────────────────────────────┘
-                               │
+                               │  Raw text (sanitized) + MD5 hash
                     ┌──────────▼──────────────────────────────────────────┐
                     │            EXTRACTION LAYER                         │
-                    │  Content Chunker → Groq LLaMA 3.3 70B → Parser     │
+                    │  Content Chunker → Groq LLM → Pydantic Validator   │
                     │  Multi-key rotation  │  Chunk aggregation           │
+                    │  Confidence scoring  │  Extraction failure logging  │
                     └──────────┬──────────────────────────────────────────┘
-                               │
+                               │  EmploymentRule[] with confidence scores
                     ┌──────────▼──────────────────────────────────────────┐
                     │          RECONCILIATION LAYER                       │
-                    │  Semantic Diff Engine  │  Change Classification     │
-                    │  Materiality Scoring   │  Duplicate Detection       │
+                    │  Semantic Diff Engine (deterministic regex)         │
+                    │  Change Type Classification · Materiality Scoring   │
+                    │  Duplicate Suppression · Null-change Filtering      │
                     └──────────┬──────────────────────────────────────────┘
-                               │
+                               │  Proposed changes (not yet published)
                     ┌──────────▼──────────────────────────────────────────┐
-                    │           REVIEW & GOVERNANCE LAYER                 │
+                    │       GOVERNANCE GATE (Mandatory Human Review)      │
                     │  Review Queue  │  Approve/Reject/Escalate           │
-                    │  Bulk Approve  │  Provenance Recording              │
+                    │  Provenance Recording  │  Audit Log                 │
                     └──────────┬──────────────────────────────────────────┘
-                               │
+                               │  Approved, provenance-linked rules
               ┌────────────────┼────────────────────────┐
               │                │                        │
     ┌─────────▼────────┐ ┌────▼──────────────┐ ┌───────▼────────────┐
     │  PUBLICATION      │ │  DRIFT DETECTION  │ │  ALERTING          │
-    │  Active Guide     │ │  Staleness Rules  │ │  Slack Webhooks    │
-    │  Version History  │ │  Pending Aging    │ │  Region Routing    │
-    │  Temporal Queries │ │  Coverage Gaps    │ │  APAC/EMEA/Americas│
+    │  Active Guide     │ │  SLA Monitoring   │ │  Region-Routed     │
+    │  Version History  │ │  Coverage Gaps    │ │  APAC/EMEA/Americas│
+    │  Temporal Queries │ │  Escalation Queue │ │  Post-Sync Summary │
     └──────────────────┘ └───────────────────┘ └────────────────────┘
 ```
 
 ---
 
-## 6. End-to-End Data Flow
+## End-to-End Data Flow
 
 ```mermaid
 flowchart LR
     A[Official Source URL] --> B[HTML Fetcher]
-    B --> C[Content Cleaning & Hashing]
-    C --> D[Source Snapshot DB]
+    B --> C[Sanitize & Hash]
+    C --> D[source_snapshots]
     D --> E[Content Chunker]
-    E --> F[Groq LLM Extraction]
-    F --> G[Rule Parser & Validator]
-    G --> H[Chunk Aggregator]
-    H --> I[Semantic Reconciliation]
-    I --> J{Change Detected?}
-    J -- No --> K[Skip]
-    J -- Yes --> L[Review Queue]
+    E --> F[Groq LLM — temperature=0.1]
+    F --> G[Pydantic Validator]
+    G --> H[Confidence Aggregator]
+    H --> I[Semantic Diff Engine]
+    I --> J{Semantic Change?}
+    J -- No change detected --> K[Suppress — no queue item]
+    J -- Change detected --> L[review_queue — status=pending]
     L --> M{Reviewer Decision}
-    M -- Approve --> N[Publish to Active Guide]
-    N --> O[Version History]
-    N --> P[Provenance Record]
-    N --> Q[Audit Log Entry]
-    M -- Reject --> R[Rejection + Audit Log]
-    M -- Escalate --> S[Escalated Queue]
+    M -- Approve --> N[country_guide UPSERT]
+    N --> O[country_guide_versions INSERT]
+    N --> P[rule_provenance INSERT]
+    N --> Q[audit_log INSERT]
+    M -- Reject --> R[audit_log INSERT — no publication]
+    M -- Escalate --> S[review_queue status=escalated]
 ```
 
 ---
 
-## 7. Key Architectural Decisions & Tradeoffs
+## Architectural Decisions & Rationale
 
-### SQLite as Default Database
+### Decision 1: Deterministic Semantic Engine (No LLM for Reconciliation)
 
-**Decision**: Use SQLite for development and single-instance deployments; PostgreSQL adapter available for production.
+**What the decision is:** Change classification uses a compiled regex pattern library with documented rules, not an LLM.
 
-**Tradeoff**: SQLite provides zero-ops simplicity and ACID compliance, but limits concurrent write throughput. The `app/utils/db.py` dual-backend adapter transparently rewrites SQL syntax (`?` to `%s`, `AUTOINCREMENT` to `SERIAL`, `date()` to `::date`) so the same repository code runs on both backends.
+**Why this matters for governance:** An LLM classifying the same (old, new) pair might return `NUMERIC_THRESHOLD_CHANGE` on one invocation and `NON_MATERIAL_FORMATTING` on another. This non-determinism is unacceptable in a compliance context: the decision to escalate a critical change versus surface it as informational must be reproducible and explainable to a reviewer or auditor. The regex engine's classification is deterministic, the reasoning is documented, and the pattern library is inspectable.
 
-**Why**: Data volumes are modest (hundreds of rules across 87 countries); SQLite is appropriate and eliminates infrastructure overhead. The adapter ensures a migration path when scale demands it.
-
-### Deterministic Semantic Engine (No LLM for Reconciliation)
-
-**Decision**: The reconciliation engine uses regex patterns and string similarity — not the LLM — to classify changes.
-
-**Tradeoff**: A regex-based engine is less flexible than LLM-based classification but is deterministic, fast, and fully auditable. The same input always produces the same classification, which is critical for compliance governance where reviewers must trust the system's assessments.
-
-**Why**: Regulatory change classification must be reproducible. An LLM might classify the same change differently on consecutive runs, undermining reviewer confidence and audit defensibility.
-
-### LLM for Extraction Only
-
-**Decision**: The LLM (Groq LLaMA 3.3 70B) is used only for structured extraction from HTML — converting unstructured government web pages into typed `EmploymentRule` objects.
-
-**Tradeoff**: LLM extraction introduces a confidence dimension (rules have a 0–1 confidence score) and requires human validation. But the alternative — hand-crafted parsers per government website — is unmaintainable across jurisdictions.
-
-**Why**: Government websites have heterogeneous HTML structures that change without notice. An LLM generalizes across formats while per-site parsers break on redesigns.
-
-### Human-in-the-Loop Governance
-
-**Decision**: Every detected change must be explicitly approved or rejected by a human reviewer before publication.
-
-**Tradeoff**: This adds latency between detection and publication. A fully automated pipeline could publish faster, but the risk of publishing an incorrect LLM extraction is unacceptable in a compliance context.
-
-**Why**: LLM extraction is imperfect. A hallucinated minimum wage figure or misclassified eligibility criterion could expose the organization to legal liability. The human approval layer is a deliberate governance control, not a limitation.
-
-### External Source Registry
-
-**Decision**: The list of official source URLs is maintained in a separate GitHub-hosted JSON file, not in the application database.
-
-**Tradeoff**: Adding or updating a source URL requires a commit to an external repo rather than a database update. But this decouples source configuration from application deployment and provides git-native change tracking on URL modifications.
-
-**Why**: Source URLs change when governments redesign websites. Decoupling URL management from application releases allows compliance teams to update sources without engineering involvement.
+**Acknowledged limitation:** The regex engine is less flexible than LLM classification. A change type outside the defined pattern vocabulary falls through to `NON_MATERIAL_FORMATTING`. This is a deliberate conservative failure mode — it surfaces the change for human review rather than attempting to classify it with a model that could return an incorrect classification. Reviewers see the before/after diff regardless of the classification.
 
 ---
 
-## 8. Security Considerations
+### Decision 2: LLM Scoped to Extraction Only
 
-| Concern | Mitigation |
-|---------|-----------|
-| Groq API key exposure | Keys loaded from environment variables, never hardcoded; multi-key rotation reduces per-key blast radius |
-| SQL injection | All database queries use parameterized statements via SQLite/psycopg2 parameter binding |
-| Untrusted HTML ingestion | BeautifulSoup sanitization strips script/style/nav elements before processing |
-| Content integrity | MD5 content hashing on every snapshot; hash stored in provenance chain |
-| Audit log immutability | Append-only table design; no UPDATE/DELETE operations on audit_log |
-| Slack webhook security | Webhook URL stored in environment variables, not in code or database |
+**What the decision is:** The LLM (Groq LLaMA 3.3 70B) processes only the ingestion-to-extraction stage. It is not used for reconciliation, classification, approval decisions, or any operation that modifies published data.
 
-## 9. Scalability Considerations
+**Why this matters for governance:** Containing the LLM to the extraction stage means AI uncertainty is bounded. Confidence scores quantify extraction reliability, human reviewers evaluate that uncertainty, and the governance gate ensures LLM output never directly modifies authoritative data. If the LLM is deprecated, rate-limited, or replaced, it affects only the extraction layer; all historical provenance, version history, and audit records remain valid.
 
-| Dimension | Current State | Scale Path |
-|-----------|--------------|------------|
-| Countries | 87 | Source registry is additive; no code changes needed |
-| Concurrent syncs | Sequential per country | Worker pool with per-country locking |
-| Database | SQLite (single-writer) | PostgreSQL adapter ready in `db.py` |
-| LLM throughput | Multi-key rotation (N keys) | Add keys to `GROQ_API_KEY` comma-separated list |
-| Alerting | Slack webhooks | Pluggable notification interface |
-| Ingestion formats | HTML + Notion + PDF | Adapter pattern in ingestion layer |
+---
 
-## 10. Failure Scenarios & Recovery
+### Decision 3: Append-Only Audit Infrastructure
 
-| Failure | Impact | Recovery |
-|---------|--------|----------|
-| Groq API rate limit | Extraction paused | Automatic key rotation; retry on next scheduled sync |
-| Source website down (5xx) | No new snapshot | Retry with exponential backoff; previous snapshot preserved |
-| Source website restructured | Extraction quality degrades | Confidence scores drop; low-confidence extractions flagged for manual review |
-| LLM hallucination | Incorrect rule proposed | Human reviewer rejects; audit log records rejection rationale |
-| Database corruption | Data loss | WAL mode for SQLite; PostgreSQL with standard backup strategies |
-| Scheduler crash | Missed sync window | APScheduler misfire_grace_time=300s; next scheduled run proceeds normally |
-| Slack webhook failure | Missed alert | Sync results persisted in DB regardless of alert delivery |
+**What the decision is:** `audit_log`, `country_guide_versions`, `rule_provenance`, and `source_snapshots` are append-only at the application level. No repository methods, migration scripts, or API endpoints issue UPDATE or DELETE against these tables.
+
+**Why this matters for governance:** Regulators and auditors must be able to trust that the audit record reflects what actually happened, not what the organization wishes had happened. A mutable audit log is not an audit log — it is a liability. Append-only design makes post-hoc modification structurally difficult; it is not just a policy but an architectural constraint.
+
+---
+
+### Decision 4: External Source Registry (Git-Tracked)
+
+**What the decision is:** Official source URLs are maintained in a GitHub-hosted JSON file, not in the application database.
+
+**Why this matters for governance:** Source URL changes are configuration changes with compliance implications — adding or removing a source affects what regulatory content the system monitors. Git version control provides change history, author attribution, and the ability to revert to a previous source set. Database-stored URLs would have none of these properties.
+
+**Acknowledged tradeoff:** Updating source URLs requires a commit rather than a database update. This is an intentional friction point — source changes should be deliberate and tracked, not ad-hoc.
+
+---
+
+### Decision 5: PostgreSQL / SQLite Dual Backend
+
+**What the decision is:** The `app/utils/db.py` adapter transparently handles syntax differences between SQLite and PostgreSQL, so the same repository code runs on both backends.
+
+**Why this matters operationally:** SQLite provides zero-ops local development and single-instance deployments with full ACID compliance. The adapter ensures that a move to PostgreSQL for production scale does not require rewriting repository logic. The migration path is `set DATABASE_URL` — no schema changes, no query rewrites.
+
+---
+
+### Decision 6: APScheduler as In-Process Scheduler
+
+**What the decision is:** Automated sync runs are scheduled via APScheduler embedded in the Flask process, not an external job scheduler (Celery, Airflow, Kubernetes CronJob).
+
+**Why this matters operationally:** An in-process scheduler eliminates infrastructure dependencies for single-instance deployments. The acknowledged risk is that a Flask process restart cancels an in-progress sync. This is mitigated by idempotent sync design: each source is processed independently, failed jobs record their state, and the next scheduled run reprocesses failed sources.
+
+**Scale path:** For multi-instance or high-availability deployments, APScheduler should be replaced with an external job scheduler (Celery + Beat, Kubernetes CronJob) with a distributed lock to prevent concurrent runs for the same source.
+
+---
+
+## Failure Handling Framework
+
+The system distinguishes between three categories of failure, each with a different handling strategy:
+
+### Category 1: Recoverable Pipeline Failures
+
+Failures that do not corrupt data and will resolve on the next sync cycle:
+
+| Failure | Detection | Impact | Recovery |
+|---------|-----------|--------|----------|
+| Source website 5xx / timeout | HTTP response code | No new snapshot; previous published rule unchanged | Automatic retry (max 2); job marked `failed` with reason; next sync re-attempts |
+| Groq API rate limit | 429 response | Extraction paused for current key | Automatic key rotation to next configured key; transparent retry |
+| Groq API outage | Connection error / all keys exhausted | Extraction fails for affected sources | Job marked `failed`; source snapshot preserved; extraction retried on next sync |
+| Scheduler process restart | Process death | In-progress sync cancelled | Next scheduled run starts fresh; idempotent design means no data corruption |
+
+### Category 2: Quality Degradation (Detectable)
+
+Failures that produce data, but data of degraded quality, requiring heightened human review:
+
+| Failure | Detection | Impact | Response |
+|---------|-----------|--------|----------|
+| Government website restructured | Confidence scores drop significantly | Extractions propose incorrect rules | Low-confidence items are flagged; reviewers examine source paragraph against source URL |
+| LLM extracts a hallucinated rule | Confidence score < 0.7; source paragraph doesn't support value | Incorrect change proposed in review queue | Human reviewer rejects; audit log records rejection; next sync re-extracts |
+| Regex pattern misclassifies change type | Wrong change type or materiality assigned | Change may be under-prioritized | Human reviewer sees before/after diff regardless; classification guides but does not gate review |
+
+### Category 3: Unacceptable Failures (Data Integrity)
+
+These failures represent corruption of the governance record and trigger immediate investigation:
+
+| Failure | Detection | Response |
+|---------|-----------|----------|
+| Approval recorded without audit log entry | Provenance without corresponding audit_log row | Immediately investigate transaction boundary; do not proceed with further approvals until root cause identified |
+| Published rule without provenance | `current_provenance_id IS NULL` on active rule | Flag rule as requiring provenance reconstruction; do not serve to clients without provenance |
+| Version history gap | Period with no version covering a date range | Reconstruct from audit log; create corrective version record with appropriate effective dates |
+
+---
+
+## Scalability Strategy
+
+Scalability decisions are made with governance as the primary constraint. Performance optimizations that undermine auditability or compromise the review gate are not acceptable.
+
+| Dimension | Current Approach | Scale Path |
+|-----------|-----------------|------------|
+| Source coverage | 87 countries × N sources per country | Source registry is additive; no code changes required |
+| Sync throughput | Sequential per source endpoint | Worker pool with per-country distributed locking; requires external scheduler |
+| LLM throughput | N-key rotation (one key per Groq account) | Add keys to `GROQ_API_KEY` comma-separated; rotation is automatic |
+| Database concurrency | SQLite (single-writer) | PostgreSQL adapter in `db.py`; `set DATABASE_URL` activates it |
+| Audit record volume | ~1 record per review action | Append-only; archive partitions for historical records beyond N years |
+| Temporal query performance | `(country, section, effective_date)` composite index | Adequate for 87 countries × 7 sections × N versions; no optimization needed at current scale |
+
+---
+
+## Security Architecture
+
+| Threat | Control |
+|--------|---------|
+| Groq API key exposure | Environment variables only; multi-key rotation reduces per-key blast radius |
+| SQL injection via user input | All database queries use parameterized statements throughout the repository layer |
+| Prompt injection via government source content | BeautifulSoup strips executable tags before text enters the LLM context; LLM is instruction-prompted to extract only |
+| Audit log tampering | Append-only table design; no UPDATE/DELETE methods in `ProvenanceRepository` or `audit_log` handlers |
+| Snapshot content integrity | MD5 hash stored with every snapshot; hash is recorded in provenance chain; hash mismatch detectable |
+| Slack webhook secret exposure | Webhook URL in environment variables; never logged or returned by API |
+| Unauthorized approval | Review actions are POST-only; GET requests produce no state change; reviewer identity is recorded (SSO enforcement is an integration requirement) |

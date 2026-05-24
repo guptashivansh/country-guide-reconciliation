@@ -1,54 +1,65 @@
-# Country Guide Reconciliation Platform
+# Compliance Governance Infrastructure
 
-An AI-powered compliance governance platform that continuously monitors official government sources, detects regulatory changes to employment guides, and routes them through a human-in-the-loop approval workflow with full provenance tracking.
-
-![Home Page](assets/screenshots/home.png){ loading=lazy }
+This system is the authoritative source of truth for employment regulation across 87 jurisdictions. It ingests official government sources, extracts structured regulatory rules, classifies changes by materiality, routes them through a mandatory human review gate, and publishes approved changes with a complete, immutable provenance chain linking every published rule back to the government document that originated it.
 
 ---
 
-## Business Problem
+## Governance Philosophy
 
-Global employers operating across jurisdictions must comply with local employment laws — leave entitlements, minimum wage, tax obligations, termination notice periods, work permit requirements, and more. These rules change frequently, are published across dozens of government websites, and carry material legal and financial risk when stale.
+Multi-jurisdiction employment compliance operates under a fundamental constraint: the cost of a missed regulatory change is asymmetric. A minimum wage miscalculation, a stale termination notice period, or an outdated work permit requirement can expose the organization to penalties, employment disputes, or visa processing failures that exceed the cost of the entire compliance operation.
 
-**The cost of getting it wrong:**
+This system is built around four principles that govern every architectural decision:
 
-- Payroll miscalculations triggering regulatory penalties
-- Incorrect leave entitlements leading to employment disputes
-- Stale immigration guidance causing visa processing failures
-- Compliance audit failures due to inability to prove when a rule was adopted and who approved it
+**Provenance-first.** No rule is considered authoritative unless its origin can be traced to a specific government document, captured at a specific time, extracted by a versioned model, reviewed by an identified person, and approved with a documented rationale. This chain cannot be bypassed, bypassing it produces an audit finding.
 
-Traditional approaches — manual monitoring of government websites by compliance analysts — are slow, error-prone, and unscalable. A single missed regulatory gazette update can expose the organization to millions in liability.
+**Human authority over AI output.** The LLM extracts; humans decide. The system uses a large language model to convert unstructured government HTML into structured rule objects — a task for which AI generalization across heterogeneous formats is appropriate. The system never allows AI output to become a published rule without explicit human approval. This is not a limitation of the AI; it is a deliberate governance control.
 
----
+**Deterministic classification over probabilistic judgment.** Change classification — determining whether a detected difference is a numeric threshold change, an eligibility scope modification, or a formatting artifact — uses a deterministic regex-based engine, not an LLM. The same (old, new) pair always produces the same classification. Auditors can reconstruct the reasoning. LLM classification would undermine that reproducibility.
 
-## What This Platform Does
-
-| Stage | Description |
-|-------|-------------|
-| **Monitor** | Crawls official government sources for 87 countries on a configurable schedule |
-| **Extract** | Uses Groq LLaMA 3.3 70B to extract structured employment rules from raw HTML |
-| **Reconcile** | Semantic diffing engine classifies changes by type and materiality |
-| **Review** | Human reviewers examine before/after diffs with source evidence |
-| **Publish** | Approved changes are versioned, provenance-tracked, and published to client-facing guides |
-| **Detect Drift** | Continuous monitoring for staleness, unreviewed escalations, and compliance gaps |
-| **Alert** | Region-aware Slack notifications to compliance owners |
+**Immutable audit record.** Every decision, at every stage of the pipeline, is written to append-only tables. No UPDATE or DELETE operation exists for audit data. The complete history of who decided what, when, and why is always reconstructable from the database.
 
 ---
 
-## Key Capabilities
+## What This System Guarantees
 
-- **Semantic change classification** — Not just text diffs; the engine distinguishes numeric threshold changes, eligibility scope modifications, new requirements, timeline shifts, and non-material formatting
-- **Materiality assessment** — Every change is scored Critical / High / Moderate / Low / Informational so reviewers prioritize what matters
-- **Full provenance chain** — From government source URL to crawler snapshot to LLM extraction to reviewer decision to published rule, every link is recorded
-- **Temporal rule queries** — "What was India's minimum wage on March 15, 2025?" answered from immutable version history
-- **Drift detection** — Automated alerts when rules go stale, reviews sit unactioned, or coverage gaps emerge
-- **Audit-ready operations** — Immutable audit log with reviewer identity, timestamp, rationale, and source evidence for every decision
+The following are system-level guarantees, not aspirational claims:
+
+| Guarantee | Mechanism |
+|-----------|-----------|
+| No regulatory change is published without human approval | `review_queue` is the mandatory gate; `country_guide` is only updated via `approve_pending_review_item()` |
+| Every published rule has a traceable provenance chain | Approval atomically writes provenance; `current_provenance_id` is a FK constraint |
+| Critical-severity changes cannot be bulk-approved | `bulk_approve_non_critical()` enforces `severity != 'critical'` at the repository level |
+| Audit records cannot be modified or deleted | No UPDATE/DELETE endpoints or repository methods exist for `audit_log` |
+| Every version of every rule is retained | `country_guide_versions` is append-only; superseded versions are never deleted |
+| Point-in-time rule state is always reconstructable | Version rows carry `[effective_date, superseded_at)` intervals; temporal queries are deterministic |
+| Source content is archived at crawl time | `source_snapshots` stores the raw text and MD5 hash of every crawled page before extraction |
 
 ---
 
-## Global Coverage — 87 Countries
+## What This System Does Not Guarantee
 
-Employment guides are maintained across 87 countries spanning APAC, EMEA, and the Americas. Each country covers up to 7 rule categories: Leave, Working Hours, Compensation, Benefits & Social Security, Employment Terms, Immigration, and Workplace Safety.
+Honesty about system boundaries is as important as stating capabilities:
+
+- The system does not guarantee that government sources are correctly identified. Source URL maintenance is a human operational concern; incorrect sources produce incorrect extractions that must be caught at the review gate.
+- The system does not guarantee LLM extraction accuracy. Confidence scores flag uncertain extractions, but human reviewers are the authority on whether an extraction reflects the source document.
+- The system does not authenticate reviewers. Reviewer identity is captured and recorded, but the system does not enforce that the identity belongs to an authorized person. Role-based access control is an integration requirement for production deployment.
+- The system does not guarantee real-time change detection. Government sources are crawled on a configurable schedule; changes published between syncs are detected at the next sync, not immediately.
+
+---
+
+## Compliance Coverage
+
+Employment guides are maintained across 87 countries spanning APAC, EMEA, and the Americas. Each country covers up to 7 regulatory sections:
+
+| Section | Examples |
+|---------|---------|
+| **Leave** | Annual leave entitlement, sick leave, parental leave, public holidays |
+| **Working Hours** | Maximum working hours, overtime eligibility, rest periods |
+| **Compensation** | Minimum wage, overtime rates, salary payment frequency |
+| **Benefits & Social Security** | Pension contributions, health insurance mandates, provident fund |
+| **Employment Terms** | Probation periods, notice periods, termination procedures |
+| **Immigration** | Work permit categories, visa processing timelines, eligibility conditions |
+| **Workplace Safety** | Mandatory safety obligations, reporting requirements |
 
 ??? note "Full country list (click to expand)"
 
@@ -60,39 +71,63 @@ Employment guides are maintained across 87 countries spanning APAC, EMEA, and th
 
 ---
 
-## Tech Stack
+## Pipeline Stages
 
-| Component | Technology | Rationale |
-|-----------|-----------|-----------|
-| Application Framework | Flask (Python) | Lightweight, rapid iteration, strong ecosystem |
-| Database | SQLite / PostgreSQL (dual-backend) | Zero-ops local dev; Postgres for production scale |
-| LLM Provider | Groq API (LLaMA 3.3 70B) | Fast inference, structured extraction, generous rate limits |
-| Semantic Engine | Regex + string similarity | Deterministic, auditable classification without LLM dependency |
-| Alerting | Slack Webhooks | Real-time, region-routed notifications |
-| Scheduler | APScheduler | In-process cron with misfire recovery |
-| Documentation | MkDocs Material | Auto-captured screenshots, GitHub Pages hosting |
-| Screenshot Automation | Playwright | Headless Chromium for CI-integrated visual documentation |
+The governance pipeline is sequential by design. Each stage has a defined responsibility boundary, and no stage can be skipped.
+
+| Stage | Responsibility | Output |
+|-------|----------------|--------|
+| **Ingestion** | Fetch official sources, archive raw content with content hash | `source_snapshots` record |
+| **Extraction** | Convert unstructured HTML to structured rule objects | `EmploymentRule` objects with confidence scores |
+| **Reconciliation** | Classify the semantic difference between extracted and published rules | `review_queue` entry with change type and materiality |
+| **Review** | Human examines source evidence and approves, rejects, or escalates | `audit_log` entry; `country_guide` updated on approval |
+| **Publication** | Approved rule becomes authoritative; version history updated | `country_guide_versions` row; `rule_provenance` record |
+| **Drift Detection** | Continuous assessment of compliance posture staleness | `DriftReport` per country with recommended actions |
+| **Alerting** | Region-routed notifications to accountability owners | Slack messages to designated regional leads |
 
 ---
 
-## Quick Start
+## Personas and Their Trust Relationship with the System
 
-```bash
-pip install -r requirements.txt
-python app.py                    # Initialize DB + start server on :8080
-python notion_import.py          # One-time baseline seed from Notion
-```
+| Persona | Trust Relationship |
+|---------|-------------------|
+| **Compliance Analyst** | Trusts that the review queue presents complete, accurate evidence for every detected change. Is accountable for every decision they record. |
+| **Compliance Lead** | Trusts that drift reports reflect current system state computed on-demand, not cached. Can rely on metrics for operational oversight. |
+| **Regional Owner** | Trusts that Slack alerts fire reliably after sync completion, with accurate change counts. Is accountable for country coverage in their region. |
+| **External Auditor** | Trusts that the audit log is append-only and complete. Can reconstruct the provenance chain for any published rule using only the database. |
+| **Platform Engineer** | Trusts that the ingestion job state machine accurately reflects pipeline execution. Is responsible for source URL maintenance and extraction quality monitoring. |
+| **Legal Counsel** | Trusts that temporal queries return the rule that was in effect at a specific date, backed by an immutable version record. |
 
-Then open `http://localhost:8080/ops` for the compliance dashboard.
+---
+
+## Technical Foundation
+
+| Component | Technology | Governance Rationale |
+|-----------|-----------|---------------------|
+| Application Framework | Flask (Python) | Explicit, auditable request handling; no magic |
+| Database | SQLite (development) / PostgreSQL (production) | ACID transactions; append-only tables for audit data |
+| LLM Provider | Groq API (LLaMA 3.3 70B, temperature=0.1) | Near-deterministic extraction; fast inference for structured output |
+| Semantic Engine | Regex pattern library (deterministic) | Reproducible classification; full reasoning traceability |
+| Alerting | Slack Webhooks (region-routed) | Direct notification to regional accountability owners |
+| Scheduler | APScheduler (in-process cron) | Configurable schedule with misfire recovery |
 
 ---
 
 ## Documentation Structure
 
-| Section | Audience | Content |
-|---------|----------|---------|
-| [Platform Architecture](architecture/overview.md) | Solution Architects, Engineering | System design, data flow, service graph |
-| [Core Modules](modules/sync-pipeline.md) | Engineering, Compliance Leadership | Deep-dive into each pipeline stage |
-| [Operations Guide](guide/ops-dashboard.md) | Compliance Analysts, Ops Teams | How to use the dashboard, review changes, manage drift |
-| [API Reference](api.md) | Engineering, Integrations | Endpoint catalog with request/response schemas |
-| [Development](development.md) | Engineering | Setup, testing, deployment, screenshot automation |
+| Section | Audience | What to Read For |
+|---------|----------|-----------------|
+| [Platform Architecture](architecture/overview.md) | Solution Architects, Engineering Leads | System guarantees, trust boundaries, failure handling, architectural rationale |
+| [Database Design](architecture/database.md) | Data Architects, Auditors | Schema integrity, append-only guarantees, temporal model |
+| [Service Architecture](architecture/services.md) | Engineering Teams | Service boundaries, dependency model, transaction ownership |
+| [Ingestion Layer](modules/ingestion.md) | Platform Engineers | Source reliability, snapshot integrity, failure isolation |
+| [LLM Extraction](modules/llm-extraction.md) | Engineers, Compliance Leads | AI trust boundaries, confidence model, extraction governance |
+| [Semantic Reconciliation](modules/semantic-reconciliation.md) | Compliance Leadership, Architects | Deterministic classification rationale, materiality framework |
+| [Review & Governance Workflow](modules/review-workflow.md) | Compliance Analysts, Leads, Auditors | Governance protocol, reviewer accountability, publishing safety |
+| [Provenance & Audit Trail](modules/provenance.md) | Auditors, Legal, Compliance Leads | Chain of custody, audit readiness, historical reconstruction |
+| [Temporal Versioning](modules/temporal-versioning.md) | Legal, Auditors, Advisors | Point-in-time queries, version integrity, dispute evidence |
+| [Drift Detection](modules/drift-detection.md) | Compliance Operations | SLA monitoring, escalation thresholds, coverage assurance |
+| [Sync Pipeline](modules/sync-pipeline.md) | Platform Engineers, Compliance Leads | End-to-end orchestration, failure recovery, operational reliability |
+| [Operational Runbook](guide/ops-dashboard.md) | Compliance Analysts, Ops Teams | Governance workflows, triage procedures, escalation paths |
+| [Alerting](guide/alerting.md) | Regional Owners, Compliance Leads | Alert routing, notification contracts, response expectations |
+| [API Reference](api.md) | Engineering, Integration Teams | Endpoint contracts, request/response schemas |

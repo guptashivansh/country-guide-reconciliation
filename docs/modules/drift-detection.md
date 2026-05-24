@@ -1,231 +1,188 @@
-# Drift Detection
+# Compliance Drift Detection
 
-## 1. Feature Name
+## Operational Purpose
 
-**Automated Compliance Drift Detection & Alerting**
+Compliance drift is the condition in which the system's governance posture has degraded below an acceptable threshold — where review items have aged beyond their SLA, escalations have stalled, or published rules have not been re-verified against their official sources for an unacceptable period.
 
-## 2. Business Problem Solved
+The drift detection system continuously evaluates these conditions and produces per-country severity assessments. It does not resolve drift — that is a human responsibility. It makes drift visible, quantified, and actionable.
 
-Even with automated pipelines, compliance gaps emerge: reviews sit unactioned for weeks, critical changes are escalated but not resolved, published rules go months without re-verification, or new sections appear in the review queue that have no corresponding published rule. Drift detection continuously evaluates the health of the compliance posture and surfaces risks before they become incidents.
+The drift detector is a monitoring control, not a remediation mechanism. Its output is always a finding with recommended human action, never an automated correction.
 
-## 3. Operational Pain Points Addressed
+---
 
-- **Stale reviews**: Pending items age without action; no visibility into review queue aging
-- **Escalation bottlenecks**: Escalated items signal disagreement or complexity but have no SLA tracking
-- **Coverage gaps**: New regulatory sections may exist in source data but have no published rule
-- **Compliance complacency**: Without active monitoring, teams assume "no alerts = no problems"
+## Compliance Posture Model
 
-## 4. User Personas Involved
+The system models compliance posture across three dimensions:
 
-| Persona | Interaction |
-|---------|-------------|
-| Compliance Lead | Reviews drift reports; acts on critical/warning alerts |
-| Regional Owner | Receives Slack alerts for drift in their region's countries |
-| Platform Engineer | Tunes drift rule thresholds; adds new canonical rules |
+**Review Queue Health** — Are pending changes being reviewed within acceptable SLAs?
 
-## 5. Functional Overview
+A review queue that is growing without resolution is not a backlog — it is a governance gap. Changes that are detected but not reviewed are effectively invisible to clients and advisors, which is worse than no detection at all because the organization is aware of the gap and has not acted.
 
-![Drift Monitoring Dashboard — Country-level compliance drift status with severity breakdown and suggested actions](../assets/screenshots/drift_monitoring_dashboard.png){ loading=lazy }
+**Escalation Resolution Health** — Are escalated items being resolved?
 
+An escalated item represents a change that a reviewer considered too significant or ambiguous to approve alone. If escalated items sit unresolved, they indicate either a decision bottleneck, a shortage of senior reviewer capacity, or a genuinely ambiguous regulatory situation that requires external input. In all cases, the risk is real and quantifiable.
 
-The drift detector evaluates two categories of rules:
+**Coverage Completeness** — Are all monitored regulatory sections covered by published rules?
 
-**Pending Rules** — Analyze the review queue for aging and urgency:
+A section appearing in the review queue but having no corresponding published rule in `country_guide` indicates a coverage gap: the system is detecting regulatory content for a category that has never been formally published. This gap may expose the organization to liability for a jurisdiction it nominally covers.
 
-- How long have pending items been unreviewed?
-- Are there escalated items that have been sitting for too long?
+---
 
-**Canonical Rules** — Analyze published rules for staleness and gaps:
+## SLA Framework
 
-- When was each rule last verified against its source?
-- Are there sections in the review queue with no corresponding published rule?
+The following SLAs define acceptable review latency by severity. These thresholds are configurable constants in `app/drift/rules.py` and should be calibrated to the organization's regulatory risk appetite and reviewer capacity.
 
-Each evaluation produces `DriftRecord` objects with severity (CRITICAL / WARNING / INFO), which are aggregated into a `DriftReport` per country.
+### Review Queue SLAs
 
-## 6. End-to-End Workflow
+| Condition | Severity | Operational Meaning |
+|-----------|----------|---------------------|
+| Critical item pending > 14 days | CRITICAL | A high-impact regulatory change has been unreviewed for two full weeks. Immediate escalation to compliance leadership. |
+| Critical item pending > 7 days | WARNING | A high-impact change is approaching the CRITICAL threshold. Reviewer assignment required within 24 hours. |
+| Major item pending > 14 days | WARNING | Moderate-impact change has exceeded reasonable review time. Schedule reviewer attention. |
+| Any item pending > 7 days | INFO | General queue aging. Review workload may need rebalancing. |
 
-```mermaid
-flowchart TD
-    A[DriftDetector.detect] --> B[Load pending review items]
-    A --> C[Load canonical guide entries]
-    A --> D[Load provenance data]
+### Escalation Resolution SLAs
 
-    B --> E[Apply pending_change_rule]
-    B --> F[Apply escalated_item_rule]
-    C --> G[Apply missing_section_rule]
+| Condition | Severity | Operational Meaning |
+|-----------|----------|---------------------|
+| Escalated item unresolved > 7 days | CRITICAL | Escalation has been sitting without resolution for a week. The senior reviewer or compliance lead must act. This item will block the country's drift clearance until resolved. |
+| Any escalated item (< 7 days) | WARNING | Escalation requires tracking. Assign a resolution owner and target date. |
 
-    E --> H[DriftRecord with severity]
-    F --> H
-    G --> H
+### Coverage Gap
 
-    H --> I[Deduplicate by section + drift_type]
-    I --> J[Aggregate severity]
-    J --> K[Build summary + recommended action]
-    K --> L[DriftReport]
-```
+| Condition | Severity | Operational Meaning |
+|-----------|----------|---------------------|
+| Review queue section has no published rule | WARNING | Detected regulatory content exists for a category that has no authoritative published rule. The organization is operating without published guidance for this area. |
 
-## 7. Technical Architecture
+---
 
-### Drift Rules
+## Drift Record Structure
 
-Rules are implemented as callable predicates that receive context and return an optional `DriftRecord`:
-
-**`pending_change_rule`** — Evaluates unreviewed items:
-
-| Condition | Severity |
-|-----------|----------|
-| Critical-severity item pending > 14 days | CRITICAL |
-| Critical-severity item pending > 7 days | WARNING |
-| Major-severity item pending > 14 days | WARNING |
-| Any item pending > 7 days | INFO |
-
-**`escalated_item_rule`** — Evaluates escalated items:
-
-| Condition | Severity |
-|-----------|----------|
-| Escalated item unresolved > 7 days | CRITICAL |
-| Any escalated item | WARNING |
-
-**`missing_section_rule`** — Evaluates coverage gaps:
-
-| Condition | Severity |
-|-----------|----------|
-| Section in review queue has no published rule in country_guide | WARNING |
-
-### Tunable Thresholds
-
-```python
-PENDING_DAYS_CRITICAL = 14
-PENDING_DAYS_WARNING = 7
-ESCALATED_DAYS_CRITICAL = 7
-STALE_DAYS_CRITICAL = 90
-STALE_DAYS_WARNING = 30
-STALE_DAYS_INFO = 14
-```
-
-These are defined as module-level constants in `app/drift/rules.py` and can be adjusted without code changes to the detection logic.
-
-### DriftRecord Model
+Each drift finding produces a `DriftRecord` with the following fields:
 
 ```python
 @dataclass
 class DriftRecord:
     country: str
     section: str
-    drift_type: str                # "pending_review_aging", "escalation_bottleneck", "coverage_gap"
-    severity: str                  # "CRITICAL", "WARNING", "INFO"
-    current_value: Optional[str]
-    proposed_value: Optional[str]
+    drift_type: str        # "pending_review_aging" | "escalation_bottleneck" | "coverage_gap"
+    severity: str          # "CRITICAL" | "WARNING" | "INFO"
+    current_value: Optional[str]   # The currently published rule (if any)
+    proposed_value: Optional[str]  # The proposed change awaiting review (if any)
     pending_item_id: Optional[int]
-    days_pending: Optional[int]
+    days_pending: Optional[int]    # How long the item has been in the queue
     last_verified_at: Optional[str]
-    evidence: str                  # Human-readable explanation
-    recommended_action: str        # What the compliance team should do
+    evidence: str          # Human-readable explanation of why this drift was detected
+    recommended_action: str  # Specific action for the compliance team
 ```
 
-### DriftReport Model
+The `recommended_action` field is operationally significant — it is not a generic suggestion but a specific action derived from the drift type and severity:
+
+| Drift Type | CRITICAL Action | WARNING Action |
+|------------|-----------------|----------------|
+| `pending_review_aging` | "Review critical pending item for [section] immediately — [N] days overdue" | "Schedule review for major pending item for [section]" |
+| `escalation_bottleneck` | "Resolve escalated [section] item — unresolved for [N] days" | "Assign resolution owner for escalated [section] item" |
+| `coverage_gap` | N/A (only WARNING) | "Publish a rule for [section] — detected content has no published guide entry" |
+
+---
+
+## Drift Report Aggregation
+
+The `DriftReport` for a country aggregates all `DriftRecord` findings:
 
 ```python
 @dataclass
 class DriftReport:
     country: str
-    generated_at: str
+    generated_at: str           # ISO timestamp of report generation
     drift_detected: bool
-    severity: str                  # Aggregate: max severity across all records
+    severity: str               # Maximum severity across all records
     affected_sections: list[str]
-    summary: str                   # "2 CRITICAL, 1 WARNING drift items for India"
-    recommended_action: str        # Context-specific action text
+    summary: str                # E.g., "2 CRITICAL, 1 WARNING drift items for India"
+    recommended_action: str     # Highest-priority recommended action
 ```
 
-### Deduplication
+**Severity aggregation is conservative:** The report's overall severity is the maximum across all individual records. A country with one CRITICAL and five INFO findings is a CRITICAL country. This conservatism is intentional — a single unresolved critical item represents real compliance risk regardless of how many low-severity findings exist.
 
-Multiple rules may fire for the same (section, drift_type) combination. The detector deduplicates by keeping the highest-severity record for each unique pair.
+**Deduplication:** If multiple drift rules fire for the same `(section, drift_type)` pair — for example, both the 7-day and 14-day pending thresholds fire for the same item — only the highest-severity record is retained. The compliance team receives one clear signal per section, not duplicate findings.
 
-### Severity Aggregation
+---
 
-The report's overall severity is the maximum across all drift records:
+## Read-Only Architecture
 
-```python
-SEVERITY_ORDER = {"CRITICAL": 3, "WARNING": 2, "INFO": 1, "NONE": 0}
-```
+The drift detector has no write path. It reads from `country_guide`, `review_queue`, and `rule_provenance` but never inserts, updates, or deletes records. This is a deliberate architectural constraint with two implications:
 
-## 8. Data Flow
+**Drift is always computed on current state.** There is no cached drift result that could become stale. Every call to `/api/drift` computes drift fresh from the current database state. A reviewer who resolves a critical pending item will see the CRITICAL finding disappear on the next drift API call.
 
-```
-DriftRepository reads (no writes):
-    → country_guide (canonical rules with last_updated)
-    → review_queue (pending/escalated items with created_at)
-    → rule_provenance (last verification dates)
-        ↓
-DriftDetector applies rule functions
-        ↓
-DriftRecord[] (per section, per drift type)
-        ↓
-Deduplicate → Aggregate → Summarize
-        ↓
-DriftReport {
-    country: "India",
-    drift_detected: true,
-    severity: "CRITICAL",
-    affected_sections: ["minimum_wage", "annual_leave"],
-    summary: "1 CRITICAL, 1 WARNING drift items for India",
-    recommended_action: "Review critical pending items immediately"
-}
-```
+**Drift computation cannot corrupt governance data.** A buggy drift rule cannot accidentally modify the review queue or country guide. The worst-case outcome of a drift computation bug is an incorrect finding — a finding that is visible to reviewers and inspectable.
 
-## 9. Backend Components
+---
+
+## Integration with Alerting
+
+Post-sync Slack notifications include aggregate drift status. If any country has a CRITICAL drift finding at the time of the sync, the alert includes the country name, affected sections, and recommended action.
+
+This ensures that drift does not accumulate silently between dashboard sessions. Regional owners receive proactive notification when their countries' compliance posture degrades.
+
+---
+
+## Operational Procedures
+
+### Daily Drift Review (Recommended)
+
+1. Call `GET /api/drift` or open the Drift tab in the ops dashboard.
+2. For each CRITICAL finding: assign a named reviewer with a resolution deadline.
+3. For each WARNING finding: assess whether it is tracking toward CRITICAL and schedule action.
+4. For coverage gaps: determine whether the missing section is an active monitoring gap or a deliberate exclusion.
+
+### Drift Clearance
+
+A CRITICAL drift finding clears when the underlying condition resolves:
+- `pending_review_aging` clears when the pending item is approved, rejected, or escalated
+- `escalation_bottleneck` clears when the escalated item is approved or rejected
+- `coverage_gap` clears when a rule for the affected section is published in `country_guide`
+
+The drift report does not require manual acknowledgment. Resolution of the underlying condition is the only clearance mechanism.
+
+### Threshold Calibration
+
+The drift thresholds in `app/drift/rules.py` are operational parameters, not fixed constants. They should be reviewed periodically and calibrated based on:
+
+- Actual reviewer capacity (if reviewers consistently clear items in 5 days, a 14-day CRITICAL threshold is too lenient)
+- Regulatory risk profile (high-risk jurisdictions warrant tighter thresholds)
+- Organizational SLA commitments to clients (if the organization has committed to 48-hour update publication, thresholds must reflect that)
+
+Threshold changes should be documented, reviewed by compliance leadership, and tracked in the source control history of `rules.py`.
+
+---
+
+## Backend Components
 
 | Component | File | Lines | Responsibility |
 |-----------|------|-------|----------------|
 | `DriftDetector` | `app/drift/detector.py` | 110 | Orchestrates rule evaluation, deduplication, report generation |
 | `DriftRepository` | `app/drift/repository.py` | 150 | Read-only queries across guide, queue, and provenance tables |
-| `DriftRecord` | `app/drift/report.py` | 71 | Individual drift finding |
-| `DriftReport` | `app/drift/report.py` | 71 | Aggregated country-level report |
-| Drift rules | `app/drift/rules.py` | 150+ | Predicate functions with tunable thresholds |
+| `DriftRecord` | `app/drift/report.py` | — | Individual drift finding with evidence and recommended action |
+| `DriftReport` | `app/drift/report.py` | — | Country-level aggregated report |
+| Drift rules | `app/drift/rules.py` | 150+ | Predicate functions implementing SLA thresholds |
 
-## 10. APIs Involved
+---
 
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `GET /api/drift` | GET | All drift reports across all countries |
-| `GET /api/drift/<country>` | GET | Drift report for a specific country |
+## API Surface
 
-## 11. Database Design Implications
+| Endpoint | Response |
+|----------|---------|
+| `GET /api/drift` | `DriftReport[]` for all countries — only countries with drift findings are returned |
+| `GET /api/drift/<country>` | Single `DriftReport` for the specified country |
 
-The drift detector is **read-only** — it queries existing tables but never writes drift state to the database. This is a deliberate design choice:
+---
 
-- Drift is computed on-demand from current state, not cached
-- No stale drift data can mislead reviewers
-- No additional tables to maintain or migrate
-- Drift severity is always consistent with the current review queue and guide state
-
-## 12. Observability & Monitoring
-
-- **Dashboard integration**: Drift report count displayed as a metric card on the ops dashboard
-- **Per-country drill-down**: API returns affected sections, severity, evidence, and recommended actions
-- **Slack integration**: Drift alerts can be included in post-sync Slack notifications
-- **No false positives**: Rules are designed to fire only on actionable conditions with clear evidence
-
-## 13. Risk Mitigation
+## Risk Mitigation
 
 | Risk | Mitigation |
 |------|-----------|
-| Drift thresholds are too aggressive (noisy) | Thresholds are tunable constants; start conservative, tighten based on team capacity |
-| Drift thresholds are too lenient (missed risk) | CRITICAL thresholds (14 days pending, 7 days escalated) are based on regulatory SLA expectations |
-| Drift computation is expensive | Read-only queries with no joins; no full-table scans; O(rules × drift_rules) per country |
-| Drift report is outdated between syncs | Drift is computed on-demand via API call, not cached |
-
-## 14. Business Impact
-
-- **Proactive risk management**: Compliance gaps are surfaced before they cause incidents
-- **SLA visibility**: Days-pending metrics make review bottlenecks visible to leadership
-- **Coverage assurance**: Missing-section detection ensures every regulatory area has a published rule
-- **Continuous compliance posture**: Drift reports provide a real-time compliance health score per country
-
-## 15. Future Enhancements
-
-- **Staleness rules**: Alert when a published rule hasn't been re-verified against its source in N days
-- **Provenance completeness rules**: Flag rules with incomplete provenance chains
-- **Drift trending**: Track drift severity over time to measure compliance posture improvement
-- **Drift SLAs**: Configure per-country or per-materiality SLAs with automatic escalation
-- **Drift-based scheduling**: Automatically increase sync frequency for countries with high drift
+| Thresholds too aggressive — noisy alerts | Thresholds are tunable; calibrate based on actual reviewer cadence and organizational risk appetite |
+| Thresholds too lenient — drift undetected | Default CRITICAL thresholds (14 days pending, 7 days escalated) reflect a conservative baseline; review during deployment |
+| Coverage gap for deliberately excluded section | The coverage gap rule fires for any section in the review queue without a published rule; intentionally excluded sections should either not be monitored at source level or have a placeholder rule in `country_guide` |
+| Drift report is stale between checks | Drift is computed on-demand; there is no cache to become stale |
+| Drift computation fails (database error) | API returns error; no partial drift data is surfaced; previous state of the dashboard is unaffected |
