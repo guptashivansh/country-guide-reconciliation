@@ -25,6 +25,9 @@ Employment regulations are published across heterogeneous formats — government
 
 ## 5. Functional Overview
 
+![Multi-Source Ingestion — Pipeline job tracking with per-stage progress dots, status indicators, and source URLs](../assets/screenshots/multi_source_ingestion.png)
+
+
 Three ingestion adapters feed into a common pipeline:
 
 | Adapter | Source | Use Case |
@@ -85,6 +88,10 @@ Root Page
 **Content format**: Notion pages contain pipe-separated tables which are parsed deterministically — no LLM is needed for this structured format.
 
 ### PDF Intake
+
+![PDF Compliance Parsing — Document upload interface with processing pipeline status and ingestion activity feed](../assets/screenshots/pdf_compliance_parsing.png)
+
+![Compliance Pipeline — Job-level tracking with stage progress dots, pagination, and source URL display](../assets/screenshots/compliance_pipeline.png)
 
 The `/api/intake/pdf` endpoint accepts multipart form uploads, extracts text content, and feeds it into the standard extraction pipeline.
 

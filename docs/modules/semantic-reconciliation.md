@@ -26,6 +26,9 @@ When a government source changes, the raw text diff is often unhelpful. A format
 
 ## 5. Functional Overview
 
+![Semantic Diff Engine — Before/after comparison with word-level highlighting and change classification](../assets/screenshots/semantic_diff_engine.png)
+
+
 The engine compares an old rule value against a new rule value and produces a `SemanticReconciliationResult` with:
 
 - **`semantic_change_detected`**: Boolean — is this a meaningful change?
@@ -156,6 +159,8 @@ Stored in review_queue.materiality_level and review_queue.change_type
 | `MaterialityLevel` | `app/reconciliation/schemas.py` | Enum: CRITICAL, HIGH, MODERATE, LOW, INFORMATIONAL |
 | `ChangeType` | `app/reconciliation/schemas.py` | Enum: 6 change types |
 | `SemanticReconciliationResult` | `app/reconciliation/schemas.py` | Pydantic model for engine output |
+
+![Materiality Classification — Severity badges and materiality chips on review queue items](../assets/screenshots/materiality_classification.png)
 
 ## 10. Database Design Implications
 

@@ -27,6 +27,9 @@ AI-detected regulatory changes cannot be trusted without human validation. An LL
 
 ## 5. Functional Overview
 
+![Governance Review Queue — Prioritized review items with severity badges, materiality classification, and action controls](../assets/screenshots/governance_review_queue.png)
+
+
 The review workflow supports 5 core actions:
 
 | Action | Description | Audit Impact |
@@ -147,7 +150,7 @@ On Reject:
 
 ## 10. Frontend/UI Components
 
-![Ops Dashboard — Review Queue](../assets/screenshots/ops_dashboard.png)
+![Semantic Diff Engine — Side-by-side before/after comparison with change classification](../assets/screenshots/semantic_diff_engine.png)
 
 The review queue in the ops dashboard provides:
 
@@ -187,6 +190,10 @@ An auditor can answer:
 - "What was the source evidence?" → `rule_provenance.source_fragment`
 - "What was the extraction confidence?" → `rule_provenance.extraction_confidence`
 - "What was the previous value?" → `audit_log.old_value` or `country_guide_versions` with `superseded_at`
+
+![Manual Override Controls — Approve, Reject, and Escalate action buttons with rationale capture](../assets/screenshots/manual_override_controls.png)
+
+![Review Rationale Capture — Audit trail showing reviewer decisions with comments and timestamps](../assets/screenshots/review_rationale_capture.png)
 
 ## 13. Human-in-the-Loop Governance Controls
 
