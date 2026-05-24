@@ -1207,7 +1207,7 @@
 <li>A 404 means the government page has been restructured, renamed, or removed. Retrying does not fix this.</li>
 <li>A 403 means the server is explicitly rejecting the request. Retrying the same request will produce the same rejection.</li>
 </ul>
-<p>The correct operational response to a 4xx is to investigate and update the source URL in the source registry. The failure is recorded with its reason; the platform engineering team can identify 4xx failures in the <code>ingestion_jobs</code> table and take corrective action.</p>
+<p>The correct operational response to a 4xx is to update the <code>website_url</code> for the affected authority in the <a href="https://github.com/guptashivansh/compliance-data"><code>compliance-data</code></a> source registry. The failure is recorded with its reason in <code>ingestion_jobs.failure_reason</code>; the <code>owner_team</code> field on the authority record identifies who is accountable for resolving it.</p>
 <p>Automatic retry on 4xx would mask this signal by appearing to "process" the source when it is actually unreachable, potentially causing the previous stale snapshot to be re-used for extraction.</p>
 <hr />
 <h2 id="content-sanitization">Content Sanitization<a class="headerlink" href="#content-sanitization" title="Permanent link">&para;</a></h2>

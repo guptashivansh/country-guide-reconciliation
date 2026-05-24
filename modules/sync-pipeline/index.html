@@ -1157,25 +1157,62 @@
 </ul>
 <hr />
 <h2 id="source-registry">Source Registry<a class="headerlink" href="#source-registry" title="Permanent link">&para;</a></h2>
-<p>The set of official government source URLs is maintained in a GitHub-hosted JSON file with a three-tier hierarchy:</p>
+<p>The set of official government source URLs is maintained in a dedicated, separately versioned data repository: <a href="https://github.com/guptashivansh/compliance-data"><code>guptashivansh/compliance-data</code></a>. This repository is the authoritative registry for all monitored regulatory authorities. It is decoupled from application code so that source coverage can be expanded, corrected, or disabled without a deployment.</p>
+<p>The registry file (<code>data/official-sources.json</code>) has a three-tier hierarchy:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>countries → authorities → source_endpoints
 </code></pre></div>
-<p>Each <code>SourceEndpoint</code> is a frozen dataclass:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="k">class</span><span class="w"> </span><span class="nc">SourceEndpoint</span><span class="p">:</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="n">country</span><span class="p">:</span> <span class="nb">str</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="n">authority</span><span class="p">:</span> <span class="nb">str</span>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="n">sections</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>  <span class="c1"># Which regulatory sections this source covers</span>
-</code></pre></div>
-<p><strong>Active filtering:</strong> Only endpoints where <code>status: "active"</code> under authorities with <code>is_active: true</code> are included in a sync run. Disabling a source requires no code change — it requires only updating the JSON file in the source registry repository.</p>
-<p><strong>Governance implication of external registry:</strong> Source URL changes are tracked in git. Adding a new source, modifying an existing URL, or disabling a source all produce a commit with author, timestamp, and message. This is the compliance record of source management decisions.</p>
+<p>Each authority entry carries governance metadata beyond a simple URL:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>website_url</code></td>
+<td>The official government source URL</td>
+</tr>
+<tr>
+<td><code>authority_type</code></td>
+<td>Domain: <code>labour</code>, <code>tax</code>, <code>immigration</code>, <code>social_security</code></td>
+</tr>
+<tr>
+<td><code>trust_level</code></td>
+<td>Assessed reliability of this source</td>
+</tr>
+<tr>
+<td><code>precedence_rank</code></td>
+<td>When multiple authorities cover the same domain, this determines which takes precedence</td>
+</tr>
+<tr>
+<td><code>is_active</code></td>
+<td>Whether this authority is included in sync runs</td>
+</tr>
+<tr>
+<td><code>escalation_required</code></td>
+<td>If <code>true</code>, any change detected from this source is automatically escalated regardless of materiality</td>
+</tr>
+<tr>
+<td><code>supports_replay</code></td>
+<td>Whether historical content can be re-fetched from this source</td>
+</tr>
+<tr>
+<td><code>owner_team</code></td>
+<td>The team accountable for monitoring and maintaining this source entry</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Active filtering:</strong> Only authorities where <code>is_active: true</code> are included in a sync run. Disabling a source requires no application code change — it requires only a commit to the registry repository setting <code>is_active: false</code>.</p>
+<p><strong>Escalation requirement:</strong> Sources with <code>escalation_required: true</code> are treated as high-sensitivity authorities. Any change detected from these sources enters the review queue with <code>status = escalated</code> immediately, bypassing the standard pending state. This ensures changes from the most sensitive authorities — such as primary immigration or tax authorities — always reach a senior reviewer.</p>
+<p><strong>Governance implication of the separate registry:</strong> Source changes are tracked in git with author, timestamp, and message. Adding a new authority, changing a URL, modifying a trust level, or disabling a source all produce a commit. This is the compliance record of source governance decisions — independent of, and auditable alongside, the application's own audit log.</p>
 <hr />
 <h2 id="pipeline-state-machine">Pipeline State Machine<a class="headerlink" href="#pipeline-state-machine" title="Permanent link">&para;</a></h2>
 <p>Each source endpoint processed by the sync pipeline creates an <code>ingestion_job</code> record that transitions through a defined state machine. The state machine is the operational record of what happened to each source on each sync run.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>queued → fetched → normalized → extracted → reconciled
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>                                               ↑
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>                     failed ← (from any state above)
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>queued → fetched → normalized → extracted → reconciled
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>                                               ↑
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>                     failed ← (from any state above)
 </code></pre></div>
 <p>Each transition sets the corresponding timestamp column (<code>queued_at</code>, <code>fetched_at</code>, <code>normalized_at</code>, <code>extracted_at</code>, <code>reconciled_at</code>, <code>failed_at</code>). The <code>failure_reason</code> column records the error detail when a job fails.</p>
 <p><strong>Latency profiling from timestamps:</strong> The difference between any two timestamps reveals stage latency for a specific source. If <code>extracted_at - normalized_at</code> is unusually long for a given source, it indicates an extraction bottleneck for that source. This data is available without separate instrumentation.</p>
@@ -1228,16 +1265,16 @@
 <hr />
 <h2 id="sync-result-contract">Sync Result Contract<a class="headerlink" href="#sync-result-contract" title="Permanent link">&para;</a></h2>
 <p>Every sync run returns a <code>SyncResult</code> object:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="p">{</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="s2">&quot;total_changes&quot;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="s2">&quot;endpoints_processed&quot;</span><span class="p">:</span> <span class="mi">24</span><span class="p">,</span>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="s2">&quot;failures&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="s2">&quot;per_country&quot;</span><span class="p">:</span> <span class="p">{</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>        <span class="s2">&quot;India&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;changes&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;failures&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>        <span class="s2">&quot;Singapore&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;changes&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;failures&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;failure_reason&quot;</span><span class="p">:</span> <span class="s2">&quot;Groq rate limit exhausted&quot;</span><span class="p">},</span>
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>        <span class="o">...</span>
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>    <span class="p">}</span>
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="p">}</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="p">{</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="s2">&quot;total_changes&quot;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="s2">&quot;endpoints_processed&quot;</span><span class="p">:</span> <span class="mi">24</span><span class="p">,</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="s2">&quot;failures&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="s2">&quot;per_country&quot;</span><span class="p">:</span> <span class="p">{</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>        <span class="s2">&quot;India&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;changes&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;failures&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>        <span class="s2">&quot;Singapore&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;changes&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;failures&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;failure_reason&quot;</span><span class="p">:</span> <span class="s2">&quot;Groq rate limit exhausted&quot;</span><span class="p">},</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>        <span class="o">...</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    <span class="p">}</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="p">}</span>
 </code></pre></div>
 <p>This result is:
 1. Returned to the trigger (API response for manual syncs, return value for scheduled syncs)

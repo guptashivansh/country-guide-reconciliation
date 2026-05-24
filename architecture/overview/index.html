@@ -485,10 +485,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#decision-4-external-source-registry-git-tracked" class="md-nav__link">
+  <a href="#decision-4-governed-source-registry-in-a-separate-repository" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Decision 4: External Source Registry (Git-Tracked)
+        Decision 4: Governed Source Registry in a Separate Repository
       
     </span>
   </a>
@@ -1342,10 +1342,14 @@
 <p><strong>What the decision is:</strong> <code>audit_log</code>, <code>country_guide_versions</code>, <code>rule_provenance</code>, and <code>source_snapshots</code> are append-only at the application level. No repository methods, migration scripts, or API endpoints issue UPDATE or DELETE against these tables.</p>
 <p><strong>Why this matters for governance:</strong> Regulators and auditors must be able to trust that the audit record reflects what actually happened, not what the organization wishes had happened. A mutable audit log is not an audit log — it is a liability. Append-only design makes post-hoc modification structurally difficult; it is not just a policy but an architectural constraint.</p>
 <hr />
-<h3 id="decision-4-external-source-registry-git-tracked">Decision 4: External Source Registry (Git-Tracked)<a class="headerlink" href="#decision-4-external-source-registry-git-tracked" title="Permanent link">&para;</a></h3>
-<p><strong>What the decision is:</strong> Official source URLs are maintained in a GitHub-hosted JSON file, not in the application database.</p>
-<p><strong>Why this matters for governance:</strong> Source URL changes are configuration changes with compliance implications — adding or removing a source affects what regulatory content the system monitors. Git version control provides change history, author attribution, and the ability to revert to a previous source set. Database-stored URLs would have none of these properties.</p>
-<p><strong>Acknowledged tradeoff:</strong> Updating source URLs requires a commit rather than a database update. This is an intentional friction point — source changes should be deliberate and tracked, not ad-hoc.</p>
+<h3 id="decision-4-governed-source-registry-in-a-separate-repository">Decision 4: Governed Source Registry in a Separate Repository<a class="headerlink" href="#decision-4-governed-source-registry-in-a-separate-repository" title="Permanent link">&para;</a></h3>
+<p><strong>What the decision is:</strong> Official source URLs and their governance metadata are maintained in a dedicated data repository (<a href="https://github.com/guptashivansh/compliance-data"><code>compliance-data</code></a>), not in the application database.</p>
+<p><strong>What the registry provides beyond URLs:</strong> Each authority entry carries <code>trust_level</code>, <code>precedence_rank</code>, <code>escalation_required</code>, <code>supports_replay</code>, and <code>owner_team</code>. This means the registry is not a flat URL list — it is a structured, governed catalogue of the organisation's regulatory intelligence sources. The <code>escalation_required</code> flag, for example, causes any change from designated high-sensitivity authorities to automatically enter the review queue as escalated, regardless of the semantic engine's materiality assessment.</p>
+<p><strong>Why this matters for governance:</strong> Source changes are configuration changes with compliance implications. A separate git-tracked repository provides:
+- Change history with author attribution for every source addition, URL update, trust level change, or deactivation
+- The ability to revert a source set to a prior state independently of application deployments
+- A clear ownership model: the <code>owner_team</code> field in the registry assigns accountability for each source</p>
+<p><strong>Acknowledged tradeoff:</strong> Updating sources requires a commit to the registry repository rather than a database update. This is an intentional friction point — source changes should be deliberate and traceable, not ad-hoc edits.</p>
 <hr />
 <h3 id="decision-5-postgresql-sqlite-dual-backend">Decision 5: PostgreSQL / SQLite Dual Backend<a class="headerlink" href="#decision-5-postgresql-sqlite-dual-backend" title="Permanent link">&para;</a></h3>
 <p><strong>What the decision is:</strong> The <code>app/utils/db.py</code> adapter transparently handles syntax differences between SQLite and PostgreSQL, so the same repository code runs on both backends.</p>

@@ -1126,13 +1126,17 @@
 <td>Source content is archived at crawl time</td>
 <td><code>source_snapshots</code> stores the raw text and MD5 hash of every crawled page before extraction</td>
 </tr>
+<tr>
+<td>Every monitored source has a defined trust level and ownership</td>
+<td>The source registry (<a href="https://github.com/guptashivansh/compliance-data"><code>compliance-data</code></a>) assigns <code>trust_level</code>, <code>precedence_rank</code>, <code>escalation_required</code>, and <code>owner_team</code> to every authority — source coverage is governed, not ad-hoc</td>
+</tr>
 </tbody>
 </table>
 <hr />
 <h2 id="what-this-system-does-not-guarantee">What This System Does Not Guarantee<a class="headerlink" href="#what-this-system-does-not-guarantee" title="Permanent link">&para;</a></h2>
 <p>Honesty about system boundaries is as important as stating capabilities:</p>
 <ul>
-<li>The system does not guarantee that government sources are correctly identified. Source URL maintenance is a human operational concern; incorrect sources produce incorrect extractions that must be caught at the review gate.</li>
+<li>The system does not guarantee that the source registry is complete. The <a href="https://github.com/guptashivansh/compliance-data"><code>compliance-data</code></a> registry defines which government authorities are monitored, with <code>trust_level</code>, <code>precedence_rank</code>, <code>escalation_required</code>, and <code>owner_team</code> per authority. Jurisdictions or regulatory domains not yet added to the registry are not monitored. Coverage expansion is a registry maintenance responsibility, tracked in that repository.</li>
 <li>The system does not guarantee LLM extraction accuracy. Confidence scores flag uncertain extractions, but human reviewers are the authority on whether an extraction reflects the source document.</li>
 <li>The system does not authenticate reviewers. Reviewer identity is captured and recorded, but the system does not enforce that the identity belongs to an authorized person. Role-based access control is an integration requirement for production deployment.</li>
 <li>The system does not guarantee real-time change detection. Government sources are crawled on a configurable schedule; changes published between syncs are detected at the next sync, not immediately.</li>
