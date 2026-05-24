@@ -413,6 +413,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#design-philosophy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Design Philosophy
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#schema-overview" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -424,15 +435,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#table-details" class="md-nav__link">
+  <a href="#table-reference" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Table Details
+        Table Reference
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Table Details">
+    <nav class="md-nav" aria-label="Table Reference">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -458,10 +469,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#review_queue-pending-resolved-changes" class="md-nav__link">
+  <a href="#review_queue-governance-staging-area" class="md-nav__link">
     <span class="md-ellipsis">
       
-        review_queue — Pending &amp; Resolved Changes
+        review_queue — Governance Staging Area
       
     </span>
   </a>
@@ -480,10 +491,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#rule_provenance-source-to-rule-traceability" class="md-nav__link">
+  <a href="#rule_provenance-chain-of-custody" class="md-nav__link">
     <span class="md-ellipsis">
       
-        rule_provenance — Source-to-Rule Traceability
+        rule_provenance — Chain of Custody
       
     </span>
   </a>
@@ -502,10 +513,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#ingestion_jobs-pipeline-execution-tracking" class="md-nav__link">
+  <a href="#ingestion_jobs-pipeline-execution-record" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ingestion_jobs — Pipeline Execution Tracking
+        ingestion_jobs — Pipeline Execution Record
       
     </span>
   </a>
@@ -514,6 +525,17 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#database-integrity-invariants" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Database Integrity Invariants
+      
+    </span>
+  </a>
   
 </li>
       
@@ -1111,8 +1133,11 @@
 
 
 <h1 id="database-design">Database Design<a class="headerlink" href="#database-design" title="Permanent link">&para;</a></h1>
+<h2 id="design-philosophy">Design Philosophy<a class="headerlink" href="#design-philosophy" title="Permanent link">&para;</a></h2>
+<p>The database schema is designed around one governing principle: <strong>compliance decisions must be permanently traceable.</strong> Every table that participates in the governance record is designed for append-only access. Every table that represents current state has a versioned shadow table that preserves historical state. Foreign key relationships create the provenance chain that links a published rule back to the government source that originated it.</p>
+<p>The schema is not normalized for write performance. It is designed for audit completeness.</p>
+<hr />
 <h2 id="schema-overview">Schema Overview<a class="headerlink" href="#schema-overview" title="Permanent link">&para;</a></h2>
-<p>The platform uses 7 core tables organized around the compliance lifecycle: ingestion, review, publication, and audit.</p>
 <pre class="mermaid"><code>erDiagram
     ingestion_jobs ||--o| source_snapshots : creates
     source_snapshots ||--o{ rule_provenance : referenced_by
@@ -1140,10 +1165,7 @@
         text country
         text section
         text value
-        text source_url
-        text source_hash
         text effective_date
-        text created_at
         text superseded_at
         int version_number
         text approval_reference
@@ -1171,6 +1193,8 @@
         text action
         text country
         text section
+        text old_value
+        text new_value
         text decision
         text reviewer_comment
         text reviewer_assignee
@@ -1217,9 +1241,9 @@
         text created_at
     }</code></pre>
 <hr />
-<h2 id="table-details">Table Details<a class="headerlink" href="#table-details" title="Permanent link">&para;</a></h2>
+<h2 id="table-reference">Table Reference<a class="headerlink" href="#table-reference" title="Permanent link">&para;</a></h2>
 <h3 id="country_guide-active-published-rules"><code>country_guide</code> — Active Published Rules<a class="headerlink" href="#country_guide-active-published-rules" title="Permanent link">&para;</a></h3>
-<p>The single source of truth for currently effective employment rules. Each row represents one rule for one country-section pair (e.g., India / annual_leave).</p>
+<p>The authoritative table for currently effective employment rules. Each row is a single rule for one (country, section) pair.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">country_guide</span><span class="w"> </span><span class="p">(</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="nb">INTEGER</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">AUTOINCREMENT</span><span class="p">,</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="n">country</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
@@ -1235,11 +1259,12 @@
 <a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">    </span><span class="k">UNIQUE</span><span class="p">(</span><span class="n">country</span><span class="p">,</span><span class="w"> </span><span class="n">section</span><span class="p">)</span>
 <a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="p">)</span>
 </code></pre></div>
-<p><strong>Design rationale</strong>: The <code>UNIQUE(country, section)</code> constraint ensures exactly one active rule per country-section pair. Updates are upserts — the previous value is preserved in <code>country_guide_versions</code> before overwriting.</p>
-<p><strong><code>current_provenance_id</code></strong>: Added via migration; links to the <code>rule_provenance</code> record that established this rule value, enabling one-click provenance chain resolution.</p>
+<p><strong><code>UNIQUE(country, section)</code></strong> — enforces exactly one active rule per (country, section) pair. Updates are upserts: the previous value is written to <code>country_guide_versions</code> before overwriting.</p>
+<p><strong><code>current_provenance_id</code></strong> — FK to <code>rule_provenance</code>. Updated atomically with every approval. Enables single-query provenance chain resolution. A published rule with <code>current_provenance_id IS NULL</code> indicates a data integrity issue and should be investigated.</p>
+<p><strong>Write policy:</strong> Only <code>approve_pending_review_item()</code> in <code>CountryGuideRepository</code> writes to this table. No other code path updates the <code>value</code> column.</p>
 <hr />
 <h3 id="country_guide_versions-immutable-version-history"><code>country_guide_versions</code> — Immutable Version History<a class="headerlink" href="#country_guide_versions-immutable-version-history" title="Permanent link">&para;</a></h3>
-<p>Every published rule change creates a new version row. Versions are never modified or deleted.</p>
+<p>Every approved rule change creates a new version row. Versions are never modified except to set <code>superseded_at</code> when the next version is created.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">country_guide_versions</span><span class="w"> </span><span class="p">(</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="nb">INTEGER</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">AUTOINCREMENT</span><span class="p">,</span>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="n">country</span><span class="w"> </span><span class="nb">TEXT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
@@ -1249,29 +1274,30 @@
 <a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span><span class="n">source_hash</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
 <a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">    </span><span class="n">effective_date</span><span class="w"> </span><span class="nb">TEXT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">    </span><span class="n">created_at</span><span class="w"> </span><span class="nb">TEXT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">    </span><span class="n">superseded_at</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">    </span><span class="n">superseded_at</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span><span class="w">           </span><span class="c1">-- NULL = currently active version</span>
 <a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">    </span><span class="n">version_number</span><span class="w"> </span><span class="nb">INTEGER</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">    </span><span class="n">approval_reference</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
-<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">    </span><span class="n">metadata</span><span class="w"> </span><span class="nb">TEXT</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">&#39;{}&#39;</span><span class="p">,</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">    </span><span class="n">metadata</span><span class="w"> </span><span class="nb">TEXT</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">&#39;{}&#39;</span><span class="p">,</span><span class="w">   </span><span class="c1">-- JSON: extraction_confidence, change_type</span>
 <a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="w">    </span><span class="k">UNIQUE</span><span class="p">(</span><span class="n">country</span><span class="p">,</span><span class="w"> </span><span class="n">section</span><span class="p">,</span><span class="w"> </span><span class="n">version_number</span><span class="p">)</span>
 <a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="p">)</span>
 </code></pre></div>
-<p><strong>Temporal query support</strong>: The <code>effective_date</code> and <code>superseded_at</code> columns enable point-in-time queries: "What was the rule at date X?" is answered by <code>WHERE effective_date &lt;= X AND (superseded_at IS NULL OR superseded_at &gt; X)</code>.</p>
-<p><strong><code>metadata</code></strong>: JSON blob for extensibility — stores extraction confidence, change type, or any context that should travel with the version.</p>
+<p><strong>Temporal semantics:</strong> A version is effective from <code>effective_date</code> until <code>superseded_at</code> (exclusive). <code>superseded_at = NULL</code> identifies the active version. The <code>[effective_date, superseded_at)</code> half-open interval enables point-in-time queries with no ambiguity.</p>
+<p><strong><code>metadata</code> JSON column:</strong> Stores context that travels with the version — currently <code>extraction_confidence</code> and <code>change_type</code>. This field enables schema evolution: new metadata can be added to future versions without a migration.</p>
+<p><strong>Immutability contract:</strong> <code>value</code>, <code>effective_date</code>, <code>version_number</code>, and <code>source_hash</code> are set at creation and never updated. Only <code>superseded_at</code> transitions from NULL to a timestamp, exactly once, when the next version is created.</p>
 <hr />
-<h3 id="review_queue-pending-resolved-changes"><code>review_queue</code> — Pending &amp; Resolved Changes<a class="headerlink" href="#review_queue-pending-resolved-changes" title="Permanent link">&para;</a></h3>
-<p>Every detected change between an extracted rule and the current guide creates a review queue item.</p>
+<h3 id="review_queue-governance-staging-area"><code>review_queue</code> — Governance Staging Area<a class="headerlink" href="#review_queue-governance-staging-area" title="Permanent link">&para;</a></h3>
+<p>Every detected semantic change between an extracted rule and the published rule creates a row here. This table is the staging area between the AI extraction pipeline and the human governance gate.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">review_queue</span><span class="w"> </span><span class="p">(</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="nb">INTEGER</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">AUTOINCREMENT</span><span class="p">,</span>
 <a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="n">country</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
 <a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">    </span><span class="n">section</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span><span class="n">old_value</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">    </span><span class="n">new_value</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">    </span><span class="n">severity</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">    </span><span class="n">confidence</span><span class="w"> </span><span class="nb">REAL</span><span class="p">,</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span><span class="n">old_value</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span><span class="w">                  </span><span class="c1">-- Currently published rule</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">    </span><span class="n">new_value</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span><span class="w">                  </span><span class="c1">-- What the extraction pipeline proposes</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">    </span><span class="n">severity</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span><span class="w">                   </span><span class="c1">-- &#39;critical&#39; | &#39;major&#39; | &#39;minor&#39;</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">    </span><span class="n">confidence</span><span class="w"> </span><span class="nb">REAL</span><span class="p">,</span><span class="w">                 </span><span class="c1">-- LLM extraction confidence (0.0–1.0)</span>
 <a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">    </span><span class="n">source_url</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
-<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">    </span><span class="n">source_paragraph</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
-<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">    </span><span class="n">status</span><span class="w"> </span><span class="nb">TEXT</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">&#39;pending&#39;</span><span class="p">,</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">    </span><span class="n">source_paragraph</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span><span class="w">           </span><span class="c1">-- Evidence excerpt from the source</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">    </span><span class="n">status</span><span class="w"> </span><span class="nb">TEXT</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">&#39;pending&#39;</span><span class="p">,</span><span class="w">   </span><span class="c1">-- &#39;pending&#39; | &#39;approved&#39; | &#39;rejected&#39; | &#39;escalated&#39;</span>
 <a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">    </span><span class="n">created_at</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
 <a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">    </span><span class="n">reviewed_at</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
 <a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">    </span><span class="n">reviewer_comment</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
@@ -1280,15 +1306,16 @@
 <a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="w">    </span><span class="n">reviewer_assignee</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
 <a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="w">    </span><span class="n">reviewer_rationale</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
 <a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a><span class="w">    </span><span class="n">effective_date</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
-<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a><span class="w">    </span><span class="n">materiality_level</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
-<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a><span class="w">    </span><span class="n">change_type</span><span class="w"> </span><span class="nb">TEXT</span>
+<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a><span class="w">    </span><span class="n">materiality_level</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span><span class="w">          </span><span class="c1">-- &#39;CRITICAL&#39; | &#39;HIGH&#39; | &#39;MODERATE&#39; | &#39;LOW&#39; | &#39;INFORMATIONAL&#39;</span>
+<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a><span class="w">    </span><span class="n">change_type</span><span class="w"> </span><span class="nb">TEXT</span><span class="w">                 </span><span class="c1">-- &#39;NUMERIC_THRESHOLD_CHANGE&#39; | ...</span>
 <a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a><span class="p">)</span>
 </code></pre></div>
-<p><strong>Status lifecycle</strong>: <code>pending</code> → <code>approved</code> | <code>rejected</code> | <code>escalated</code></p>
-<p><strong>Ordering</strong>: Pending items are returned ordered by status (escalated first), then severity, then confidence descending — ensuring the most urgent, highest-confidence items surface first.</p>
+<p><strong>Status lifecycle:</strong> <code>pending</code> → <code>approved</code> | <code>rejected</code> | <code>escalated</code></p>
+<p>A <code>pending</code> item represents an unresolved governance decision. The compliance team's queue management objective is to reduce the count of <code>pending</code> items within SLA thresholds. The drift detection system monitors this.</p>
+<p><strong>Priority ordering for API responses:</strong> Items returned from <code>GET /api/queue</code> are ordered by: <code>status</code> (escalated first), <code>severity</code> (critical → major → minor), <code>confidence</code> (descending). This ensures reviewers see the most urgent, most actionable items first.</p>
 <hr />
 <h3 id="audit_log-immutable-decision-record"><code>audit_log</code> — Immutable Decision Record<a class="headerlink" href="#audit_log-immutable-decision-record" title="Permanent link">&para;</a></h3>
-<p>Append-only table. No UPDATE or DELETE operations are ever issued against this table.</p>
+<p>Append-only table recording every governance decision. There are no UPDATE or DELETE operations against this table in any code path.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">audit_log</span><span class="w"> </span><span class="p">(</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="nb">INTEGER</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">AUTOINCREMENT</span><span class="p">,</span>
 <a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="n">action</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
@@ -1298,29 +1325,30 @@
 <a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">    </span><span class="n">new_value</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
 <a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">    </span><span class="n">decision</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
 <a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">    </span><span class="n">reviewer_comment</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
-<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">    </span><span class="k">timestamp</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
-<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">    </span><span class="n">reviewer_assignee</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
-<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">    </span><span class="n">reviewer_rationale</span><span class="w"> </span><span class="nb">TEXT</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">    </span><span class="n">reviewer_assignee</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">    </span><span class="n">reviewer_rationale</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">    </span><span class="k">timestamp</span><span class="w"> </span><span class="nb">TEXT</span>
 <a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="p">)</span>
 </code></pre></div>
-<p><strong>Audit defensibility</strong>: Every approve/reject/escalate action writes a row with the reviewer's identity, rationale, and the before/after values. External auditors can reconstruct the complete decision history for any rule.</p>
+<p><strong>Append-only guarantee:</strong> The <code>CountryGuideRepository</code> and <code>ReviewService</code> expose no method that issues UPDATE or DELETE against <code>audit_log</code>. The audit endpoint (<code>GET /api/audit</code>) is read-only. External auditors can rely on the completeness and immutability of this record.</p>
+<p><strong>Coverage:</strong> Every approve, reject, escalate, and assign action writes an <code>audit_log</code> row within the same transaction as the primary operation. A missing audit record for a review action indicates a transaction boundary violation and should be treated as a data integrity issue.</p>
 <hr />
-<h3 id="rule_provenance-source-to-rule-traceability"><code>rule_provenance</code> — Source-to-Rule Traceability<a class="headerlink" href="#rule_provenance-source-to-rule-traceability" title="Permanent link">&para;</a></h3>
-<p>Links every published rule back through the full pipeline: crawl event → snapshot → extraction → review decision.</p>
+<h3 id="rule_provenance-chain-of-custody"><code>rule_provenance</code> — Chain of Custody<a class="headerlink" href="#rule_provenance-chain-of-custody" title="Permanent link">&para;</a></h3>
+<p>Links every published rule to the complete pipeline chain that produced it: crawl event, source snapshot, AI extraction, and human review decision.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">rule_provenance</span><span class="w"> </span><span class="p">(</span>
 <a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="nb">INTEGER</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">AUTOINCREMENT</span><span class="p">,</span>
 <a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="n">country</span><span class="w"> </span><span class="nb">TEXT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span><span class="n">section</span><span class="w"> </span><span class="nb">TEXT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="n">rule_value</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">    </span><span class="n">review_queue_id</span><span class="w"> </span><span class="nb">INTEGER</span><span class="p">,</span>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">    </span><span class="n">source_snapshot_id</span><span class="w"> </span><span class="nb">INTEGER</span><span class="p">,</span>
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">    </span><span class="n">ingestion_job_id</span><span class="w"> </span><span class="nb">INTEGER</span><span class="p">,</span>
-<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">    </span><span class="n">source_url</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
-<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">    </span><span class="n">source_hash</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
-<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">    </span><span class="n">source_fragment</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">    </span><span class="n">review_queue_id</span><span class="w"> </span><span class="nb">INTEGER</span><span class="p">,</span><span class="w">          </span><span class="c1">-- The review item that was approved</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">    </span><span class="n">source_snapshot_id</span><span class="w"> </span><span class="nb">INTEGER</span><span class="p">,</span><span class="w">       </span><span class="c1">-- The archived source content</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">    </span><span class="n">ingestion_job_id</span><span class="w"> </span><span class="nb">INTEGER</span><span class="p">,</span><span class="w">         </span><span class="c1">-- The crawl job</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">    </span><span class="n">source_url</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span><span class="w">                  </span><span class="c1">-- Denormalized for chain immutability</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">    </span><span class="n">source_hash</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span><span class="w">                 </span><span class="c1">-- Denormalized for chain immutability</span>
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">    </span><span class="n">source_fragment</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span><span class="w">             </span><span class="c1">-- The exact evidence text</span>
 <a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">    </span><span class="n">extraction_confidence</span><span class="w"> </span><span class="nb">REAL</span><span class="p">,</span>
-<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="w">    </span><span class="n">parser_version</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
-<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="w">    </span><span class="n">reviewer_action</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="w">    </span><span class="n">parser_version</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span><span class="w">              </span><span class="c1">-- Model version string</span>
+<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="w">    </span><span class="n">reviewer_action</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span><span class="w">             </span><span class="c1">-- &#39;approved&#39; | &#39;bulk_approved&#39; | &#39;seeded&#39;</span>
 <a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="w">    </span><span class="n">reviewer_assignee</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
 <a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="w">    </span><span class="n">reviewer_rationale</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
 <a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="w">    </span><span class="n">reviewer_comment</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
@@ -1330,60 +1358,74 @@
 <a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a><span class="w">    </span><span class="n">created_at</span><span class="w"> </span><span class="nb">TEXT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span>
 <a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a><span class="p">)</span>
 </code></pre></div>
-<p><strong>Provenance chain resolution</strong>: The <code>get_current_chain()</code> method performs LEFT JOINs across <code>source_snapshots</code> and <code>ingestion_jobs</code> to construct a nested response:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="p">{</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nt">&quot;canonical_rule&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s2">&quot;country&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;section&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;value&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;last_updated&quot;</span><span class="w"> </span><span class="p">},</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="nt">&quot;reviewer_action&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s2">&quot;action&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;assignee&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;rationale&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;comment&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;reviewed_at&quot;</span><span class="w"> </span><span class="p">},</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="nt">&quot;extraction&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s2">&quot;confidence&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;parser_version&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;source_fragment&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;source_hash&quot;</span><span class="w"> </span><span class="p">},</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">  </span><span class="nt">&quot;source_snapshot&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s2">&quot;snapshot_id&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;content_hash&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;captured_at&quot;</span><span class="w"> </span><span class="p">},</span>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">  </span><span class="nt">&quot;crawl_event&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s2">&quot;ingestion_job_id&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;source_url&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;state&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;queued_at&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;fetched_at&quot;</span><span class="w"> </span><span class="p">}</span>
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="p">}</span>
-</code></pre></div>
+<p><strong>Denormalization intent:</strong> <code>source_url</code>, <code>source_hash</code>, and <code>source_fragment</code> are also present in <code>source_snapshots</code> and <code>review_queue</code>. They are duplicated here because the provenance record must be a self-contained chain: even if the referenced rows were hypothetically modified (which the system prevents), this record preserves the state at publication time.</p>
+<p><strong>Append-only:</strong> <code>ProvenanceRepository</code> exposes only <code>write()</code> and <code>set_current()</code>. <code>set_current()</code> updates <code>country_guide.current_provenance_id</code> — a pointer update, not a provenance modification.</p>
 <hr />
 <h3 id="source_snapshots-crawled-content-archive"><code>source_snapshots</code> — Crawled Content Archive<a class="headerlink" href="#source_snapshots-crawled-content-archive" title="Permanent link">&para;</a></h3>
-<p>Raw HTML text captured from official sources, with content hashing for deduplication.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">source_snapshots</span><span class="w"> </span><span class="p">(</span>
+<p>Raw content from official government sources, archived at crawl time. The evidence basis for all downstream extractions.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">source_snapshots</span><span class="w"> </span><span class="p">(</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="nb">INTEGER</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">AUTOINCREMENT</span><span class="p">,</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="n">source_url</span><span class="w"> </span><span class="nb">TEXT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="n">raw_text</span><span class="w"> </span><span class="nb">TEXT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="n">content_hash</span><span class="w"> </span><span class="nb">TEXT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">    </span><span class="n">captured_at</span><span class="w"> </span><span class="nb">TEXT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">    </span><span class="n">extraction_status</span><span class="w"> </span><span class="nb">TEXT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w">   </span><span class="c1">-- &#39;pending&#39; | &#39;succeeded&#39; | &#39;failed&#39;</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="p">)</span>
+</code></pre></div>
+<p><strong><code>extraction_status</code></strong>: Allows the pipeline to retry failed extractions without re-crawling. A snapshot with <code>extraction_status = 'failed'</code> still has its <code>raw_text</code> available for re-extraction on the next sync.</p>
+<p><strong>Storage growth:</strong> At 87 countries × ~3 sources each × daily syncs = ~261 snapshots/day. At ~6KB average raw text, this is ~570MB/year. Manageable for both SQLite and PostgreSQL without pruning. Historical snapshots are valuable for audit investigation; a retention policy should only be applied after confirming organizational audit requirements.</p>
+<hr />
+<h3 id="ingestion_jobs-pipeline-execution-record"><code>ingestion_jobs</code> — Pipeline Execution Record<a class="headerlink" href="#ingestion_jobs-pipeline-execution-record" title="Permanent link">&para;</a></h3>
+<p>One row per source endpoint per sync cycle. The operational record of what the pipeline did.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">ingestion_jobs</span><span class="w"> </span><span class="p">(</span>
 <a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="nb">INTEGER</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">AUTOINCREMENT</span><span class="p">,</span>
 <a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="n">source_url</span><span class="w"> </span><span class="nb">TEXT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">    </span><span class="n">raw_text</span><span class="w"> </span><span class="nb">TEXT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">    </span><span class="n">content_hash</span><span class="w"> </span><span class="nb">TEXT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">    </span><span class="n">captured_at</span><span class="w"> </span><span class="nb">TEXT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">    </span><span class="n">extraction_status</span><span class="w"> </span><span class="nb">TEXT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span>
-<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="p">)</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">    </span><span class="k">state</span><span class="w"> </span><span class="nb">TEXT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w">              </span><span class="c1">-- Current pipeline state</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">    </span><span class="n">queued_at</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">    </span><span class="n">fetched_at</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">    </span><span class="n">normalized_at</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">    </span><span class="n">extracted_at</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">    </span><span class="n">reconciled_at</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">    </span><span class="n">failed_at</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="w">    </span><span class="n">failure_reason</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span><span class="w">              </span><span class="c1">-- Populated when state = &#39;failed&#39;</span>
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="w">    </span><span class="n">source_snapshot_id</span><span class="w"> </span><span class="nb">INTEGER</span>
+<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="p">)</span>
 </code></pre></div>
-<p><strong>Extraction status</strong>: <code>pending</code> → <code>succeeded</code> | <code>failed</code>. Allows the pipeline to retry failed extractions without re-crawling.</p>
+<p><strong>Stage timestamp design:</strong> Each timestamp column is set when the pipeline transitions to that stage. Null values indicate the stage was not reached. The difference between adjacent timestamps is the latency for that stage. This provides per-source pipeline profiling without separate instrumentation.</p>
+<p><strong><code>failure_reason</code>:</strong> Plain-text description of why the job failed. This is the primary diagnostic input for platform engineers. Common values: <code>"HTTP 404 Not Found"</code>, <code>"Groq rate limit exhausted after key rotation"</code>, <code>"JSON parse error in LLM response"</code>.</p>
 <hr />
-<h3 id="ingestion_jobs-pipeline-execution-tracking"><code>ingestion_jobs</code> — Pipeline Execution Tracking<a class="headerlink" href="#ingestion_jobs-pipeline-execution-tracking" title="Permanent link">&para;</a></h3>
-<p>Tracks each crawl-extract-reconcile job through its state machine.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">ingestion_jobs</span><span class="w"> </span><span class="p">(</span>
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="nb">INTEGER</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">AUTOINCREMENT</span><span class="p">,</span>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">    </span><span class="n">source_url</span><span class="w"> </span><span class="nb">TEXT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">    </span><span class="k">state</span><span class="w"> </span><span class="nb">TEXT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">    </span><span class="n">queued_at</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
-<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span><span class="n">fetched_at</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
-<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">    </span><span class="n">normalized_at</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
-<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">    </span><span class="n">extracted_at</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
-<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="w">    </span><span class="n">reconciled_at</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
-<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="w">    </span><span class="n">failed_at</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
-<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="w">    </span><span class="n">failure_reason</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
-<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="w">    </span><span class="n">source_snapshot_id</span><span class="w"> </span><span class="nb">INTEGER</span>
-<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="p">)</span>
-</code></pre></div>
-<p><strong>State machine</strong>: <code>queued</code> → <code>fetched</code> → <code>normalized</code> → <code>extracted</code> → <code>reconciled</code> | <code>failed</code></p>
-<p>Each transition sets the corresponding timestamp column, creating a built-in latency profile for every pipeline execution.</p>
+<h2 id="database-integrity-invariants">Database Integrity Invariants<a class="headerlink" href="#database-integrity-invariants" title="Permanent link">&para;</a></h2>
+<p>The following properties must hold at all times. Violations indicate a data integrity issue:</p>
+<ol>
+<li>
+<p><strong>Every active rule has exactly one active version:</strong> For each (country, section) pair, exactly one <code>country_guide_versions</code> row has <code>superseded_at IS NULL</code>.</p>
+</li>
+<li>
+<p><strong>Every published rule has a provenance record:</strong> <code>country_guide.current_provenance_id IS NOT NULL</code> for all rules except those imported via initial seed (where <code>reviewer_action = 'seeded'</code>).</p>
+</li>
+<li>
+<p><strong>Every approved review item has an audit record:</strong> For every <code>review_queue</code> row where <code>status = 'approved'</code>, a corresponding <code>audit_log</code> row exists with the same country, section, and timestamp.</p>
+</li>
+<li>
+<p><strong>Version numbers are monotonically increasing:</strong> For each (country, section) pair, <code>version_number</code> values form an unbroken sequence starting from 1.</p>
+</li>
+<li>
+<p><strong>No version interval gap:</strong> For each (country, section) pair with multiple versions, version N's <code>superseded_at</code> equals version N+1's <code>effective_date</code>.</p>
+</li>
+</ol>
 <hr />
 <h2 id="dual-backend-support">Dual-Backend Support<a class="headerlink" href="#dual-backend-support" title="Permanent link">&para;</a></h2>
-<p>The <code>app/utils/db.py</code> module provides transparent SQLite/PostgreSQL compatibility:</p>
+<p><code>app/utils/db.py</code> provides transparent SQLite/PostgreSQL compatibility:</p>
 <table>
 <thead>
 <tr>
-<th>SQLite Syntax</th>
-<th>PostgreSQL Adaptation</th>
+<th>SQLite</th>
+<th>PostgreSQL</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>?</code> parameter</td>
+<td><code>?</code> parameter placeholder</td>
 <td><code>%s</code></td>
 </tr>
 <tr>
@@ -1395,20 +1437,37 @@
 <td><code>INSERT ... ON CONFLICT DO NOTHING</code></td>
 </tr>
 <tr>
+<td><code>INSERT OR REPLACE</code></td>
+<td><code>INSERT ... ON CONFLICT DO UPDATE</code></td>
+</tr>
+<tr>
 <td><code>date(column)</code></td>
 <td><code>column::date</code></td>
 </tr>
 </tbody>
 </table>
-<p>Backend selection is automatic: if <code>DATABASE_URL</code> is set, PostgreSQL is used; otherwise SQLite at the configured <code>DATABASE_PATH</code>.</p>
+<p><strong>Backend selection:</strong> If <code>DATABASE_URL</code> is set in the environment, PostgreSQL is used. Otherwise, SQLite at <code>DATABASE_PATH</code>. No code changes are required to switch backends.</p>
 <hr />
 <h2 id="design-principles">Design Principles<a class="headerlink" href="#design-principles" title="Permanent link">&para;</a></h2>
 <ol>
-<li><strong>Append-only audit data</strong> — <code>audit_log</code> and <code>country_guide_versions</code> are never modified after creation</li>
-<li><strong>Referential traceability</strong> — Every published rule links to its provenance record, which links to its snapshot and ingestion job</li>
-<li><strong>Temporal correctness</strong> — <code>effective_date</code> and <code>superseded_at</code> enable point-in-time reconstruction without scanning the full history</li>
-<li><strong>Idempotent ingestion</strong> — Content hashing prevents duplicate review items for unchanged source content</li>
-<li><strong>Graceful schema evolution</strong> — <code>metadata</code> JSON columns on version rows allow new fields without migrations</li>
+<li>
+<p><strong>Append-only audit data:</strong> <code>audit_log</code>, <code>country_guide_versions</code>, and <code>rule_provenance</code> are never modified after creation. The governance record is permanent.</p>
+</li>
+<li>
+<p><strong>Single-path publication:</strong> <code>country_guide.value</code> is updated only through <code>approve_pending_review_item()</code>. No other write path exists.</p>
+</li>
+<li>
+<p><strong>Referential traceability:</strong> <code>current_provenance_id</code> → <code>rule_provenance</code> → <code>source_snapshots</code> + <code>ingestion_jobs</code> + <code>review_queue</code>. The full chain is traversable from a published rule in one query.</p>
+</li>
+<li>
+<p><strong>Temporal correctness:</strong> <code>[effective_date, superseded_at)</code> intervals on <code>country_guide_versions</code> enable point-in-time queries without full-history scans.</p>
+</li>
+<li>
+<p><strong>Idempotent ingestion:</strong> Content hashing on <code>source_snapshots</code> suppresses duplicate review items for unchanged sources.</p>
+</li>
+<li>
+<p><strong>Fail-safe defaults:</strong> Review items default to <code>status = 'pending'</code>. Rules default to requiring explicit approval before publication. The system's resting state is always one of human oversight, not automation.</p>
+</li>
 </ol>
 
 

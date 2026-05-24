@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#service-dependency-graph" class="md-skip">
+        <a href="#service-architecture" class="md-skip">
           Skip to content
         </a>
       
@@ -441,10 +441,21 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#service-architecture" class="md-nav__link">
+  <a href="#layered-design-with-explicit-boundaries" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Service Architecture
+        Layered Design with Explicit Boundaries
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#service-dependency-graph" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Service Dependency Graph
       
     </span>
   </a>
@@ -467,7 +478,7 @@
   <a href="#data-layer-repositories" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Data Layer (Repositories)
+        Data Layer — Repositories
       
     </span>
   </a>
@@ -478,7 +489,7 @@
   <a href="#business-logic-layer-services" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Business Logic Layer (Services)
+        Business Logic Layer — Services
       
     </span>
   </a>
@@ -486,10 +497,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#pipeline-components" class="md-nav__link">
+  <a href="#pipeline-components-stateless" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Pipeline Components
+        Pipeline Components — Stateless
       
     </span>
   </a>
@@ -517,6 +528,17 @@
     <span class="md-ellipsis">
       
         Sync Pipeline Orchestration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#service-boundary-enforcement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Service Boundary Enforcement
       
     </span>
   </a>
@@ -1066,11 +1088,13 @@
 
 
 
-<h1 id="service-dependency-graph">Service Dependency Graph<a class="headerlink" href="#service-dependency-graph" title="Permanent link">&para;</a></h1>
-<h2 id="service-architecture">Service Architecture<a class="headerlink" href="#service-architecture" title="Permanent link">&para;</a></h2>
-<p>The platform follows a layered service architecture with dependency injection via the <code>build_services()</code> factory in <code>app/__init__.py</code>. Services are composed at startup and passed to the Flask blueprint.</p>
+<h1 id="service-architecture">Service Architecture<a class="headerlink" href="#service-architecture" title="Permanent link">&para;</a></h1>
+<h2 id="layered-design-with-explicit-boundaries">Layered Design with Explicit Boundaries<a class="headerlink" href="#layered-design-with-explicit-boundaries" title="Permanent link">&para;</a></h2>
+<p>The service architecture enforces a strict separation between persistence, business logic, and external communication. This separation is not a code organization preference — it is a governance requirement. Repository methods own database transactions; services own governance logic; the API layer owns request validation. Mixing these responsibilities would make it possible to approve a rule without writing an audit log entry (if service logic were in the API layer) or to modify published rules without going through the governance gate (if the API layer could write directly to <code>country_guide</code>).</p>
+<hr />
+<h2 id="service-dependency-graph">Service Dependency Graph<a class="headerlink" href="#service-dependency-graph" title="Permanent link">&para;</a></h2>
 <pre class="mermaid"><code>graph TD
-    subgraph "Repositories (Data Layer)"
+    subgraph "Repositories — Data Layer"
         CGR[CountryGuideRepository]
         SSR[SourceSnapshotRepository]
         IJR[IngestionJobRepository]
@@ -1079,7 +1103,7 @@
         DR[DriftRepository]
     end
 
-    subgraph "Services (Business Logic)"
+    subgraph "Services — Business Logic"
         RS[ReviewService]
         SRS[SourceRegistryService]
         IS[HtmlIngestionService]
@@ -1095,7 +1119,7 @@
         SLACK[SlackService]
     end
 
-    subgraph "Extraction Pipeline"
+    subgraph "Pipeline Components — Stateless"
         CC[ContentChunker]
         ERP[EmploymentRuleParser]
         ERA[EmploymentRuleAggregator]
@@ -1139,176 +1163,229 @@
     ROUTES --&gt; DD</code></pre>
 <hr />
 <h2 id="service-catalog">Service Catalog<a class="headerlink" href="#service-catalog" title="Permanent link">&para;</a></h2>
-<h3 id="data-layer-repositories">Data Layer (Repositories)<a class="headerlink" href="#data-layer-repositories" title="Permanent link">&para;</a></h3>
+<h3 id="data-layer-repositories">Data Layer — Repositories<a class="headerlink" href="#data-layer-repositories" title="Permanent link">&para;</a></h3>
+<p>Repositories own all SQL operations. No service or API handler writes SQL directly.</p>
 <table>
 <thead>
 <tr>
 <th>Repository</th>
-<th>Table(s)</th>
-<th>Key Operations</th>
+<th>Tables</th>
+<th>Write Operations</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>CountryGuideRepository</code></td>
 <td><code>country_guide</code>, <code>country_guide_versions</code>, <code>review_queue</code>, <code>audit_log</code></td>
-<td>Upsert rules, enqueue reviews, approve/reject, temporal queries</td>
+<td><code>approve_pending_review_item()</code> (4 writes in one transaction), <code>reject_pending_review_item()</code>, <code>escalate_review_item()</code>, <code>enqueue_review_item()</code></td>
 </tr>
 <tr>
 <td><code>SourceSnapshotRepository</code></td>
 <td><code>source_snapshots</code></td>
-<td>Create snapshots, update extraction status</td>
+<td><code>create_snapshot()</code>, <code>mark_extraction_succeeded()</code>, <code>mark_extraction_failed()</code></td>
 </tr>
 <tr>
 <td><code>IngestionJobRepository</code></td>
 <td><code>ingestion_jobs</code></td>
-<td>Create jobs, transition state machine, list recent</td>
+<td><code>create_job()</code>, <code>mark_fetched()</code>, <code>mark_normalized()</code>, <code>mark_extracted()</code>, <code>mark_reconciled()</code>, <code>mark_failed()</code></td>
 </tr>
 <tr>
 <td><code>ProvenanceRepository</code></td>
 <td><code>rule_provenance</code></td>
-<td>Write provenance records, resolve chains, get history</td>
+<td><code>write()</code> (INSERT only), <code>set_current()</code> (pointer update on <code>country_guide</code>)</td>
 </tr>
 <tr>
 <td><code>TrustedSourceEndpointRepository</code></td>
 <td>External JSON</td>
-<td>Fetch active source endpoints from GitHub</td>
+<td><code>list_active()</code> (read-only from GitHub-hosted JSON)</td>
 </tr>
 <tr>
 <td><code>DriftRepository</code></td>
 <td>Read-only across <code>country_guide</code>, <code>review_queue</code>, <code>rule_provenance</code></td>
-<td>Aggregate data for drift analysis</td>
+<td>None — read-only</td>
 </tr>
 </tbody>
 </table>
-<h3 id="business-logic-layer-services">Business Logic Layer (Services)<a class="headerlink" href="#business-logic-layer-services" title="Permanent link">&para;</a></h3>
+<p><strong>Transaction ownership:</strong> <code>CountryGuideRepository.approve_pending_review_item()</code> is the most critical transaction in the system. It executes four writes (audit log, guide upsert, version insert, version supersede) atomically. The transaction boundary is at the repository level, not the service level.</p>
+<hr />
+<h3 id="business-logic-layer-services">Business Logic Layer — Services<a class="headerlink" href="#business-logic-layer-services" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
 <th>Service</th>
-<th>Dependencies</th>
-<th>Responsibility</th>
+<th>Transaction Guarantee</th>
+<th>Governance Responsibility</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>ReviewService</code></td>
-<td><code>CountryGuideRepository</code>, <code>ProvenanceService</code></td>
-<td>Approve, reject, escalate, assign, bulk-approve review items</td>
-</tr>
-<tr>
-<td><code>SourceRegistryService</code></td>
-<td><code>TrustedSourceEndpointRepository</code></td>
-<td>List trusted government source endpoints</td>
-</tr>
-<tr>
-<td><code>HtmlIngestionService</code></td>
-<td>None (stateless)</td>
-<td>Fetch HTML, clean, truncate, hash</td>
-</tr>
-<tr>
-<td><code>SourceSnapshotService</code></td>
-<td><code>SourceSnapshotRepository</code></td>
-<td>Persist snapshots, track extraction status</td>
-</tr>
-<tr>
-<td><code>IngestionJobService</code></td>
-<td><code>IngestionJobRepository</code></td>
-<td>Lifecycle management for ingestion jobs</td>
+<td>Delegates to <code>CountryGuideRepository</code> + calls <code>ProvenanceService</code> in sequence</td>
+<td>Validates review action, coordinates approval and provenance recording, exposes governed approval/reject/escalate/assign/bulk-approve interface</td>
 </tr>
 <tr>
 <td><code>GroqExtractionService</code></td>
-<td><code>ContentChunker</code>, <code>EmploymentRuleParser</code>, <code>EmploymentRuleAggregator</code></td>
-<td>LLM-based structured extraction with multi-key rotation</td>
+<td>No database writes; reads only</td>
+<td>Manages LLM API calls, key rotation, chunk processing, confidence aggregation</td>
 </tr>
 <tr>
 <td><code>ReconciliationService</code></td>
-<td><code>CountryGuideRepository</code>, <code>SemanticReconciliationEngine</code></td>
-<td>Compare extracted rules against live guide, enqueue changes</td>
+<td>Writes via <code>CountryGuideRepository.enqueue_review_item()</code></td>
+<td>Applies semantic diff engine, suppresses duplicates, creates review queue items</td>
 </tr>
 <tr>
 <td><code>ProvenanceService</code></td>
-<td><code>ProvenanceRepository</code></td>
-<td>Record approval/seed provenance with parser version</td>
+<td>Writes via <code>ProvenanceRepository.write()</code> and <code>set_current()</code></td>
+<td>Constructs and records provenance chains for approval, bulk-approval, and seed operations</td>
 </tr>
 <tr>
 <td><code>TemporalRuleService</code></td>
-<td><code>CountryGuideRepository</code></td>
-<td>Point-in-time rule queries and version timelines</td>
+<td>No writes</td>
+<td>Point-in-time rule queries and version timeline construction</td>
 </tr>
 <tr>
 <td><code>DriftDetector</code></td>
-<td><code>DriftRepository</code></td>
-<td>Evaluate pending/canonical drift rules, generate reports</td>
+<td>No writes</td>
+<td>Evaluates drift rules, deduplicates findings, aggregates reports</td>
 </tr>
 <tr>
-<td><code>SlackService</code></td>
-<td>None (stateless functions)</td>
-<td>Region-aware Slack notifications</td>
+<td><code>SyncService</code></td>
+<td>Coordinates across all pipeline services</td>
+<td>Top-level orchestrator; does not hold database state; fault-isolates per-source failures</td>
 </tr>
 <tr>
 <td><code>SchedulerService</code></td>
-<td><code>SyncService</code>, <code>SlackService</code></td>
-<td>APScheduler cron trigger for automated sync</td>
+<td>No writes</td>
+<td>APScheduler cron configuration; triggers <code>SyncService</code> and <code>SlackService</code></td>
+</tr>
+<tr>
+<td><code>SlackService</code></td>
+<td>No writes</td>
+<td>Stateless Slack notification functions with region routing</td>
 </tr>
 </tbody>
 </table>
-<h3 id="pipeline-components">Pipeline Components<a class="headerlink" href="#pipeline-components" title="Permanent link">&para;</a></h3>
+<hr />
+<h3 id="pipeline-components-stateless">Pipeline Components — Stateless<a class="headerlink" href="#pipeline-components-stateless" title="Permanent link">&para;</a></h3>
+<p>These components are pure functions with no database access. They can be safely tested in isolation with mock inputs.</p>
 <table>
 <thead>
 <tr>
 <th>Component</th>
-<th>Type</th>
-<th>Responsibility</th>
+<th>Input</th>
+<th>Output</th>
+<th>Governance Role</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>ContentChunker</code></td>
-<td>Stateless</td>
-<td>Split HTML into LLM-sized chunks (max 6000 chars)</td>
+<td>Raw text string</td>
+<td>List of <code>{chunk_index, chunk_count, text}</code></td>
+<td>Ensures LLM context budget compliance</td>
 </tr>
 <tr>
 <td><code>EmploymentRuleParser</code></td>
-<td>Stateless</td>
-<td>Parse and validate LLM JSON output into <code>EmploymentRule</code> models</td>
+<td>LLM JSON response string, allowed sections</td>
+<td>List of validated <code>EmploymentRule</code> objects</td>
+<td>Drops invalid extractions before they enter the governance pipeline</td>
 </tr>
 <tr>
 <td><code>EmploymentRuleAggregator</code></td>
-<td>Stateless</td>
-<td>Deduplicate rules across chunks, keep highest confidence</td>
+<td>List of <code>EmploymentRule</code> objects from all chunks</td>
+<td>Deduplicated list (highest confidence per section)</td>
+<td>Resolves conflicting extractions from the same source</td>
 </tr>
 <tr>
 <td><code>SemanticReconciliationEngine</code></td>
-<td>Stateless</td>
-<td>Classify changes by type and materiality using regex patterns</td>
+<td>Old rule value, new rule value</td>
+<td><code>SemanticReconciliationResult</code></td>
+<td>Deterministic change classification with documented reasoning</td>
 </tr>
 </tbody>
 </table>
 <hr />
 <h2 id="dependency-injection">Dependency Injection<a class="headerlink" href="#dependency-injection" title="Permanent link">&para;</a></h2>
-<p>All services are constructed in <code>build_services()</code> and passed as a dictionary:</p>
+<p>All services are constructed in <code>build_services()</code> in <code>app/__init__.py</code> and passed as a typed dictionary to the Flask blueprint:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">services</span> <span class="o">=</span> <span class="p">{</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="s2">&quot;country_guide_repository&quot;</span><span class="p">:</span> <span class="n">CountryGuideRepository</span><span class="p">(</span><span class="n">db_path</span><span class="p">),</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="s2">&quot;review_service&quot;</span><span class="p">:</span> <span class="n">ReviewService</span><span class="p">(</span><span class="n">repo</span><span class="p">,</span> <span class="n">provenance_service</span><span class="p">),</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="s2">&quot;extraction_service&quot;</span><span class="p">:</span> <span class="n">GroqExtractionService</span><span class="p">(</span><span class="n">api_keys</span><span class="p">,</span> <span class="n">parser</span><span class="p">,</span> <span class="n">chunker</span><span class="p">,</span> <span class="n">aggregator</span><span class="p">),</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="s2">&quot;reconciliation_service&quot;</span><span class="p">:</span> <span class="n">ReconciliationService</span><span class="p">(</span><span class="n">repo</span><span class="p">,</span> <span class="n">semantic_engine</span><span class="p">),</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="c1"># ... 14 services total</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">}</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="s2">&quot;source_snapshot_repository&quot;</span><span class="p">:</span> <span class="n">SourceSnapshotRepository</span><span class="p">(</span><span class="n">db_path</span><span class="p">),</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="s2">&quot;ingestion_job_repository&quot;</span><span class="p">:</span> <span class="n">IngestionJobRepository</span><span class="p">(</span><span class="n">db_path</span><span class="p">),</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="s2">&quot;provenance_repository&quot;</span><span class="p">:</span> <span class="n">ProvenanceRepository</span><span class="p">(</span><span class="n">db_path</span><span class="p">),</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="s2">&quot;trusted_source_endpoint_repository&quot;</span><span class="p">:</span> <span class="n">TrustedSourceEndpointRepository</span><span class="p">(</span><span class="n">source_registry_url</span><span class="p">),</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="s2">&quot;review_service&quot;</span><span class="p">:</span> <span class="n">ReviewService</span><span class="p">(</span><span class="n">country_guide_repository</span><span class="p">,</span> <span class="n">provenance_service</span><span class="p">),</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="s2">&quot;extraction_service&quot;</span><span class="p">:</span> <span class="n">GroqExtractionService</span><span class="p">(</span><span class="n">api_keys</span><span class="p">,</span> <span class="n">parser</span><span class="p">,</span> <span class="n">chunker</span><span class="p">,</span> <span class="n">aggregator</span><span class="p">),</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="s2">&quot;reconciliation_service&quot;</span><span class="p">:</span> <span class="n">ReconciliationService</span><span class="p">(</span><span class="n">country_guide_repository</span><span class="p">,</span> <span class="n">semantic_engine</span><span class="p">),</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="s2">&quot;provenance_service&quot;</span><span class="p">:</span> <span class="n">ProvenanceService</span><span class="p">(</span><span class="n">provenance_repository</span><span class="p">,</span> <span class="n">parser_version</span><span class="p">),</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="s2">&quot;temporal_rule_service&quot;</span><span class="p">:</span> <span class="n">TemporalRuleService</span><span class="p">(</span><span class="n">country_guide_repository</span><span class="p">),</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    <span class="s2">&quot;drift_detector&quot;</span><span class="p">:</span> <span class="n">DriftDetector</span><span class="p">(</span><span class="n">drift_repository</span><span class="p">),</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="s2">&quot;sync_service&quot;</span><span class="p">:</span> <span class="n">SyncService</span><span class="p">(),</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    <span class="s2">&quot;scheduler_service&quot;</span><span class="p">:</span> <span class="n">SchedulerService</span><span class="p">(</span><span class="n">sync_service</span><span class="p">,</span> <span class="n">slack_service</span><span class="p">),</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>    <span class="s2">&quot;slack_service&quot;</span><span class="p">:</span> <span class="n">SlackService</span><span class="p">(</span><span class="n">webhook_urls</span><span class="p">),</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="p">}</span>
 </code></pre></div>
-<p>The Flask blueprint receives all services via its factory function <code>create_api_blueprint(...)</code>, avoiding global state and enabling testing with mock dependencies.</p>
+<p><strong>Governance implication of dependency injection:</strong> No service creates its own database connection or builds its own dependencies. All external dependencies (API keys, database paths, webhook URLs) are injected from environment variables at startup. This means the governance behavior of any service can be tested by injecting mock repositories — the governance logic is isolated from infrastructure concerns.</p>
 <hr />
 <h2 id="sync-pipeline-orchestration">Sync Pipeline Orchestration<a class="headerlink" href="#sync-pipeline-orchestration" title="Permanent link">&para;</a></h2>
-<p>The <code>run_sync()</code> function in <code>sync_service.py</code> is the top-level orchestrator. It does not hold state — it receives the services dictionary and coordinates calls across ingestion, extraction, and reconciliation:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>for each trusted source endpoint:
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    1. ingestion_job_service.create_job(url)
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    2. html_ingestion_service.fetch_clean_text(url)
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    3. source_snapshot_service.persist_snapshot(url, text, hash)
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    4. extraction_service.extract_employment_rules(text, url, country, sections)
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    5. reconciliation_service.reconcile_extracted_rules(country, rules, url, hash, snapshot_id)
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    6. Update job state at each transition
+<p><code>SyncService.run_sync()</code> is the only entry point for a full pipeline run. It does not hold state and it does not own transactions:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">run_sync</span><span class="p">(</span><span class="n">services</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">countries</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SyncResult</span><span class="p">:</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="n">endpoints</span> <span class="o">=</span> <span class="n">services</span><span class="p">[</span><span class="s2">&quot;source_registry&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">list_trusted_source_endpoints</span><span class="p">(</span><span class="n">countries</span><span class="p">)</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="k">for</span> <span class="n">endpoint</span> <span class="ow">in</span> <span class="n">endpoints</span><span class="p">:</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>        <span class="n">job_id</span> <span class="o">=</span> <span class="n">services</span><span class="p">[</span><span class="s2">&quot;ingestion_job_service&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">create_job</span><span class="p">(</span><span class="n">endpoint</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>        <span class="k">try</span><span class="p">:</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>            <span class="n">result</span> <span class="o">=</span> <span class="n">services</span><span class="p">[</span><span class="s2">&quot;ingestion_service&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">fetch_clean_text</span><span class="p">(</span><span class="n">endpoint</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>            <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">success</span><span class="p">:</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>                <span class="n">snapshot</span> <span class="o">=</span> <span class="n">services</span><span class="p">[</span><span class="s2">&quot;snapshot_service&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">persist_snapshot</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>                <span class="n">services</span><span class="p">[</span><span class="s2">&quot;ingestion_job_service&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mark_fetched</span><span class="p">(</span><span class="n">job_id</span><span class="p">,</span> <span class="n">snapshot</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>                <span class="n">extraction</span> <span class="o">=</span> <span class="n">services</span><span class="p">[</span><span class="s2">&quot;extraction_service&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">extract_employment_rules</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>                <span class="k">if</span> <span class="n">extraction</span><span class="o">.</span><span class="n">success</span><span class="p">:</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>                    <span class="n">services</span><span class="p">[</span><span class="s2">&quot;ingestion_job_service&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mark_extracted</span><span class="p">(</span><span class="n">job_id</span><span class="p">)</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>                    <span class="n">changes</span> <span class="o">=</span> <span class="n">services</span><span class="p">[</span><span class="s2">&quot;reconciliation_service&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">reconcile_extracted_rules</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>                    <span class="n">services</span><span class="p">[</span><span class="s2">&quot;ingestion_job_service&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mark_reconciled</span><span class="p">(</span><span class="n">job_id</span><span class="p">)</span>
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>                <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>                    <span class="n">services</span><span class="p">[</span><span class="s2">&quot;ingestion_job_service&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mark_failed</span><span class="p">(</span><span class="n">job_id</span><span class="p">,</span> <span class="n">extraction</span><span class="o">.</span><span class="n">failure</span><span class="p">)</span>
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>            <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>                <span class="n">services</span><span class="p">[</span><span class="s2">&quot;ingestion_job_service&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mark_failed</span><span class="p">(</span><span class="n">job_id</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">failure</span><span class="p">)</span>
+<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+<a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a>            <span class="n">services</span><span class="p">[</span><span class="s2">&quot;ingestion_job_service&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mark_failed</span><span class="p">(</span><span class="n">job_id</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+<a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a>            <span class="c1"># Continue to next endpoint — fault isolation</span>
 </code></pre></div>
-<p>Failures at any stage mark the job as <code>failed</code> with a reason, but do not halt processing of other endpoints.</p>
+<p><strong>Fault isolation design:</strong> The <code>except</code> block around each endpoint's processing ensures that an uncaught exception in one source's processing (network timeout, unexpected API response format) does not halt the entire sync cycle. The exception is recorded in the job's <code>failure_reason</code>, and processing continues to the next source endpoint.</p>
+<hr />
+<h2 id="service-boundary-enforcement">Service Boundary Enforcement<a class="headerlink" href="#service-boundary-enforcement" title="Permanent link">&para;</a></h2>
+<p>The following operations are only available through specific service methods, never through direct repository access from the API layer:</p>
+<table>
+<thead>
+<tr>
+<th>Operation</th>
+<th>Enforced Through</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Publishing a rule</td>
+<td><code>ReviewService.approve_review_item()</code></td>
+<td>Ensures audit log + provenance are always written with the approval</td>
+</tr>
+<tr>
+<td>Bulk approving rules</td>
+<td><code>ReviewService.bulk_approve_non_critical()</code></td>
+<td>Enforces critical-severity exclusion at service level</td>
+</tr>
+<tr>
+<td>Recording provenance</td>
+<td><code>ProvenanceService.record_approval()</code></td>
+<td>Ensures <code>parser_version</code> is always set from the service constructor</td>
+</tr>
+<tr>
+<td>Source endpoint list</td>
+<td><code>SourceRegistryService.list_trusted_source_endpoints()</code></td>
+<td>Ensures only active, authorized sources are processed</td>
+</tr>
+</tbody>
+</table>
+<p>No Flask route handler writes directly to <code>country_guide</code>, <code>audit_log</code>, or <code>rule_provenance</code>. Routes call services; services call repositories; repositories execute transactions.</p>
 
 
 

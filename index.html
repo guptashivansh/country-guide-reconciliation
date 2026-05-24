@@ -74,7 +74,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#country-guide-reconciliation-platform" class="md-skip">
+        <a href="#compliance-governance-infrastructure" class="md-skip">
           Skip to content
         </a>
       
@@ -294,10 +294,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#business-problem" class="md-nav__link">
+  <a href="#governance-philosophy" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Business Problem
+        Governance Philosophy
       
     </span>
   </a>
@@ -305,10 +305,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-this-platform-does" class="md-nav__link">
+  <a href="#what-this-system-guarantees" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What This Platform Does
+        What This System Guarantees
       
     </span>
   </a>
@@ -316,10 +316,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#key-capabilities" class="md-nav__link">
+  <a href="#what-this-system-does-not-guarantee" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Key Capabilities
+        What This System Does Not Guarantee
       
     </span>
   </a>
@@ -327,10 +327,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#global-coverage-87-countries" class="md-nav__link">
+  <a href="#compliance-coverage" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Global Coverage — 87 Countries
+        Compliance Coverage
       
     </span>
   </a>
@@ -338,10 +338,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#tech-stack" class="md-nav__link">
+  <a href="#pipeline-stages" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Tech Stack
+        Pipeline Stages
       
     </span>
   </a>
@@ -349,10 +349,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#quick-start" class="md-nav__link">
+  <a href="#personas-and-their-trust-relationship-with-the-system" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Quick Start
+        Personas and Their Trust Relationship with the System
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#technical-foundation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Foundation
       
     </span>
   </a>
@@ -1058,73 +1069,107 @@
 
 
 
-<h1 id="country-guide-reconciliation-platform">Country Guide Reconciliation Platform<a class="headerlink" href="#country-guide-reconciliation-platform" title="Permanent link">&para;</a></h1>
-<p>An AI-powered compliance governance platform that continuously monitors official government sources, detects regulatory changes to employment guides, and routes them through a human-in-the-loop approval workflow with full provenance tracking.</p>
-<p><img alt="Home Page" loading="lazy" src="assets/screenshots/home.png" /></p>
+<h1 id="compliance-governance-infrastructure">Compliance Governance Infrastructure<a class="headerlink" href="#compliance-governance-infrastructure" title="Permanent link">&para;</a></h1>
+<p>This system is the authoritative source of truth for employment regulation across 87 jurisdictions. It ingests official government sources, extracts structured regulatory rules, classifies changes by materiality, routes them through a mandatory human review gate, and publishes approved changes with a complete, immutable provenance chain linking every published rule back to the government document that originated it.</p>
 <hr />
-<h2 id="business-problem">Business Problem<a class="headerlink" href="#business-problem" title="Permanent link">&para;</a></h2>
-<p>Global employers operating across jurisdictions must comply with local employment laws — leave entitlements, minimum wage, tax obligations, termination notice periods, work permit requirements, and more. These rules change frequently, are published across dozens of government websites, and carry material legal and financial risk when stale.</p>
-<p><strong>The cost of getting it wrong:</strong></p>
-<ul>
-<li>Payroll miscalculations triggering regulatory penalties</li>
-<li>Incorrect leave entitlements leading to employment disputes</li>
-<li>Stale immigration guidance causing visa processing failures</li>
-<li>Compliance audit failures due to inability to prove when a rule was adopted and who approved it</li>
-</ul>
-<p>Traditional approaches — manual monitoring of government websites by compliance analysts — are slow, error-prone, and unscalable. A single missed regulatory gazette update can expose the organization to millions in liability.</p>
+<h2 id="governance-philosophy">Governance Philosophy<a class="headerlink" href="#governance-philosophy" title="Permanent link">&para;</a></h2>
+<p>Multi-jurisdiction employment compliance operates under a fundamental constraint: the cost of a missed regulatory change is asymmetric. A minimum wage miscalculation, a stale termination notice period, or an outdated work permit requirement can expose the organization to penalties, employment disputes, or visa processing failures that exceed the cost of the entire compliance operation.</p>
+<p>This system is built around four principles that govern every architectural decision:</p>
+<p><strong>Provenance-first.</strong> No rule is considered authoritative unless its origin can be traced to a specific government document, captured at a specific time, extracted by a versioned model, reviewed by an identified person, and approved with a documented rationale. This chain cannot be bypassed, bypassing it produces an audit finding.</p>
+<p><strong>Human authority over AI output.</strong> The LLM extracts; humans decide. The system uses a large language model to convert unstructured government HTML into structured rule objects — a task for which AI generalization across heterogeneous formats is appropriate. The system never allows AI output to become a published rule without explicit human approval. This is not a limitation of the AI; it is a deliberate governance control.</p>
+<p><strong>Deterministic classification over probabilistic judgment.</strong> Change classification — determining whether a detected difference is a numeric threshold change, an eligibility scope modification, or a formatting artifact — uses a deterministic regex-based engine, not an LLM. The same (old, new) pair always produces the same classification. Auditors can reconstruct the reasoning. LLM classification would undermine that reproducibility.</p>
+<p><strong>Immutable audit record.</strong> Every decision, at every stage of the pipeline, is written to append-only tables. No UPDATE or DELETE operation exists for audit data. The complete history of who decided what, when, and why is always reconstructable from the database.</p>
 <hr />
-<h2 id="what-this-platform-does">What This Platform Does<a class="headerlink" href="#what-this-platform-does" title="Permanent link">&para;</a></h2>
+<h2 id="what-this-system-guarantees">What This System Guarantees<a class="headerlink" href="#what-this-system-guarantees" title="Permanent link">&para;</a></h2>
+<p>The following are system-level guarantees, not aspirational claims:</p>
 <table>
 <thead>
 <tr>
-<th>Stage</th>
-<th>Description</th>
+<th>Guarantee</th>
+<th>Mechanism</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><strong>Monitor</strong></td>
-<td>Crawls official government sources for 87 countries on a configurable schedule</td>
+<td>No regulatory change is published without human approval</td>
+<td><code>review_queue</code> is the mandatory gate; <code>country_guide</code> is only updated via <code>approve_pending_review_item()</code></td>
 </tr>
 <tr>
-<td><strong>Extract</strong></td>
-<td>Uses Groq LLaMA 3.3 70B to extract structured employment rules from raw HTML</td>
+<td>Every published rule has a traceable provenance chain</td>
+<td>Approval atomically writes provenance; <code>current_provenance_id</code> is a FK constraint</td>
 </tr>
 <tr>
-<td><strong>Reconcile</strong></td>
-<td>Semantic diffing engine classifies changes by type and materiality</td>
+<td>Critical-severity changes cannot be bulk-approved</td>
+<td><code>bulk_approve_non_critical()</code> enforces <code>severity != 'critical'</code> at the repository level</td>
 </tr>
 <tr>
-<td><strong>Review</strong></td>
-<td>Human reviewers examine before/after diffs with source evidence</td>
+<td>Audit records cannot be modified or deleted</td>
+<td>No UPDATE/DELETE endpoints or repository methods exist for <code>audit_log</code></td>
 </tr>
 <tr>
-<td><strong>Publish</strong></td>
-<td>Approved changes are versioned, provenance-tracked, and published to client-facing guides</td>
+<td>Every version of every rule is retained</td>
+<td><code>country_guide_versions</code> is append-only; superseded versions are never deleted</td>
 </tr>
 <tr>
-<td><strong>Detect Drift</strong></td>
-<td>Continuous monitoring for staleness, unreviewed escalations, and compliance gaps</td>
+<td>Point-in-time rule state is always reconstructable</td>
+<td>Version rows carry <code>[effective_date, superseded_at)</code> intervals; temporal queries are deterministic</td>
 </tr>
 <tr>
-<td><strong>Alert</strong></td>
-<td>Region-aware Slack notifications to compliance owners</td>
+<td>Source content is archived at crawl time</td>
+<td><code>source_snapshots</code> stores the raw text and MD5 hash of every crawled page before extraction</td>
 </tr>
 </tbody>
 </table>
 <hr />
-<h2 id="key-capabilities">Key Capabilities<a class="headerlink" href="#key-capabilities" title="Permanent link">&para;</a></h2>
+<h2 id="what-this-system-does-not-guarantee">What This System Does Not Guarantee<a class="headerlink" href="#what-this-system-does-not-guarantee" title="Permanent link">&para;</a></h2>
+<p>Honesty about system boundaries is as important as stating capabilities:</p>
 <ul>
-<li><strong>Semantic change classification</strong> — Not just text diffs; the engine distinguishes numeric threshold changes, eligibility scope modifications, new requirements, timeline shifts, and non-material formatting</li>
-<li><strong>Materiality assessment</strong> — Every change is scored Critical / High / Moderate / Low / Informational so reviewers prioritize what matters</li>
-<li><strong>Full provenance chain</strong> — From government source URL to crawler snapshot to LLM extraction to reviewer decision to published rule, every link is recorded</li>
-<li><strong>Temporal rule queries</strong> — "What was India's minimum wage on March 15, 2025?" answered from immutable version history</li>
-<li><strong>Drift detection</strong> — Automated alerts when rules go stale, reviews sit unactioned, or coverage gaps emerge</li>
-<li><strong>Audit-ready operations</strong> — Immutable audit log with reviewer identity, timestamp, rationale, and source evidence for every decision</li>
+<li>The system does not guarantee that government sources are correctly identified. Source URL maintenance is a human operational concern; incorrect sources produce incorrect extractions that must be caught at the review gate.</li>
+<li>The system does not guarantee LLM extraction accuracy. Confidence scores flag uncertain extractions, but human reviewers are the authority on whether an extraction reflects the source document.</li>
+<li>The system does not authenticate reviewers. Reviewer identity is captured and recorded, but the system does not enforce that the identity belongs to an authorized person. Role-based access control is an integration requirement for production deployment.</li>
+<li>The system does not guarantee real-time change detection. Government sources are crawled on a configurable schedule; changes published between syncs are detected at the next sync, not immediately.</li>
 </ul>
 <hr />
-<h2 id="global-coverage-87-countries">Global Coverage — 87 Countries<a class="headerlink" href="#global-coverage-87-countries" title="Permanent link">&para;</a></h2>
-<p>Employment guides are maintained across 87 countries spanning APAC, EMEA, and the Americas. Each country covers up to 7 rule categories: Leave, Working Hours, Compensation, Benefits &amp; Social Security, Employment Terms, Immigration, and Workplace Safety.</p>
+<h2 id="compliance-coverage">Compliance Coverage<a class="headerlink" href="#compliance-coverage" title="Permanent link">&para;</a></h2>
+<p>Employment guides are maintained across 87 countries spanning APAC, EMEA, and the Americas. Each country covers up to 7 regulatory sections:</p>
+<table>
+<thead>
+<tr>
+<th>Section</th>
+<th>Examples</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Leave</strong></td>
+<td>Annual leave entitlement, sick leave, parental leave, public holidays</td>
+</tr>
+<tr>
+<td><strong>Working Hours</strong></td>
+<td>Maximum working hours, overtime eligibility, rest periods</td>
+</tr>
+<tr>
+<td><strong>Compensation</strong></td>
+<td>Minimum wage, overtime rates, salary payment frequency</td>
+</tr>
+<tr>
+<td><strong>Benefits &amp; Social Security</strong></td>
+<td>Pension contributions, health insurance mandates, provident fund</td>
+</tr>
+<tr>
+<td><strong>Employment Terms</strong></td>
+<td>Probation periods, notice periods, termination procedures</td>
+</tr>
+<tr>
+<td><strong>Immigration</strong></td>
+<td>Work permit categories, visa processing timelines, eligibility conditions</td>
+</tr>
+<tr>
+<td><strong>Workplace Safety</strong></td>
+<td>Mandatory safety obligations, reporting requirements</td>
+</tr>
+</tbody>
+</table>
 <details class="note">
 <summary>Full country list (click to expand)</summary>
 <table>
@@ -1151,65 +1196,133 @@
 </table>
 </details>
 <hr />
-<h2 id="tech-stack">Tech Stack<a class="headerlink" href="#tech-stack" title="Permanent link">&para;</a></h2>
+<h2 id="pipeline-stages">Pipeline Stages<a class="headerlink" href="#pipeline-stages" title="Permanent link">&para;</a></h2>
+<p>The governance pipeline is sequential by design. Each stage has a defined responsibility boundary, and no stage can be skipped.</p>
+<table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Responsibility</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Ingestion</strong></td>
+<td>Fetch official sources, archive raw content with content hash</td>
+<td><code>source_snapshots</code> record</td>
+</tr>
+<tr>
+<td><strong>Extraction</strong></td>
+<td>Convert unstructured HTML to structured rule objects</td>
+<td><code>EmploymentRule</code> objects with confidence scores</td>
+</tr>
+<tr>
+<td><strong>Reconciliation</strong></td>
+<td>Classify the semantic difference between extracted and published rules</td>
+<td><code>review_queue</code> entry with change type and materiality</td>
+</tr>
+<tr>
+<td><strong>Review</strong></td>
+<td>Human examines source evidence and approves, rejects, or escalates</td>
+<td><code>audit_log</code> entry; <code>country_guide</code> updated on approval</td>
+</tr>
+<tr>
+<td><strong>Publication</strong></td>
+<td>Approved rule becomes authoritative; version history updated</td>
+<td><code>country_guide_versions</code> row; <code>rule_provenance</code> record</td>
+</tr>
+<tr>
+<td><strong>Drift Detection</strong></td>
+<td>Continuous assessment of compliance posture staleness</td>
+<td><code>DriftReport</code> per country with recommended actions</td>
+</tr>
+<tr>
+<td><strong>Alerting</strong></td>
+<td>Region-routed notifications to accountability owners</td>
+<td>Slack messages to designated regional leads</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="personas-and-their-trust-relationship-with-the-system">Personas and Their Trust Relationship with the System<a class="headerlink" href="#personas-and-their-trust-relationship-with-the-system" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Persona</th>
+<th>Trust Relationship</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Compliance Analyst</strong></td>
+<td>Trusts that the review queue presents complete, accurate evidence for every detected change. Is accountable for every decision they record.</td>
+</tr>
+<tr>
+<td><strong>Compliance Lead</strong></td>
+<td>Trusts that drift reports reflect current system state computed on-demand, not cached. Can rely on metrics for operational oversight.</td>
+</tr>
+<tr>
+<td><strong>Regional Owner</strong></td>
+<td>Trusts that Slack alerts fire reliably after sync completion, with accurate change counts. Is accountable for country coverage in their region.</td>
+</tr>
+<tr>
+<td><strong>External Auditor</strong></td>
+<td>Trusts that the audit log is append-only and complete. Can reconstruct the provenance chain for any published rule using only the database.</td>
+</tr>
+<tr>
+<td><strong>Platform Engineer</strong></td>
+<td>Trusts that the ingestion job state machine accurately reflects pipeline execution. Is responsible for source URL maintenance and extraction quality monitoring.</td>
+</tr>
+<tr>
+<td><strong>Legal Counsel</strong></td>
+<td>Trusts that temporal queries return the rule that was in effect at a specific date, backed by an immutable version record.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="technical-foundation">Technical Foundation<a class="headerlink" href="#technical-foundation" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
 <th>Component</th>
 <th>Technology</th>
-<th>Rationale</th>
+<th>Governance Rationale</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>Application Framework</td>
 <td>Flask (Python)</td>
-<td>Lightweight, rapid iteration, strong ecosystem</td>
+<td>Explicit, auditable request handling; no magic</td>
 </tr>
 <tr>
 <td>Database</td>
-<td>SQLite / PostgreSQL (dual-backend)</td>
-<td>Zero-ops local dev; Postgres for production scale</td>
+<td>SQLite (development) / PostgreSQL (production)</td>
+<td>ACID transactions; append-only tables for audit data</td>
 </tr>
 <tr>
 <td>LLM Provider</td>
-<td>Groq API (LLaMA 3.3 70B)</td>
-<td>Fast inference, structured extraction, generous rate limits</td>
+<td>Groq API (LLaMA 3.3 70B, temperature=0.1)</td>
+<td>Near-deterministic extraction; fast inference for structured output</td>
 </tr>
 <tr>
 <td>Semantic Engine</td>
-<td>Regex + string similarity</td>
-<td>Deterministic, auditable classification without LLM dependency</td>
+<td>Regex pattern library (deterministic)</td>
+<td>Reproducible classification; full reasoning traceability</td>
 </tr>
 <tr>
 <td>Alerting</td>
-<td>Slack Webhooks</td>
-<td>Real-time, region-routed notifications</td>
+<td>Slack Webhooks (region-routed)</td>
+<td>Direct notification to regional accountability owners</td>
 </tr>
 <tr>
 <td>Scheduler</td>
-<td>APScheduler</td>
-<td>In-process cron with misfire recovery</td>
-</tr>
-<tr>
-<td>Documentation</td>
-<td>MkDocs Material</td>
-<td>Auto-captured screenshots, GitHub Pages hosting</td>
-</tr>
-<tr>
-<td>Screenshot Automation</td>
-<td>Playwright</td>
-<td>Headless Chromium for CI-integrated visual documentation</td>
+<td>APScheduler (in-process cron)</td>
+<td>Configurable schedule with misfire recovery</td>
 </tr>
 </tbody>
 </table>
-<hr />
-<h2 id="quick-start">Quick Start<a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>python<span class="w"> </span>app.py<span class="w">                    </span><span class="c1"># Initialize DB + start server on :8080</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>python<span class="w"> </span>notion_import.py<span class="w">          </span><span class="c1"># One-time baseline seed from Notion</span>
-</code></pre></div>
-<p>Then open <code>http://localhost:8080/ops</code> for the compliance dashboard.</p>
 <hr />
 <h2 id="documentation-structure">Documentation Structure<a class="headerlink" href="#documentation-structure" title="Permanent link">&para;</a></h2>
 <table>
@@ -1217,34 +1330,79 @@
 <tr>
 <th>Section</th>
 <th>Audience</th>
-<th>Content</th>
+<th>What to Read For</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><a href="architecture/overview/">Platform Architecture</a></td>
-<td>Solution Architects, Engineering</td>
-<td>System design, data flow, service graph</td>
+<td>Solution Architects, Engineering Leads</td>
+<td>System guarantees, trust boundaries, failure handling, architectural rationale</td>
 </tr>
 <tr>
-<td><a href="modules/sync-pipeline/">Core Modules</a></td>
-<td>Engineering, Compliance Leadership</td>
-<td>Deep-dive into each pipeline stage</td>
+<td><a href="architecture/database/">Database Design</a></td>
+<td>Data Architects, Auditors</td>
+<td>Schema integrity, append-only guarantees, temporal model</td>
 </tr>
 <tr>
-<td><a href="guide/ops-dashboard/">Operations Guide</a></td>
+<td><a href="architecture/services/">Service Architecture</a></td>
+<td>Engineering Teams</td>
+<td>Service boundaries, dependency model, transaction ownership</td>
+</tr>
+<tr>
+<td><a href="modules/ingestion/">Ingestion Layer</a></td>
+<td>Platform Engineers</td>
+<td>Source reliability, snapshot integrity, failure isolation</td>
+</tr>
+<tr>
+<td><a href="modules/llm-extraction/">LLM Extraction</a></td>
+<td>Engineers, Compliance Leads</td>
+<td>AI trust boundaries, confidence model, extraction governance</td>
+</tr>
+<tr>
+<td><a href="modules/semantic-reconciliation/">Semantic Reconciliation</a></td>
+<td>Compliance Leadership, Architects</td>
+<td>Deterministic classification rationale, materiality framework</td>
+</tr>
+<tr>
+<td><a href="modules/review-workflow/">Review &amp; Governance Workflow</a></td>
+<td>Compliance Analysts, Leads, Auditors</td>
+<td>Governance protocol, reviewer accountability, publishing safety</td>
+</tr>
+<tr>
+<td><a href="modules/provenance/">Provenance &amp; Audit Trail</a></td>
+<td>Auditors, Legal, Compliance Leads</td>
+<td>Chain of custody, audit readiness, historical reconstruction</td>
+</tr>
+<tr>
+<td><a href="modules/temporal-versioning/">Temporal Versioning</a></td>
+<td>Legal, Auditors, Advisors</td>
+<td>Point-in-time queries, version integrity, dispute evidence</td>
+</tr>
+<tr>
+<td><a href="modules/drift-detection/">Drift Detection</a></td>
+<td>Compliance Operations</td>
+<td>SLA monitoring, escalation thresholds, coverage assurance</td>
+</tr>
+<tr>
+<td><a href="modules/sync-pipeline/">Sync Pipeline</a></td>
+<td>Platform Engineers, Compliance Leads</td>
+<td>End-to-end orchestration, failure recovery, operational reliability</td>
+</tr>
+<tr>
+<td><a href="guide/ops-dashboard/">Operational Runbook</a></td>
 <td>Compliance Analysts, Ops Teams</td>
-<td>How to use the dashboard, review changes, manage drift</td>
+<td>Governance workflows, triage procedures, escalation paths</td>
+</tr>
+<tr>
+<td><a href="guide/alerting/">Alerting</a></td>
+<td>Regional Owners, Compliance Leads</td>
+<td>Alert routing, notification contracts, response expectations</td>
 </tr>
 <tr>
 <td><a href="api/">API Reference</a></td>
-<td>Engineering, Integrations</td>
-<td>Endpoint catalog with request/response schemas</td>
-</tr>
-<tr>
-<td><a href="development/">Development</a></td>
-<td>Engineering</td>
-<td>Setup, testing, deployment, screenshot automation</td>
+<td>Engineering, Integration Teams</td>
+<td>Endpoint contracts, request/response schemas</td>
 </tr>
 </tbody>
 </table>

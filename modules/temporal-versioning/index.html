@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#temporal-versioning" class="md-skip">
+        <a href="#temporal-versioning-historical-rule-state" class="md-skip">
           Skip to content
         </a>
       
@@ -716,10 +716,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#1-feature-name" class="md-nav__link">
+  <a href="#legal-and-operational-purpose" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. Feature Name
+        Legal and Operational Purpose
       
     </span>
   </a>
@@ -727,10 +727,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-business-problem-solved" class="md-nav__link">
+  <a href="#the-valid-time-data-model" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. Business Problem Solved
+        The Valid-Time Data Model
       
     </span>
   </a>
@@ -738,10 +738,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#3-operational-pain-points-addressed" class="md-nav__link">
+  <a href="#version-table-schema" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3. Operational Pain Points Addressed
+        Version Table Schema
       
     </span>
   </a>
@@ -749,10 +749,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#4-user-personas-involved" class="md-nav__link">
+  <a href="#point-in-time-query-semantics" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. User Personas Involved
+        Point-in-Time Query Semantics
       
     </span>
   </a>
@@ -760,38 +760,27 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#5-functional-overview" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        5. Functional Overview
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#6-end-to-end-workflow" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        6. End-to-End Workflow
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="6. End-to-End Workflow">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
   <a href="#version-creation-on-approval" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Version Creation (on Approval)
+        Version Creation on Approval
       
     </span>
   </a>
   
 </li>
+      
+        <li class="md-nav__item">
+  <a href="#temporal-query-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Temporal Query API
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Temporal Query API">
+      <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#point-in-time-query" class="md-nav__link">
@@ -804,28 +793,39 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#version-timeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Version Timeline
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#7-technical-architecture" class="md-nav__link">
+  <a href="#legal-defensibility-scenarios" class="md-nav__link">
     <span class="md-ellipsis">
       
-        7. Technical Architecture
+        Legal Defensibility Scenarios
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="7. Technical Architecture">
+    <nav class="md-nav" aria-label="Legal Defensibility Scenarios">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#version-table-design" class="md-nav__link">
+  <a href="#scenario-1-payroll-dispute-incorrect-overtime-rate-applied" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Version Table Design
+        Scenario 1: Payroll Dispute — Incorrect Overtime Rate Applied
       
     </span>
   </a>
@@ -833,10 +833,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#temporalruleservice-methods" class="md-nav__link">
+  <a href="#scenario-2-audit-question-what-rules-were-you-applying-in-q3-2024-for-malaysia" class="md-nav__link">
     <span class="md-ellipsis">
       
-        TemporalRuleService Methods
+        Scenario 2: Audit Question — "What rules were you applying in Q3 2024 for Malaysia?"
       
     </span>
   </a>
@@ -844,10 +844,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#version-timeline-example" class="md-nav__link">
+  <a href="#scenario-3-rule-correction-a-historical-version-had-an-incorrect-effective-date" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Version Timeline Example
+        Scenario 3: Rule Correction — A Historical Version Had an Incorrect Effective Date
       
     </span>
   </a>
@@ -860,49 +860,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#8-apis-involved" class="md-nav__link">
+  <a href="#coverage-gap-detection" class="md-nav__link">
     <span class="md-ellipsis">
       
-        8. APIs Involved
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="8. APIs Involved">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#example-request" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Example Request
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#example-response" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Example Response
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#9-backend-components" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        9. Backend Components
+        Coverage Gap Detection
       
     </span>
   </a>
@@ -910,10 +871,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#10-database-design-implications" class="md-nav__link">
+  <a href="#backend-components" class="md-nav__link">
     <span class="md-ellipsis">
       
-        10. Database Design Implications
+        Backend Components
       
     </span>
   </a>
@@ -921,43 +882,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#11-auditability-traceability" class="md-nav__link">
+  <a href="#risk-mitigation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        11. Auditability &amp; Traceability
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#12-risk-mitigation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        12. Risk Mitigation
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#13-business-impact" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        13. Business Impact
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#14-future-enhancements" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        14. Future Enhancements
+        Risk Mitigation
       
     </span>
   </a>
@@ -1232,84 +1160,22 @@
 
 
 
-<h1 id="temporal-versioning">Temporal Versioning<a class="headerlink" href="#temporal-versioning" title="Permanent link">&para;</a></h1>
-<h2 id="1-feature-name">1. Feature Name<a class="headerlink" href="#1-feature-name" title="Permanent link">&para;</a></h2>
-<p><strong>Point-in-Time Rule Versioning &amp; Historical Query Engine</strong></p>
-<h2 id="2-business-problem-solved">2. Business Problem Solved<a class="headerlink" href="#2-business-problem-solved" title="Permanent link">&para;</a></h2>
-<p>Employment law compliance is not just about current rules — it requires answering questions about past regulatory state. "What was the minimum wage when this employee's contract was signed?" "What leave entitlements were effective during this dispute period?" The temporal versioning system maintains an immutable version history of every rule and supports point-in-time queries.</p>
-<h2 id="3-operational-pain-points-addressed">3. Operational Pain Points Addressed<a class="headerlink" href="#3-operational-pain-points-addressed" title="Permanent link">&para;</a></h2>
-<ul>
-<li><strong>Retroactive disputes</strong>: Employment disputes reference the rules that were effective at the time of the event, not the current rules</li>
-<li><strong>Contract validation</strong>: Contracts signed under previous regulations may reference superseded rules</li>
-<li><strong>Compliance audits</strong>: Auditors may ask "what rules were you applying in Q3 2024?" and expect documentary evidence</li>
-<li><strong>Payroll reconciliation</strong>: Retroactive payroll adjustments require knowing the exact rule that was in effect for each pay period</li>
-</ul>
-<h2 id="4-user-personas-involved">4. User Personas Involved<a class="headerlink" href="#4-user-personas-involved" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Persona</th>
-<th>Interaction</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Client Advisor</td>
-<td>Queries historical rules when advising on disputes or contract interpretation</td>
-</tr>
-<tr>
-<td>Compliance Lead</td>
-<td>Reviews version history to understand how a rule evolved</td>
-</tr>
-<tr>
-<td>External Auditor</td>
-<td>Examines version timeline to verify compliance posture at a specific date</td>
-</tr>
-<tr>
-<td>Legal Counsel</td>
-<td>References point-in-time rules for dispute resolution</td>
-</tr>
-</tbody>
-</table>
-<h2 id="5-functional-overview">5. Functional Overview<a class="headerlink" href="#5-functional-overview" title="Permanent link">&para;</a></h2>
-<p>Every time a rule is approved and published, the system:</p>
-<ol>
-<li>Marks the previous version's <code>superseded_at</code> timestamp</li>
-<li>Creates a new version with the new <code>effective_date</code></li>
-<li>Increments the <code>version_number</code></li>
-<li>Links to the provenance record</li>
-</ol>
-<p>The <code>TemporalRuleService</code> then supports three query types:</p>
-<ul>
-<li><strong>Point-in-time</strong>: What was the rule at date X?</li>
-<li><strong>Timeline</strong>: The complete version history for a rule</li>
-<li><strong>Version list</strong>: All versions sorted chronologically</li>
-</ul>
-<h2 id="6-end-to-end-workflow">6. End-to-End Workflow<a class="headerlink" href="#6-end-to-end-workflow" title="Permanent link">&para;</a></h2>
-<h3 id="version-creation-on-approval">Version Creation (on Approval)<a class="headerlink" href="#version-creation-on-approval" title="Permanent link">&para;</a></h3>
-<pre class="mermaid"><code>sequenceDiagram
-    participant RS as ReviewService
-    participant CGR as CountryGuideRepository
-    participant DB as Database
-
-    RS-&gt;&gt;CGR: approve_pending_review_item(id, effective_date)
-
-    CGR-&gt;&gt;DB: SELECT current version for (country, section)
-    CGR-&gt;&gt;DB: UPDATE country_guide_versions SET superseded_at = NOW()
-    Note over DB: Previous version now has an end date
-
-    CGR-&gt;&gt;DB: UPSERT country_guide (new value, new version_number)
-    CGR-&gt;&gt;DB: INSERT country_guide_versions (new version, effective_date, superseded_at = NULL)
-    Note over DB: New version is now the active (unsuperseded) version</code></pre>
-<h3 id="point-in-time-query">Point-in-Time Query<a class="headerlink" href="#point-in-time-query" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">country_guide_versions</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">country</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">section</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">?</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="nb">date</span><span class="p">(</span><span class="n">effective_date</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="nb">date</span><span class="p">(</span><span class="o">?</span><span class="p">)</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="p">(</span><span class="n">superseded_at</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">OR</span><span class="w"> </span><span class="nb">date</span><span class="p">(</span><span class="n">superseded_at</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="nb">date</span><span class="p">(</span><span class="o">?</span><span class="p">))</span>
+<h1 id="temporal-versioning-historical-rule-state">Temporal Versioning &amp; Historical Rule State<a class="headerlink" href="#temporal-versioning-historical-rule-state" title="Permanent link">&para;</a></h1>
+<h2 id="legal-and-operational-purpose">Legal and Operational Purpose<a class="headerlink" href="#legal-and-operational-purpose" title="Permanent link">&para;</a></h2>
+<p>Employment law compliance is not only about knowing what the current rules are — it is about knowing what the rules were. Employment disputes, contract interpretations, payroll reconciliations, and external audits all reference the regulatory state that was in effect at a specific historical date, not the current state.</p>
+<p>The temporal versioning system maintains an immutable, complete version history of every employment rule and provides deterministic point-in-time queries. Given any (country, section, date) triple, the system returns the exact rule value that was effective on that date, backed by an immutable database record.</p>
+<p>This is not a "nice-to-have" reporting feature. It is the evidentiary foundation for legal defensibility in employment disputes and audit challenges.</p>
+<hr />
+<h2 id="the-valid-time-data-model">The Valid-Time Data Model<a class="headerlink" href="#the-valid-time-data-model" title="Permanent link">&para;</a></h2>
+<p>The version table uses the valid-time temporal pattern. Each version row has an open-closed interval <code>[effective_date, superseded_at)</code> representing the period during which it was the authoritative rule:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Version 1:  effective_date = 2024-01-01,  superseded_at = 2024-07-01
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>Version 2:  effective_date = 2024-07-01,  superseded_at = 2025-04-01
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>Version 3:  effective_date = 2025-04-01,  superseded_at = NULL  (currently active)
 </code></pre></div>
-<p>This query finds the version that was effective at the requested date — its effective_date is on or before the query date, and it had not yet been superseded.</p>
-<h2 id="7-technical-architecture">7. Technical Architecture<a class="headerlink" href="#7-technical-architecture" title="Permanent link">&para;</a></h2>
-<h3 id="version-table-design">Version Table Design<a class="headerlink" href="#version-table-design" title="Permanent link">&para;</a></h3>
+<p><code>superseded_at = NULL</code> identifies the currently active version. There is always exactly one active version per (country, section) pair — the <code>UNIQUE(country, section, version_number)</code> constraint enforces this.</p>
+<p><strong>Version interval integrity:</strong> When version N+1 is created with <code>effective_date = D</code>, version N's <code>superseded_at</code> is set to <code>D</code> in the same transaction. This ensures continuous coverage — there is no date for which no version is effective (after the first version was published).</p>
+<hr />
+<h2 id="version-table-schema">Version Table Schema<a class="headerlink" href="#version-table-schema" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">country_guide_versions</span><span class="w"> </span><span class="p">(</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="nb">INTEGER</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">AUTOINCREMENT</span><span class="p">,</span>
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="n">country</span><span class="w"> </span><span class="nb">TEXT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
@@ -1322,76 +1188,103 @@
 <a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">    </span><span class="n">superseded_at</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span><span class="w">              </span><span class="c1">-- NULL = currently active</span>
 <a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">    </span><span class="n">version_number</span><span class="w"> </span><span class="nb">INTEGER</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
 <a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">    </span><span class="n">approval_reference</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
-<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">    </span><span class="n">metadata</span><span class="w"> </span><span class="nb">TEXT</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">&#39;{}&#39;</span><span class="p">,</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">    </span><span class="n">metadata</span><span class="w"> </span><span class="nb">TEXT</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">&#39;{}&#39;</span><span class="p">,</span><span class="w">      </span><span class="c1">-- JSON: extraction_confidence, change_type, etc.</span>
 <a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="w">    </span><span class="k">UNIQUE</span><span class="p">(</span><span class="n">country</span><span class="p">,</span><span class="w"> </span><span class="n">section</span><span class="p">,</span><span class="w"> </span><span class="n">version_number</span><span class="p">)</span>
 <a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="p">)</span>
 </code></pre></div>
-<p><strong>Key design choices</strong>:</p>
-<ul>
-<li><strong><code>superseded_at</code></strong>: <code>NULL</code> for the currently active version; set when a new version is approved. This enables efficient point-in-time queries without scanning the full history.</li>
-<li><strong><code>version_number</code></strong>: Monotonically increasing per (country, section) pair. The UNIQUE constraint prevents duplicate version numbers.</li>
-<li><strong><code>metadata</code></strong>: JSON blob for extensibility — stores extraction confidence, change type, or any context that should travel with the version.</li>
-</ul>
-<h3 id="temporalruleservice-methods">TemporalRuleService Methods<a class="headerlink" href="#temporalruleservice-methods" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">TemporalRuleService</span><span class="p">:</span>
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_rule_at_date</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">country</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">as_of_date</span><span class="p">):</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the rule that was effective at the given date.&quot;&quot;&quot;</span>
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">build_timeline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">country</span><span class="p">,</span> <span class="n">section</span><span class="p">):</span>
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return {current: rule, versions: [all versions]}.&quot;&quot;&quot;</span>
-<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>
-<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">list_version_history</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">country</span><span class="p">,</span> <span class="n">section</span><span class="p">):</span>
-<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Return all versions sorted by version_number.&quot;&quot;&quot;</span>
+<p><strong>Immutability contract:</strong> Once a version row is created:
+- <code>value</code>, <code>effective_date</code>, <code>version_number</code>, and <code>source_hash</code> are never modified
+- <code>superseded_at</code> is set exactly once, when the next version is created
+- The row is never deleted</p>
+<p>The only exception is <code>superseded_at</code>: it transitions from NULL to a timestamp when a new version is published. This is not a violation of immutability — it is the completion of the version's lifecycle record.</p>
+<hr />
+<h2 id="point-in-time-query-semantics">Point-in-Time Query Semantics<a class="headerlink" href="#point-in-time-query-semantics" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">country_guide_versions</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">country</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">:</span><span class="n">country</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="n">section</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">:</span><span class="n">section</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="nb">date</span><span class="p">(</span><span class="n">effective_date</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="nb">date</span><span class="p">(:</span><span class="n">as_of_date</span><span class="p">)</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span><span class="k">AND</span><span class="w"> </span><span class="p">(</span><span class="n">superseded_at</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">OR</span><span class="w"> </span><span class="nb">date</span><span class="p">(</span><span class="n">superseded_at</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="nb">date</span><span class="p">(:</span><span class="n">as_of_date</span><span class="p">))</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">version_number</span><span class="w"> </span><span class="k">DESC</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="k">LIMIT</span><span class="w"> </span><span class="mi">1</span>
 </code></pre></div>
-<p><strong>Date normalization</strong>: The service accepts ISO datetime strings, <code>date</code> objects, or <code>YYYY-MM-DD</code> strings and normalizes them for the SQL query.</p>
-<h3 id="version-timeline-example">Version Timeline Example<a class="headerlink" href="#version-timeline-example" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>Version 1: effective 2024-01-01, superseded 2024-07-01
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    value: &quot;15 days annual leave&quot;
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>Version 2: effective 2024-07-01, superseded 2025-04-01
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    value: &quot;18 days annual leave&quot;
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>Version 3: effective 2025-04-01, superseded NULL (current)
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    value: &quot;21 days annual leave&quot;
+<p>This query returns the version whose validity interval contains the query date:
+- <code>effective_date &lt;= query_date</code> — the version had already become effective
+- <code>superseded_at IS NULL OR superseded_at &gt; query_date</code> — the version had not yet been superseded</p>
+<p>The <code>ORDER BY version_number DESC LIMIT 1</code> is a safety clause. In a correctly maintained dataset, this query returns exactly one row. The ordering ensures that if, through a system error, two versions overlap, the most recent takes precedence.</p>
+<p><strong>No result:</strong> If no version has an <code>effective_date</code> on or before the query date, the query returns no result. This means the organization did not have a published rule for this section on the queried date. The caller should treat this as a coverage gap finding, not a query error.</p>
+<hr />
+<h2 id="version-creation-on-approval">Version Creation on Approval<a class="headerlink" href="#version-creation-on-approval" title="Permanent link">&para;</a></h2>
+<p>Every approval triggers version creation as part of the same atomic transaction:</p>
+<pre class="mermaid"><code>sequenceDiagram
+    participant RS as ReviewService
+    participant CGR as CountryGuideRepository
+    participant DB as Database (transaction)
+
+    RS-&gt;&gt;DB: BEGIN TRANSACTION
+    CGR-&gt;&gt;DB: SELECT current version_number, id WHERE superseded_at IS NULL
+    CGR-&gt;&gt;DB: UPDATE country_guide_versions SET superseded_at = :effective_date WHERE id = current_id
+    CGR-&gt;&gt;DB: UPSERT country_guide SET value = :new_value, version_number = current+1
+    CGR-&gt;&gt;DB: INSERT country_guide_versions (value, effective_date, superseded_at=NULL, version_number=current+1)
+    RS-&gt;&gt;DB: COMMIT</code></pre>
+<p><strong>Effective date control:</strong> The reviewer sets <code>effective_date</code> in the approval payload. This is not the approval date — it is the date the rule becomes effective in the jurisdiction, which may be in the past (retroactive correction) or future (pre-publication of a known upcoming change). The system accepts any valid date.</p>
+<p><strong>Retroactive corrections:</strong> If a historical version had an incorrect effective date, a new version can be published with a past <code>effective_date</code>. This supersedes the interval of the incorrect version. Both the error and the correction remain in the version history — the system does not delete or amend historical records.</p>
+<hr />
+<h2 id="temporal-query-api">Temporal Query API<a class="headerlink" href="#temporal-query-api" title="Permanent link">&para;</a></h2>
+<h3 id="point-in-time-query">Point-in-Time Query<a class="headerlink" href="#point-in-time-query" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>GET /api/guide/{country}/{section}/at?date=YYYY-MM-DD
 </code></pre></div>
-<p>Query for <code>2024-09-15</code> returns Version 2 ("18 days annual leave").</p>
-<h2 id="8-apis-involved">8. APIs Involved<a class="headerlink" href="#8-apis-involved" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Endpoint</th>
-<th>Method</th>
-<th>Purpose</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>GET /api/guide/&lt;country&gt;/&lt;section&gt;/at?date=YYYY-MM-DD</code></td>
-<td>GET</td>
-<td>Rule value at a specific date</td>
-</tr>
-<tr>
-<td><code>GET /api/guide/&lt;country&gt;/&lt;section&gt;/history</code></td>
-<td>GET</td>
-<td>Full version timeline</td>
-</tr>
-</tbody>
-</table>
-<h3 id="example-request">Example Request<a class="headerlink" href="#example-request" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>GET /api/guide/India/minimum_wage/at?date=2024-09-15
+<p>Returns the rule that was effective on the specified date:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">{</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="nt">&quot;country&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;India&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="nt">&quot;section&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;minimum_wage&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;INR 21,000/month for scheduled employment&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="nt">&quot;effective_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2024-07-01&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">    </span><span class="nt">&quot;superseded_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-04-01&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">    </span><span class="nt">&quot;version_number&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">    </span><span class="nt">&quot;as_of_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2024-09-15&quot;</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="p">}</span>
 </code></pre></div>
-<h3 id="example-response">Example Response<a class="headerlink" href="#example-response" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="p">{</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span><span class="nt">&quot;country&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;India&quot;</span><span class="p">,</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="nt">&quot;section&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;minimum_wage&quot;</span><span class="p">,</span>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;INR 21,000/month for scheduled employment&quot;</span><span class="p">,</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="nt">&quot;effective_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2024-07-01&quot;</span><span class="p">,</span>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">    </span><span class="nt">&quot;superseded_at&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-04-01&quot;</span><span class="p">,</span>
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">    </span><span class="nt">&quot;version_number&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
-<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">    </span><span class="nt">&quot;as_of_date&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2024-09-15&quot;</span>
-<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="p">}</span>
+<p>If no version exists for the query date, the response is HTTP 404 with an explanatory message. The caller can distinguish between "the rule has never existed" and "the rule was not published at this date."</p>
+<h3 id="version-timeline">Version Timeline<a class="headerlink" href="#version-timeline" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>GET /api/guide/{country}/{section}/history
 </code></pre></div>
-<h2 id="9-backend-components">9. Backend Components<a class="headerlink" href="#9-backend-components" title="Permanent link">&para;</a></h2>
+<p>Returns all versions in chronological order with their validity intervals. This enables reconstruction of the full regulatory history for any section.</p>
+<hr />
+<h2 id="legal-defensibility-scenarios">Legal Defensibility Scenarios<a class="headerlink" href="#legal-defensibility-scenarios" title="Permanent link">&para;</a></h2>
+<h3 id="scenario-1-payroll-dispute-incorrect-overtime-rate-applied">Scenario 1: Payroll Dispute — Incorrect Overtime Rate Applied<a class="headerlink" href="#scenario-1-payroll-dispute-incorrect-overtime-rate-applied" title="Permanent link">&para;</a></h3>
+<p><strong>Claim:</strong> Employee alleges incorrect overtime rate was applied for pay periods in September 2024.</p>
+<p><strong>Evidence retrieval:</strong>
+1. <code>GET /api/guide/Singapore/working_hours/at?date=2024-09-15</code> — returns the overtime rule that was in effect
+2. <code>GET /api/provenance/Singapore/working_hours</code> — returns who published this version and what government source it was based on
+3. The version record shows <code>effective_date = 2024-06-01</code> and the source is the Ministry of Manpower's Employment Act page, crawled on 2024-05-28</p>
+<p><strong>Outcome:</strong> The organization can demonstrate that it was applying the rule from the authoritative source in effect at the time, with a documented trail of how the rule was obtained and verified.</p>
+<hr />
+<h3 id="scenario-2-audit-question-what-rules-were-you-applying-in-q3-2024-for-malaysia">Scenario 2: Audit Question — "What rules were you applying in Q3 2024 for Malaysia?"<a class="headerlink" href="#scenario-2-audit-question-what-rules-were-you-applying-in-q3-2024-for-malaysia" title="Permanent link">&para;</a></h3>
+<p><strong>Evidence retrieval:</strong>
+1. <code>GET /api/guide/Malaysia/{section}/at?date=2024-09-01</code> for each of the 7 regulatory sections
+2. Each response includes the <code>version_number</code> and <code>effective_date</code> of the rule in effect
+3. The version history for each section shows when rules were updated, by whom, and based on what source</p>
+<p><strong>Outcome:</strong> The organization can produce a point-in-time compliance snapshot for any jurisdiction at any date, with full provenance for each rule.</p>
+<hr />
+<h3 id="scenario-3-rule-correction-a-historical-version-had-an-incorrect-effective-date">Scenario 3: Rule Correction — A Historical Version Had an Incorrect Effective Date<a class="headerlink" href="#scenario-3-rule-correction-a-historical-version-had-an-incorrect-effective-date" title="Permanent link">&para;</a></h3>
+<p><strong>Situation:</strong> Version 2 of India's minimum wage was published with <code>effective_date = 2025-01-01</code> but the correct effective date was 2025-04-01.</p>
+<p><strong>Correction procedure:</strong>
+1. Approve a new version (version 3) with the correct values and <code>effective_date = 2025-04-01</code>
+2. Version 2's <code>superseded_at</code> is set to <code>2025-04-01</code>
+3. The version history now shows: version 2 effective 2025-01-01, superseded 2025-04-01; version 3 effective 2025-04-01
+4. Point-in-time queries for dates between 2025-01-01 and 2025-04-01 return version 2 (the incorrect version, as it was in effect during that period)
+5. The audit log records the correction with the reviewer's rationale</p>
+<p><strong>Note:</strong> The incorrect version is not deleted. It is superseded. The history of the error and the correction are both visible. This is correct governance — the organization's actual compliance state during the error period is preserved, not erased.</p>
+<hr />
+<h2 id="coverage-gap-detection">Coverage Gap Detection<a class="headerlink" href="#coverage-gap-detection" title="Permanent link">&para;</a></h2>
+<p>A point-in-time query that returns no result indicates a coverage gap: the organization had no published rule for a regulatory section on the queried date. This has two possible interpretations:</p>
+<ol>
+<li><strong>Monitored gap:</strong> The section is monitored but no rule had been published at that date (e.g., a new section was added to monitoring after the query date)</li>
+<li><strong>Unmonitored gap:</strong> The section was not under active monitoring during that period</li>
+</ol>
+<p>Both findings are significant. Organizations maintaining compliance guides should ensure that the date of first publication for each section is accurately reflected in the version history, and that gaps are documented with an explanation.</p>
+<hr />
+<h2 id="backend-components">Backend Components<a class="headerlink" href="#backend-components" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
@@ -1403,34 +1296,18 @@
 <tbody>
 <tr>
 <td><code>TemporalRuleService</code></td>
-<td><code>app/services/temporal_rule_service.py</code> (45 lines)</td>
+<td><code>app/services/temporal_rule_service.py</code></td>
 <td><code>get_rule_at_date()</code>, <code>build_timeline()</code>, <code>list_version_history()</code></td>
 </tr>
 <tr>
 <td><code>CountryGuideRepository</code></td>
 <td><code>app/repositories/country_guide_repository.py</code></td>
-<td><code>get_rule_at_date()</code>, <code>list_rule_versions()</code></td>
+<td><code>get_rule_at_date()</code>, <code>list_rule_versions()</code>, version creation in <code>approve_pending_review_item()</code></td>
 </tr>
 </tbody>
 </table>
-<h2 id="10-database-design-implications">10. Database Design Implications<a class="headerlink" href="#10-database-design-implications" title="Permanent link">&para;</a></h2>
-<p>The temporal design follows the <strong>valid-time pattern</strong>:</p>
-<ul>
-<li>Each version has a <code>[effective_date, superseded_at)</code> half-open interval</li>
-<li>The currently active version has <code>superseded_at = NULL</code></li>
-<li>Point-in-time queries use <code>effective_date &lt;= ? AND (superseded_at IS NULL OR superseded_at &gt; ?)</code></li>
-</ul>
-<p><strong>Index considerations</strong>: For production scale, a composite index on <code>(country, section, effective_date)</code> accelerates temporal queries. The <code>UNIQUE(country, section, version_number)</code> constraint provides implicit indexing.</p>
-<p><strong>Immutability</strong>: Version rows are never updated except to set <code>superseded_at</code> when a new version is created. The <code>value</code>, <code>effective_date</code>, and <code>version_number</code> fields are immutable after insertion.</p>
-<h2 id="11-auditability-traceability">11. Auditability &amp; Traceability<a class="headerlink" href="#11-auditability-traceability" title="Permanent link">&para;</a></h2>
-<p>Temporal versioning enables:</p>
-<ul>
-<li><strong>Historical reconstruction</strong>: Show the complete state of a country's employment guide at any past date</li>
-<li><strong>Change velocity analysis</strong>: How frequently has a specific rule changed? Which countries have the most regulatory churn?</li>
-<li><strong>Compliance timeline</strong>: Demonstrate to auditors that the organization was applying the correct rule at any point in time</li>
-<li><strong>Dispute evidence</strong>: Provide the exact rule text that was effective during a disputed period</li>
-</ul>
-<h2 id="12-risk-mitigation">12. Risk Mitigation<a class="headerlink" href="#12-risk-mitigation" title="Permanent link">&para;</a></h2>
+<hr />
+<h2 id="risk-mitigation">Risk Mitigation<a class="headerlink" href="#risk-mitigation" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
@@ -1440,38 +1317,27 @@
 </thead>
 <tbody>
 <tr>
-<td>Version gap (period with no effective rule)</td>
-<td><code>superseded_at</code> of version N is set to the <code>effective_date</code> of version N+1, ensuring continuous coverage</td>
+<td>Version interval gap — no version covering a date</td>
+<td><code>superseded_at</code> of version N is set to <code>effective_date</code> of version N+1 in the same transaction; continuous coverage enforced</td>
 </tr>
 <tr>
-<td>Incorrect effective date on approval</td>
-<td>Reviewers can set the <code>effective_date</code> explicitly during approval; defaults to approval timestamp</td>
+<td>Two versions covering the same date (interval overlap)</td>
+<td><code>UNIQUE(country, section, version_number)</code> prevents duplicate version numbers; point-in-time query uses <code>ORDER BY version_number DESC LIMIT 1</code> as safety net</td>
+</tr>
+<tr>
+<td>Retroactive correction changes historical state</td>
+<td>Corrections create a new version with a past effective date; the historical version is superseded but not deleted; both are visible in the timeline</td>
+</tr>
+<tr>
+<td>Effective date set incorrectly at approval</td>
+<td>Version history records the error; a corrective version can be published; the error and correction are both in the audit record</td>
 </tr>
 <tr>
 <td>Version history grows unbounded</td>
-<td>Versions are small (text + metadata); storage cost is negligible for the query value provided</td>
-</tr>
-<tr>
-<td>Retroactive corrections</td>
-<td>A new version can be created with a past <code>effective_date</code> to correct the timeline</td>
+<td>Versions are small text rows; at current scale (87 countries × 7 sections × N changes per year) storage is negligible; no pruning policy is needed or appropriate</td>
 </tr>
 </tbody>
 </table>
-<h2 id="13-business-impact">13. Business Impact<a class="headerlink" href="#13-business-impact" title="Permanent link">&para;</a></h2>
-<ul>
-<li><strong>Legal defensibility</strong>: The organization can prove exactly what rules it was applying at any historical date</li>
-<li><strong>Payroll accuracy</strong>: Retroactive payroll calculations use the correct historical rule values</li>
-<li><strong>Client trust</strong>: Advisors can trace rule changes over time and explain when changes took effect</li>
-<li><strong>Regulatory reporting</strong>: Period-specific compliance reports reference the correct rule versions</li>
-</ul>
-<h2 id="14-future-enhancements">14. Future Enhancements<a class="headerlink" href="#14-future-enhancements" title="Permanent link">&para;</a></h2>
-<ul>
-<li><strong>Diff between versions</strong>: Show semantic diff between version N and version N+1</li>
-<li><strong>Bulk temporal query</strong>: "What was the full employment guide for India on date X?" (all sections at once)</li>
-<li><strong>Version annotations</strong>: Add notes to specific versions (e.g., "Budget 2025 update")</li>
-<li><strong>Change frequency analytics</strong>: Dashboard showing rule change velocity by country and section</li>
-<li><strong>Export</strong>: Generate point-in-time compliance snapshots as PDF or CSV</li>
-</ul>
 
 
 

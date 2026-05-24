@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#system-overview" class="md-skip">
+        <a href="#platform-architecture" class="md-skip">
           Skip to content
         </a>
       
@@ -385,10 +385,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#1-feature-name" class="md-nav__link">
+  <a href="#governance-architecture-overview" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. Feature Name
+        Governance Architecture Overview
       
     </span>
   </a>
@@ -396,10 +396,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-business-problem-solved" class="md-nav__link">
+  <a href="#system-invariants" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. Business Problem Solved
+        System Invariants
       
     </span>
   </a>
@@ -407,10 +407,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#3-operational-pain-points-addressed" class="md-nav__link">
+  <a href="#trust-boundary-model" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3. Operational Pain Points Addressed
+        Trust Boundary Model
       
     </span>
   </a>
@@ -418,10 +418,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#4-user-personas" class="md-nav__link">
+  <a href="#high-level-architecture" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. User Personas
+        High-Level Architecture
       
     </span>
   </a>
@@ -429,10 +429,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#5-high-level-architecture" class="md-nav__link">
+  <a href="#end-to-end-data-flow" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. High-Level Architecture
+        End-to-End Data Flow
       
     </span>
   </a>
@@ -440,33 +440,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#6-end-to-end-data-flow" class="md-nav__link">
+  <a href="#architectural-decisions-rationale" class="md-nav__link">
     <span class="md-ellipsis">
       
-        6. End-to-End Data Flow
+        Architectural Decisions &amp; Rationale
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#7-key-architectural-decisions-tradeoffs" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        7. Key Architectural Decisions &amp; Tradeoffs
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="7. Key Architectural Decisions &amp; Tradeoffs">
+    <nav class="md-nav" aria-label="Architectural Decisions &amp; Rationale">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#sqlite-as-default-database" class="md-nav__link">
+  <a href="#decision-1-deterministic-semantic-engine-no-llm-for-reconciliation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        SQLite as Default Database
+        Decision 1: Deterministic Semantic Engine (No LLM for Reconciliation)
       
     </span>
   </a>
@@ -474,10 +463,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#deterministic-semantic-engine-no-llm-for-reconciliation" class="md-nav__link">
+  <a href="#decision-2-llm-scoped-to-extraction-only" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Deterministic Semantic Engine (No LLM for Reconciliation)
+        Decision 2: LLM Scoped to Extraction Only
       
     </span>
   </a>
@@ -485,10 +474,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#llm-for-extraction-only" class="md-nav__link">
+  <a href="#decision-3-append-only-audit-infrastructure" class="md-nav__link">
     <span class="md-ellipsis">
       
-        LLM for Extraction Only
+        Decision 3: Append-Only Audit Infrastructure
       
     </span>
   </a>
@@ -496,10 +485,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#human-in-the-loop-governance" class="md-nav__link">
+  <a href="#decision-4-external-source-registry-git-tracked" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Human-in-the-Loop Governance
+        Decision 4: External Source Registry (Git-Tracked)
       
     </span>
   </a>
@@ -507,10 +496,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#external-source-registry" class="md-nav__link">
+  <a href="#decision-5-postgresql-sqlite-dual-backend" class="md-nav__link">
     <span class="md-ellipsis">
       
-        External Source Registry
+        Decision 5: PostgreSQL / SQLite Dual Backend
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#decision-6-apscheduler-as-in-process-scheduler" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decision 6: APScheduler as In-Process Scheduler
       
     </span>
   </a>
@@ -523,10 +523,60 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#8-security-considerations" class="md-nav__link">
+  <a href="#failure-handling-framework" class="md-nav__link">
     <span class="md-ellipsis">
       
-        8. Security Considerations
+        Failure Handling Framework
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Failure Handling Framework">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#category-1-recoverable-pipeline-failures" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Category 1: Recoverable Pipeline Failures
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#category-2-quality-degradation-detectable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Category 2: Quality Degradation (Detectable)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#category-3-unacceptable-failures-data-integrity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Category 3: Unacceptable Failures (Data Integrity)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scalability-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scalability Strategy
       
     </span>
   </a>
@@ -534,21 +584,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#9-scalability-considerations" class="md-nav__link">
+  <a href="#security-architecture" class="md-nav__link">
     <span class="md-ellipsis">
       
-        9. Scalability Considerations
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#10-failure-scenarios-recovery" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        10. Failure Scenarios &amp; Recovery
+        Security Architecture
       
     </span>
   </a>
@@ -1154,300 +1193,350 @@
 
 
 
-<h1 id="system-overview">System Overview<a class="headerlink" href="#system-overview" title="Permanent link">&para;</a></h1>
-<h2 id="1-feature-name">1. Feature Name<a class="headerlink" href="#1-feature-name" title="Permanent link">&para;</a></h2>
-<p><strong>AI-Powered Compliance Governance &amp; Country Guide Reconciliation Platform</strong></p>
-<h2 id="2-business-problem-solved">2. Business Problem Solved<a class="headerlink" href="#2-business-problem-solved" title="Permanent link">&para;</a></h2>
-<p>Organizations operating across multiple jurisdictions must maintain accurate, up-to-date employment guides that reflect local labor laws. Regulatory changes are published across fragmented government sources — ministry of labor websites, official gazettes, immigration portals — with no centralized notification system. A single missed change can result in:</p>
-<ul>
-<li><strong>Payroll liability</strong>: Incorrect minimum wage or tax withholding calculations</li>
-<li><strong>Employment disputes</strong>: Stale leave entitlement or termination notice guidance</li>
-<li><strong>Visa processing failures</strong>: Outdated work permit requirements</li>
-<li><strong>Audit failures</strong>: Inability to demonstrate when and why a compliance rule was adopted</li>
-</ul>
-<p>This platform automates the detection, classification, review, and publication of regulatory changes with full provenance tracking and audit-ready governance.</p>
-<h2 id="3-operational-pain-points-addressed">3. Operational Pain Points Addressed<a class="headerlink" href="#3-operational-pain-points-addressed" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Pain Point</th>
-<th>How the Platform Addresses It</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Manual monitoring of government websites is slow and error-prone</td>
-<td>Automated crawling on configurable schedules with snapshot tracking</td>
-</tr>
-<tr>
-<td>Analysts cannot distinguish material changes from formatting updates</td>
-<td>Semantic reconciliation engine classifies change type and materiality</td>
-</tr>
-<tr>
-<td>No audit trail for who approved a compliance rule change and when</td>
-<td>Immutable audit log + provenance chain from source to published rule</td>
-</tr>
-<tr>
-<td>Stale guides go undetected until a compliance incident occurs</td>
-<td>Drift detection with tunable staleness thresholds and Slack alerts</td>
-</tr>
-<tr>
-<td>Compliance teams across regions operate in silos</td>
-<td>Region-aware notifications route changes to APAC, EMEA, and Americas owners</td>
-</tr>
-<tr>
-<td>Point-in-time regulatory queries are impossible without version history</td>
-<td>Temporal versioning with effective/superseded dates on every rule</td>
-</tr>
-</tbody>
-</table>
-<h2 id="4-user-personas">4. User Personas<a class="headerlink" href="#4-user-personas" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Persona</th>
-<th>Role</th>
-<th>Interaction</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Compliance Analyst</strong></td>
-<td>Reviews and approves/rejects detected changes</td>
-<td>Ops dashboard, review queue, before/after diffs</td>
-</tr>
-<tr>
-<td><strong>Compliance Lead</strong></td>
-<td>Monitors drift, escalations, and pipeline health</td>
-<td>Metrics cards, drift reports, audit log</td>
-</tr>
-<tr>
-<td><strong>Regional Owner</strong></td>
-<td>Accountable for country coverage within APAC/EMEA/Americas</td>
-<td>Slack alerts, region-filtered dashboards</td>
-</tr>
-<tr>
-<td><strong>Client-Facing Advisor</strong></td>
-<td>Consults published guides when advising employers</td>
-<td>Country guide pages, temporal queries</td>
-</tr>
-<tr>
-<td><strong>Engineering / Platform Team</strong></td>
-<td>Maintains the pipeline, sources, and extraction quality</td>
-<td>API endpoints, ingestion job logs, provenance debugging</td>
-</tr>
-<tr>
-<td><strong>External Auditor</strong></td>
-<td>Verifies compliance posture and decision provenance</td>
-<td>Audit log, provenance chains, version history</td>
-</tr>
-</tbody>
-</table>
+<h1 id="platform-architecture">Platform Architecture<a class="headerlink" href="#platform-architecture" title="Permanent link">&para;</a></h1>
+<h2 id="governance-architecture-overview">Governance Architecture Overview<a class="headerlink" href="#governance-architecture-overview" title="Permanent link">&para;</a></h2>
+<p>This system implements a provenance-first compliance governance pipeline. Its architecture reflects a specific set of engineering commitments about what the system guarantees, where human authority is mandatory, and what failure modes are acceptable versus unacceptable.</p>
+<p>The central architectural concern is not performance or developer ergonomics — it is <strong>auditability under adversarial scrutiny</strong>. Every design decision is evaluated against the question: "If an external auditor or regulator examined this system's behavior, would they find it defensible?"</p>
 <hr />
-<h2 id="5-high-level-architecture">5. High-Level Architecture<a class="headerlink" href="#5-high-level-architecture" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>                    ┌─────────────────────────────────────────────────────┐
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>                    │                  Official Sources                    │
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>                    │   Ministry of Labor  │  Immigration Portal  │ Gazette│
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>                    └──────────┬──────────────────────┬───────────────────┘
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>                               │                      │
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>                    ┌──────────▼──────────────────────▼───────────────────┐
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>                    │              INGESTION LAYER                        │
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>                    │  HTML Fetcher  │  Notion Importer  │  PDF Intake    │
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>                    │  Snapshot Storage  │  Content Hashing               │
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>                    └──────────┬──────────────────────────────────────────┘
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>                               │
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>                    ┌──────────▼──────────────────────────────────────────┐
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>                    │            EXTRACTION LAYER                         │
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>                    │  Content Chunker → Groq LLaMA 3.3 70B → Parser     │
-<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>                    │  Multi-key rotation  │  Chunk aggregation           │
-<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>                    └──────────┬──────────────────────────────────────────┘
-<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>                               │
-<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>                    ┌──────────▼──────────────────────────────────────────┐
-<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>                    │          RECONCILIATION LAYER                       │
-<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>                    │  Semantic Diff Engine  │  Change Classification     │
-<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>                    │  Materiality Scoring   │  Duplicate Detection       │
-<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>                    └──────────┬──────────────────────────────────────────┘
-<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>                               │
-<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>                    ┌──────────▼──────────────────────────────────────────┐
-<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>                    │           REVIEW &amp; GOVERNANCE LAYER                 │
-<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>                    │  Review Queue  │  Approve/Reject/Escalate           │
-<a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a>                    │  Bulk Approve  │  Provenance Recording              │
-<a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a>                    └──────────┬──────────────────────────────────────────┘
-<a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a>                               │
-<a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a>              ┌────────────────┼────────────────────────┐
-<a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a>              │                │                        │
-<a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a>    ┌─────────▼────────┐ ┌────▼──────────────┐ ┌───────▼────────────┐
-<a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a>    │  PUBLICATION      │ │  DRIFT DETECTION  │ │  ALERTING          │
-<a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a>    │  Active Guide     │ │  Staleness Rules  │ │  Slack Webhooks    │
-<a id="__codelineno-0-35" name="__codelineno-0-35" href="#__codelineno-0-35"></a>    │  Version History  │ │  Pending Aging    │ │  Region Routing    │
-<a id="__codelineno-0-36" name="__codelineno-0-36" href="#__codelineno-0-36"></a>    │  Temporal Queries │ │  Coverage Gaps    │ │  APAC/EMEA/Americas│
-<a id="__codelineno-0-37" name="__codelineno-0-37" href="#__codelineno-0-37"></a>    └──────────────────┘ └───────────────────┘ └────────────────────┘
+<h2 id="system-invariants">System Invariants<a class="headerlink" href="#system-invariants" title="Permanent link">&para;</a></h2>
+<p>These properties hold regardless of configuration, load, or operational context. They are enforced at the code level and cannot be disabled:</p>
+<ol>
+<li>
+<p><strong>No rule is published without human approval.</strong> The <code>country_guide</code> table is only updated through <code>approve_pending_review_item()</code>. No API endpoint, background job, or migration script writes to <code>country_guide.value</code> directly.</p>
+</li>
+<li>
+<p><strong>No approval occurs without an audit record.</strong> Approval and audit log insertion are executed within the same database transaction. A failure in audit log insertion rolls back the entire approval.</p>
+</li>
+<li>
+<p><strong>Audit records are never modified.</strong> The <code>audit_log</code> table has no UPDATE or DELETE repository methods. The API exposes only GET endpoints against it.</p>
+</li>
+<li>
+<p><strong>Critical changes require individual review.</strong> The <code>bulk_approve_non_critical()</code> operation enforces <code>severity != 'critical'</code> at the SQL level. This filter is in the repository, not in the API layer, ensuring it cannot be bypassed by API callers.</p>
+</li>
+<li>
+<p><strong>Every version of every rule is retained permanently.</strong> <code>country_guide_versions</code> rows are never deleted. <code>superseded_at</code> is set when a new version is created; the row is not removed.</p>
+</li>
+<li>
+<p><strong>Provenance is recorded atomically with publication.</strong> Provenance insertion and <code>current_provenance_id</code> update happen in the same transaction as rule publication. A rule without provenance is a system bug, not an expected state.</p>
+</li>
+</ol>
+<hr />
+<h2 id="trust-boundary-model">Trust Boundary Model<a class="headerlink" href="#trust-boundary-model" title="Permanent link">&para;</a></h2>
+<p>The system defines three trust zones with explicit boundary enforcement:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>┌────────────────────────────────────────────────────────────────────┐
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>│  UNTRUSTED ZONE: External Sources                                   │
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>│                                                                     │
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>│  Government websites, gazettes, immigration portals                │
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>│  • Content is treated as adversarial input                         │
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>│  • HTML is sanitized before processing                             │
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>│  • LLM extraction does not execute any code                        │
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>│  • Content is archived verbatim; processing is downstream          │
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>└──────────────────────────────┬─────────────────────────────────────┘
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>                               │ Sanitized text only crosses this boundary
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>┌──────────────────────────────▼─────────────────────────────────────┐
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>│  AI PROCESSING ZONE: Extraction &amp; Classification                   │
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>│                                                                     │
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>│  LLM extraction (Groq LLaMA 3.3 70B, temperature=0.1)             │
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>│  Deterministic semantic classification (regex engine)              │
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>│  • AI output is NEVER published directly                           │
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>│  • Every AI output carries a confidence score                      │
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>│  • Classification decisions have documented reasoning              │
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>│  • Extraction failures are explicit, not silent                    │
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>└──────────────────────────────┬─────────────────────────────────────┘
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>                               │ Proposed changes only — not published rules
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>┌──────────────────────────────▼─────────────────────────────────────┐
+<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>│  GOVERNANCE ZONE: Human Review &amp; Authorization                     │
+<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>│                                                                     │
+<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>│  Review queue, approval workflow, escalation                       │
+<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>│  • Mandatory human gate for all publication                        │
+<a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a>│  • Reviewer identity and rationale recorded immutably              │
+<a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a>│  • Critical changes require individual review                      │
+<a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a>│  • Audit log is append-only                                        │
+<a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a>└──────────────────────────────┬─────────────────────────────────────┘
+<a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a>                               │ Approved, provenance-linked rules only
+<a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a>┌──────────────────────────────▼─────────────────────────────────────┐
+<a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a>│  AUTHORITATIVE ZONE: Published Rules &amp; History                     │
+<a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a>│                                                                     │
+<a id="__codelineno-0-35" name="__codelineno-0-35" href="#__codelineno-0-35"></a>│  country_guide, country_guide_versions, rule_provenance            │
+<a id="__codelineno-0-36" name="__codelineno-0-36" href="#__codelineno-0-36"></a>│  • Immutable version history                                       │
+<a id="__codelineno-0-37" name="__codelineno-0-37" href="#__codelineno-0-37"></a>│  • Complete provenance chains                                      │
+<a id="__codelineno-0-38" name="__codelineno-0-38" href="#__codelineno-0-38"></a>│  • Temporal queries with legal defensibility                       │
+<a id="__codelineno-0-39" name="__codelineno-0-39" href="#__codelineno-0-39"></a>│  • Audit log covering all transitions                              │
+<a id="__codelineno-0-40" name="__codelineno-0-40" href="#__codelineno-0-40"></a>└────────────────────────────────────────────────────────────────────┘
 </code></pre></div>
 <hr />
-<h2 id="6-end-to-end-data-flow">6. End-to-End Data Flow<a class="headerlink" href="#6-end-to-end-data-flow" title="Permanent link">&para;</a></h2>
+<h2 id="high-level-architecture">High-Level Architecture<a class="headerlink" href="#high-level-architecture" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>                    ┌─────────────────────────────────────────────────────┐
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>                    │          Official Government Sources                 │
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>                    │  Ministry of Labor · Immigration Portal · Gazette   │
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>                    └──────────┬──────────────────────┬───────────────────┘
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>                               │                      │
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>                    ┌──────────▼──────────────────────▼───────────────────┐
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>                    │              INGESTION LAYER                        │
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>                    │  HTML Fetcher  │  Snapshot Archival  │  Content Hash│
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>                    │  Ingestion Job State Machine                        │
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>                    └──────────┬──────────────────────────────────────────┘
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>                               │  Raw text (sanitized) + MD5 hash
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>                    ┌──────────▼──────────────────────────────────────────┐
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>                    │            EXTRACTION LAYER                         │
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>                    │  Content Chunker → Groq LLM → Pydantic Validator   │
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>                    │  Multi-key rotation  │  Chunk aggregation           │
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>                    │  Confidence scoring  │  Extraction failure logging  │
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>                    └──────────┬──────────────────────────────────────────┘
+<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>                               │  EmploymentRule[] with confidence scores
+<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>                    ┌──────────▼──────────────────────────────────────────┐
+<a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a>                    │          RECONCILIATION LAYER                       │
+<a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a>                    │  Semantic Diff Engine (deterministic regex)         │
+<a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a>                    │  Change Type Classification · Materiality Scoring   │
+<a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a>                    │  Duplicate Suppression · Null-change Filtering      │
+<a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a>                    └──────────┬──────────────────────────────────────────┘
+<a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a>                               │  Proposed changes (not yet published)
+<a id="__codelineno-1-26" name="__codelineno-1-26" href="#__codelineno-1-26"></a>                    ┌──────────▼──────────────────────────────────────────┐
+<a id="__codelineno-1-27" name="__codelineno-1-27" href="#__codelineno-1-27"></a>                    │       GOVERNANCE GATE (Mandatory Human Review)      │
+<a id="__codelineno-1-28" name="__codelineno-1-28" href="#__codelineno-1-28"></a>                    │  Review Queue  │  Approve/Reject/Escalate           │
+<a id="__codelineno-1-29" name="__codelineno-1-29" href="#__codelineno-1-29"></a>                    │  Provenance Recording  │  Audit Log                 │
+<a id="__codelineno-1-30" name="__codelineno-1-30" href="#__codelineno-1-30"></a>                    └──────────┬──────────────────────────────────────────┘
+<a id="__codelineno-1-31" name="__codelineno-1-31" href="#__codelineno-1-31"></a>                               │  Approved, provenance-linked rules
+<a id="__codelineno-1-32" name="__codelineno-1-32" href="#__codelineno-1-32"></a>              ┌────────────────┼────────────────────────┐
+<a id="__codelineno-1-33" name="__codelineno-1-33" href="#__codelineno-1-33"></a>              │                │                        │
+<a id="__codelineno-1-34" name="__codelineno-1-34" href="#__codelineno-1-34"></a>    ┌─────────▼────────┐ ┌────▼──────────────┐ ┌───────▼────────────┐
+<a id="__codelineno-1-35" name="__codelineno-1-35" href="#__codelineno-1-35"></a>    │  PUBLICATION      │ │  DRIFT DETECTION  │ │  ALERTING          │
+<a id="__codelineno-1-36" name="__codelineno-1-36" href="#__codelineno-1-36"></a>    │  Active Guide     │ │  SLA Monitoring   │ │  Region-Routed     │
+<a id="__codelineno-1-37" name="__codelineno-1-37" href="#__codelineno-1-37"></a>    │  Version History  │ │  Coverage Gaps    │ │  APAC/EMEA/Americas│
+<a id="__codelineno-1-38" name="__codelineno-1-38" href="#__codelineno-1-38"></a>    │  Temporal Queries │ │  Escalation Queue │ │  Post-Sync Summary │
+<a id="__codelineno-1-39" name="__codelineno-1-39" href="#__codelineno-1-39"></a>    └──────────────────┘ └───────────────────┘ └────────────────────┘
+</code></pre></div>
+<hr />
+<h2 id="end-to-end-data-flow">End-to-End Data Flow<a class="headerlink" href="#end-to-end-data-flow" title="Permanent link">&para;</a></h2>
 <pre class="mermaid"><code>flowchart LR
     A[Official Source URL] --&gt; B[HTML Fetcher]
-    B --&gt; C[Content Cleaning &amp; Hashing]
-    C --&gt; D[Source Snapshot DB]
+    B --&gt; C[Sanitize &amp; Hash]
+    C --&gt; D[source_snapshots]
     D --&gt; E[Content Chunker]
-    E --&gt; F[Groq LLM Extraction]
-    F --&gt; G[Rule Parser &amp; Validator]
-    G --&gt; H[Chunk Aggregator]
-    H --&gt; I[Semantic Reconciliation]
-    I --&gt; J{Change Detected?}
-    J -- No --&gt; K[Skip]
-    J -- Yes --&gt; L[Review Queue]
+    E --&gt; F[Groq LLM — temperature=0.1]
+    F --&gt; G[Pydantic Validator]
+    G --&gt; H[Confidence Aggregator]
+    H --&gt; I[Semantic Diff Engine]
+    I --&gt; J{Semantic Change?}
+    J -- No change detected --&gt; K[Suppress — no queue item]
+    J -- Change detected --&gt; L[review_queue — status=pending]
     L --&gt; M{Reviewer Decision}
-    M -- Approve --&gt; N[Publish to Active Guide]
-    N --&gt; O[Version History]
-    N --&gt; P[Provenance Record]
-    N --&gt; Q[Audit Log Entry]
-    M -- Reject --&gt; R[Rejection + Audit Log]
-    M -- Escalate --&gt; S[Escalated Queue]</code></pre>
+    M -- Approve --&gt; N[country_guide UPSERT]
+    N --&gt; O[country_guide_versions INSERT]
+    N --&gt; P[rule_provenance INSERT]
+    N --&gt; Q[audit_log INSERT]
+    M -- Reject --&gt; R[audit_log INSERT — no publication]
+    M -- Escalate --&gt; S[review_queue status=escalated]</code></pre>
 <hr />
-<h2 id="7-key-architectural-decisions-tradeoffs">7. Key Architectural Decisions &amp; Tradeoffs<a class="headerlink" href="#7-key-architectural-decisions-tradeoffs" title="Permanent link">&para;</a></h2>
-<h3 id="sqlite-as-default-database">SQLite as Default Database<a class="headerlink" href="#sqlite-as-default-database" title="Permanent link">&para;</a></h3>
-<p><strong>Decision</strong>: Use SQLite for development and single-instance deployments; PostgreSQL adapter available for production.</p>
-<p><strong>Tradeoff</strong>: SQLite provides zero-ops simplicity and ACID compliance, but limits concurrent write throughput. The <code>app/utils/db.py</code> dual-backend adapter transparently rewrites SQL syntax (<code>?</code> to <code>%s</code>, <code>AUTOINCREMENT</code> to <code>SERIAL</code>, <code>date()</code> to <code>::date</code>) so the same repository code runs on both backends.</p>
-<p><strong>Why</strong>: Data volumes are modest (hundreds of rules across 87 countries); SQLite is appropriate and eliminates infrastructure overhead. The adapter ensures a migration path when scale demands it.</p>
-<h3 id="deterministic-semantic-engine-no-llm-for-reconciliation">Deterministic Semantic Engine (No LLM for Reconciliation)<a class="headerlink" href="#deterministic-semantic-engine-no-llm-for-reconciliation" title="Permanent link">&para;</a></h3>
-<p><strong>Decision</strong>: The reconciliation engine uses regex patterns and string similarity — not the LLM — to classify changes.</p>
-<p><strong>Tradeoff</strong>: A regex-based engine is less flexible than LLM-based classification but is deterministic, fast, and fully auditable. The same input always produces the same classification, which is critical for compliance governance where reviewers must trust the system's assessments.</p>
-<p><strong>Why</strong>: Regulatory change classification must be reproducible. An LLM might classify the same change differently on consecutive runs, undermining reviewer confidence and audit defensibility.</p>
-<h3 id="llm-for-extraction-only">LLM for Extraction Only<a class="headerlink" href="#llm-for-extraction-only" title="Permanent link">&para;</a></h3>
-<p><strong>Decision</strong>: The LLM (Groq LLaMA 3.3 70B) is used only for structured extraction from HTML — converting unstructured government web pages into typed <code>EmploymentRule</code> objects.</p>
-<p><strong>Tradeoff</strong>: LLM extraction introduces a confidence dimension (rules have a 0–1 confidence score) and requires human validation. But the alternative — hand-crafted parsers per government website — is unmaintainable across jurisdictions.</p>
-<p><strong>Why</strong>: Government websites have heterogeneous HTML structures that change without notice. An LLM generalizes across formats while per-site parsers break on redesigns.</p>
-<h3 id="human-in-the-loop-governance">Human-in-the-Loop Governance<a class="headerlink" href="#human-in-the-loop-governance" title="Permanent link">&para;</a></h3>
-<p><strong>Decision</strong>: Every detected change must be explicitly approved or rejected by a human reviewer before publication.</p>
-<p><strong>Tradeoff</strong>: This adds latency between detection and publication. A fully automated pipeline could publish faster, but the risk of publishing an incorrect LLM extraction is unacceptable in a compliance context.</p>
-<p><strong>Why</strong>: LLM extraction is imperfect. A hallucinated minimum wage figure or misclassified eligibility criterion could expose the organization to legal liability. The human approval layer is a deliberate governance control, not a limitation.</p>
-<h3 id="external-source-registry">External Source Registry<a class="headerlink" href="#external-source-registry" title="Permanent link">&para;</a></h3>
-<p><strong>Decision</strong>: The list of official source URLs is maintained in a separate GitHub-hosted JSON file, not in the application database.</p>
-<p><strong>Tradeoff</strong>: Adding or updating a source URL requires a commit to an external repo rather than a database update. But this decouples source configuration from application deployment and provides git-native change tracking on URL modifications.</p>
-<p><strong>Why</strong>: Source URLs change when governments redesign websites. Decoupling URL management from application releases allows compliance teams to update sources without engineering involvement.</p>
+<h2 id="architectural-decisions-rationale">Architectural Decisions &amp; Rationale<a class="headerlink" href="#architectural-decisions-rationale" title="Permanent link">&para;</a></h2>
+<h3 id="decision-1-deterministic-semantic-engine-no-llm-for-reconciliation">Decision 1: Deterministic Semantic Engine (No LLM for Reconciliation)<a class="headerlink" href="#decision-1-deterministic-semantic-engine-no-llm-for-reconciliation" title="Permanent link">&para;</a></h3>
+<p><strong>What the decision is:</strong> Change classification uses a compiled regex pattern library with documented rules, not an LLM.</p>
+<p><strong>Why this matters for governance:</strong> An LLM classifying the same (old, new) pair might return <code>NUMERIC_THRESHOLD_CHANGE</code> on one invocation and <code>NON_MATERIAL_FORMATTING</code> on another. This non-determinism is unacceptable in a compliance context: the decision to escalate a critical change versus surface it as informational must be reproducible and explainable to a reviewer or auditor. The regex engine's classification is deterministic, the reasoning is documented, and the pattern library is inspectable.</p>
+<p><strong>Acknowledged limitation:</strong> The regex engine is less flexible than LLM classification. A change type outside the defined pattern vocabulary falls through to <code>NON_MATERIAL_FORMATTING</code>. This is a deliberate conservative failure mode — it surfaces the change for human review rather than attempting to classify it with a model that could return an incorrect classification. Reviewers see the before/after diff regardless of the classification.</p>
 <hr />
-<h2 id="8-security-considerations">8. Security Considerations<a class="headerlink" href="#8-security-considerations" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Concern</th>
-<th>Mitigation</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Groq API key exposure</td>
-<td>Keys loaded from environment variables, never hardcoded; multi-key rotation reduces per-key blast radius</td>
-</tr>
-<tr>
-<td>SQL injection</td>
-<td>All database queries use parameterized statements via SQLite/psycopg2 parameter binding</td>
-</tr>
-<tr>
-<td>Untrusted HTML ingestion</td>
-<td>BeautifulSoup sanitization strips script/style/nav elements before processing</td>
-</tr>
-<tr>
-<td>Content integrity</td>
-<td>MD5 content hashing on every snapshot; hash stored in provenance chain</td>
-</tr>
-<tr>
-<td>Audit log immutability</td>
-<td>Append-only table design; no UPDATE/DELETE operations on audit_log</td>
-</tr>
-<tr>
-<td>Slack webhook security</td>
-<td>Webhook URL stored in environment variables, not in code or database</td>
-</tr>
-</tbody>
-</table>
-<h2 id="9-scalability-considerations">9. Scalability Considerations<a class="headerlink" href="#9-scalability-considerations" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Dimension</th>
-<th>Current State</th>
-<th>Scale Path</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Countries</td>
-<td>87</td>
-<td>Source registry is additive; no code changes needed</td>
-</tr>
-<tr>
-<td>Concurrent syncs</td>
-<td>Sequential per country</td>
-<td>Worker pool with per-country locking</td>
-</tr>
-<tr>
-<td>Database</td>
-<td>SQLite (single-writer)</td>
-<td>PostgreSQL adapter ready in <code>db.py</code></td>
-</tr>
-<tr>
-<td>LLM throughput</td>
-<td>Multi-key rotation (N keys)</td>
-<td>Add keys to <code>GROQ_API_KEY</code> comma-separated list</td>
-</tr>
-<tr>
-<td>Alerting</td>
-<td>Slack webhooks</td>
-<td>Pluggable notification interface</td>
-</tr>
-<tr>
-<td>Ingestion formats</td>
-<td>HTML + Notion + PDF</td>
-<td>Adapter pattern in ingestion layer</td>
-</tr>
-</tbody>
-</table>
-<h2 id="10-failure-scenarios-recovery">10. Failure Scenarios &amp; Recovery<a class="headerlink" href="#10-failure-scenarios-recovery" title="Permanent link">&para;</a></h2>
+<h3 id="decision-2-llm-scoped-to-extraction-only">Decision 2: LLM Scoped to Extraction Only<a class="headerlink" href="#decision-2-llm-scoped-to-extraction-only" title="Permanent link">&para;</a></h3>
+<p><strong>What the decision is:</strong> The LLM (Groq LLaMA 3.3 70B) processes only the ingestion-to-extraction stage. It is not used for reconciliation, classification, approval decisions, or any operation that modifies published data.</p>
+<p><strong>Why this matters for governance:</strong> Containing the LLM to the extraction stage means AI uncertainty is bounded. Confidence scores quantify extraction reliability, human reviewers evaluate that uncertainty, and the governance gate ensures LLM output never directly modifies authoritative data. If the LLM is deprecated, rate-limited, or replaced, it affects only the extraction layer; all historical provenance, version history, and audit records remain valid.</p>
+<hr />
+<h3 id="decision-3-append-only-audit-infrastructure">Decision 3: Append-Only Audit Infrastructure<a class="headerlink" href="#decision-3-append-only-audit-infrastructure" title="Permanent link">&para;</a></h3>
+<p><strong>What the decision is:</strong> <code>audit_log</code>, <code>country_guide_versions</code>, <code>rule_provenance</code>, and <code>source_snapshots</code> are append-only at the application level. No repository methods, migration scripts, or API endpoints issue UPDATE or DELETE against these tables.</p>
+<p><strong>Why this matters for governance:</strong> Regulators and auditors must be able to trust that the audit record reflects what actually happened, not what the organization wishes had happened. A mutable audit log is not an audit log — it is a liability. Append-only design makes post-hoc modification structurally difficult; it is not just a policy but an architectural constraint.</p>
+<hr />
+<h3 id="decision-4-external-source-registry-git-tracked">Decision 4: External Source Registry (Git-Tracked)<a class="headerlink" href="#decision-4-external-source-registry-git-tracked" title="Permanent link">&para;</a></h3>
+<p><strong>What the decision is:</strong> Official source URLs are maintained in a GitHub-hosted JSON file, not in the application database.</p>
+<p><strong>Why this matters for governance:</strong> Source URL changes are configuration changes with compliance implications — adding or removing a source affects what regulatory content the system monitors. Git version control provides change history, author attribution, and the ability to revert to a previous source set. Database-stored URLs would have none of these properties.</p>
+<p><strong>Acknowledged tradeoff:</strong> Updating source URLs requires a commit rather than a database update. This is an intentional friction point — source changes should be deliberate and tracked, not ad-hoc.</p>
+<hr />
+<h3 id="decision-5-postgresql-sqlite-dual-backend">Decision 5: PostgreSQL / SQLite Dual Backend<a class="headerlink" href="#decision-5-postgresql-sqlite-dual-backend" title="Permanent link">&para;</a></h3>
+<p><strong>What the decision is:</strong> The <code>app/utils/db.py</code> adapter transparently handles syntax differences between SQLite and PostgreSQL, so the same repository code runs on both backends.</p>
+<p><strong>Why this matters operationally:</strong> SQLite provides zero-ops local development and single-instance deployments with full ACID compliance. The adapter ensures that a move to PostgreSQL for production scale does not require rewriting repository logic. The migration path is <code>set DATABASE_URL</code> — no schema changes, no query rewrites.</p>
+<hr />
+<h3 id="decision-6-apscheduler-as-in-process-scheduler">Decision 6: APScheduler as In-Process Scheduler<a class="headerlink" href="#decision-6-apscheduler-as-in-process-scheduler" title="Permanent link">&para;</a></h3>
+<p><strong>What the decision is:</strong> Automated sync runs are scheduled via APScheduler embedded in the Flask process, not an external job scheduler (Celery, Airflow, Kubernetes CronJob).</p>
+<p><strong>Why this matters operationally:</strong> An in-process scheduler eliminates infrastructure dependencies for single-instance deployments. The acknowledged risk is that a Flask process restart cancels an in-progress sync. This is mitigated by idempotent sync design: each source is processed independently, failed jobs record their state, and the next scheduled run reprocesses failed sources.</p>
+<p><strong>Scale path:</strong> For multi-instance or high-availability deployments, APScheduler should be replaced with an external job scheduler (Celery + Beat, Kubernetes CronJob) with a distributed lock to prevent concurrent runs for the same source.</p>
+<hr />
+<h2 id="failure-handling-framework">Failure Handling Framework<a class="headerlink" href="#failure-handling-framework" title="Permanent link">&para;</a></h2>
+<p>The system distinguishes between three categories of failure, each with a different handling strategy:</p>
+<h3 id="category-1-recoverable-pipeline-failures">Category 1: Recoverable Pipeline Failures<a class="headerlink" href="#category-1-recoverable-pipeline-failures" title="Permanent link">&para;</a></h3>
+<p>Failures that do not corrupt data and will resolve on the next sync cycle:</p>
 <table>
 <thead>
 <tr>
 <th>Failure</th>
+<th>Detection</th>
 <th>Impact</th>
 <th>Recovery</th>
 </tr>
 </thead>
 <tbody>
 <tr>
+<td>Source website 5xx / timeout</td>
+<td>HTTP response code</td>
+<td>No new snapshot; previous published rule unchanged</td>
+<td>Automatic retry (max 2); job marked <code>failed</code> with reason; next sync re-attempts</td>
+</tr>
+<tr>
 <td>Groq API rate limit</td>
-<td>Extraction paused</td>
-<td>Automatic key rotation; retry on next scheduled sync</td>
+<td>429 response</td>
+<td>Extraction paused for current key</td>
+<td>Automatic key rotation to next configured key; transparent retry</td>
 </tr>
 <tr>
-<td>Source website down (5xx)</td>
-<td>No new snapshot</td>
-<td>Retry with exponential backoff; previous snapshot preserved</td>
+<td>Groq API outage</td>
+<td>Connection error / all keys exhausted</td>
+<td>Extraction fails for affected sources</td>
+<td>Job marked <code>failed</code>; source snapshot preserved; extraction retried on next sync</td>
 </tr>
 <tr>
-<td>Source website restructured</td>
-<td>Extraction quality degrades</td>
-<td>Confidence scores drop; low-confidence extractions flagged for manual review</td>
+<td>Scheduler process restart</td>
+<td>Process death</td>
+<td>In-progress sync cancelled</td>
+<td>Next scheduled run starts fresh; idempotent design means no data corruption</td>
+</tr>
+</tbody>
+</table>
+<h3 id="category-2-quality-degradation-detectable">Category 2: Quality Degradation (Detectable)<a class="headerlink" href="#category-2-quality-degradation-detectable" title="Permanent link">&para;</a></h3>
+<p>Failures that produce data, but data of degraded quality, requiring heightened human review:</p>
+<table>
+<thead>
+<tr>
+<th>Failure</th>
+<th>Detection</th>
+<th>Impact</th>
+<th>Response</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Government website restructured</td>
+<td>Confidence scores drop significantly</td>
+<td>Extractions propose incorrect rules</td>
+<td>Low-confidence items are flagged; reviewers examine source paragraph against source URL</td>
 </tr>
 <tr>
-<td>LLM hallucination</td>
-<td>Incorrect rule proposed</td>
-<td>Human reviewer rejects; audit log records rejection rationale</td>
+<td>LLM extracts a hallucinated rule</td>
+<td>Confidence score &lt; 0.7; source paragraph doesn't support value</td>
+<td>Incorrect change proposed in review queue</td>
+<td>Human reviewer rejects; audit log records rejection; next sync re-extracts</td>
 </tr>
 <tr>
-<td>Database corruption</td>
-<td>Data loss</td>
-<td>WAL mode for SQLite; PostgreSQL with standard backup strategies</td>
+<td>Regex pattern misclassifies change type</td>
+<td>Wrong change type or materiality assigned</td>
+<td>Change may be under-prioritized</td>
+<td>Human reviewer sees before/after diff regardless; classification guides but does not gate review</td>
+</tr>
+</tbody>
+</table>
+<h3 id="category-3-unacceptable-failures-data-integrity">Category 3: Unacceptable Failures (Data Integrity)<a class="headerlink" href="#category-3-unacceptable-failures-data-integrity" title="Permanent link">&para;</a></h3>
+<p>These failures represent corruption of the governance record and trigger immediate investigation:</p>
+<table>
+<thead>
+<tr>
+<th>Failure</th>
+<th>Detection</th>
+<th>Response</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Approval recorded without audit log entry</td>
+<td>Provenance without corresponding audit_log row</td>
+<td>Immediately investigate transaction boundary; do not proceed with further approvals until root cause identified</td>
 </tr>
 <tr>
-<td>Scheduler crash</td>
-<td>Missed sync window</td>
-<td>APScheduler misfire_grace_time=300s; next scheduled run proceeds normally</td>
+<td>Published rule without provenance</td>
+<td><code>current_provenance_id IS NULL</code> on active rule</td>
+<td>Flag rule as requiring provenance reconstruction; do not serve to clients without provenance</td>
 </tr>
 <tr>
-<td>Slack webhook failure</td>
-<td>Missed alert</td>
-<td>Sync results persisted in DB regardless of alert delivery</td>
+<td>Version history gap</td>
+<td>Period with no version covering a date range</td>
+<td>Reconstruct from audit log; create corrective version record with appropriate effective dates</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="scalability-strategy">Scalability Strategy<a class="headerlink" href="#scalability-strategy" title="Permanent link">&para;</a></h2>
+<p>Scalability decisions are made with governance as the primary constraint. Performance optimizations that undermine auditability or compromise the review gate are not acceptable.</p>
+<table>
+<thead>
+<tr>
+<th>Dimension</th>
+<th>Current Approach</th>
+<th>Scale Path</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Source coverage</td>
+<td>87 countries × N sources per country</td>
+<td>Source registry is additive; no code changes required</td>
+</tr>
+<tr>
+<td>Sync throughput</td>
+<td>Sequential per source endpoint</td>
+<td>Worker pool with per-country distributed locking; requires external scheduler</td>
+</tr>
+<tr>
+<td>LLM throughput</td>
+<td>N-key rotation (one key per Groq account)</td>
+<td>Add keys to <code>GROQ_API_KEY</code> comma-separated; rotation is automatic</td>
+</tr>
+<tr>
+<td>Database concurrency</td>
+<td>SQLite (single-writer)</td>
+<td>PostgreSQL adapter in <code>db.py</code>; <code>set DATABASE_URL</code> activates it</td>
+</tr>
+<tr>
+<td>Audit record volume</td>
+<td>~1 record per review action</td>
+<td>Append-only; archive partitions for historical records beyond N years</td>
+</tr>
+<tr>
+<td>Temporal query performance</td>
+<td><code>(country, section, effective_date)</code> composite index</td>
+<td>Adequate for 87 countries × 7 sections × N versions; no optimization needed at current scale</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="security-architecture">Security Architecture<a class="headerlink" href="#security-architecture" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Threat</th>
+<th>Control</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Groq API key exposure</td>
+<td>Environment variables only; multi-key rotation reduces per-key blast radius</td>
+</tr>
+<tr>
+<td>SQL injection via user input</td>
+<td>All database queries use parameterized statements throughout the repository layer</td>
+</tr>
+<tr>
+<td>Prompt injection via government source content</td>
+<td>BeautifulSoup strips executable tags before text enters the LLM context; LLM is instruction-prompted to extract only</td>
+</tr>
+<tr>
+<td>Audit log tampering</td>
+<td>Append-only table design; no UPDATE/DELETE methods in <code>ProvenanceRepository</code> or <code>audit_log</code> handlers</td>
+</tr>
+<tr>
+<td>Snapshot content integrity</td>
+<td>MD5 hash stored with every snapshot; hash is recorded in provenance chain; hash mismatch detectable</td>
+</tr>
+<tr>
+<td>Slack webhook secret exposure</td>
+<td>Webhook URL in environment variables; never logged or returned by API</td>
+</tr>
+<tr>
+<td>Unauthorized approval</td>
+<td>Review actions are POST-only; GET requests produce no state change; reviewer identity is recorded (SSO enforcement is an integration requirement)</td>
 </tr>
 </tbody>
 </table>
