@@ -162,7 +162,7 @@ Each state transition sets the corresponding timestamp column, creating a per-st
 
 ## 10. Database Design Implications
 
-**`source_snapshots`**: Stores the raw text of every crawled page. This grows linearly with (sources × sync frequency). For 8 countries × 3 sources each × daily sync = ~24 snapshots/day, or ~8,760/year. At ~6KB average, this is ~50MB/year — manageable for SQLite.
+**`source_snapshots`**: Stores the raw text of every crawled page. This grows linearly with (sources × sync frequency). For 87 countries × 3 sources each × daily sync = ~261 snapshots/day, or ~95K/year. At ~6KB average, this is ~570MB/year — manageable for SQLite or PostgreSQL.
 
 **`ingestion_jobs`**: One row per source per sync. The `list_recent_jobs(limit=25)` query keeps the API lightweight; historical jobs remain queryable for debugging.
 

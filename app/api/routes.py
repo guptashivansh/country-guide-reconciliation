@@ -10,9 +10,35 @@ from app.utils.config import slack_webhook_url
 logger = logging.getLogger(__name__)
 
 FLAGS = {
-    "India": "🇮🇳", "Australia": "🇦🇺", "Singapore": "🇸🇬",
-    "South Africa": "🇿🇦", "UAE": "🇦🇪", "New Zealand": "🇳🇿",
-    "Philippines": "🇵🇭", "Pakistan": "🇵🇰",
+    "Argentina": "🇦🇷", "Australia": "🇦🇺", "Austria": "🇦🇹",
+    "Azerbaijan": "🇦🇿", "Bahrain": "🇧🇭", "Bangladesh": "🇧🇩",
+    "Belgium": "🇧🇪", "Belize": "🇧🇿", "Bolivia": "🇧🇴",
+    "Bosnia And Herzegovina": "🇧🇦", "Botswana": "🇧🇼", "Brazil": "🇧🇷",
+    "Bulgaria": "🇧🇬", "Cameroon": "🇨🇲", "Chile": "🇨🇱",
+    "China": "🇨🇳", "Colombia": "🇨🇴", "Congo (Republic of Congo)": "🇨🇬",
+    "Costa Rica": "🇨🇷", "Croatia": "🇭🇷", "Cyprus": "🇨🇾",
+    "Czech Republic": "🇨🇿", "Denmark": "🇩🇰", "Dominican Republic": "🇩🇴",
+    "Egypt": "🇪🇬", "Estonia": "🇪🇪", "France": "🇫🇷",
+    "Georgia": "🇬🇪", "Germany": "🇩🇪", "Ghana": "🇬🇭",
+    "Greece": "🇬🇷", "Guatemala": "🇬🇹", "Hong Kong": "🇭🇰",
+    "Hungary": "🇭🇺", "India": "🇮🇳", "Indonesia": "🇮🇩",
+    "Israel": "🇮🇱", "Jamaica": "🇯🇲", "Japan": "🇯🇵",
+    "Jordan": "🇯🇴", "Kenya": "🇰🇪", "Kuwait": "🇰🇼",
+    "Lebanon": "🇱🇧", "Lithuania": "🇱🇹", "Luxembourg": "🇱🇺",
+    "Madagascar": "🇲🇬", "Malawi": "🇲🇼", "Malaysia": "🇲🇾",
+    "Malta": "🇲🇹", "Mauritius": "🇲🇺", "Mexico": "🇲🇽",
+    "Morocco": "🇲🇦", "Nepal": "🇳🇵", "Netherlands": "🇳🇱",
+    "New Zealand": "🇳🇿", "Nicaragua": "🇳🇮", "Nigeria": "🇳🇬",
+    "Norway": "🇳🇴", "Oman": "🇴🇲", "Pakistan": "🇵🇰",
+    "Panama": "🇵🇦", "Paraguay": "🇵🇾", "Peru": "🇵🇪",
+    "Philippines": "🇵🇭", "Poland": "🇵🇱", "Portugal": "🇵🇹",
+    "Puerto Rico": "🇵🇷", "Qatar": "🇶🇦", "Romania": "🇷🇴",
+    "Rwanda": "🇷🇼", "Saudi Arabia": "🇸🇦", "Serbia": "🇷🇸",
+    "Singapore": "🇸🇬", "Slovakia": "🇸🇰", "South Africa": "🇿🇦",
+    "South Korea": "🇰🇷", "Spain": "🇪🇸", "Sri Lanka": "🇱🇰",
+    "Switzerland": "🇨🇭", "Taiwan": "🇹🇼", "Thailand": "🇹🇭",
+    "Turkey": "🇹🇷", "UAE": "🇦🇪", "Uganda": "🇺🇬",
+    "Ukraine": "🇺🇦", "United Kingdom": "🇬🇧", "Vietnam": "🇻🇳",
 }
 
 SECTION_GROUPS = [

@@ -6,7 +6,7 @@
 
 ## 2. Business Problem Solved
 
-Compliance teams cannot manually track regulatory changes across dozens of government websites for 8+ countries. Changes to employment law — minimum wage adjustments, leave entitlement modifications, new tax brackets — are published without notification on ministry websites, official gazettes, and immigration portals. The sync pipeline automates the entire detection lifecycle.
+Compliance teams cannot manually track regulatory changes across dozens of government websites for 87 countries. Changes to employment law — minimum wage adjustments, leave entitlement modifications, new tax brackets — are published without notification on ministry websites, official gazettes, and immigration portals. The sync pipeline automates the entire detection lifecycle.
 
 ## 3. Operational Pain Points Addressed
 
