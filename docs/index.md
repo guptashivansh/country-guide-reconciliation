@@ -60,7 +60,7 @@ Honesty about system boundaries is as important as stating capabilities:
 - The system does not guarantee that the source registry is complete. The [`compliance-data`](https://github.com/guptashivansh/compliance-data) registry defines which government authorities are monitored, with `trust_level`, `precedence_rank`, `escalation_required`, and `owner_team` per authority. Jurisdictions or regulatory domains not yet added to the registry are not monitored. Coverage expansion is a registry maintenance responsibility, tracked in that repository.
 - The system does not guarantee LLM extraction accuracy. Confidence scores flag uncertain extractions, but human reviewers are the authority on whether an extraction reflects the source document.
 - The system does not authenticate reviewers. Reviewer identity is captured and recorded, but the system does not enforce that the identity belongs to an authorized person. Role-based access control is an integration requirement for production deployment.
-- The system does not guarantee real-time change detection. Government sources are crawled on a configurable schedule; changes published between syncs are detected at the next sync, not immediately.
+- The system does not guarantee real-time change detection. Government sources are crawled daily at **08:00 UTC** (`SYNC_CRON_SCHEDULE=0 8 * * *`). A regulatory change published at 08:01 UTC will not be detected until the following day's sync. The maximum detection lag is 24 hours.
 
 ---
 
