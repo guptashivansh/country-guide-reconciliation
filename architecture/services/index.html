@@ -11,26 +11,28 @@
       
       
       
+        <link rel="prev" href="../database/">
       
-        <link rel="next" href="architecture/overview/">
+      
+        <link rel="next" href="../../modules/sync-pipeline/">
       
       
         
       
       
-      <link rel="icon" href="assets/images/favicon.png">
+      <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
-        <title>Country Guide Reconciliation Platform</title>
+        <title>Service Dependency Graph - Country Guide Reconciliation Platform</title>
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -49,7 +51,7 @@
       
     
     
-    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -74,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#country-guide-reconciliation-platform" class="md-skip">
+        <a href="#service-dependency-graph" class="md-skip">
           Skip to content
         </a>
       
@@ -90,7 +92,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="." title="Country Guide Reconciliation Platform" class="md-header__button md-logo" aria-label="Country Guide Reconciliation Platform" data-md-component="logo">
+    <a href="../.." title="Country Guide Reconciliation Platform" class="md-header__button md-logo" aria-label="Country Guide Reconciliation Platform" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -110,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Home
+              Service Dependency Graph
             
           </span>
         </div>
@@ -216,7 +218,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="." title="Country Guide Reconciliation Platform" class="md-nav__button md-logo" aria-label="Country Guide Reconciliation Platform" data-md-component="logo">
+    <a href="../.." title="Country Guide Reconciliation Platform" class="md-nav__button md-logo" aria-label="Country Guide Reconciliation Platform" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -231,37 +233,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Home
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="." class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
         
   
   
@@ -277,103 +252,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#business-problem" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Business Problem
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#what-this-platform-does" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What This Platform Does
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#key-capabilities" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Key Capabilities
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#monitored-countries" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Monitored Countries
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#tech-stack" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Tech Stack
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#quick-start" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Quick Start
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#documentation-structure" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Documentation Structure
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -382,8 +260,10 @@
       
   
   
+    
   
   
+  
     
     
       
@@ -402,13 +282,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
         
           
           <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
@@ -429,7 +307,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             
@@ -447,7 +325,7 @@
   
   
     <li class="md-nav__item">
-      <a href="architecture/overview/" class="md-nav__link">
+      <a href="../overview/" class="md-nav__link">
         
   
   
@@ -475,7 +353,7 @@
   
   
     <li class="md-nav__item">
-      <a href="architecture/database/" class="md-nav__link">
+      <a href="../database/" class="md-nav__link">
         
   
   
@@ -500,10 +378,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="architecture/services/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Service Dependency Graph
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -519,6 +424,109 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#service-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Service Architecture
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#service-catalog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Service Catalog
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Service Catalog">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#data-layer-repositories" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Layer (Repositories)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#business-logic-layer-services" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Business Logic Layer (Services)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pipeline-components" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pipeline Components
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dependency-injection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dependency Injection
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sync-pipeline-orchestration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sync Pipeline Orchestration
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -610,7 +618,7 @@
   
   
     <li class="md-nav__item">
-      <a href="modules/sync-pipeline/" class="md-nav__link">
+      <a href="../../modules/sync-pipeline/" class="md-nav__link">
         
   
   
@@ -638,7 +646,7 @@
   
   
     <li class="md-nav__item">
-      <a href="modules/semantic-reconciliation/" class="md-nav__link">
+      <a href="../../modules/semantic-reconciliation/" class="md-nav__link">
         
   
   
@@ -666,7 +674,7 @@
   
   
     <li class="md-nav__item">
-      <a href="modules/llm-extraction/" class="md-nav__link">
+      <a href="../../modules/llm-extraction/" class="md-nav__link">
         
   
   
@@ -694,7 +702,7 @@
   
   
     <li class="md-nav__item">
-      <a href="modules/review-workflow/" class="md-nav__link">
+      <a href="../../modules/review-workflow/" class="md-nav__link">
         
   
   
@@ -722,7 +730,7 @@
   
   
     <li class="md-nav__item">
-      <a href="modules/provenance/" class="md-nav__link">
+      <a href="../../modules/provenance/" class="md-nav__link">
         
   
   
@@ -750,7 +758,7 @@
   
   
     <li class="md-nav__item">
-      <a href="modules/drift-detection/" class="md-nav__link">
+      <a href="../../modules/drift-detection/" class="md-nav__link">
         
   
   
@@ -778,7 +786,7 @@
   
   
     <li class="md-nav__item">
-      <a href="modules/temporal-versioning/" class="md-nav__link">
+      <a href="../../modules/temporal-versioning/" class="md-nav__link">
         
   
   
@@ -806,7 +814,7 @@
   
   
     <li class="md-nav__item">
-      <a href="modules/ingestion/" class="md-nav__link">
+      <a href="../../modules/ingestion/" class="md-nav__link">
         
   
   
@@ -903,7 +911,7 @@
   
   
     <li class="md-nav__item">
-      <a href="guide/ops-dashboard/" class="md-nav__link">
+      <a href="../../guide/ops-dashboard/" class="md-nav__link">
         
   
   
@@ -931,7 +939,7 @@
   
   
     <li class="md-nav__item">
-      <a href="guide/country-guides/" class="md-nav__link">
+      <a href="../../guide/country-guides/" class="md-nav__link">
         
   
   
@@ -959,7 +967,7 @@
   
   
     <li class="md-nav__item">
-      <a href="guide/alerting/" class="md-nav__link">
+      <a href="../../guide/alerting/" class="md-nav__link">
         
   
   
@@ -994,7 +1002,7 @@
   
   
     <li class="md-nav__item">
-      <a href="api/" class="md-nav__link">
+      <a href="../../api/" class="md-nav__link">
         
   
   
@@ -1021,7 +1029,7 @@
   
   
     <li class="md-nav__item">
-      <a href="development/" class="md-nav__link">
+      <a href="../../development/" class="md-nav__link">
         
   
   
@@ -1058,221 +1066,249 @@
 
 
 
-<h1 id="country-guide-reconciliation-platform">Country Guide Reconciliation Platform<a class="headerlink" href="#country-guide-reconciliation-platform" title="Permanent link">&para;</a></h1>
-<p>An AI-powered compliance governance platform that continuously monitors official government sources, detects regulatory changes to employment guides, and routes them through a human-in-the-loop approval workflow with full provenance tracking.</p>
-<p><img alt="Home Page" src="assets/screenshots/home.png" /></p>
+<h1 id="service-dependency-graph">Service Dependency Graph<a class="headerlink" href="#service-dependency-graph" title="Permanent link">&para;</a></h1>
+<h2 id="service-architecture">Service Architecture<a class="headerlink" href="#service-architecture" title="Permanent link">&para;</a></h2>
+<p>The platform follows a layered service architecture with dependency injection via the <code>build_services()</code> factory in <code>app/__init__.py</code>. Services are composed at startup and passed to the Flask blueprint.</p>
+<pre class="mermaid"><code>graph TD
+    subgraph "Repositories (Data Layer)"
+        CGR[CountryGuideRepository]
+        SSR[SourceSnapshotRepository]
+        IJR[IngestionJobRepository]
+        PR[ProvenanceRepository]
+        SER[TrustedSourceEndpointRepository]
+        DR[DriftRepository]
+    end
+
+    subgraph "Services (Business Logic)"
+        RS[ReviewService]
+        SRS[SourceRegistryService]
+        IS[HtmlIngestionService]
+        SSS[SourceSnapshotService]
+        IJS[IngestionJobService]
+        ES[GroqExtractionService]
+        RCS[ReconciliationService]
+        PS[ProvenanceService]
+        TRS[TemporalRuleService]
+        DD[DriftDetector]
+        SS[SyncService]
+        SCHED[SchedulerService]
+        SLACK[SlackService]
+    end
+
+    subgraph "Extraction Pipeline"
+        CC[ContentChunker]
+        ERP[EmploymentRuleParser]
+        ERA[EmploymentRuleAggregator]
+        SRE[SemanticReconciliationEngine]
+    end
+
+    subgraph "API Layer"
+        ROUTES[Flask Blueprint]
+    end
+
+    RS --&gt; CGR
+    RS --&gt; PS
+    SRS --&gt; SER
+    SSS --&gt; SSR
+    IJS --&gt; IJR
+    ES --&gt; CC
+    ES --&gt; ERP
+    ES --&gt; ERA
+    RCS --&gt; CGR
+    RCS --&gt; SRE
+    PS --&gt; PR
+    TRS --&gt; CGR
+    DD --&gt; DR
+    SS --&gt; IS
+    SS --&gt; SSS
+    SS --&gt; IJS
+    SS --&gt; ES
+    SS --&gt; RCS
+    SS --&gt; SRS
+    SCHED --&gt; SS
+    SCHED --&gt; SLACK
+    ROUTES --&gt; RS
+    ROUTES --&gt; SRS
+    ROUTES --&gt; IS
+    ROUTES --&gt; SSS
+    ROUTES --&gt; IJS
+    ROUTES --&gt; ES
+    ROUTES --&gt; RCS
+    ROUTES --&gt; PS
+    ROUTES --&gt; TRS
+    ROUTES --&gt; DD</code></pre>
 <hr />
-<h2 id="business-problem">Business Problem<a class="headerlink" href="#business-problem" title="Permanent link">&para;</a></h2>
-<p>Global employers operating across jurisdictions must comply with local employment laws — leave entitlements, minimum wage, tax obligations, termination notice periods, work permit requirements, and more. These rules change frequently, are published across dozens of government websites, and carry material legal and financial risk when stale.</p>
-<p><strong>The cost of getting it wrong:</strong></p>
-<ul>
-<li>Payroll miscalculations triggering regulatory penalties</li>
-<li>Incorrect leave entitlements leading to employment disputes</li>
-<li>Stale immigration guidance causing visa processing failures</li>
-<li>Compliance audit failures due to inability to prove when a rule was adopted and who approved it</li>
-</ul>
-<p>Traditional approaches — manual monitoring of government websites by compliance analysts — are slow, error-prone, and unscalable. A single missed regulatory gazette update can expose the organization to millions in liability.</p>
-<hr />
-<h2 id="what-this-platform-does">What This Platform Does<a class="headerlink" href="#what-this-platform-does" title="Permanent link">&para;</a></h2>
+<h2 id="service-catalog">Service Catalog<a class="headerlink" href="#service-catalog" title="Permanent link">&para;</a></h2>
+<h3 id="data-layer-repositories">Data Layer (Repositories)<a class="headerlink" href="#data-layer-repositories" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
-<th>Stage</th>
-<th>Description</th>
+<th>Repository</th>
+<th>Table(s)</th>
+<th>Key Operations</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><strong>Monitor</strong></td>
-<td>Crawls official government sources for 8+ countries on a configurable schedule</td>
+<td><code>CountryGuideRepository</code></td>
+<td><code>country_guide</code>, <code>country_guide_versions</code>, <code>review_queue</code>, <code>audit_log</code></td>
+<td>Upsert rules, enqueue reviews, approve/reject, temporal queries</td>
 </tr>
 <tr>
-<td><strong>Extract</strong></td>
-<td>Uses Groq LLaMA 3.3 70B to extract structured employment rules from raw HTML</td>
+<td><code>SourceSnapshotRepository</code></td>
+<td><code>source_snapshots</code></td>
+<td>Create snapshots, update extraction status</td>
 </tr>
 <tr>
-<td><strong>Reconcile</strong></td>
-<td>Semantic diffing engine classifies changes by type and materiality</td>
+<td><code>IngestionJobRepository</code></td>
+<td><code>ingestion_jobs</code></td>
+<td>Create jobs, transition state machine, list recent</td>
 </tr>
 <tr>
-<td><strong>Review</strong></td>
-<td>Human reviewers examine before/after diffs with source evidence</td>
+<td><code>ProvenanceRepository</code></td>
+<td><code>rule_provenance</code></td>
+<td>Write provenance records, resolve chains, get history</td>
 </tr>
 <tr>
-<td><strong>Publish</strong></td>
-<td>Approved changes are versioned, provenance-tracked, and published to client-facing guides</td>
+<td><code>TrustedSourceEndpointRepository</code></td>
+<td>External JSON</td>
+<td>Fetch active source endpoints from GitHub</td>
 </tr>
 <tr>
-<td><strong>Detect Drift</strong></td>
-<td>Continuous monitoring for staleness, unreviewed escalations, and compliance gaps</td>
-</tr>
-<tr>
-<td><strong>Alert</strong></td>
-<td>Region-aware Slack notifications to compliance owners</td>
+<td><code>DriftRepository</code></td>
+<td>Read-only across <code>country_guide</code>, <code>review_queue</code>, <code>rule_provenance</code></td>
+<td>Aggregate data for drift analysis</td>
 </tr>
 </tbody>
 </table>
-<hr />
-<h2 id="key-capabilities">Key Capabilities<a class="headerlink" href="#key-capabilities" title="Permanent link">&para;</a></h2>
-<ul>
-<li><strong>Semantic change classification</strong> — Not just text diffs; the engine distinguishes numeric threshold changes, eligibility scope modifications, new requirements, timeline shifts, and non-material formatting</li>
-<li><strong>Materiality assessment</strong> — Every change is scored Critical / High / Moderate / Low / Informational so reviewers prioritize what matters</li>
-<li><strong>Full provenance chain</strong> — From government source URL to crawler snapshot to LLM extraction to reviewer decision to published rule, every link is recorded</li>
-<li><strong>Temporal rule queries</strong> — "What was India's minimum wage on March 15, 2025?" answered from immutable version history</li>
-<li><strong>Drift detection</strong> — Automated alerts when rules go stale, reviews sit unactioned, or coverage gaps emerge</li>
-<li><strong>Audit-ready operations</strong> — Immutable audit log with reviewer identity, timestamp, rationale, and source evidence for every decision</li>
-</ul>
-<hr />
-<h2 id="monitored-countries">Monitored Countries<a class="headerlink" href="#monitored-countries" title="Permanent link">&para;</a></h2>
+<h3 id="business-logic-layer-services">Business Logic Layer (Services)<a class="headerlink" href="#business-logic-layer-services" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
-<th>Country</th>
-<th>Flag</th>
-<th>Sections</th>
+<th>Service</th>
+<th>Dependencies</th>
+<th>Responsibility</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>India</td>
-<td><img alt="🇮🇳" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/1f1ee-1f1f3.svg" title=":flag_in:" /></td>
-<td>Leave, Hours, Compensation, Benefits, Employment, Immigration, Safety</td>
+<td><code>ReviewService</code></td>
+<td><code>CountryGuideRepository</code>, <code>ProvenanceService</code></td>
+<td>Approve, reject, escalate, assign, bulk-approve review items</td>
 </tr>
 <tr>
-<td>Australia</td>
-<td><img alt="🇦🇺" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/1f1e6-1f1fa.svg" title=":flag_au:" /></td>
-<td>Leave, Hours, Compensation, Benefits, Employment, Immigration, Safety</td>
+<td><code>SourceRegistryService</code></td>
+<td><code>TrustedSourceEndpointRepository</code></td>
+<td>List trusted government source endpoints</td>
 </tr>
 <tr>
-<td>Singapore</td>
-<td><img alt="🇸🇬" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/1f1f8-1f1ec.svg" title=":flag_sg:" /></td>
-<td>Leave, Hours, Compensation, Benefits, Employment, Immigration, Safety</td>
+<td><code>HtmlIngestionService</code></td>
+<td>None (stateless)</td>
+<td>Fetch HTML, clean, truncate, hash</td>
 </tr>
 <tr>
-<td>South Africa</td>
-<td><img alt="🇿🇦" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/1f1ff-1f1e6.svg" title=":flag_za:" /></td>
-<td>Leave, Hours, Compensation, Benefits, Employment, Immigration, Safety</td>
+<td><code>SourceSnapshotService</code></td>
+<td><code>SourceSnapshotRepository</code></td>
+<td>Persist snapshots, track extraction status</td>
 </tr>
 <tr>
-<td>UAE</td>
-<td><img alt="🇦🇪" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/1f1e6-1f1ea.svg" title=":flag_ae:" /></td>
-<td>Leave, Hours, Compensation, Benefits, Employment, Immigration, Safety</td>
+<td><code>IngestionJobService</code></td>
+<td><code>IngestionJobRepository</code></td>
+<td>Lifecycle management for ingestion jobs</td>
 </tr>
 <tr>
-<td>New Zealand</td>
-<td><img alt="🇳🇿" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/1f1f3-1f1ff.svg" title=":flag_nz:" /></td>
-<td>Leave, Hours, Compensation, Benefits, Employment, Immigration, Safety</td>
+<td><code>GroqExtractionService</code></td>
+<td><code>ContentChunker</code>, <code>EmploymentRuleParser</code>, <code>EmploymentRuleAggregator</code></td>
+<td>LLM-based structured extraction with multi-key rotation</td>
 </tr>
 <tr>
-<td>Philippines</td>
-<td><img alt="🇵🇭" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/1f1f5-1f1ed.svg" title=":flag_ph:" /></td>
-<td>Leave, Hours, Compensation, Benefits, Employment, Immigration, Safety</td>
+<td><code>ReconciliationService</code></td>
+<td><code>CountryGuideRepository</code>, <code>SemanticReconciliationEngine</code></td>
+<td>Compare extracted rules against live guide, enqueue changes</td>
 </tr>
 <tr>
-<td>Pakistan</td>
-<td><img alt="🇵🇰" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/1f1f5-1f1f0.svg" title=":flag_pk:" /></td>
-<td>Leave, Hours, Compensation, Benefits, Employment, Immigration, Safety</td>
+<td><code>ProvenanceService</code></td>
+<td><code>ProvenanceRepository</code></td>
+<td>Record approval/seed provenance with parser version</td>
+</tr>
+<tr>
+<td><code>TemporalRuleService</code></td>
+<td><code>CountryGuideRepository</code></td>
+<td>Point-in-time rule queries and version timelines</td>
+</tr>
+<tr>
+<td><code>DriftDetector</code></td>
+<td><code>DriftRepository</code></td>
+<td>Evaluate pending/canonical drift rules, generate reports</td>
+</tr>
+<tr>
+<td><code>SlackService</code></td>
+<td>None (stateless functions)</td>
+<td>Region-aware Slack notifications</td>
+</tr>
+<tr>
+<td><code>SchedulerService</code></td>
+<td><code>SyncService</code>, <code>SlackService</code></td>
+<td>APScheduler cron trigger for automated sync</td>
 </tr>
 </tbody>
 </table>
-<hr />
-<h2 id="tech-stack">Tech Stack<a class="headerlink" href="#tech-stack" title="Permanent link">&para;</a></h2>
+<h3 id="pipeline-components">Pipeline Components<a class="headerlink" href="#pipeline-components" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
 <th>Component</th>
-<th>Technology</th>
-<th>Rationale</th>
+<th>Type</th>
+<th>Responsibility</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Application Framework</td>
-<td>Flask (Python)</td>
-<td>Lightweight, rapid iteration, strong ecosystem</td>
+<td><code>ContentChunker</code></td>
+<td>Stateless</td>
+<td>Split HTML into LLM-sized chunks (max 6000 chars)</td>
 </tr>
 <tr>
-<td>Database</td>
-<td>SQLite / PostgreSQL (dual-backend)</td>
-<td>Zero-ops local dev; Postgres for production scale</td>
+<td><code>EmploymentRuleParser</code></td>
+<td>Stateless</td>
+<td>Parse and validate LLM JSON output into <code>EmploymentRule</code> models</td>
 </tr>
 <tr>
-<td>LLM Provider</td>
-<td>Groq API (LLaMA 3.3 70B)</td>
-<td>Fast inference, structured extraction, generous rate limits</td>
+<td><code>EmploymentRuleAggregator</code></td>
+<td>Stateless</td>
+<td>Deduplicate rules across chunks, keep highest confidence</td>
 </tr>
 <tr>
-<td>Semantic Engine</td>
-<td>Regex + string similarity</td>
-<td>Deterministic, auditable classification without LLM dependency</td>
-</tr>
-<tr>
-<td>Alerting</td>
-<td>Slack Webhooks</td>
-<td>Real-time, region-routed notifications</td>
-</tr>
-<tr>
-<td>Scheduler</td>
-<td>APScheduler</td>
-<td>In-process cron with misfire recovery</td>
-</tr>
-<tr>
-<td>Documentation</td>
-<td>MkDocs Material</td>
-<td>Auto-captured screenshots, GitHub Pages hosting</td>
-</tr>
-<tr>
-<td>Screenshot Automation</td>
-<td>Playwright</td>
-<td>Headless Chromium for CI-integrated visual documentation</td>
+<td><code>SemanticReconciliationEngine</code></td>
+<td>Stateless</td>
+<td>Classify changes by type and materiality using regex patterns</td>
 </tr>
 </tbody>
 </table>
 <hr />
-<h2 id="quick-start">Quick Start<a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>python<span class="w"> </span>app.py<span class="w">                    </span><span class="c1"># Initialize DB + start server on :8080</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>python<span class="w"> </span>notion_import.py<span class="w">          </span><span class="c1"># One-time baseline seed from Notion</span>
+<h2 id="dependency-injection">Dependency Injection<a class="headerlink" href="#dependency-injection" title="Permanent link">&para;</a></h2>
+<p>All services are constructed in <code>build_services()</code> and passed as a dictionary:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">services</span> <span class="o">=</span> <span class="p">{</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="s2">&quot;country_guide_repository&quot;</span><span class="p">:</span> <span class="n">CountryGuideRepository</span><span class="p">(</span><span class="n">db_path</span><span class="p">),</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="s2">&quot;review_service&quot;</span><span class="p">:</span> <span class="n">ReviewService</span><span class="p">(</span><span class="n">repo</span><span class="p">,</span> <span class="n">provenance_service</span><span class="p">),</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="s2">&quot;extraction_service&quot;</span><span class="p">:</span> <span class="n">GroqExtractionService</span><span class="p">(</span><span class="n">api_keys</span><span class="p">,</span> <span class="n">parser</span><span class="p">,</span> <span class="n">chunker</span><span class="p">,</span> <span class="n">aggregator</span><span class="p">),</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="s2">&quot;reconciliation_service&quot;</span><span class="p">:</span> <span class="n">ReconciliationService</span><span class="p">(</span><span class="n">repo</span><span class="p">,</span> <span class="n">semantic_engine</span><span class="p">),</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="c1"># ... 14 services total</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">}</span>
 </code></pre></div>
-<p>Then open <code>http://localhost:8080/ops</code> for the compliance dashboard.</p>
+<p>The Flask blueprint receives all services via its factory function <code>create_api_blueprint(...)</code>, avoiding global state and enabling testing with mock dependencies.</p>
 <hr />
-<h2 id="documentation-structure">Documentation Structure<a class="headerlink" href="#documentation-structure" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Section</th>
-<th>Audience</th>
-<th>Content</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="architecture/overview/">Platform Architecture</a></td>
-<td>Solution Architects, Engineering</td>
-<td>System design, data flow, service graph</td>
-</tr>
-<tr>
-<td><a href="modules/sync-pipeline/">Core Modules</a></td>
-<td>Engineering, Compliance Leadership</td>
-<td>Deep-dive into each pipeline stage</td>
-</tr>
-<tr>
-<td><a href="guide/ops-dashboard/">Operations Guide</a></td>
-<td>Compliance Analysts, Ops Teams</td>
-<td>How to use the dashboard, review changes, manage drift</td>
-</tr>
-<tr>
-<td><a href="api/">API Reference</a></td>
-<td>Engineering, Integrations</td>
-<td>Endpoint catalog with request/response schemas</td>
-</tr>
-<tr>
-<td><a href="development/">Development</a></td>
-<td>Engineering</td>
-<td>Setup, testing, deployment, screenshot automation</td>
-</tr>
-</tbody>
-</table>
+<h2 id="sync-pipeline-orchestration">Sync Pipeline Orchestration<a class="headerlink" href="#sync-pipeline-orchestration" title="Permanent link">&para;</a></h2>
+<p>The <code>run_sync()</code> function in <code>sync_service.py</code> is the top-level orchestrator. It does not hold state — it receives the services dictionary and coordinates calls across ingestion, extraction, and reconciliation:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>for each trusted source endpoint:
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    1. ingestion_job_service.create_job(url)
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    2. html_ingestion_service.fetch_clean_text(url)
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    3. source_snapshot_service.persist_snapshot(url, text, hash)
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    4. extraction_service.extract_employment_rules(text, url, country, sections)
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    5. reconciliation_service.reconcile_extracted_rules(country, rules, url, hash, snapshot_id)
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    6. Update job state at each transition
+</code></pre></div>
+<p>Failures at any stage mark the job as <code>failed</code> with a reason, but do not halt processing of other endpoints.</p>
 
 
 
@@ -1328,10 +1364,10 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.sections", "navigation.expand", "navigation.top", "navigation.indexes", "content.code.copy", "toc.follow", "toc.integrate"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.expand", "navigation.top", "navigation.indexes", "content.code.copy", "toc.follow", "toc.integrate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
     
   </body>

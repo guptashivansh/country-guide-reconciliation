@@ -1,0 +1,1584 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="AI-powered compliance governance and regulatory change detection for global employment guides">
+      
+      
+      
+      
+        <link rel="prev" href="../semantic-reconciliation/">
+      
+      
+        <link rel="next" href="../review-workflow/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>LLM Extraction Service - Country Guide Reconciliation Platform</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#llm-extraction-service" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Country Guide Reconciliation Platform" class="md-header__button md-logo" aria-label="Country Guide Reconciliation Platform" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Country Guide Reconciliation Platform
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              LLM Extraction Service
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Country Guide Reconciliation Platform" class="md-nav__button md-logo" aria-label="Country Guide Reconciliation Platform" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Country Guide Reconciliation Platform
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Platform Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Platform Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/database/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Database Design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/services/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Service Dependency Graph
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core Modules
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Core Modules
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sync-pipeline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sync Pipeline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../semantic-reconciliation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Semantic Reconciliation Engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM Extraction Service
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM Extraction Service
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-feature-name" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Feature Name
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-business-problem-solved" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Business Problem Solved
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-operational-pain-points-addressed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Operational Pain Points Addressed
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-user-personas-involved" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. User Personas Involved
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-functional-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Functional Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-end-to-end-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. End-to-End Workflow
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-technical-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Technical Architecture
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Technical Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#content-chunking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Content Chunking
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#groq-api-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Groq API Integration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#multi-key-rotation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Multi-Key Rotation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#employment-rule-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Employment Rule Model
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#chunk-aggregation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Chunk Aggregation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-data-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Data Flow
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-backend-components" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Backend Components
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-database-design-implications" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Database Design Implications
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-aillm-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. AI/LLM Usage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-human-in-the-loop-governance-controls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. Human-in-the-Loop Governance Controls
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#13-risk-mitigation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13. Risk Mitigation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#14-observability-monitoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14. Observability &amp; Monitoring
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15-future-enhancements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        15. Future Enhancements
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../review-workflow/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Review & Approval Workflow
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../provenance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Provenance & Audit Trail
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../drift-detection/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Drift Detection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../temporal-versioning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Temporal Versioning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ingestion/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ingestion Layer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operations Guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Operations Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/ops-dashboard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ops Dashboard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/country-guides/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Country Guides
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/alerting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Alerting & Notifications
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../development/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Development
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="llm-extraction-service">LLM Extraction Service<a class="headerlink" href="#llm-extraction-service" title="Permanent link">&para;</a></h1>
+<h2 id="1-feature-name">1. Feature Name<a class="headerlink" href="#1-feature-name" title="Permanent link">&para;</a></h2>
+<p><strong>Groq-Powered Structured Rule Extraction with Multi-Key Rotation</strong></p>
+<h2 id="2-business-problem-solved">2. Business Problem Solved<a class="headerlink" href="#2-business-problem-solved" title="Permanent link">&para;</a></h2>
+<p>Government employment law is published as unstructured HTML across hundreds of pages with varying formats — tables, prose, bullet lists, PDF-embedded content. No two countries' labor ministry websites share the same structure. The extraction service uses a large language model to convert raw HTML into typed, validated <code>EmploymentRule</code> objects that can be programmatically compared and versioned.</p>
+<h2 id="3-operational-pain-points-addressed">3. Operational Pain Points Addressed<a class="headerlink" href="#3-operational-pain-points-addressed" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Format heterogeneity</strong>: Per-country parsers break when government websites redesign; an LLM generalizes across formats</li>
+<li><strong>Extraction consistency</strong>: Human analysts reading the same page may extract different rules; the LLM with temperature=0.1 provides near-deterministic extraction</li>
+<li><strong>Scale</strong>: Manual extraction of 7 rule categories across 8 countries from dozens of pages is a multi-day effort; the pipeline completes in minutes</li>
+<li><strong>Quality visibility</strong>: Every extracted rule carries a confidence score (0.0–1.0) that flags uncertain extractions for manual review</li>
+</ul>
+<h2 id="4-user-personas-involved">4. User Personas Involved<a class="headerlink" href="#4-user-personas-involved" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Persona</th>
+<th>Interaction</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Platform Engineer</td>
+<td>Configures API keys, monitors extraction success rates, tunes prompts</td>
+</tr>
+<tr>
+<td>Compliance Analyst</td>
+<td>Sees confidence scores on review queue items; low confidence triggers closer inspection</td>
+</tr>
+<tr>
+<td>Compliance Lead</td>
+<td>Monitors extraction failure rates via metrics dashboard</td>
+</tr>
+</tbody>
+</table>
+<h2 id="5-functional-overview">5. Functional Overview<a class="headerlink" href="#5-functional-overview" title="Permanent link">&para;</a></h2>
+<p>The extraction service takes cleaned HTML text and a target country/sections list, then:</p>
+<ol>
+<li>Chunks the content to fit LLM context windows</li>
+<li>Sends each chunk to Groq's LLaMA 3.3 70B model</li>
+<li>Parses the JSON response into validated <code>EmploymentRule</code> objects</li>
+<li>Aggregates results across chunks (highest confidence per section wins)</li>
+<li>Returns an <code>ExtractionResult</code> with the list of rules and any failures</li>
+</ol>
+<h2 id="6-end-to-end-workflow">6. End-to-End Workflow<a class="headerlink" href="#6-end-to-end-workflow" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>sequenceDiagram
+    participant Sync as SyncService
+    participant Chunker as ContentChunker
+    participant Groq as GroqExtractionService
+    participant API as Groq API
+    participant Parser as EmploymentRuleParser
+    participant Agg as EmploymentRuleAggregator
+
+    Sync-&gt;&gt;Groq: extract_employment_rules(text, url, country, sections)
+    Groq-&gt;&gt;Chunker: split(text)
+    Chunker--&gt;&gt;Groq: [{chunk_index: 0, text: "..."}, ...]
+
+    loop Each Chunk
+        Groq-&gt;&gt;API: chat.completions.create(prompt, model="llama-3.3-70b-versatile")
+        alt Success
+            API--&gt;&gt;Groq: JSON response
+            Groq-&gt;&gt;Parser: parse(response, allowed_sections, source_url)
+            Parser--&gt;&gt;Groq: [EmploymentRule, ...]
+        else Rate Limited (429)
+            Groq-&gt;&gt;Groq: rotate_api_key()
+            Groq-&gt;&gt;API: retry with next key
+        else Failure
+            Groq-&gt;&gt;Groq: log failure, continue to next chunk
+        end
+    end
+
+    Groq-&gt;&gt;Agg: aggregate(chunk_results)
+    Agg--&gt;&gt;Groq: deduplicated rules (highest confidence per section)
+    Groq--&gt;&gt;Sync: ExtractionResult(rules=[...])</code></pre>
+<h2 id="7-technical-architecture">7. Technical Architecture<a class="headerlink" href="#7-technical-architecture" title="Permanent link">&para;</a></h2>
+<h3 id="content-chunking">Content Chunking<a class="headerlink" href="#content-chunking" title="Permanent link">&para;</a></h3>
+<p><code>ContentChunker</code> splits text into chunks of at most 6,000 characters, breaking on sentence boundaries (regex: <code>(?&lt;=[.!?])\s+|\n+</code>). Each chunk carries metadata:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="p">{</span><span class="s2">&quot;chunk_index&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;chunk_count&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">}</span>
+</code></pre></div>
+<p><strong>Why 6,000 characters?</strong> This leaves room for the system prompt, country/section context, and response formatting within the LLM's context window while ensuring sufficient content for meaningful extraction.</p>
+<h3 id="groq-api-integration">Groq API Integration<a class="headerlink" href="#groq-api-integration" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+<th>Rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Model</td>
+<td><code>llama-3.3-70b-versatile</code></td>
+<td>Strong structured extraction; fast inference</td>
+</tr>
+<tr>
+<td>Temperature</td>
+<td><code>0.1</code></td>
+<td>Near-deterministic output for reproducible extraction</td>
+</tr>
+<tr>
+<td>Max attempts</td>
+<td><code>2</code> per chunk</td>
+<td>One retry on transient failures</td>
+</tr>
+<tr>
+<td>Response format</td>
+<td>JSON (prompted)</td>
+<td>Structured output for parser validation</td>
+</tr>
+</tbody>
+</table>
+<h3 id="multi-key-rotation">Multi-Key Rotation<a class="headerlink" href="#multi-key-rotation" title="Permanent link">&para;</a></h3>
+<p>The service accepts a comma-separated list of Groq API keys. On receiving a 429 (rate limit) response:</p>
+<ol>
+<li>The current key index advances to the next key</li>
+<li>The request retries immediately with the new key</li>
+<li>If all keys are exhausted, the chunk is marked as failed</li>
+</ol>
+<p>This provides N× rate limit headroom where N is the number of configured keys, without requiring any coordination logic.</p>
+<h3 id="employment-rule-model">Employment Rule Model<a class="headerlink" href="#employment-rule-model" title="Permanent link">&para;</a></h3>
+<p>Every extracted rule is validated as a Pydantic model:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">EmploymentRule</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="n">section</span><span class="p">:</span> <span class="nb">str</span>        <span class="c1"># Must be in allowed_sections list</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="n">value</span><span class="p">:</span> <span class="nb">str</span>          <span class="c1"># Non-empty rule text</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="n">confidence</span><span class="p">:</span> <span class="nb">float</span>   <span class="c1"># 0.0 to 1.0</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">severity</span><span class="p">:</span> <span class="nb">str</span>       <span class="c1"># &quot;critical&quot; | &quot;major&quot; | &quot;minor&quot;</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="n">source_paragraph</span><span class="p">:</span> <span class="nb">str</span>  <span class="c1"># Evidence from the source text</span>
+</code></pre></div>
+<p><strong>Validators</strong>:
+- <code>section</code> is checked against the allowed sections for the country
+- <code>severity</code> is normalized to lowercase
+- <code>value</code> and <code>source_paragraph</code> must be non-empty strings</p>
+<p>Invalid rules are silently dropped by the parser (logged at WARNING level), not propagated to reconciliation.</p>
+<h3 id="chunk-aggregation">Chunk Aggregation<a class="headerlink" href="#chunk-aggregation" title="Permanent link">&para;</a></h3>
+<p>When a section appears in multiple chunks, the <code>EmploymentRuleAggregator</code> keeps only the highest-confidence extraction per section. Results are returned sorted by section name for deterministic ordering.</p>
+<h2 id="8-data-flow">8. Data Flow<a class="headerlink" href="#8-data-flow" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>Cleaned HTML text (≤6000 chars per chunk)
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    ↓
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>Prompt construction: &quot;Extract employment rules for {country} covering {sections}...&quot;
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    ↓
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>Groq API → raw JSON string
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    ↓
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>Strip markdown fences (```json...```) → JSON.loads
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    ↓
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>Validate each object as EmploymentRule (Pydantic)
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>    ↓
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>Drop invalid items → keep valid EmploymentRule list per chunk
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>    ↓
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>Aggregate across chunks → highest confidence per section
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>    ↓
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>ExtractionResult { status, rules[], failure? }
+</code></pre></div>
+<h2 id="9-backend-components">9. Backend Components<a class="headerlink" href="#9-backend-components" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>File</th>
+<th>Lines</th>
+<th>Responsibility</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GroqExtractionService</code></td>
+<td><code>app/extraction/groq_extraction_service.py</code></td>
+<td>237</td>
+<td>API calls, key rotation, retry logic</td>
+</tr>
+<tr>
+<td><code>ContentChunker</code></td>
+<td><code>app/extraction/content_chunker.py</code></td>
+<td>49</td>
+<td>Sentence-boundary chunking</td>
+</tr>
+<tr>
+<td><code>EmploymentRuleParser</code></td>
+<td><code>app/extraction/employment_rule_parser.py</code></td>
+<td>55</td>
+<td>JSON parsing, Pydantic validation</td>
+</tr>
+<tr>
+<td><code>EmploymentRuleAggregator</code></td>
+<td><code>app/extraction/employment_rule_aggregator.py</code></td>
+<td>25</td>
+<td>Cross-chunk deduplication</td>
+</tr>
+<tr>
+<td><code>EmploymentRule</code></td>
+<td><code>app/models/employment_rule.py</code></td>
+<td>36</td>
+<td>Pydantic model with validators</td>
+</tr>
+<tr>
+<td><code>ExtractionResult</code></td>
+<td><code>app/models/workflow_results.py</code></td>
+<td>59</td>
+<td>Result envelope with success/failure</td>
+</tr>
+</tbody>
+</table>
+<h2 id="10-database-design-implications">10. Database Design Implications<a class="headerlink" href="#10-database-design-implications" title="Permanent link">&para;</a></h2>
+<p>Extraction outputs flow into:</p>
+<ul>
+<li><strong><code>source_snapshots.extraction_status</code></strong>: Set to <code>"succeeded"</code> or <code>"failed"</code> after extraction</li>
+<li><strong><code>review_queue.confidence</code></strong>: The extraction confidence score (0.0–1.0) is carried through to the review queue</li>
+<li><strong><code>review_queue.source_paragraph</code></strong>: The evidence text from the LLM extraction</li>
+<li><strong><code>rule_provenance.extraction_confidence</code></strong>: Recorded in the provenance chain</li>
+<li><strong><code>rule_provenance.parser_version</code></strong>: Fixed string <code>"groq/llama-3.3-70b-versatile/v1"</code> for model lineage</li>
+</ul>
+<h2 id="11-aillm-usage">11. AI/LLM Usage<a class="headerlink" href="#11-aillm-usage" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>Detail</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Provider</td>
+<td>Groq</td>
+</tr>
+<tr>
+<td>Model</td>
+<td>LLaMA 3.3 70B Versatile</td>
+</tr>
+<tr>
+<td>Task</td>
+<td>Structured data extraction from unstructured HTML</td>
+</tr>
+<tr>
+<td>Temperature</td>
+<td>0.1 (near-deterministic)</td>
+</tr>
+<tr>
+<td>Output format</td>
+<td>JSON array of rule objects</td>
+</tr>
+<tr>
+<td>Confidence</td>
+<td>Model self-reports confidence per rule (0.0–1.0)</td>
+</tr>
+<tr>
+<td>Hallucination mitigation</td>
+<td>Human review gate; confidence scoring; source paragraph evidence</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Why Groq and not OpenAI/Anthropic for extraction?</strong></p>
+<ul>
+<li><strong>Inference speed</strong>: Groq's LPU architecture provides significantly faster inference for this structured extraction task</li>
+<li><strong>Cost</strong>: Generous free tier and competitive pricing for the volume of extraction calls</li>
+<li><strong>Accuracy</strong>: LLaMA 3.3 70B performs well on structured extraction with low temperature</li>
+</ul>
+<h2 id="12-human-in-the-loop-governance-controls">12. Human-in-the-Loop Governance Controls<a class="headerlink" href="#12-human-in-the-loop-governance-controls" title="Permanent link">&para;</a></h2>
+<ul>
+<li>The LLM's extraction is <strong>never published directly</strong>. Every extracted rule enters the review queue for human approval.</li>
+<li>Confidence scores below a threshold are visually flagged in the ops dashboard.</li>
+<li>The source paragraph (evidence) is displayed alongside the extracted rule so reviewers can verify accuracy.</li>
+<li>Extraction failures are logged and visible in the ingestion jobs API — a compliance lead can see exactly which sources failed extraction and why.</li>
+</ul>
+<h2 id="13-risk-mitigation">13. Risk Mitigation<a class="headerlink" href="#13-risk-mitigation" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Risk</th>
+<th>Mitigation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LLM hallucinates a rule that doesn't exist in the source</td>
+<td>Source paragraph evidence displayed to reviewer; rejection workflow with rationale</td>
+</tr>
+<tr>
+<td>LLM misinterprets a numeric value (e.g., currency conversion)</td>
+<td>Semantic reconciliation engine independently validates numeric changes</td>
+</tr>
+<tr>
+<td>Model version changes alter extraction quality</td>
+<td><code>parser_version</code> recorded in provenance; quality regression detectable via confidence trends</td>
+</tr>
+<tr>
+<td>Groq API outage</td>
+<td>Extraction marked as failed; previous published rules remain active; retry on next sync</td>
+</tr>
+<tr>
+<td>Prompt injection via government website content</td>
+<td>LLM is instructed to extract only; no tool use or action capabilities</td>
+</tr>
+</tbody>
+</table>
+<h2 id="14-observability-monitoring">14. Observability &amp; Monitoring<a class="headerlink" href="#14-observability-monitoring" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Extraction status per snapshot</strong>: <code>source_snapshots.extraction_status</code> tracks success/failure</li>
+<li><strong>Confidence distribution</strong>: Queryable via the review queue to detect model quality regression</li>
+<li><strong>Ingestion job latency</strong>: Timestamps on <code>extracted_at</code> vs <code>fetched_at</code> measure extraction duration</li>
+<li><strong>Key rotation events</strong>: Logged at WARNING level when a key hits rate limits</li>
+<li><strong>Parser validation drops</strong>: Invalid rules logged at WARNING level with the raw response content</li>
+</ul>
+<h2 id="15-future-enhancements">15. Future Enhancements<a class="headerlink" href="#15-future-enhancements" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Model A/B testing</strong>: Run two models in parallel and compare extraction quality before switching</li>
+<li><strong>Confidence calibration</strong>: Correlate LLM-reported confidence with reviewer acceptance rate to calibrate thresholds</li>
+<li><strong>Extraction caching</strong>: Skip re-extraction when the source snapshot hash hasn't changed</li>
+<li><strong>Multi-model fallback</strong>: Try a primary model; fall back to a secondary model on failure</li>
+<li><strong>Structured output mode</strong>: Use Groq's JSON mode when available for guaranteed valid JSON responses</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.expand", "navigation.top", "navigation.indexes", "content.code.copy", "toc.follow", "toc.integrate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
