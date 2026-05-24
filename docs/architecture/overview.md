@@ -117,7 +117,7 @@ flowchart LR
 
 **Tradeoff**: SQLite provides zero-ops simplicity and ACID compliance, but limits concurrent write throughput. The `app/utils/db.py` dual-backend adapter transparently rewrites SQL syntax (`?` to `%s`, `AUTOINCREMENT` to `SERIAL`, `date()` to `::date`) so the same repository code runs on both backends.
 
-**Why**: Data volumes are modest (hundreds of rules across 8 countries); SQLite is appropriate and eliminates infrastructure overhead. The adapter ensures a migration path when scale demands it.
+**Why**: Data volumes are modest (hundreds of rules across 87 countries); SQLite is appropriate and eliminates infrastructure overhead. The adapter ensures a migration path when scale demands it.
 
 ### Deterministic Semantic Engine (No LLM for Reconciliation)
 
@@ -168,7 +168,7 @@ flowchart LR
 
 | Dimension | Current State | Scale Path |
 |-----------|--------------|------------|
-| Countries | 8 | Source registry is additive; no code changes needed |
+| Countries | 87 | Source registry is additive; no code changes needed |
 | Concurrent syncs | Sequential per country | Worker pool with per-country locking |
 | Database | SQLite (single-writer) | PostgreSQL adapter ready in `db.py` |
 | LLM throughput | Multi-key rotation (N keys) | Add keys to `GROQ_API_KEY` comma-separated list |

@@ -12,7 +12,7 @@ Government employment law is published as unstructured HTML across hundreds of p
 
 - **Format heterogeneity**: Per-country parsers break when government websites redesign; an LLM generalizes across formats
 - **Extraction consistency**: Human analysts reading the same page may extract different rules; the LLM with temperature=0.1 provides near-deterministic extraction
-- **Scale**: Manual extraction of 7 rule categories across 8 countries from dozens of pages is a multi-day effort; the pipeline completes in minutes
+- **Scale**: Manual extraction of 7 rule categories across 87 countries from dozens of pages is a multi-week effort; the pipeline completes in minutes
 - **Quality visibility**: Every extracted rule carries a confidence score (0.0–1.0) that flags uncertain extractions for manual review
 
 ## 4. User Personas Involved

@@ -25,7 +25,7 @@ Traditional approaches — manual monitoring of government websites by complianc
 
 | Stage | Description |
 |-------|-------------|
-| **Monitor** | Crawls official government sources for 8+ countries on a configurable schedule |
+| **Monitor** | Crawls official government sources for 87 countries on a configurable schedule |
 | **Extract** | Uses Groq LLaMA 3.3 70B to extract structured employment rules from raw HTML |
 | **Reconcile** | Semantic diffing engine classifies changes by type and materiality |
 | **Review** | Human reviewers examine before/after diffs with source evidence |
@@ -46,18 +46,17 @@ Traditional approaches — manual monitoring of government websites by complianc
 
 ---
 
-## Monitored Countries
+## Global Coverage — 87 Countries
 
-| Country | Flag | Sections |
-|---------|------|----------|
-| India | :flag_in: | Leave, Hours, Compensation, Benefits, Employment, Immigration, Safety |
-| Australia | :flag_au: | Leave, Hours, Compensation, Benefits, Employment, Immigration, Safety |
-| Singapore | :flag_sg: | Leave, Hours, Compensation, Benefits, Employment, Immigration, Safety |
-| South Africa | :flag_za: | Leave, Hours, Compensation, Benefits, Employment, Immigration, Safety |
-| UAE | :flag_ae: | Leave, Hours, Compensation, Benefits, Employment, Immigration, Safety |
-| New Zealand | :flag_nz: | Leave, Hours, Compensation, Benefits, Employment, Immigration, Safety |
-| Philippines | :flag_ph: | Leave, Hours, Compensation, Benefits, Employment, Immigration, Safety |
-| Pakistan | :flag_pk: | Leave, Hours, Compensation, Benefits, Employment, Immigration, Safety |
+Employment guides are maintained across 87 countries spanning APAC, EMEA, and the Americas. Each country covers up to 7 rule categories: Leave, Working Hours, Compensation, Benefits & Social Security, Employment Terms, Immigration, and Workplace Safety.
+
+??? note "Full country list (click to expand)"
+
+    | Region | Countries |
+    |--------|-----------|
+    | **APAC** (18) | Australia, Bangladesh, China, Hong Kong, India, Indonesia, Japan, Malaysia, Nepal, New Zealand, Pakistan, Philippines, Singapore, South Korea, Sri Lanka, Taiwan, Thailand, Vietnam |
+    | **EMEA** (53) | Austria, Azerbaijan, Bahrain, Belgium, Bosnia And Herzegovina, Botswana, Bulgaria, Cameroon, Congo (Republic of Congo), Croatia, Cyprus, Czech Republic, Denmark, Egypt, Estonia, France, Georgia, Germany, Ghana, Greece, Hungary, Israel, Jordan, Kenya, Kuwait, Lebanon, Lithuania, Luxembourg, Madagascar, Malawi, Malta, Mauritius, Morocco, Netherlands, Nigeria, Norway, Oman, Poland, Portugal, Qatar, Romania, Rwanda, Saudi Arabia, Serbia, Slovakia, South Africa, Spain, Switzerland, Turkey, UAE, Uganda, Ukraine, United Kingdom |
+    | **Americas** (16) | Argentina, Belize, Bolivia, Brazil, Chile, Colombia, Costa Rica, Dominican Republic, Guatemala, Jamaica, Mexico, Nicaragua, Panama, Paraguay, Peru, Puerto Rico |
 
 ---
 
