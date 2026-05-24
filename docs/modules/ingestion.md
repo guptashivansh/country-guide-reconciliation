@@ -55,7 +55,7 @@ A 4xx response indicates a client error — typically that the URL is no longer 
 - A 404 means the government page has been restructured, renamed, or removed. Retrying does not fix this.
 - A 403 means the server is explicitly rejecting the request. Retrying the same request will produce the same rejection.
 
-The correct operational response to a 4xx is to investigate and update the source URL in the source registry. The failure is recorded with its reason; the platform engineering team can identify 4xx failures in the `ingestion_jobs` table and take corrective action.
+The correct operational response to a 4xx is to update the `website_url` for the affected authority in the [`compliance-data`](https://github.com/guptashivansh/compliance-data) source registry. The failure is recorded with its reason in `ingestion_jobs.failure_reason`; the `owner_team` field on the authority record identifies who is accountable for resolving it.
 
 Automatic retry on 4xx would mask this signal by appearing to "process" the source when it is actually unreachable, potentially causing the previous stale snapshot to be re-used for extraction.
 

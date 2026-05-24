@@ -175,13 +175,18 @@ flowchart LR
 
 ---
 
-### Decision 4: External Source Registry (Git-Tracked)
+### Decision 4: Governed Source Registry in a Separate Repository
 
-**What the decision is:** Official source URLs are maintained in a GitHub-hosted JSON file, not in the application database.
+**What the decision is:** Official source URLs and their governance metadata are maintained in a dedicated data repository ([`compliance-data`](https://github.com/guptashivansh/compliance-data)), not in the application database.
 
-**Why this matters for governance:** Source URL changes are configuration changes with compliance implications — adding or removing a source affects what regulatory content the system monitors. Git version control provides change history, author attribution, and the ability to revert to a previous source set. Database-stored URLs would have none of these properties.
+**What the registry provides beyond URLs:** Each authority entry carries `trust_level`, `precedence_rank`, `escalation_required`, `supports_replay`, and `owner_team`. This means the registry is not a flat URL list — it is a structured, governed catalogue of the organisation's regulatory intelligence sources. The `escalation_required` flag, for example, causes any change from designated high-sensitivity authorities to automatically enter the review queue as escalated, regardless of the semantic engine's materiality assessment.
 
-**Acknowledged tradeoff:** Updating source URLs requires a commit rather than a database update. This is an intentional friction point — source changes should be deliberate and tracked, not ad-hoc.
+**Why this matters for governance:** Source changes are configuration changes with compliance implications. A separate git-tracked repository provides:
+- Change history with author attribution for every source addition, URL update, trust level change, or deactivation
+- The ability to revert a source set to a prior state independently of application deployments
+- A clear ownership model: the `owner_team` field in the registry assigns accountability for each source
+
+**Acknowledged tradeoff:** Updating sources requires a commit to the registry repository rather than a database update. This is an intentional friction point — source changes should be deliberate and traceable, not ad-hoc edits.
 
 ---
 

@@ -20,26 +20,32 @@ The pipeline is sequential per source endpoint, fault-isolated across endpoints:
 
 ## Source Registry
 
-The set of official government source URLs is maintained in a GitHub-hosted JSON file with a three-tier hierarchy:
+The set of official government source URLs is maintained in a dedicated, separately versioned data repository: [`guptashivansh/compliance-data`](https://github.com/guptashivansh/compliance-data). This repository is the authoritative registry for all monitored regulatory authorities. It is decoupled from application code so that source coverage can be expanded, corrected, or disabled without a deployment.
+
+The registry file (`data/official-sources.json`) has a three-tier hierarchy:
 
 ```
 countries → authorities → source_endpoints
 ```
 
-Each `SourceEndpoint` is a frozen dataclass:
+Each authority entry carries governance metadata beyond a simple URL:
 
-```python
-@dataclass(frozen=True)
-class SourceEndpoint:
-    country: str
-    authority: str
-    url: str
-    sections: tuple[str, ...]  # Which regulatory sections this source covers
-```
+| Field | Purpose |
+|-------|---------|
+| `website_url` | The official government source URL |
+| `authority_type` | Domain: `labour`, `tax`, `immigration`, `social_security` |
+| `trust_level` | Assessed reliability of this source |
+| `precedence_rank` | When multiple authorities cover the same domain, this determines which takes precedence |
+| `is_active` | Whether this authority is included in sync runs |
+| `escalation_required` | If `true`, any change detected from this source is automatically escalated regardless of materiality |
+| `supports_replay` | Whether historical content can be re-fetched from this source |
+| `owner_team` | The team accountable for monitoring and maintaining this source entry |
 
-**Active filtering:** Only endpoints where `status: "active"` under authorities with `is_active: true` are included in a sync run. Disabling a source requires no code change — it requires only updating the JSON file in the source registry repository.
+**Active filtering:** Only authorities where `is_active: true` are included in a sync run. Disabling a source requires no application code change — it requires only a commit to the registry repository setting `is_active: false`.
 
-**Governance implication of external registry:** Source URL changes are tracked in git. Adding a new source, modifying an existing URL, or disabling a source all produce a commit with author, timestamp, and message. This is the compliance record of source management decisions.
+**Escalation requirement:** Sources with `escalation_required: true` are treated as high-sensitivity authorities. Any change detected from these sources enters the review queue with `status = escalated` immediately, bypassing the standard pending state. This ensures changes from the most sensitive authorities — such as primary immigration or tax authorities — always reach a senior reviewer.
+
+**Governance implication of the separate registry:** Source changes are tracked in git with author, timestamp, and message. Adding a new authority, changing a URL, modifying a trust level, or disabling a source all produce a commit. This is the compliance record of source governance decisions — independent of, and auditable alongside, the application's own audit log.
 
 ---
 
