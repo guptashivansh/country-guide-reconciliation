@@ -1229,6 +1229,7 @@
 </tbody>
 </table>
 <h2 id="5-functional-overview">5. Functional Overview<a class="headerlink" href="#5-functional-overview" title="Permanent link">&para;</a></h2>
+<p><img alt="Multi-Source Ingestion — Pipeline job tracking with per-stage progress dots, status indicators, and source URLs" src="../../assets/screenshots/multi_source_ingestion.png" /></p>
 <p>Three ingestion adapters feed into a common pipeline:</p>
 <table>
 <thead>
@@ -1319,6 +1320,8 @@
 <p><strong>Country discovery</strong>: Regex pattern <code>^(.+?)\s*[-–]\s*Employment Guide</code> auto-discovers country names from page titles.</p>
 <p><strong>Content format</strong>: Notion pages contain pipe-separated tables which are parsed deterministically — no LLM is needed for this structured format.</p>
 <h3 id="pdf-intake">PDF Intake<a class="headerlink" href="#pdf-intake" title="Permanent link">&para;</a></h3>
+<p><img alt="PDF Compliance Parsing — Document upload interface with processing pipeline status and ingestion activity feed" src="../../assets/screenshots/pdf_compliance_parsing.png" /></p>
+<p><img alt="Compliance Pipeline — Job-level tracking with stage progress dots, pagination, and source URL display" src="../../assets/screenshots/compliance_pipeline.png" /></p>
 <p>The <code>/api/intake/pdf</code> endpoint accepts multipart form uploads, extracts text content, and feeds it into the standard extraction pipeline.</p>
 <h2 id="7-technical-architecture">7. Technical Architecture<a class="headerlink" href="#7-technical-architecture" title="Permanent link">&para;</a></h2>
 <h3 id="source-snapshot-lifecycle">Source Snapshot Lifecycle<a class="headerlink" href="#source-snapshot-lifecycle" title="Permanent link">&para;</a></h3>

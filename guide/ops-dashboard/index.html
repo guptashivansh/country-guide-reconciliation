@@ -1104,6 +1104,7 @@
 <p><img alt="Ops Dashboard" src="../../assets/screenshots/ops_dashboard.png" /></p>
 <hr />
 <h2 id="metrics-cards">Metrics Cards<a class="headerlink" href="#metrics-cards" title="Permanent link">&para;</a></h2>
+<p><img alt="Regulatory Risk Scoring — Real-time KPIs with critical counts, confidence scores, and crawl failure tracking" src="../../assets/screenshots/regulatory_risk_scoring.png" /></p>
 <p>The top row displays real-time KPIs pulled from <code>GET /api/metrics</code>:</p>
 <table>
 <thead>
@@ -1161,6 +1162,7 @@
 2. <strong>Severity</strong>: Critical → major → minor
 3. <strong>Confidence</strong>: Highest confidence first</p>
 <h3 id="per-item-display">Per-Item Display<a class="headerlink" href="#per-item-display" title="Permanent link">&para;</a></h3>
+<p><img alt="Materiality Classification — Severity badges, change type chips, and confidence-based prioritization" src="../../assets/screenshots/materiality_classification.png" /></p>
 <ul>
 <li><strong>Severity badge</strong>: Color-coded (red = critical, orange = major, blue = minor)</li>
 <li><strong>Materiality chip</strong>: CRITICAL / HIGH / MODERATE / LOW / INFORMATIONAL</li>
@@ -1171,6 +1173,7 @@
 <li><strong>Source URL</strong>: Link to the original government page</li>
 </ul>
 <h3 id="actions">Actions<a class="headerlink" href="#actions" title="Permanent link">&para;</a></h3>
+<p><img alt="Manual Override Controls — Approve, Reject, and Escalate decision buttons with audit trail linkage" src="../../assets/screenshots/manual_override_controls.png" /></p>
 <table>
 <thead>
 <tr>
@@ -1211,10 +1214,12 @@
 </ul>
 <hr />
 <h2 id="sync-controls">Sync Controls<a class="headerlink" href="#sync-controls" title="Permanent link">&para;</a></h2>
+<p><img alt="CMS Synchronization — Source selection modal for targeted country sync" src="../../assets/screenshots/cms_synchronization.png" /></p>
 <p>Click <strong>Sync Now</strong> to trigger a manual pipeline run. A modal allows selecting specific countries to sync, conserving Groq API quota for targeted checks.</p>
 <p>After sync completes, the metrics cards refresh and any detected changes appear in the review queue.</p>
 <hr />
 <h2 id="audit-log-tab">Audit Log Tab<a class="headerlink" href="#audit-log-tab" title="Permanent link">&para;</a></h2>
+<p><img alt="Review Rationale Capture — Immutable audit timeline with reviewer identity, rationale text, and decision badges" src="../../assets/screenshots/provenance_audit_trail.png" /></p>
 <p>The audit log tab displays an immutable record of every review decision:</p>
 <table>
 <thead>
@@ -1257,6 +1262,7 @@
 <p>Filterable by country and date range via <code>GET /api/audit?country=India&amp;since=2025-01-01</code>.</p>
 <hr />
 <h2 id="drift-reports">Drift Reports<a class="headerlink" href="#drift-reports" title="Permanent link">&para;</a></h2>
+<p><img alt="Drift Monitoring Dashboard — Country-level drift status with severity filters" src="../../assets/screenshots/drift_monitoring_dashboard.png" /></p>
 <p>The drift tab shows compliance drift reports per country:</p>
 <ul>
 <li><strong>Overall severity</strong>: CRITICAL / WARNING / INFO / NONE</li>
@@ -1266,6 +1272,7 @@
 </ul>
 <hr />
 <h2 id="pipeline-health">Pipeline Health<a class="headerlink" href="#pipeline-health" title="Permanent link">&para;</a></h2>
+<p><img alt="Multi-Source Ingestion Pipeline — Job status tracking with per-stage progress dots and source URLs" src="../../assets/screenshots/multi_source_ingestion.png" /></p>
 <p>The pipeline tab shows recent ingestion jobs with:</p>
 <ul>
 <li><strong>State</strong>: queued → fetched → extracted → reconciled (or failed)</li>
