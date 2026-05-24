@@ -2124,10 +2124,14 @@
       <div class="logo-sub">Country Guide Reconciliation</div>
     </div>
   </div>
-  <button class="sync-btn" id="syncBtn" onclick="openSyncModal()">
-    <span id="syncIcon">⟳</span>
-    <span id="syncText">Sync Now</span>
-  </button>
+  <div style="display:flex;align-items:center;gap:10px">
+    <a href="/" style="font-size:12px;font-family:'DM Mono',monospace;color:var(--muted);text-decoration:none;border:1px solid var(--border);padding:6px 14px;border-radius:6px;transition:all 0.15s" onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'">⌂ Hub</a>
+    <a href="/compliance/intake" style="font-size:12px;font-family:'DM Mono',monospace;color:var(--muted);text-decoration:none;border:1px solid var(--border);padding:6px 14px;border-radius:6px;transition:all 0.15s" onmouseover="this.style.color='var(--warn)';this.style.borderColor='var(--warn)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'">+ Intake</a>
+    <button class="sync-btn" id="syncBtn" onclick="openSyncModal()">
+      <span id="syncIcon">⟳</span>
+      <span id="syncText">Sync Now</span>
+    </button>
+  </div>
 </header>
 
 <!-- SYNC MODAL -->

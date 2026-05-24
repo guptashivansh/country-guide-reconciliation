@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 
-from flask import Blueprint, abort, jsonify, render_template, request
+from flask import Blueprint, abort, jsonify, redirect, render_template, request, url_for
 from app.services.sync_service import run_sync
 from app.services.slack_service import send_sync_alert
 from app.utils.config import slack_webhook_url
@@ -47,7 +47,19 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
     routes = Blueprint("country_guide_routes", __name__)
 
     @routes.route("/")
+    def home():
+        countries = [
+            {"name": r["country"], "flag": FLAGS.get(r["country"], "🌐")}
+            for r in review_service.list_countries_summary()
+        ]
+        return render_template("home.html", countries=countries)
+
+    @routes.route("/ops")
     def index():
+        return render_template("ops_dashboard_v2.html")
+
+    @routes.route("/ops-legacy")
+    def ops_legacy():
         return render_template("index.html")
 
     @routes.route("/guide")
@@ -57,7 +69,7 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
              "rule_count": r["rule_count"], "last_updated": _fmt_date(r["last_updated"])}
             for r in review_service.list_countries_summary()
         ]
-        return render_template("guide_list.html", countries=countries)
+        return render_template("guide_list.html", countries=countries, nav_active="guides")
 
     @routes.route("/guide/<country>")
     def guide_country(country):
@@ -81,6 +93,7 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
             rule_count=len(rows),
             last_updated=last_updated,
             groups=groups,
+            nav_active="guides",
         )
 
     @routes.route("/api/guide")
@@ -93,7 +106,18 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
 
     @routes.route("/api/audit")
     def get_audit():
-        return jsonify(review_service.list_audit_entries())
+        entries = review_service.list_audit_entries()
+        country_filter = request.args.get("country")
+        since_filter = request.args.get("since")
+        if country_filter:
+            entries = [e for e in entries if e.get("country") == country_filter]
+        if since_filter:
+            try:
+                since_dt = datetime.fromisoformat(since_filter)
+                entries = [e for e in entries if e.get("timestamp") and datetime.fromisoformat(e["timestamp"]) > since_dt]
+            except ValueError:
+                pass
+        return jsonify(entries)
 
     @routes.route("/api/ingestion-jobs")
     def get_ingestion_jobs():
@@ -255,6 +279,20 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
             "message": f"'{result['section']}' escalated for compliance review"
         })
 
+    @routes.route("/api/provenance/<country>")
+    def get_provenance_all(country):
+        if not provenance_service:
+            return jsonify({"error": "provenance service not configured"}), 503
+        rows = review_service.get_country_sections(country)
+        if not rows:
+            return jsonify({"error": f"No data for {country}"}), 404
+        chains = []
+        for r in rows:
+            chain = provenance_service.get_chain(country, r["section"])
+            if chain:
+                chains.append(chain)
+        return jsonify({"country": country, "chains": chains})
+
     @routes.route("/api/provenance/<country>/<section>")
     def get_provenance(country, section):
         if not provenance_service:
@@ -277,6 +315,74 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
             return jsonify({"error": "drift detector not configured"}), 503
         reports = drift_detector.detect_all()
         return jsonify([r.to_dict() for r in reports])
+
+    @routes.route("/client")
+    def client_overview():
+        return render_template("client_overview.html")
+
+    @routes.route("/employee/<country>")
+    def employee_country(country):
+        rows = review_service.get_country_sections(country)
+        if not rows:
+            abort(404)
+        return render_template(
+            "employee.html",
+            country=country,
+            flag=FLAGS.get(country, "🌐"),
+        )
+
+    @routes.route("/api/employee/guide/<country>")
+    def api_employee_guide(country):
+        rows = review_service.get_country_sections(country)
+        if not rows:
+            return jsonify({"error": "Country not found"}), 404
+        rules_by_section = {r["section"]: r for r in rows}
+        groups = []
+        for g in SECTION_GROUPS:
+            group_rules = []
+            for s in g["sections"]:
+                r = rules_by_section.get(s)
+                if r:
+                    group_rules.append({
+                        "id": s,
+                        "label": s.replace("_", " ").title(),
+                        "value": r["value"],
+                        "last_updated": _fmt_date(r["last_updated"]),
+                    })
+            if group_rules:
+                groups.append({"id": g["id"], "label": g["label"], "rules": group_rules})
+        return jsonify({
+            "country": country,
+            "flag": FLAGS.get(country, "🌐"),
+            "last_updated": _fmt_date(max(r["last_updated"] for r in rows)),
+            "rule_count": len(rows),
+            "groups": groups,
+        })
+
+    @routes.route("/api/employee/ask", methods=["POST"])
+    def api_employee_ask():
+        data = request.get_json(silent=True) or {}
+        prompt = data.get("prompt", "").strip()
+        if not prompt:
+            return jsonify({"error": "No prompt provided"}), 400
+        try:
+            from groq import Groq
+            import os
+            api_key = os.environ.get("GROQ_API_KEY")
+            if not api_key:
+                return jsonify({"error": "GROQ_API_KEY is not set. Get a free key at console.groq.com then run: export GROQ_API_KEY=your_key"}), 501
+            client = Groq(api_key=api_key)
+            chat = client.chat.completions.create(
+                model="llama-3.3-70b-versatile",
+                max_tokens=512,
+                messages=[{"role": "user", "content": prompt}],
+            )
+            return jsonify({"reply": chat.choices[0].message.content})
+        except ImportError:
+            return jsonify({"error": "groq SDK not installed. Run: pip install groq"}), 501
+        except Exception as exc:
+            logger.exception("Ask Atlas error")
+            return jsonify({"error": str(exc)}), 500
 
     @routes.route("/api/drift/<country>")
     def get_drift_country(country):
@@ -305,5 +411,78 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
         if not rule:
             return jsonify({"error": f"No rule found for {country}/{section} at {as_of_date}"}), 404
         return jsonify({"country": country, "section": section, "as_of_date": as_of_date, "rule": rule})
+
+    # ── Compliance Intelligence surfaces ──
+
+    @routes.route("/compliance")
+    def compliance_root():
+        return redirect(url_for("country_guide_routes.compliance_intake"))
+
+    @routes.route("/compliance/intake")
+    def compliance_intake():
+        return render_template("compliance_intake.html", nav_active="intake", flags=FLAGS)
+
+    @routes.route("/compliance/intake/pdf")
+    def compliance_intake_pdf():
+        return render_template(
+            "compliance_intake_pdf.html",
+            nav_active="intake",
+            flags=FLAGS,
+            sections=[{"id": g["id"], "label": g["label"], "sections": g["sections"]} for g in SECTION_GROUPS],
+        )
+
+    @routes.route("/compliance/pipeline")
+    def compliance_pipeline():
+        return render_template("compliance_pipeline.html", nav_active="intake")
+
+    @routes.route("/compliance/pipeline/<int:job_id>")
+    def compliance_pipeline_job(job_id):
+        return render_template("compliance_pipeline.html", nav_active="intake", focus_job=job_id)
+
+    @routes.route("/api/intake/pdf", methods=["POST"])
+    def api_intake_pdf():
+        jurisdiction = request.form.get("jurisdiction", "").strip()
+        publisher = request.form.get("publisher", "").strip()
+        doc_title = request.form.get("doc_title", "").strip()
+        authority = request.form.get("authority", "").strip()
+        effective_date = request.form.get("effective_date", "").strip()
+        file_hash = request.form.get("file_hash", "").strip()
+
+        source_url = f"pdf://{file_hash[:12] if file_hash else 'upload'}#{doc_title or 'untitled'}"
+        job_id = ingestion_job_service.create_job(source_url)
+
+        logger.info(
+            "PDF intake registered",
+            extra={
+                "stage": "pdf_intake",
+                "ingestion_job_id": job_id,
+                "jurisdiction": jurisdiction,
+                "publisher": publisher,
+                "authority": authority,
+                "effective_date": effective_date,
+            },
+        )
+
+        return jsonify({
+            "success": True,
+            "job_id": job_id,
+            "message": f"Document registered as job #{job_id}",
+        })
+
+    @routes.route("/compliance/dashboard")
+    def compliance_dashboard():
+        return render_template("compliance_base.html", nav_active="dashboard")
+
+    @routes.route("/compliance/review")
+    def compliance_review():
+        return render_template("compliance_base.html", nav_active="review")
+
+    @routes.route("/compliance/audit")
+    def compliance_audit():
+        return render_template("compliance_base.html", nav_active="audit")
+
+    @routes.route("/compliance/settings")
+    def compliance_settings():
+        return render_template("compliance_base.html", nav_active="settings")
 
     return routes

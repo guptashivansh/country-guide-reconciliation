@@ -1,5 +1,6 @@
 import json
 import logging
+import re
 import time
 import urllib.request
 import urllib.error
@@ -8,6 +9,10 @@ logger = logging.getLogger(__name__)
 
 _NOTION_API = "https://www.notion.so/api/v3"
 _PAGE_MENTION = "‣"  # ‣ inline page reference character
+
+# Country guide page titles follow the pattern "<Country> - Employment Guide".
+# Both ASCII hyphen and en-dash are tolerated.
+_GUIDE_TITLE_RE = re.compile(r"^(.+?)\s*[-–]\s*Employment Guide", re.IGNORECASE)
 
 
 def _to_uuid(raw_id: str) -> str:
@@ -50,32 +55,18 @@ class NotionIngestionService:
     separate API call per text block.
     """
 
-    def __init__(self, page_id: str, country_names: list):
+    def __init__(self, page_id: str, country_names: list = None):
         self.root_id = _to_uuid(page_id)
-        self._countries = {c.lower(): c for c in country_names}
+        self._countries = {c.lower(): c for c in (country_names or [])}
 
     # ------------------------------------------------------------------ public
 
     def fetch_country_texts(self) -> dict:
         """Return {canonical_country_name: plain_text} for each matched country page."""
-        logger.info("Loading root Notion page", extra={"page_id": self.root_id})
-        root_blocks = self._load_blocks(self.root_id)
-
-        qcg_id = self._find_country_guides_header(root_blocks)
-        if not qcg_id:
-            logger.error("Could not find 'Quick Country Guides' header on root page")
+        candidate_ids = self._collect_candidate_page_ids()
+        if not candidate_ids:
             return {}
 
-        qcg_header = root_blocks.get(qcg_id, {})
-
-        # Collect ‣ page mention IDs from all region column_lists
-        candidate_ids: set = set()
-        for col_list_id in qcg_header.get("content", []):
-            candidate_ids.update(self._collect_mentions_from_column_list(col_list_id))
-
-        logger.info("Collected page mention candidates", extra={"count": len(candidate_ids)})
-
-        # Load each candidate page and match against known country names
         results: dict = {}
         for page_id in candidate_ids:
             if len(results) >= len(self._countries):
@@ -101,6 +92,64 @@ class NotionIngestionService:
         if not results:
             logger.warning("No country pages found — Notion page structure may have changed")
         return results
+
+    def fetch_all_employment_guides(self) -> dict:
+        """
+        Auto-discovery variant: load every ‣ candidate page and keep the ones whose
+        title matches '<Country> - Employment Guide'. Returns {country: plain_text}
+        using the country name parsed from the page title (caller is responsible
+        for any aliasing, e.g. 'United Arab Emirates' → 'UAE').
+        """
+        candidate_ids = self._collect_candidate_page_ids()
+        if not candidate_ids:
+            return {}
+
+        results: dict = {}
+        for page_id in candidate_ids:
+            try:
+                time.sleep(1.5)
+                page_uuid = _to_uuid(page_id)
+                page_blocks = self._load_blocks(page_uuid)
+                root_block = page_blocks.get(page_uuid, {})
+                title = _plain_text(root_block.get("properties", {}).get("title", []))
+                match = _GUIDE_TITLE_RE.match(title.strip())
+                if not match:
+                    logger.debug("Skipping non-guide page: %r", title)
+                    continue
+                country = match.group(1).strip()
+                if country in results:
+                    continue
+                text = self._blocks_to_text(page_blocks, page_uuid)
+                results[country] = text
+                logger.info(
+                    "Discovered country guide",
+                    extra={"country": country, "char_count": len(text)},
+                )
+            except Exception as exc:
+                logger.debug("Skipping candidate page %s: %s", page_id, exc)
+
+        if not results:
+            logger.warning("Auto-discovery found no employment guides — page structure may have changed")
+        return results
+
+    def _collect_candidate_page_ids(self) -> set:
+        """Walk the root page → 'Quick Country Guides' header → region columns
+        and return the set of ‣ page-mention IDs found across all regions."""
+        logger.info("Loading root Notion page", extra={"page_id": self.root_id})
+        root_blocks = self._load_blocks(self.root_id)
+
+        qcg_id = self._find_country_guides_header(root_blocks)
+        if not qcg_id:
+            logger.error("Could not find 'Quick Country Guides' header on root page")
+            return set()
+
+        qcg_header = root_blocks.get(qcg_id, {})
+        candidate_ids: set = set()
+        for col_list_id in qcg_header.get("content", []):
+            candidate_ids.update(self._collect_mentions_from_column_list(col_list_id))
+
+        logger.info("Collected page mention candidates", extra={"count": len(candidate_ids)})
+        return candidate_ids
 
     # ----------------------------------------------------------------- helpers
 

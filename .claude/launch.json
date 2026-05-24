@@ -1,0 +1,19 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "flask-app",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["app.py"],
+      "cwd": "/Users/shivanshgupta/Desktop/country-guide-reconciliation",
+      "port": 8080
+    },
+    {
+      "name": "mkdocs",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["/Users/shivanshgupta/Desktop/country-guide-reconciliation/docs/serve.py"],
+      "cwd": "/Users/shivanshgupta/Desktop/country-guide-reconciliation",
+      "port": 8000
+    }
+  ]
+}

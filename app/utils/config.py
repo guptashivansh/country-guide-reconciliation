@@ -48,6 +48,10 @@ def slack_webhook_url():
     return os.environ.get("SLACK_WEBHOOK_URL", "")
 
 
+def app_base_url():
+    return os.environ.get("APP_BASE_URL", "http://localhost:5000").rstrip("/")
+
+
 def sync_cron_schedule():
     """5-field cron expression controlling when the scheduled sync runs. Empty string disables it."""
     return os.environ.get("SYNC_CRON_SCHEDULE", "")

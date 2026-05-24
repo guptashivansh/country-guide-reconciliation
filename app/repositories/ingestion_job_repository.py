@@ -1,15 +1,18 @@
-import sqlite3
 from datetime import datetime
+
+from app.utils.db import Database
 
 
 class IngestionJobRepository:
     VALID_STATES = {"queued", "fetched", "normalized", "extracted", "reconciled", "failed"}
 
-    def __init__(self, db_path):
-        self.db_path = db_path
+    def __init__(self, db):
+        if isinstance(db, str):
+            db = Database(db)
+        self.db = db
 
     def connect(self):
-        return sqlite3.connect(self.db_path)
+        return self.db.connect()
 
     def initialize_schema(self):
         conn = self.connect()

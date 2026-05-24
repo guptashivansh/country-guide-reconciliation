@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Workforce Overview — Skuad</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+/* ── Atlas design tokens (matches employee.html) ── */
+:root {
+  --paper:        #FFFFFF;
+  --paper-2:      #F6F7F9;
+  --paper-3:      #ECEEF2;
+  --paper-line:   #E2E5EB;
+  --ink:          #0E1014;
+  --ink-2:        #2E323B;
+  --ink-3:        #6B7180;
+  --ink-4:        #A2A8B5;
+  --accent:       #FF4800;
+  --accent-2:     #E03E00;
+  --accent-soft:  #FFE7DC;
+  --accent-line:  #FFBFA0;
+  --purple:       #6F4FF2;
+  --purple-2:     #5B3FE0;
+  --purple-soft:  #ECE7FF;
+  --purple-line:  #C6B8FF;
+  --navy:         #1B2336;
+  --ok:           #1E8A5F;
+  --ok-soft:      #DCF1E6;
+  --warn:         #C9740F;
+  --warn-soft:    #FFEFD6;
+  --danger:       #C8302D;
+  --danger-soft:  #FDE5E4;
+  --info:         #1E5FB6;
+  --info-soft:    #E2EDFB;
+  --font-ui:      "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  --font-mono:    "JetBrains Mono", ui-monospace, monospace;
+  --radius-s: 6px;
+  --radius-m: 10px;
+  --radius-l: 16px;
+  --radius-xl: 24px;
+  --shadow-1: 0 1px 0 rgba(14,16,20,0.04), 0 1px 2px rgba(14,16,20,0.05);
+  --shadow-2: 0 2px 6px rgba(14,16,20,0.06), 0 14px 32px -18px rgba(14,16,20,0.18);
+  --shadow-3: 0 8px 24px -8px rgba(14,16,20,0.18), 0 28px 60px -28px rgba(14,16,20,0.28);
+  --maxw: 1280px;
+  --gutter: 28px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+}
+body { min-height: 100vh; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; cursor: pointer; border: 0; background: transparent; }
+input, textarea, select { font: inherit; color: inherit; }
+::selection { background: var(--accent); color: #fff; }
+
+.eyebrow { font-family: var(--font-mono); font-size: 10.5px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: var(--paper-line); border-radius: 999px; border: 2px solid var(--paper); }
+::-webkit-scrollbar-thumb:hover { background: var(--ink-4); }
+
+/* ── App bar ── */
+.appbar {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(255,255,255,0.86);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border-bottom: 1px solid var(--paper-line);
+}
+.appbar-row1 {
+  height: 56px;
+  display: flex; align-items: center;
+  padding: 0 var(--gutter);
+  gap: 18px;
+}
+.appbar-brand { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.appbar-logo {
+  width: 28px; height: 28px;
+  background: var(--accent);
+  border-radius: var(--radius-s);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 800; color: #fff;
+  letter-spacing: -0.5px;
+}
+.appbar-name { font-weight: 700; font-size: 16px; letter-spacing: -0.3px; }
+.appbar-divider { width: 1px; height: 22px; background: var(--paper-line); }
+.appbar-product { font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); letter-spacing: 0.04em; }
+.appbar-crumb {
+  font-family: var(--font-mono); font-size: 11px; color: var(--ink-4);
+  display: flex; align-items: center; gap: 6px;
+}
+.appbar-crumb a { color: var(--ink-3); }
+.appbar-crumb a:hover { color: var(--ink); }
+.appbar-crumb-sep { color: var(--paper-line); }
+.appbar-spacer { flex: 1; }
+.appbar-actions { display: flex; align-items: center; gap: 8px; }
+.appbar-btn {
+  height: 32px; padding: 0 12px;
+  border: 1px solid var(--paper-line);
+  border-radius: var(--radius-s);
+  background: var(--paper-2);
+  font-size: 12px; color: var(--ink-3);
+  display: flex; align-items: center; gap: 6px;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.appbar-btn:hover { color: var(--ink); background: var(--paper-3); }
+.appbar-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+.appbar-icon-btn {
+  width: 32px; height: 32px; padding: 0;
+  border: 1px solid var(--paper-line);
+  border-radius: var(--radius-s);
+  background: var(--paper-2);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--ink-3);
+  position: relative;
+  transition: all 0.15s;
+}
+.appbar-icon-btn:hover { color: var(--ink); background: var(--paper-3); }
+.appbar-icon-btn .dot {
+  position: absolute; top: 5px; right: 5px;
+  width: 7px; height: 7px; background: var(--accent);
+  border: 2px solid var(--paper); border-radius: 50%;
+}
+.appbar-tenant {
+  display: flex; align-items: center; gap: 8px;
+  padding: 4px 10px 4px 4px;
+  border: 1px solid var(--paper-line);
+  border-radius: 999px;
+  background: var(--paper-2);
+}
+.appbar-tenant-mark {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1B2336 0%, #2E323B 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color: #fff;
+  flex-shrink: 0;
+}
+.appbar-tenant-name {
+  font-size: 12.5px; font-weight: 600; color: var(--ink-2);
+}
+.appbar-tenant-caret { color: var(--ink-4); }
+.appbar-avatar {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--purple) 0%, var(--accent) 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color: #fff;
+  flex-shrink: 0;
+}
+
+/* nav tabs row */
+.appbar-row2 {
+  display: flex;
+  padding: 0 var(--gutter);
+  gap: 4px;
+  border-top: 1px solid transparent;
+}
+.appbar-tab {
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-3);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.15s;
+  display: flex; align-items: center; gap: 6px;
+  white-space: nowrap;
+}
+.appbar-tab:hover { color: var(--ink); }
+.appbar-tab.active {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}
+.appbar-tab-count {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--paper-3);
+  color: var(--ink-3);
+}
+.appbar-tab.active .appbar-tab-count {
+  background: var(--accent-soft);
+  color: var(--accent-2);
+}
+
+/* ── Shell ── */
+.shell {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 32px var(--gutter) 80px;
+}
+
+/* ── Buttons ── */
+.btn {
+  height: 36px; padding: 0 16px;
+  border-radius: var(--radius-m);
+  font-size: 13px; font-weight: 600;
+  transition: all 0.15s;
+  white-space: nowrap;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.btn-primary { background: var(--purple); color: #fff; }
+.btn-primary:hover:not(:disabled) { background: var(--purple-2); }
+.btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
+.btn-accent { background: var(--accent); color: #fff; }
+.btn-accent:hover:not(:disabled) { background: var(--accent-2); }
+.btn-ghost { background: transparent; border: 1px solid var(--paper-line); color: var(--ink-2); }
+.btn-ghost:hover { background: var(--paper-2); }
+.btn-sm { height: 30px; padding: 0 12px; font-size: 12px; }
+
+/* ── Section heading ── */
+.section-head {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+.section-head h2 {
+  font-size: 20px; font-weight: 700; letter-spacing: -0.3px;
+  margin-top: 4px;
+}
+.section-head .sub {
+  font-size: 13px; color: var(--ink-3); margin-top: 4px;
+}
+.section-head-actions { display: flex; gap: 8px; align-items: center; }
+
+/* ── Card ── */
+.card {
+  background: var(--paper);
+  border: 1px solid var(--paper-line);
+  border-radius: var(--radius-m);
+  box-shadow: var(--shadow-1);
+}
+.card-pad { padding: 18px 20px; }
+
+/* ── Generic tags ── */
+.tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 9px; border-radius: 999px;
+  font-family: var(--font-mono); font-size: 10.5px;
+  font-weight: 600; letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.tag-ok { background: var(--ok-soft); color: var(--ok); }
+.tag-warn { background: var(--warn-soft); color: var(--warn); }
+.tag-danger { background: var(--danger-soft); color: var(--danger); }
+.tag-info { background: var(--info-soft); color: var(--info); }
+.tag-purple { background: var(--purple-soft); color: var(--purple-2); }
+.tag-accent { background: var(--accent-soft); color: var(--accent-2); }
+.tag-neutral { background: var(--paper-3); color: var(--ink-3); }
+.tag-outline { background: transparent; border: 1px solid var(--paper-line); color: var(--ink-3); }
+
+.dot-status { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.dot-ok { background: var(--ok); }
+.dot-warn { background: var(--warn); }
+.dot-danger { background: var(--danger); }
+.dot-info { background: var(--info); }
+.dot-neutral { background: var(--ink-4); }
+
+/* ── KPI strip ── */
+.kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 28px;
+}
+.kpi {
+  background: var(--paper);
+  border: 1px solid var(--paper-line);
+  border-radius: var(--radius-m);
+  padding: 16px 18px;
+  position: relative;
+}
+.kpi-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.kpi-label {
+  font-family: var(--font-mono); font-size: 10.5px;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--ink-3); font-weight: 500;
+}
+.kpi-value {
+  font-family: var(--font-ui);
+  font-size: 28px; font-weight: 800; letter-spacing: -0.8px;
+  line-height: 1.05;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.kpi-unit {
+  font-size: 14px; font-weight: 700; color: var(--ink-3);
+  margin-left: 4px;
+}
+.kpi-foot {
+  display: flex; align-items: center; gap: 6px;
+  margin-top: 8px;
+  font-family: var(--font-mono); font-size: 11px;
+  color: var(--ink-3);
+}
+.kpi-delta { font-weight: 600; }
+.kpi-delta-up { color: var(--ok); }
+.kpi-delta-down { color: var(--danger); }
+.kpi-delta-flat { color: var(--ink-3); }
+.kpi-spark { position: absolute; right: 14px; bottom: 14px; opacity: 0.35; }
+@media (max-width: 900px) { .kpi-strip { grid-template-columns: repeat(2, 1fr); } }
+
+/* ── Tables (dense) ── */
+.dtable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.dtable thead th {
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--paper-line);
+  background: var(--paper-2);
+  white-space: nowrap;
+}
+.dtable thead th:first-child { border-top-left-radius: var(--radius-m); }
+.dtable thead th:last-child { border-top-right-radius: var(--radius-m); }
+.dtable tbody td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--paper-line);
+  vertical-align: middle;
+}
+.dtable tbody tr:last-child td { border-bottom: none; }
+.dtable tbody tr:hover { background: var(--paper-2); }
+.dtable .num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.dtable .right { text-align: right; }
+
+/* ── Ask Atlas ── */
+.ask-atlas {
+  background: linear-gradient(135deg, var(--purple-soft) 0%, #F4EFFF 100%);
+  border: 1px solid var(--purple-line);
+  border-radius: var(--radius-l);
+  padding: 22px 24px 20px;
+  margin-bottom: 28px;
+  position: relative;
+  overflow: hidden;
+}
+.ask-atlas::after {
+  content: ""; position: absolute; top: -40px; right: -40px;
+  width: 180px; height: 180px;
+  background: radial-gradient(circle, rgba(255,255,255,0.45) 0%, transparent 70%);
+  pointer-events: none;
+}
+.ask-atlas-header {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 14px;
+}
+.ask-atlas-mark {
+  width: 26px; height: 26px;
+  border-radius: 8px;
+  background: var(--purple);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff;
+}
+.ask-atlas-title { font-size: 14px; font-weight: 700; color: var(--purple-2); }
+.ask-atlas-sub { font-size: 12px; color: var(--purple-2); opacity: 0.7; margin-left: auto; font-family: var(--font-mono); }
+.ask-atlas-bar { display: flex; gap: 10px; align-items: center; position: relative; z-index: 1; }
+.ask-atlas-bar input {
+  flex: 1;
+  background: rgba(255,255,255,0.85);
+  border: 1px solid rgba(255,255,255,0.7);
+  border-radius: var(--radius-m);
+  padding: 11px 14px;
+  font-size: 14px; color: var(--ink);
+  outline: none;
+}
+.ask-atlas-bar input::placeholder { color: var(--ink-4); }
+.ask-suggestions {
+  display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px;
+  position: relative; z-index: 1;
+}
+.ask-suggestion {
+  font-size: 12px; color: var(--purple-2);
+  background: rgba(255,255,255,0.7);
+  border: 1px solid rgba(255,255,255,0.95);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+.ask-suggestion:hover { background: #fff; }
+
+/* ── Tiny helper bits ── */
+.hr-soft { height: 1px; background: var(--paper-line); border: 0; }
+.row { display: flex; align-items: center; gap: 8px; }
+.col { display: flex; flex-direction: column; gap: 4px; }
+.flex-1 { flex: 1; }
+.text-muted { color: var(--ink-3); }
+.text-sm { font-size: 12.5px; }
+.text-xs { font-size: 11px; }
+.text-mono-sm { font-family: var(--font-mono); font-size: 11px; }
+
+/* ── Pills (filters) ── */
+.pill-row { display: inline-flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.pill {
+  padding: 5px 11px;
+  font-size: 12px; font-weight: 600;
+  color: var(--ink-3);
+  background: var(--paper-2);
+  border: 1px solid var(--paper-line);
+  border-radius: 999px;
+  transition: all 0.15s;
+}
+.pill:hover { color: var(--ink); }
+.pill.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+/* ── Overview page-specific styles ── */
+
+/* greet */
+.ov-greet {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 28px;
+  padding: 28px 0 0;
+  margin-bottom: 28px;
+}
+@media (max-width: 900px) { .ov-greet { grid-template-columns: 1fr; } }
+.ov-greet h1 { font-size: 36px; font-weight: 800; letter-spacing: -1.2px; line-height: 1.08; margin-bottom: 10px; }
+.ov-greet h1 .mark { color: var(--accent); }
+.ov-greet .sub { font-size: 14px; color: var(--ink-3); max-width: 560px; line-height: 1.6; }
+.ov-greet .sub strong { color: var(--ink-2); font-weight: 600; }
+.ov-greet-pills { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+.ov-greet-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--ink-3);
+  background: var(--paper-2); border: 1px solid var(--paper-line);
+  padding: 5px 10px; border-radius: 999px;
+}
+.ov-greet-pill .num { font-weight: 700; color: var(--ink-2); }
+
+.ov-snapshot {
+  background: linear-gradient(135deg, #1B2336 0%, #0E1014 100%);
+  color: #fff;
+  border-radius: var(--radius-l);
+  padding: 22px 24px;
+  box-shadow: var(--shadow-3);
+  display: flex; flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+.ov-snapshot::before {
+  content:""; position:absolute; right:-60px; top:-60px;
+  width: 240px; height: 240px;
+  background: radial-gradient(circle, rgba(255,72,0,0.16) 0%, transparent 70%);
+}
+.ov-snapshot-label { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.6; margin-bottom: 14px; }
+.ov-snapshot-h { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+.ov-snapshot-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; position: relative; }
+.ov-snap-v { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; font-variant-numeric: tabular-nums; }
+.ov-snap-v .u { font-size: 11px; font-weight: 600; opacity: 0.7; margin-left: 3px; }
+.ov-snap-l { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.6; margin-top: 3px; }
+.ov-snap-flags { display: flex; gap: 6px; flex-wrap: wrap; }
+.ov-snap-flag {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-family: var(--font-mono);
+}
+.ov-snap-foot {
+  padding-top: 14px; margin-top: auto;
+  border-top: 1px solid rgba(255,255,255,0.12);
+  display: flex; justify-content: space-between; align-items: center;
+  font-family: var(--font-mono); font-size: 11px; opacity: 0.75;
+}
+
+/* ── Country grid ── */
+.ctry-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+@media (max-width: 1000px) { .ctry-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px) { .ctry-grid { grid-template-columns: 1fr; } }
+
+.ctry-card {
+  background: var(--paper);
+  border: 1px solid var(--paper-line);
+  border-radius: var(--radius-l);
+  padding: 20px 22px;
+  box-shadow: var(--shadow-1);
+  transition: all 0.15s;
+  display: flex; flex-direction: column; gap: 14px;
+  cursor: pointer;
+  position: relative;
+}
+.ctry-card:hover {
+  border-color: var(--accent-line);
+  box-shadow: var(--shadow-2);
+  transform: translateY(-1px);
+}
+.ctry-card.focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft), var(--shadow-2); }
+.ctry-card.available { background: var(--paper); border-style: dashed; border-color: var(--paper-line); }
+.ctry-card.available:hover { border-style: solid; border-color: var(--purple-line); box-shadow: var(--shadow-2); }
+.ctry-card.available .ctry-link { color: var(--purple); }
+.ctry-card .avail-note {
+  font-size: 12.5px; color: var(--ink-3);
+  background: var(--paper-2);
+  border-radius: var(--radius-s);
+  padding: 8px 10px;
+  margin-top: -4px;
+  font-style: italic;
+}
+
+.ctry-head { display: flex; align-items: center; gap: 12px; }
+.ctry-flag {
+  width: 48px; height: 48px; border-radius: var(--radius-m);
+  background: var(--paper-2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px;
+  flex-shrink: 0;
+}
+.ctry-name { font-size: 17px; font-weight: 800; letter-spacing: -0.3px; }
+.ctry-region { font-family: var(--font-mono); font-size: 10.5px; color: var(--ink-3); letter-spacing: 0.06em; }
+.ctry-headcount { margin-left: auto; text-align: right; }
+.ctry-headcount-v { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; font-variant-numeric: tabular-nums; }
+.ctry-headcount-l { font-family: var(--font-mono); font-size: 10px; color: var(--ink-3); letter-spacing: 0.08em; text-transform: uppercase; }
+
+.ctry-metric-row {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 0 16px;
+}
+.ctry-metric { padding: 8px 0; }
+.ctry-metric-l { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 2px; }
+.ctry-metric-v { font-family: var(--font-mono); font-weight: 700; color: var(--ink); font-size: 14px; }
+.ctry-metric-v .delta { font-size: 11px; font-weight: 600; margin-left: 5px; }
+.delta-up { color: var(--ok); } .delta-down { color: var(--danger); }
+
+.ctry-foot {
+  display: flex; align-items: center; justify-content: space-between;
+  padding-top: 12px; border-top: 1px solid var(--paper-line);
+  gap: 10px;
+}
+.ctry-status-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+.ctry-link {
+  font-size: 12px; font-weight: 600; color: var(--accent);
+  display: inline-flex; align-items: center; gap: 4px;
+}
+
+/* ── Map / global section ── */
+.map-section {
+  background: linear-gradient(180deg, var(--paper-2) 0%, var(--paper) 100%);
+  border: 1px solid var(--paper-line);
+  border-radius: var(--radius-l);
+  padding: 24px;
+  margin-bottom: 36px;
+}
+.map-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 18px; flex-wrap: wrap; }
+.map-head h3 { font-size: 18px; font-weight: 700; }
+.map-head .sub { font-size: 13px; color: var(--ink-3); margin-top: 4px; }
+
+.map-canvas {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+@media (max-width: 900px) { .map-canvas { grid-template-columns: 1fr; } }
+
+.world {
+  position: relative;
+  aspect-ratio: 16/9;
+  background: var(--paper);
+  border: 1px solid var(--paper-line);
+  border-radius: var(--radius-m);
+  overflow: hidden;
+}
+.world svg { width: 100%; height: 100%; display: block; }
+.world-dot {
+  position: absolute;
+  border-radius: 50%;
+  border: 3px solid var(--paper);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; color: #fff;
+  font-family: var(--font-mono);
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  transition: all 0.18s;
+  text-decoration: none;
+}
+.world-dot.active {
+  width: 42px; height: 42px;
+  background: var(--accent);
+  box-shadow: 0 6px 18px rgba(255,72,0,0.42);
+  font-size: 13px;
+  z-index: 3;
+}
+.world-dot.avail {
+  width: 26px; height: 26px;
+  background: #fff;
+  border: 1.5px solid #A2A8B5;
+  font-size: 13px;
+  color: var(--ink);
+  box-shadow: 0 2px 6px rgba(14,16,20,0.10);
+  z-index: 2;
+}
+.world-dot.avail:hover { transform: translate(-50%, -50%) scale(1.18); border-color: var(--purple); z-index: 4; box-shadow: 0 4px 12px rgba(111,79,242,0.32); }
+.world-dot.active:hover { transform: translate(-50%, -50%) scale(1.1); z-index: 6; }
+.world-pulse {
+  position: absolute;
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: rgba(255,72,0,0.18);
+  transform: translate(-50%, -50%);
+  animation: world-pulse 2.4s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes world-pulse {
+  0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.7; }
+  100% { transform: translate(-50%, -50%) scale(1.6); opacity: 0; }
+}
+
+.map-legend { display: flex; flex-direction: column; gap: 8px; }
+.map-legend-row {
+  display: grid; grid-template-columns: 1fr auto auto;
+  align-items: center; gap: 12px;
+  padding: 10px 12px;
+  background: var(--paper);
+  border: 1px solid var(--paper-line);
+  border-radius: var(--radius-s);
+}
+.map-legend-row:hover { border-color: var(--ink-4); }
+.map-legend-flag { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; }
+.map-legend-flag .emoji { font-size: 20px; }
+.map-legend-count { font-family: var(--font-mono); font-weight: 700; font-size: 13px; }
+.map-legend-bar {
+  width: 56px; height: 6px;
+  background: var(--paper-3); border-radius: 3px; overflow: hidden;
+}
+.map-legend-bar-fill { height: 100%; background: var(--accent); border-radius: 3px; }
+
+/* compare countries (cost) */
+.compare {
+  background: var(--paper);
+  border: 1px solid var(--paper-line);
+  border-radius: var(--radius-l);
+  padding: 22px 24px;
+  margin-bottom: 36px;
+  box-shadow: var(--shadow-1);
+}
+.compare-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 18px; flex-wrap: wrap; }
+.compare-head h3 { font-size: 18px; font-weight: 700; }
+.compare-head .sub { font-size: 13px; color: var(--ink-3); margin-top: 3px; }
+
+.compare-controls {
+  display: flex; gap: 10px; align-items: center;
+  flex-wrap: wrap;
+}
+.compare-control {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--paper-2); border: 1px solid var(--paper-line);
+  border-radius: var(--radius-s);
+  padding: 6px 10px;
+  font-size: 12px;
+}
+.compare-control select {
+  background: transparent; border: none; outline: none;
+  font-weight: 600; color: var(--ink); padding-right: 4px;
+}
+
+.compare-bars { display: flex; flex-direction: column; gap: 12px; }
+.compare-row { display: grid; grid-template-columns: 140px 1fr 120px; gap: 16px; align-items: center; }
+.compare-row-name { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; }
+.compare-row-name .emoji { font-size: 18px; }
+.compare-row-bar { position: relative; height: 28px; background: var(--paper-3); border-radius: var(--radius-s); overflow: hidden; }
+.compare-row-bar-base { position: absolute; left: 0; top: 0; height: 100%; background: var(--ink-2); }
+.compare-row-bar-over { position: absolute; top: 0; height: 100%; background: var(--accent); }
+.compare-row-bar-label {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+}
+.compare-row-total { font-family: var(--font-mono); font-weight: 700; font-size: 14px; text-align: right; }
+.compare-row-total-sub { font-size: 11px; color: var(--ink-3); font-family: var(--font-mono); margin-top: 2px; }
+.compare-row.you .compare-row-name::after { content: "YOU"; font-family: var(--font-mono); font-size: 9px; padding: 1px 5px; background: var(--accent-soft); color: var(--accent-2); border-radius: 3px; margin-left: 4px; letter-spacing: 0.06em; }
+.compare-legend {
+  display: flex; gap: 18px; margin-top: 14px;
+  font-size: 12px; color: var(--ink-3);
+}
+.compare-legend-item { display: flex; align-items: center; gap: 6px; }
+.compare-legend-sw { width: 12px; height: 8px; border-radius: 2px; }
+
+/* feed */
+.feed-section {
+  display: grid; grid-template-columns: 1.6fr 1fr; gap: 20px;
+  margin-bottom: 36px;
+}
+@media (max-width: 900px) { .feed-section { grid-template-columns: 1fr; } }
+.feed-card { background: var(--paper); border: 1px solid var(--paper-line); border-radius: var(--radius-l); padding: 22px 24px; box-shadow: var(--shadow-1); }
+.feed-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+.feed-card .sub { font-size: 12.5px; color: var(--ink-3); margin-bottom: 18px; }
+.feed { display: flex; flex-direction: column; gap: 4px; }
+.feed-item {
+  display: grid; grid-template-columns: 100px 1fr auto;
+  gap: 14px; padding: 12px 0;
+  border-bottom: 1px solid var(--paper-line);
+  align-items: center;
+}
+.feed-item:last-child { border-bottom: none; }
+.feed-date { font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); }
+.feed-meta { display: flex; align-items: center; gap: 8px; }
+.feed-flag { font-size: 18px; }
+.feed-text { font-size: 13px; color: var(--ink-2); font-weight: 500; }
+.feed-text .where { color: var(--ink-3); font-weight: 400; }
+.feed-action { font-size: 12px; font-weight: 600; color: var(--purple); }
+.feed-action:hover { text-decoration: underline; }
+
+/* ── Provenance cards ── */
+.prov-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+@media (max-width: 900px) { .prov-grid { grid-template-columns: 1fr; } }
+.prov-card {
+  background: var(--paper);
+  border: 1px solid var(--paper-line);
+  border-radius: var(--radius-m);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-1);
+  display: flex; flex-direction: column; gap: 10px;
+  transition: border-color 0.15s;
+}
+.prov-card:hover { border-color: var(--purple-line); }
+.prov-card-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.prov-card-section {
+  font-size: 13px; font-weight: 700; color: var(--ink);
+}
+.prov-card-rule {
+  font-size: 13px; color: var(--ink-2); line-height: 1.55;
+}
+.prov-card-fragment {
+  font-size: 12.5px; color: var(--ink-3); line-height: 1.6;
+  background: var(--paper-2);
+  border-left: 3px solid var(--purple-line);
+  border-radius: 0 var(--radius-s) var(--radius-s) 0;
+  padding: 10px 14px;
+  font-style: italic;
+}
+.prov-card-meta {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  font-family: var(--font-mono); font-size: 10.5px; color: var(--ink-4);
+}
+.prov-conf {
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.prov-conf-bar {
+  width: 40px; height: 4px; background: var(--paper-3); border-radius: 2px; overflow: hidden;
+}
+.prov-conf-fill { height: 100%; border-radius: 2px; }
+.prov-empty {
+  text-align: center; padding: 40px 20px;
+  color: var(--ink-3); font-size: 13px;
+  font-family: var(--font-mono);
+}
+</style>
+</head>
+<body>
+
+<div id="root">
+  <div style="display:flex;align-items:center;justify-content:center;min-height:100vh;color:var(--ink-4);font-family:var(--font-mono);font-size:13px;">Loading…</div>
+</div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+
+{% raw %}
+<script type="text/babel" data-presets="react">
+const { useState, useEffect } = React;
+
+const COMPANY = "Lumen Robotics";
+
+/* ACTIVE — countries the client currently has employees in. */
+const ACTIVE_COUNTRIES = [
+  {
+    id: "in", name: "India", flag: "🇮🇳", region: "South Asia",
+    headcount: 23, openReqs: 4, monthlyUsd: 340800,
+    avgTenure: "2.1 yrs", loadPct: 17.4,
+    deltaHc: "+3 QoQ", deltaCost: "+4.2%",
+    changes: 3, alerts: "warn",
+    mapX: 70.5, mapY: 51,
+  },
+];
+
+/* AVAILABLE — countries the client can hire in via Skuad, but doesn't yet. */
+const AVAILABLE_COUNTRIES = [
+  { id:"my", name:"Malaysia",      flag:"🇲🇾", region:"Southeast Asia",  seniorEngUsd: 39000,  loadPct: 16.4, leadDays: 5,  changes: 1, talent: "Strong",    note: "English-fluent · tech hub",       mapX: 77,   mapY: 60, recommended: true },
+  { id:"ph", name:"Philippines",   flag:"🇵🇭", region:"Southeast Asia",  seniorEngUsd: 36000,  loadPct: 13.2, leadDays: 4,  changes: 0, talent: "Deep",      note: "English-native · BPO heritage",   mapX: 84,   mapY: 55, recommended: true },
+  { id:"vn", name:"Vietnam",       flag:"🇻🇳", region:"Southeast Asia",  seniorEngUsd: 32000,  loadPct: 21.5, leadDays: 7,  changes: 1, talent: "Growing",   note: "Fastest-growing tech talent pool",mapX: 79.5, mapY: 56, recommended: true },
+  { id:"mx", name:"Mexico",        flag:"🇲🇽", region:"Latin America",   seniorEngUsd: 55900,  loadPct: 33.1, leadDays: 6,  changes: 1, talent: "Strong",    note: "US time zones · nearshore",       mapX: 19.5, mapY: 49, recommended: true },
+  { id:"pl", name:"Poland",        flag:"🇵🇱", region:"Europe",          seniorEngUsd: 68000,  loadPct: 22.6, leadDays: 8,  changes: 0, talent: "Strong",    note: "EU coverage · strong engineering",mapX: 53,   mapY: 32, recommended: true },
+  { id:"de", name:"Germany",       flag:"🇩🇪", region:"Europe",          seniorEngUsd: 103700, loadPct: 23.4, leadDays: 9,  changes: 2, talent: "Strong",    note: "EU/EEA strategic hire",           mapX: 51,   mapY: 33, recommended: true },
+  { id:"sg", name:"Singapore",     flag:"🇸🇬", region:"Southeast Asia",  seniorEngUsd: 92000,  loadPct: 17.0, leadDays: 5,  changes: 0, talent: "Premium",   note: "Regional HQ · APAC hub",          mapX: 78.2, mapY: 63 },
+  { id:"id", name:"Indonesia",     flag:"🇮🇩", region:"Southeast Asia",  seniorEngUsd: 27000,  loadPct: 19.8, leadDays: 8,  changes: 1, talent: "Growing",   note: "Massive market access",           mapX: 80.5, mapY: 67 },
+  { id:"th", name:"Thailand",      flag:"🇹🇭", region:"Southeast Asia",  seniorEngUsd: 34000,  loadPct: 18.4, leadDays: 7,  changes: 0, talent: "Moderate",  note: "Stable · creative talent",        mapX: 78,   mapY: 57 },
+  { id:"ae", name:"UAE",           flag:"🇦🇪", region:"Middle East",     seniorEngUsd: 78000,  loadPct:  8.2, leadDays:10,  changes: 0, talent: "Mixed",     note: "Tax-free · expat-friendly",       mapX: 62,   mapY: 50 },
+  { id:"uk", name:"United Kingdom",flag:"🇬🇧", region:"Europe",          seniorEngUsd: 95000,  loadPct: 21.8, leadDays: 6,  changes: 0, talent: "Strong",    note: "Post-Brexit, IR35 aware",         mapX: 47,   mapY: 30 },
+  { id:"es", name:"Spain",         flag:"🇪🇸", region:"Europe",          seniorEngUsd: 62000,  loadPct: 31.5, leadDays: 9,  changes: 0, talent: "Strong",    note: "EU + LATAM bridge · remote-friendly", mapX:47, mapY: 38 },
+  { id:"pt", name:"Portugal",      flag:"🇵🇹", region:"Europe",          seniorEngUsd: 54000,  loadPct: 26.8, leadDays: 8,  changes: 0, talent: "Strong",    note: "EU · low cost · tech-friendly visa", mapX:45, mapY: 38 },
+  { id:"us", name:"United States", flag:"🇺🇸", region:"North America",   seniorEngUsd:179000,  loadPct: 26.2, leadDays:12,  changes: 2, talent: "Premium",   note: "State-by-state compliance",       mapX: 19,   mapY: 38 },
+  { id:"ca", name:"Canada",        flag:"🇨🇦", region:"North America",   seniorEngUsd: 98000,  loadPct: 18.5, leadDays: 8,  changes: 0, talent: "Strong",    note: "US time zones · CPP/EI",          mapX: 22,   mapY: 32 },
+  { id:"br", name:"Brazil",        flag:"🇧🇷", region:"Latin America",   seniorEngUsd: 52700,  loadPct: 38.7, leadDays: 9,  changes: 0, talent: "Strong",    note: "Largest LATAM market",            mapX: 32,   mapY: 70 },
+  { id:"ar", name:"Argentina",     flag:"🇦🇷", region:"Latin America",   seniorEngUsd: 38000,  loadPct: 32.4, leadDays: 9,  changes: 1, talent: "Strong",    note: "USD contracts · USD-pegged comp", mapX: 30,   mapY: 76 },
+  { id:"za", name:"South Africa",  flag:"🇿🇦", region:"Africa",          seniorEngUsd: 48000,  loadPct: 12.8, leadDays: 7,  changes: 0, talent: "Moderate",  note: "English-fluent · EU overlap",     mapX: 56,   mapY: 78 },
+  { id:"ke", name:"Kenya",         flag:"🇰🇪", region:"Africa",          seniorEngUsd: 32000,  loadPct: 16.2, leadDays:11,  changes: 0, talent: "Growing",   note: "Africa tech corridor",            mapX: 60,   mapY: 60 },
+  { id:"jp", name:"Japan",         flag:"🇯🇵", region:"East Asia",       seniorEngUsd:118000,  loadPct: 16.5, leadDays:14,  changes: 0, talent: "Premium",   note: "Slow but stable · seniority",     mapX: 88,   mapY: 41 },
+  { id:"au", name:"Australia",     flag:"🇦🇺", region:"Oceania",         seniorEngUsd:112000,  loadPct: 14.5, leadDays: 8,  changes: 0, talent: "Strong",    note: "APAC coverage · superannuation",  mapX: 88,   mapY: 80 },
+  { id:"nl", name:"Netherlands",   flag:"🇳🇱", region:"Europe",          seniorEngUsd: 92000,  loadPct: 25.2, leadDays: 8,  changes: 0, talent: "Strong",    note: "EU · English-fluent",             mapX: 49,   mapY: 31 },
+];
+
+const RECOMMENDED = AVAILABLE_COUNTRIES.filter(c => c.recommended);
+const TOTAL_AVAILABLE = AVAILABLE_COUNTRIES.length;
+
+const TOTAL_HEAD = ACTIVE_COUNTRIES.reduce((s, c) => s + c.headcount, 0);
+const TOTAL_OPEN = ACTIVE_COUNTRIES.reduce((s, c) => s + c.openReqs, 0);
+const TOTAL_CHANGES = ACTIVE_COUNTRIES.reduce((s, c) => s + c.changes, 0);
+const SKUAD_COUNTRY_COUNT = 1 + TOTAL_AVAILABLE;
+
+/* Route into the existing Atlas employee guide where the country exists in the DB.
+   Countries not yet in the DB will 404 — same shape as the design's stub pages. */
+const countryHref = (c) => `/employee/${encodeURIComponent(c.name)}`;
+
+/* Compliance feed — India focused */
+const FEED = [
+  { date: "Nov 22",  flag: "🇮🇳", country: "India",   text: "Code on Wages — base salary definition changes",        impact: "All 23 employees", severity: "danger" },
+  { date: "Nov 18",  flag: "🇮🇳", country: "India",   text: "Karnataka professional-tax slab revision",              impact: "8 employees",      severity: "warn" },
+  { date: "Nov 09",  flag: "🇮🇳", country: "India",   text: "EPF wage-ceiling raise to ₹21,000/month proposed",      impact: "12 employees · pending", severity: "info" },
+  { date: "Nov 02",  flag: "🇮🇳", country: "India",   text: "Maharashtra revised minimum wages",                     impact: "0 employees · above floor", severity: "info" },
+];
+
+const HIRING = [
+  { flag:"🇮🇳", country:"India",      role:"Senior ML Engineer · L5",     cost:"₹38 L / yr",     state:"ready",   kind:"req",       eta:"Hire-ready" },
+  { flag:"🇮🇳", country:"India",      role:"Engineering Manager · M5",    cost:"₹52 L / yr",     state:"ready",   kind:"req",       eta:"Hire-ready" },
+  { flag:"🇮🇳", country:"India",      role:"Staff Software Engineer · L6",cost:"₹62 L / yr",     state:"ready",   kind:"req",       eta:"Hire-ready" },
+  { flag:"🇮🇳", country:"India",      role:"Senior Product Designer",     cost:"₹32 L / yr",     state:"ready",   kind:"req",       eta:"Hire-ready" },
+  { flag:"🇲🇾", country:"Malaysia",   role:"Try: Senior SWE in Kuala Lumpur", cost:"~$39K /yr",  state:"explore", kind:"expansion", eta:"5-day setup" },
+  { flag:"🇵🇭", country:"Philippines",role:"Try: Customer Success Lead",  cost:"~$42K /yr",      state:"explore", kind:"expansion", eta:"4-day setup" },
+  { flag:"🇲🇽", country:"Mexico",     role:"Try: Sr Engineer (US time zones)",cost:"~$56K /yr",  state:"explore", kind:"expansion", eta:"6-day setup" },
+];
+
+const ROLE_COMPARE = {
+  "Senior Software Engineer": [
+    { ctry: "Vietnam",       flag: "🇻🇳", base: 26000, load:  6000, curr: "VND 660M base + 22%",  active: false },
+    { ctry: "Philippines",   flag: "🇵🇭", base: 32000, load:  4000, curr: "PHP 1.85M base + 13%", active: false },
+    { ctry: "India",         flag: "🇮🇳", base: 33000, load:  6000, curr: "₹27.4L base + 17%",    active: true  },
+    { ctry: "Malaysia",      flag: "🇲🇾", base: 34000, load:  5000, curr: "MYR 175K base + 16%",  active: false },
+    { ctry: "Mexico",        flag: "🇲🇽", base: 42000, load: 13900, curr: "MXN 720K base + 33%",  active: false },
+    { ctry: "Poland",        flag: "🇵🇱", base: 55000, load: 13000, curr: "PLN 270K base + 23%",  active: false },
+    { ctry: "United Kingdom",flag: "🇬🇧", base: 78000, load: 17000, curr: "£62K base + 22%",      active: false },
+    { ctry: "Germany",       flag: "🇩🇪", base: 84000, load: 19700, curr: "€78K base + 23%",      active: false },
+    { ctry: "United States", flag: "🇺🇸", base:142000, load: 37200, curr: "$142K base + 26%",     active: false },
+  ],
+  "Engineering Manager": [
+    { ctry: "Vietnam",       flag: "🇻🇳", base: 42000, load:  9000, curr: "VND 1.07B base + 22%",  active: false },
+    { ctry: "Philippines",   flag: "🇵🇭", base: 52000, load:  6800, curr: "PHP 3M base + 13%",     active: false },
+    { ctry: "India",         flag: "🇮🇳", base: 50000, load:  8800, curr: "₹41.6L base + 17%",     active: true  },
+    { ctry: "Malaysia",      flag: "🇲🇾", base: 58000, load:  9500, curr: "MYR 300K base + 16%",   active: false },
+    { ctry: "Mexico",        flag: "🇲🇽", base: 68000, load: 22500, curr: "MXN 1.17M base + 33%",  active: false },
+    { ctry: "United Kingdom",flag: "🇬🇧", base:118000, load: 25700, curr: "£94K base + 22%",       active: false },
+    { ctry: "Germany",       flag: "🇩🇪", base:124000, load: 29000, curr: "€115K base + 23%",      active: false },
+    { ctry: "United States", flag: "🇺🇸", base:198000, load: 51900, curr: "$198K base + 26%",      active: false },
+  ],
+  "Product Designer": [
+    { ctry: "Vietnam",       flag: "🇻🇳", base: 22000, load:  4800, curr: "VND 560M base + 22%",  active: false },
+    { ctry: "Philippines",   flag: "🇵🇭", base: 26000, load:  3400, curr: "PHP 1.5M base + 13%",  active: false },
+    { ctry: "India",         flag: "🇮🇳", base: 28000, load:  4900, curr: "₹23.3L base + 17%",    active: true  },
+    { ctry: "Malaysia",      flag: "🇲🇾", base: 30000, load:  4900, curr: "MYR 155K base + 16%",  active: false },
+    { ctry: "Mexico",        flag: "🇲🇽", base: 38000, load: 12600, curr: "MXN 654K base + 33%",  active: false },
+    { ctry: "United Kingdom",flag: "🇬🇧", base: 68000, load: 14800, curr: "£54K base + 22%",      active: false },
+    { ctry: "Germany",       flag: "🇩🇪", base: 72000, load: 16800, curr: "€67K base + 23%",      active: false },
+    { ctry: "United States", flag: "🇺🇸", base:124000, load: 32500, curr: "$124K base + 26%",     active: false },
+  ],
+};
+
+const I = {
+  sparkle: () => (<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 1.5C8 1.5 8.7 4.5 10 5.8C11.3 7.1 14 8 14 8C14 8 11.3 8.9 10 10.2C8.7 11.5 8 14.5 8 14.5C8 14.5 7.3 11.5 6 10.2C4.7 8.9 2 8 2 8C2 8 4.7 7.1 6 5.8C7.3 4.5 8 1.5 8 1.5Z" fill="currentColor"/></svg>),
+  bell: () => (<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1.5C5 1.5 3.5 3 3.5 5V8L2.5 9.5H11.5L10.5 8V5C10.5 3 9 1.5 7 1.5Z" stroke="currentColor" strokeWidth="1.4" fill="none" strokeLinejoin="round"/><path d="M5.5 11C5.5 11.8 6.2 12.5 7 12.5C7.8 12.5 8.5 11.8 8.5 11" stroke="currentColor" strokeWidth="1.4" fill="none" strokeLinecap="round"/></svg>),
+  search: () => (<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4" stroke="currentColor" strokeWidth="1.5"/><path d="M9.5 9.5L12.5 12.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>),
+  plus: () => (<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2v10M2 7h10" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>),
+  download: () => (<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1.5v8M3.5 6.5L7 10L10.5 6.5M2 12h10" stroke="currentColor" strokeWidth="1.4" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>),
+  caret: () => (<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 4L5 7L8 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>),
+  arrow: () => (<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 6h7M6 2.5L9.5 6 6 9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>),
+  globe: () => (<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.4" stroke="currentColor" strokeWidth="1.3"/><path d="M1.6 7H12.4M7 1.6C9 4 9 10 7 12.4M7 1.6C5 4 5 10 7 12.4" stroke="currentColor" strokeWidth="1.3" fill="none"/></svg>),
+};
+
+const usd = (n, opts={}) => {
+  if (opts.short) {
+    if (Math.abs(n) >= 1000000) return "$" + (n/1000000).toFixed(2) + "M";
+    if (Math.abs(n) >= 1000) return "$" + (n/1000).toFixed(0) + "K";
+    return "$" + n.toLocaleString("en-US");
+  }
+  return "$" + n.toLocaleString("en-US");
+};
+
+function WorldMapBg() {
+  return (
+    <svg viewBox="0 0 1000 562" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <pattern id="dots" x="0" y="0" width="12" height="12" patternUnits="userSpaceOnUse">
+          <circle cx="2" cy="2" r="1.6" fill="#A2A8B5" />
+        </pattern>
+        <mask id="land">
+          <path fill="#fff" d="M80,80 Q110,60 180,70 Q260,90 280,160 Q300,220 250,280 Q200,320 160,300 Q100,260 80,200 Z" />
+          <path fill="#fff" d="M240,300 Q270,310 290,360 Q330,420 310,490 Q280,540 250,520 Q220,460 230,400 Z" />
+          <path fill="#fff" d="M450,110 Q510,90 540,130 Q560,170 530,200 Q480,210 450,180 Z" />
+          <path fill="#fff" d="M470,210 Q540,200 560,260 Q580,340 540,420 Q500,460 460,420 Q440,340 450,270 Z" />
+          <path fill="#fff" d="M560,170 Q620,160 660,200 Q680,230 660,260 Q610,270 580,230 Z" />
+          <path fill="#fff" d="M660,220 Q720,210 740,270 Q740,310 700,330 Q670,310 660,270 Z" />
+          <path fill="#fff" d="M740,140 Q820,130 850,180 Q860,230 830,260 Q780,270 750,230 Q740,190 740,160 Z" />
+          <path fill="#fff" d="M790,300 Q830,310 850,340 Q860,380 830,400 Q800,400 790,360 Z" />
+          <path fill="#fff" d="M820,410 Q900,400 930,440 Q940,490 900,500 Q840,500 810,470 Z" />
+        </mask>
+      </defs>
+      <rect width="1000" height="562" fill="#F6F7F9" />
+      <rect width="1000" height="562" fill="url(#dots)" mask="url(#land)" />
+    </svg>
+  );
+}
+
+function AppBar() {
+  return (
+    <header className="appbar">
+      <div className="appbar-row1">
+        <div className="appbar-brand">
+          <div className="appbar-logo">S</div>
+          <span className="appbar-name">Skuad</span>
+          <span className="appbar-divider" />
+          <span className="appbar-product">WORKFORCE</span>
+        </div>
+        <div className="appbar-crumb">
+          <span>Workforce</span>
+          <span className="appbar-crumb-sep">/</span>
+          <span>Overview</span>
+        </div>
+        <div className="appbar-spacer" />
+        <div className="appbar-actions">
+          <button className="appbar-btn"><I.search /> Search<span style={{marginLeft:6,padding:"1px 5px",border:"1px solid var(--paper-line)",borderRadius:4,fontFamily:"var(--font-mono)",fontSize:10,color:"var(--ink-4)"}}>⌘K</span></button>
+          <button className="appbar-icon-btn"><I.bell /><span className="dot" /></button>
+          <div className="appbar-tenant">
+            <div className="appbar-tenant-mark">LR</div>
+            <span className="appbar-tenant-name">{COMPANY}</span>
+            <span className="appbar-tenant-caret"><I.caret /></span>
+          </div>
+          <div className="appbar-avatar">EM</div>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+function Greet() {
+  return (
+    <section className="ov-greet">
+      <div>
+        <div className="eyebrow" style={{marginBottom:10, display:"inline-flex", alignItems:"center", gap:8}}>
+          <span className="dot-status dot-ok" /> Good morning, Emily — your workforce is in sync
+        </div>
+        <h1>{TOTAL_HEAD} people in <span className="mark">India</span>. {SKUAD_COUNTRY_COUNT - 1} more countries ready when you are.</h1>
+        <div className="sub">
+          Your team at <strong>{COMPANY}</strong> is fully in <strong>India</strong> today. Atlas tracks {TOTAL_CHANGES} compliance changes on your existing contracts — and gives you hire-ready cost &amp; compliance for every other country we cover, so you can plan your next move in minutes, not months.
+        </div>
+        <div className="ov-greet-pills">
+          <span className="ov-greet-pill"><span className="dot-status dot-ok" />Payroll on track · Nov 24</span>
+          <span className="ov-greet-pill"><span className="dot-status dot-warn" />{TOTAL_CHANGES} India compliance items</span>
+          <span className="ov-greet-pill"><span className="dot-status dot-neutral" /><span className="num">{TOTAL_OPEN}</span> open reqs</span>
+          <span className="ov-greet-pill"><span className="dot-status dot-info" />{TOTAL_AVAILABLE} countries to explore</span>
+        </div>
+      </div>
+      <aside className="ov-snapshot">
+        <div className="ov-snapshot-label">Workforce snapshot · Nov 22, 2025</div>
+        <div className="ov-snapshot-stats">
+          <div>
+            <div className="ov-snap-v">{TOTAL_HEAD}<span className="u">people</span></div>
+            <div className="ov-snap-l">Headcount</div>
+          </div>
+          <div>
+            <div className="ov-snap-v">1<span className="u">/ {SKUAD_COUNTRY_COUNT}</span></div>
+            <div className="ov-snap-l">Active countries</div>
+          </div>
+          <div>
+            <div className="ov-snap-v">{TOTAL_OPEN}<span className="u">open</span></div>
+            <div className="ov-snap-l">Reqs in India</div>
+          </div>
+          <div>
+            <div className="ov-snap-v">{TOTAL_AVAILABLE}<span className="u">available</span></div>
+            <div className="ov-snap-l">Expansion-ready</div>
+          </div>
+        </div>
+        <div className="ov-snap-flags">
+          <span className="ov-snap-flag" style={{background:"rgba(255,72,0,0.18)",borderColor:"rgba(255,72,0,0.4)"}}>🇮🇳 <strong>{TOTAL_HEAD}</strong></span>
+          {RECOMMENDED.slice(0,5).map(c => (<span key={c.id} className="ov-snap-flag">{c.flag} <span style={{opacity:0.55}}>—</span></span>))}
+          <span className="ov-snap-flag" style={{opacity:0.65}}>+{TOTAL_AVAILABLE - 5}</span>
+        </div>
+        <div className="ov-snap-foot">
+          <span>Atlas Compliance · sweep 03:14 UTC</span>
+          <span style={{color:"#5BBE92"}}>● in sync</span>
+        </div>
+      </aside>
+    </section>
+  );
+}
+
+function KPIStrip() {
+  return (
+    <div className="kpi-strip">
+      <div className="kpi">
+        <div className="kpi-head"><span className="kpi-label">Headcount</span><span className="tag tag-ok">+3 QoQ</span></div>
+        <div className="kpi-value">{TOTAL_HEAD}</div>
+        <div className="kpi-foot"><span className="kpi-delta kpi-delta-up">▲ 15%</span> vs last quarter · all in India</div>
+      </div>
+      <div className="kpi">
+        <div className="kpi-head"><span className="kpi-label">Active countries</span><span className="tag tag-neutral">{SKUAD_COUNTRY_COUNT - 1} more available</span></div>
+        <div className="kpi-value">1<span className="kpi-unit">/ {SKUAD_COUNTRY_COUNT}</span></div>
+        <div className="kpi-foot">India today · {SKUAD_COUNTRY_COUNT - 1} expansion-ready via Skuad</div>
+      </div>
+      <div className="kpi">
+        <div className="kpi-head"><span className="kpi-label">Countries covered</span><span className="tag tag-info">Via Skuad</span></div>
+        <div className="kpi-value">{SKUAD_COUNTRY_COUNT}</div>
+        <div className="kpi-foot">1 active · {TOTAL_AVAILABLE} available for expansion</div>
+      </div>
+      <div className="kpi">
+        <div className="kpi-head"><span className="kpi-label">Compliance items</span><span className="tag tag-danger">3 to action</span></div>
+        <div className="kpi-value">{TOTAL_CHANGES}<span className="kpi-unit">/ 4</span></div>
+        <div className="kpi-foot">changes touching your India contracts</div>
+      </div>
+    </div>
+  );
+}
+
+function AskAtlas() {
+  const [query, setQuery] = useState("");
+  const [reply, setReply] = useState("");
+  const [loading, setLoading] = useState(false);
+  const suggestions = [
+    "Where is it cheapest to hire 5 more senior engineers near India?",
+    "Which countries offer English-fluent talent for customer success?",
+    "What's the cost difference between Malaysia and Vietnam for a SWE?",
+    "Summarize India compliance changes I haven't acknowledged yet",
+    "If we open a US time zone team, which country has shortest lead time?",
+  ];
+  const ask = async (prompt) => {
+    const q = prompt || query;
+    if (!q.trim()) return;
+    setLoading(true);
+    setReply("");
+    try {
+      const res = await fetch("/api/employee/ask", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({prompt: q}),
+      });
+      const data = await res.json();
+      setReply(data.reply || data.error || "No response");
+    } catch (e) {
+      setReply("Failed to reach Atlas. Is the server running?");
+    }
+    setLoading(false);
+  };
+  return (
+    <section className="ask-atlas">
+      <div className="ask-atlas-header">
+        <div className="ask-atlas-mark"><I.sparkle /></div>
+        <div className="ask-atlas-title">Ask Atlas</div>
+        <div className="ask-atlas-sub">Workforce intelligence across {SKUAD_COUNTRY_COUNT} countries</div>
+      </div>
+      <div className="ask-atlas-bar">
+        <input value={query} onChange={e=>setQuery(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")ask();}} placeholder="Ask anything about your India workforce, costs, compliance, or expansion plans…" />
+        <button className="btn btn-primary" disabled={loading} onClick={()=>ask()}>{loading ? "Thinking…" : <><I.sparkle /> Ask</>}</button>
+      </div>
+      {reply && (
+        <div style={{marginTop:14,padding:"14px 16px",background:"rgba(255,255,255,0.85)",border:"1px solid var(--purple-line)",borderRadius:"var(--radius-m)",fontSize:13,lineHeight:1.6,color:"var(--ink-2)",whiteSpace:"pre-wrap",position:"relative",zIndex:1}}>
+          {reply}
+        </div>
+      )}
+      <div className="ask-suggestions">
+        {suggestions.map(s => (<button key={s} className="ask-suggestion" onClick={()=>{setQuery(s);ask(s);}}>{s}</button>))}
+      </div>
+    </section>
+  );
+}
+
+function ActiveCard({ c }) {
+  return (
+    <a className="ctry-card focus" href={countryHref(c)}>
+      <div style={{position:"absolute",top:14,right:14}}>
+        <span className="tag tag-accent" style={{background:"var(--accent)",color:"#fff"}}>● Active</span>
+      </div>
+      <div className="ctry-head">
+        <div className="ctry-flag">{c.flag}</div>
+        <div>
+          <div className="ctry-name">{c.name}</div>
+          <div className="ctry-region">{c.region}</div>
+        </div>
+        <div className="ctry-headcount">
+          <div className="ctry-headcount-v">{c.headcount}</div>
+          <div className="ctry-headcount-l">employees</div>
+        </div>
+      </div>
+      <div className="ctry-metric-row">
+        <div className="ctry-metric">
+          <div className="ctry-metric-l">Open reqs</div>
+          <div className="ctry-metric-v">{c.openReqs}</div>
+        </div>
+        <div className="ctry-metric">
+          <div className="ctry-metric-l">Avg tenure</div>
+          <div className="ctry-metric-v">{c.avgTenure}</div>
+        </div>
+        <div className="ctry-metric">
+          <div className="ctry-metric-l">Employer load</div>
+          <div className="ctry-metric-v">{c.loadPct}%</div>
+        </div>
+        <div className="ctry-metric">
+          <div className="ctry-metric-l">Headcount growth</div>
+          <div className="ctry-metric-v">{c.deltaHc}</div>
+        </div>
+      </div>
+      <div className="ctry-foot">
+        <div className="ctry-status-tags">
+          <span className="tag tag-warn"><span className="dot-status dot-warn" /> {c.changes} compliance change{c.changes>1?"s":""}</span>
+          <span className="tag tag-neutral">{c.deltaHc}</span>
+        </div>
+        <span className="ctry-link">Open <I.arrow /></span>
+      </div>
+    </a>
+  );
+}
+
+function AvailableCard({ c }) {
+  return (
+    <a className="ctry-card available" href={countryHref(c)}>
+      <div style={{position:"absolute",top:14,right:14}}>
+        <span className="tag tag-outline" style={{background:"var(--paper-2)"}}>Available · {c.leadDays}d setup</span>
+      </div>
+      <div className="ctry-head">
+        <div className="ctry-flag" style={{background:"var(--paper-2)"}}>{c.flag}</div>
+        <div>
+          <div className="ctry-name">{c.name}</div>
+          <div className="ctry-region">{c.region}</div>
+        </div>
+      </div>
+      <div className="avail-note">{c.note}</div>
+      <div className="ctry-metric-row">
+        <div className="ctry-metric">
+          <div className="ctry-metric-l">Sr SWE cost</div>
+          <div className="ctry-metric-v">${(c.seniorEngUsd/1000).toFixed(0)}K <span style={{fontSize:11,color:"var(--ink-3)",fontWeight:400}}>/ yr</span></div>
+        </div>
+        <div className="ctry-metric">
+          <div className="ctry-metric-l">Employer load</div>
+          <div className="ctry-metric-v">{c.loadPct}%</div>
+        </div>
+        <div className="ctry-metric">
+          <div className="ctry-metric-l">Talent</div>
+          <div className="ctry-metric-v" style={{fontSize:13,fontFamily:"var(--font-ui)",fontWeight:600}}>{c.talent}</div>
+        </div>
+        <div className="ctry-metric">
+          <div className="ctry-metric-l">Time-to-hire</div>
+          <div className="ctry-metric-v">{c.leadDays} days</div>
+        </div>
+      </div>
+      <div className="ctry-foot">
+        <div className="ctry-status-tags">
+          {c.changes > 0
+            ? <span className="tag tag-info"><span className="dot-status dot-info" /> {c.changes} rule update{c.changes>1?"s":""}</span>
+            : <span className="tag tag-ok"><span className="dot-status dot-ok" /> Up-to-date guide</span>}
+        </div>
+        <span className="ctry-link">Explore <I.arrow /></span>
+      </div>
+    </a>
+  );
+}
+
+function CountryGrid() {
+  return (
+    <section style={{marginBottom: 36}}>
+      <div className="section-head">
+        <div>
+          <div className="eyebrow">Workforce by country</div>
+          <h2>Where your team is — and where it could go next</h2>
+          <div className="sub">Your active country, plus six expansion-ready picks. Click any card to open its cost, compliance, and hire details.</div>
+        </div>
+      </div>
+      <div className="ctry-grid">
+        {ACTIVE_COUNTRIES.map(c => <ActiveCard key={c.id} c={c} />)}
+        {RECOMMENDED.map(c => <AvailableCard key={c.id} c={c} />)}
+      </div>
+    </section>
+  );
+}
+
+function BrowseAll() {
+  const [query, setQuery] = useState("");
+  const [region, setRegion] = useState("All");
+  const regions = ["All", ...Array.from(new Set(AVAILABLE_COUNTRIES.map(c => c.region)))];
+  const filtered = AVAILABLE_COUNTRIES.filter(c => {
+    if (region !== "All" && c.region !== region) return false;
+    if (query && !c.name.toLowerCase().includes(query.toLowerCase()) && !c.region.toLowerCase().includes(query.toLowerCase())) return false;
+    return true;
+  });
+
+  return (
+    <section style={{marginBottom: 36}}>
+      <div className="section-head">
+        <div>
+          <div className="eyebrow">Browse all countries</div>
+          <h2>Every country we can run payroll in</h2>
+          <div className="sub">Filter by region, jump to any country's full guide. Skuad handles the entity, contracts, and statutory filings end-to-end.</div>
+        </div>
+        <div className="section-head-actions">
+          <span className="text-mono-sm text-muted">{filtered.length} of {TOTAL_AVAILABLE}</span>
+        </div>
+      </div>
+
+      <div style={{display:"flex",gap:10,marginBottom:12,flexWrap:"wrap",alignItems:"center"}}>
+        <div style={{display:"flex",alignItems:"center",gap:6,background:"var(--paper)",border:"1px solid var(--paper-line)",borderRadius:"var(--radius-s)",padding:"4px 10px",minWidth:240,flex:"0 1 280px"}}>
+          <I.search />
+          <input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search by country or region…" style={{border:"none",background:"none",outline:"none",fontSize:13,flex:1,padding:"4px 0"}} />
+        </div>
+        <div className="pill-row">
+          {regions.map(r => (
+            <button key={r} className={`pill ${region===r?"active":""}`} onClick={()=>setRegion(r)}>{r}</button>
+          ))}
+        </div>
+      </div>
+
+      <div className="card" style={{padding:0,overflow:"hidden"}}>
+        <table className="dtable">
+          <thead>
+            <tr>
+              <th>Country</th>
+              <th>Region</th>
+              <th className="right">Sr SWE / yr</th>
+              <th className="right">Employer load</th>
+              <th className="right">Time-to-hire</th>
+              <th>Talent</th>
+              <th>Notes</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {filtered.map(c => (
+              <tr key={c.id} style={{cursor:"pointer"}} onClick={()=>{ window.location.href = countryHref(c); }}>
+                <td><span style={{display:"inline-flex",alignItems:"center",gap:8,fontWeight:600}}><span style={{fontSize:18}}>{c.flag}</span>{c.name}</span></td>
+                <td className="text-muted">{c.region}</td>
+                <td className="right num">{usd(c.seniorEngUsd, {short:true})}</td>
+                <td className="right num">{c.loadPct}%</td>
+                <td className="right num">{c.leadDays} days</td>
+                <td><span className="tag tag-neutral">{c.talent}</span></td>
+                <td className="text-muted text-sm">{c.note}</td>
+                <td><a className="ctry-link" style={{whiteSpace:"nowrap"}} href={countryHref(c)}>Explore <I.arrow /></a></td>
+              </tr>
+            ))}
+            {filtered.length === 0 && (
+              <tr><td colSpan="8" style={{padding:"30px",textAlign:"center",color:"var(--ink-3)",fontSize:13}}>No countries match your filter.</td></tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
+function MapSection() {
+  return (
+    <section className="map-section">
+      <div className="map-head">
+        <div>
+          <div className="eyebrow">Global footprint</div>
+          <h3>1 active · {TOTAL_AVAILABLE} ready</h3>
+          <div className="sub">Orange = where your team is. Grey = countries you can hire in via Skuad.</div>
+        </div>
+        <div className="row">
+          <span className="tag tag-outline" style={{display:"inline-flex",alignItems:"center",gap:6}}><span style={{width:8,height:8,borderRadius:"50%",background:"var(--accent)",display:"inline-block"}} />Active</span>
+          <span className="tag tag-outline" style={{display:"inline-flex",alignItems:"center",gap:6}}><span style={{width:8,height:8,borderRadius:"50%",background:"#A2A8B5",display:"inline-block"}} />Available</span>
+        </div>
+      </div>
+      <div className="map-canvas">
+        <div className="world">
+          <WorldMapBg />
+          {ACTIVE_COUNTRIES.map(c => (
+            <div key={"p-"+c.id} className="world-pulse" style={{left:`${c.mapX}%`, top:`${c.mapY}%`}} />
+          ))}
+          {AVAILABLE_COUNTRIES.map(c => (
+            <a key={"a-"+c.id} className="world-dot avail" style={{left:`${c.mapX}%`, top:`${c.mapY}%`}} href={countryHref(c)} title={`${c.name} · ${c.leadDays}d to hire`}><span>{c.flag}</span></a>
+          ))}
+          {ACTIVE_COUNTRIES.map(c => (
+            <a key={"act-"+c.id} className="world-dot active" style={{left:`${c.mapX}%`, top:`${c.mapY}%`}} href={countryHref(c)} title={`${c.name} · ${c.headcount}`}>{c.headcount}</a>
+          ))}
+        </div>
+        <div className="map-legend">
+          <div className="map-legend-row" style={{borderColor:"var(--accent-line)",background:"var(--accent-soft)"}}>
+            <div className="map-legend-flag"><span className="emoji">🇮🇳</span> India</div>
+            <div className="map-legend-count">{TOTAL_HEAD}</div>
+            <div className="map-legend-bar"><div className="map-legend-bar-fill" style={{width:"100%"}} /></div>
+          </div>
+          <div style={{padding:"10px 12px",color:"var(--ink-3)",fontSize:12,fontFamily:"var(--font-mono)",letterSpacing:0.4,textTransform:"uppercase"}}>Available {TOTAL_AVAILABLE}</div>
+          {RECOMMENDED.map(c => (
+            <div key={c.id} className="map-legend-row">
+              <div className="map-legend-flag"><span className="emoji">{c.flag}</span> {c.name}</div>
+              <div className="map-legend-count" style={{color:"var(--ink-3)",fontSize:11}}>{c.leadDays}d</div>
+              <div className="map-legend-bar"><div className="map-legend-bar-fill" style={{width:"0%",background:"#A2A8B5"}} /></div>
+            </div>
+          ))}
+          <a href="#browse-all" style={{display:"block",textAlign:"center",padding:"10px",fontSize:12,fontWeight:600,color:"var(--purple)"}}>See all {TOTAL_AVAILABLE} →</a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function sectionLabel(s) {
+  return s.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function confColor(c) {
+  if (c >= 0.8) return "var(--ok)";
+  if (c >= 0.5) return "var(--warn)";
+  return "var(--danger)";
+}
+
+function ProvenanceClaims() {
+  const [chains, setChains] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState("All");
+
+  useEffect(() => {
+    fetch("/api/provenance/India")
+      .then(r => r.json())
+      .then(data => { setChains(data.chains || []); setLoading(false); })
+      .catch(() => { setChains([]); setLoading(false); });
+  }, []);
+
+  const groups = chains ? Array.from(new Set(chains.map(c => {
+    const s = c.section;
+    if (["annual_leave","sick_leave","maternity_leave","public_holidays"].includes(s)) return "Leave & Time Off";
+    if (["working_hours","overtime","probation"].includes(s)) return "Working Hours";
+    if (["minimum_wage","income_tax","payroll_tax","withholding_tax"].includes(s)) return "Compensation";
+    if (["health_insurance","social_security","pension","employee_benefits"].includes(s)) return "Benefits";
+    if (["termination_notice","employer_obligations","industrial_relations"].includes(s)) return "Employment Terms";
+    if (["work_permit","work_visa","expatriate_employment"].includes(s)) return "Immigration";
+    return "Other";
+  }))) : [];
+
+  const filtered = chains ? chains.filter(c => {
+    if (filter === "All") return true;
+    const s = c.section;
+    if (filter === "Leave & Time Off") return ["annual_leave","sick_leave","maternity_leave","public_holidays"].includes(s);
+    if (filter === "Working Hours") return ["working_hours","overtime","probation"].includes(s);
+    if (filter === "Compensation") return ["minimum_wage","income_tax","payroll_tax","withholding_tax"].includes(s);
+    if (filter === "Benefits") return ["health_insurance","social_security","pension","employee_benefits"].includes(s);
+    if (filter === "Employment Terms") return ["termination_notice","employer_obligations","industrial_relations"].includes(s);
+    if (filter === "Immigration") return ["work_permit","work_visa","expatriate_employment"].includes(s);
+    return true;
+  }) : [];
+
+  return (
+    <section style={{marginBottom: 36}}>
+      <div className="section-head">
+        <div>
+          <div className="eyebrow">Provenance · India</div>
+          <h2>Rule claims &amp; source evidence</h2>
+          <div className="sub">Every employment rule traced to its source paragraph, extraction confidence, and reviewer decision.</div>
+        </div>
+        <div className="section-head-actions">
+          <a className="btn btn-ghost btn-sm" href="/employee/India">Full India guide <I.arrow /></a>
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="prov-empty">Loading provenance data…</div>
+      ) : chains.length === 0 ? (
+        <div className="prov-empty">No provenance records found for India. Run a sync + approval cycle to populate.</div>
+      ) : (
+        <>
+          <div style={{display:"flex",gap:6,marginBottom:14,flexWrap:"wrap"}}>
+            <button className={`pill ${filter==="All"?"active":""}`} onClick={()=>setFilter("All")}>All ({chains.length})</button>
+            {groups.map(g => {
+              const cnt = chains.filter(c => {
+                const s = c.section;
+                if (g === "Leave & Time Off") return ["annual_leave","sick_leave","maternity_leave","public_holidays"].includes(s);
+                if (g === "Working Hours") return ["working_hours","overtime","probation"].includes(s);
+                if (g === "Compensation") return ["minimum_wage","income_tax","payroll_tax","withholding_tax"].includes(s);
+                if (g === "Benefits") return ["health_insurance","social_security","pension","employee_benefits"].includes(s);
+                if (g === "Employment Terms") return ["termination_notice","employer_obligations","industrial_relations"].includes(s);
+                if (g === "Immigration") return ["work_permit","work_visa","expatriate_employment"].includes(s);
+                return false;
+              }).length;
+              return <button key={g} className={`pill ${filter===g?"active":""}`} onClick={()=>setFilter(g)}>{g} ({cnt})</button>;
+            })}
+          </div>
+          <div className="prov-grid">
+            {filtered.map(c => {
+              const ch = c.chain;
+              const ext = ch.extraction || {};
+              const rev = ch.reviewer_action || {};
+              const rule = ch.canonical_rule || {};
+              const conf = ext.confidence;
+              const fragment = ext.source_fragment;
+              return (
+                <div key={c.provenance_id} className="prov-card">
+                  <div className="prov-card-head">
+                    <span style={{fontSize:18}}>🇮🇳</span>
+                    <span className="prov-card-section">{sectionLabel(c.section)}</span>
+                    {rev.action && <span className="tag tag-ok">{rev.action}</span>}
+                    {conf != null && (
+                      <span className="prov-conf">
+                        <span className="prov-conf-bar"><span className="prov-conf-fill" style={{width:`${Math.round(conf*100)}%`,background:confColor(conf)}} /></span>
+                        <span style={{color:confColor(conf),fontWeight:600}}>{Math.round(conf*100)}%</span>
+                      </span>
+                    )}
+                  </div>
+                  <div className="prov-card-rule">{rule.value}</div>
+                  {fragment && (
+                    <div className="prov-card-fragment">
+                      "{fragment}"
+                    </div>
+                  )}
+                  <div className="prov-card-meta">
+                    {ext.parser_version && <span>{ext.parser_version}</span>}
+                    {rev.assignee && <span>· {rev.assignee}</span>}
+                    {rev.reviewed_at && <span>· {new Date(rev.reviewed_at).toLocaleDateString()}</span>}
+                    {ch.crawl_event && ch.crawl_event.source_url && (
+                      <a href={ch.crawl_event.source_url} target="_blank" rel="noopener" style={{color:"var(--purple)",fontWeight:600,marginLeft:"auto"}}>Source ↗</a>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
+    </section>
+  );
+}
+
+function Compare() {
+  const [role, setRole] = useState("Senior Software Engineer");
+  const rows = ROLE_COMPARE[role];
+  const max = Math.max(...rows.map(r => r.base + r.load));
+
+  return (
+    <section className="compare">
+      <div className="compare-head">
+        <div>
+          <div className="eyebrow">Compare countries · for your next hire</div>
+          <h3>What it costs to hire the same role, everywhere</h3>
+          <div className="sub">Annual total employer cost in USD. Bars include base + statutory load. The tag <span className="tag tag-accent" style={{padding:"1px 5px",fontSize:9}}>YOU</span> marks your active country.</div>
+        </div>
+        <div className="compare-controls">
+          <div className="compare-control">
+            <span className="text-muted">Role:</span>
+            <select value={role} onChange={e => setRole(e.target.value)}>
+              {Object.keys(ROLE_COMPARE).map(k => <option key={k}>{k}</option>)}
+            </select>
+          </div>
+          <div className="compare-control">
+            <span className="text-muted">Seniority:</span>
+            <select defaultValue="Senior">
+              <option>Junior</option><option>Mid</option><option>Senior</option><option>Staff</option>
+            </select>
+          </div>
+          <div className="compare-control">
+            <span className="text-muted">Currency:</span>
+            <select defaultValue="USD">
+              <option>USD</option><option>Local</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div className="compare-bars">
+        {rows.map(r => {
+          const total = r.base + r.load;
+          const pctTotal = (total / max) * 100;
+          const pctBase = (r.base / total) * pctTotal;
+          const pctOver = (r.load / total) * pctTotal;
+          return (
+            <div key={r.ctry} className={`compare-row ${r.active?"you":""}`}>
+              <div className="compare-row-name"><span className="emoji">{r.flag}</span>{r.ctry}</div>
+              <div className="compare-row-bar">
+                <div className="compare-row-bar-base" style={{width: pctBase+"%"}} />
+                <div className="compare-row-bar-over" style={{left: pctBase+"%", width: pctOver+"%"}} />
+                <span className="compare-row-bar-label">{r.curr}</span>
+              </div>
+              <div>
+                <div className="compare-row-total">{usd(total, {short:true})}</div>
+                <div className="compare-row-total-sub">total / yr</div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <div className="compare-legend">
+        <div className="compare-legend-item"><span className="compare-legend-sw" style={{background:"var(--ink-2)"}} />Base salary</div>
+        <div className="compare-legend-item"><span className="compare-legend-sw" style={{background:"var(--accent)"}} />Employer load (taxes, benefits, fees)</div>
+        <div className="text-mono-sm text-muted" style={{marginLeft:"auto"}}>Indicative · Nov 2025 rates · FX as of today</div>
+      </div>
+    </section>
+  );
+}
+
+function AggregateCost() {
+  return (
+    <section className="agg-section">
+      <div className="section-head">
+        <div>
+          <div className="eyebrow">This month's payroll · India</div>
+          <h2>November 2025</h2>
+          <div className="sub">Settling Nov 24. All amounts in USD at today's FX. Adds new countries automatically as you start hiring there.</div>
+        </div>
+        <div className="section-head-actions">
+          <button className="btn btn-ghost btn-sm"><I.download /> Statement</button>
+          <button className="btn btn-primary btn-sm">Review &amp; approve</button>
+        </div>
+      </div>
+      <div className="card" style={{padding:0, overflow:"hidden"}}>
+        <table className="dtable agg-tbl">
+          <thead>
+            <tr>
+              <th>Country</th>
+              <th className="right">Headcount</th>
+              <th className="right">Base salaries</th>
+              <th className="right">Employer load</th>
+              <th className="right">Skuad fees</th>
+              <th className="right">Total this month</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {ACTIVE_COUNTRIES.map(c => {
+              const base = c.monthlyUsd * (1 / (1 + c.loadPct/100));
+              const load = c.monthlyUsd - base;
+              const fees = c.headcount * 199;
+              const total = c.monthlyUsd + fees;
+              return (
+                <tr key={c.id}>
+                  <td><span style={{display:"inline-flex",alignItems:"center",gap:8,fontWeight:600}}><span style={{fontSize:18}}>{c.flag}</span>{c.name}</span></td>
+                  <td className="right num">{c.headcount}</td>
+                  <td className="right num">{usd(Math.round(base))}</td>
+                  <td className="right num">{usd(Math.round(load))}</td>
+                  <td className="right num">{usd(fees)}</td>
+                  <td className="right num row-strong">{usd(Math.round(total))}</td>
+                  <td><span className="tag tag-ok"><span className="dot-status dot-ok" /> Ready</span></td>
+                </tr>
+              );
+            })}
+            <tr style={{background:"var(--paper-2)"}}>
+              <td colSpan="7" style={{padding:"14px",fontSize:12,color:"var(--ink-3)",fontFamily:"var(--font-mono)"}}>
+                <span style={{display:"inline-flex",alignItems:"center",gap:8}}>
+                  <I.globe /> Want to add another country? Pick one from <a href="#browse-all" style={{color:"var(--purple)",fontWeight:600,marginLeft:4}}>Browse all countries</a> — Skuad spins up the entity, contract, and payroll in days.
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
+
+function App() {
+  return (
+    <>
+      <AppBar />
+      <main className="shell">
+        <Greet />
+        <KPIStrip />
+        <AskAtlas />
+        <MapSection />
+        <CountryGrid />
+        <ProvenanceClaims />
+        <Compare />
+        <div id="browse-all" style={{paddingTop:8}}><BrowseAll /></div>
+        <footer style={{display:"flex",justifyContent:"space-between",alignItems:"center",paddingTop:24,borderTop:"1px solid var(--paper-line)",fontFamily:"var(--font-mono)",fontSize:11,color:"var(--ink-4)",flexWrap:"wrap",gap:8}}>
+          <span>Skuad Workforce · {COMPANY}</span>
+          <span>Atlas Compliance · sweep Nov 22, 2025 · not legal advice</span>
+        </footer>
+      </main>
+    </>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<App />);
+</script>
+{% endraw %}
+
+</body>
+</html>

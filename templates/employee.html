@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en" data-mode="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Atlas · {{ country }} Employment Guide</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+<style>
+/* ── Tokens ── */
+:root {
+  --paper: #FFFFFF; --paper-2: #F6F7F9; --paper-3: #ECEEF2; --paper-line: #E2E5EB;
+  --ink: #0E1014; --ink-2: #2E323B; --ink-3: #6B7180; --ink-4: #A2A8B5;
+  --accent: #FF4800; --accent-2: #E03E00; --accent-soft: #FFE7DC; --accent-line: #FFBFA0;
+  --purple: #6F4FF2; --purple-2: #5B3FE0; --purple-soft: #ECE7FF; --purple-line: #C6B8FF;
+  --warn: #C9740F; --warn-soft: #FFEFD6;
+  --ok: #1E8A5F; --ok-soft: #DCF1E6;
+  --calm: #44516A; --calm-soft: #E2E6EF;
+  --danger: #C8302D; --danger-soft: #FBDFDC;
+  --font-ui: "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --radius-s:6px; --radius-m:10px; --radius-l:16px;
+  --shadow-1: 0 1px 0 rgba(14,16,20,.04), 0 1px 2px rgba(14,16,20,.05);
+  --shadow-2: 0 2px 6px rgba(14,16,20,.06), 0 14px 32px -18px rgba(14,16,20,.18);
+  --shadow-3: 0 8px 24px -8px rgba(14,16,20,.18), 0 28px 60px -28px rgba(14,16,20,.28);
+  --maxw: 1200px; --gutter: 40px;
+}
+[data-mode="dark"] {
+  --paper:#0B0D11; --paper-2:#131620; --paper-3:#1B1F2A; --paper-line:#262B38;
+  --ink:#F5F6F8; --ink-2:#D8DBE2; --ink-3:#9097A4; --ink-4:#5A6273;
+  --accent:#FF6A33; --accent-2:#FF8C5C; --accent-soft:rgba(255,106,51,.12); --accent-line:rgba(255,106,51,.36);
+  --purple:#9B85FF; --purple-2:#B5A5FF; --purple-soft:rgba(155,133,255,.14); --purple-line:rgba(155,133,255,.36);
+  --warn:#E0A04A; --warn-soft:rgba(224,160,74,.10);
+  --ok:#5BBE92; --ok-soft:rgba(91,190,146,.10);
+  --calm:#A6B2C5; --calm-soft:rgba(166,178,197,.10);
+  --danger:#E87874; --danger-soft:rgba(232,120,116,.10);
+  --shadow-1:0 1px 0 rgba(0,0,0,.4),0 1px 2px rgba(0,0,0,.4);
+  --shadow-2:0 2px 6px rgba(0,0,0,.4),0 14px 32px -18px rgba(0,0,0,.6);
+  --shadow-3:0 8px 24px -8px rgba(0,0,0,.6),0 28px 60px -28px rgba(0,0,0,.7);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--paper);color:var(--ink);font-family:var(--font-ui);font-size:15px;line-height:1.55;font-weight:400;-webkit-font-smoothing:antialiased;min-height:100vh}
+a{color:inherit;text-decoration:none} button{font:inherit;color:inherit;cursor:pointer;border:0;background:transparent}
+input,textarea{font:inherit;color:inherit} ::selection{background:var(--accent);color:#fff}
+.eyebrow{font-family:var(--font-mono);font-size:10.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+::-webkit-scrollbar{width:10px} ::-webkit-scrollbar-thumb{background:var(--paper-line);border-radius:999px;border:2px solid var(--paper)} ::-webkit-scrollbar-thumb:hover{background:var(--ink-4)}
+
+/* ── AppBar ── */
+.appbar{position:sticky;top:0;z-index:60;background:color-mix(in srgb,var(--paper) 92%,transparent);backdrop-filter:saturate(140%) blur(12px);border-bottom:1px solid var(--paper-line)}
+.appbar-inner{max-width:var(--maxw);margin:0 auto;padding:14px var(--gutter);display:grid;grid-template-columns:auto 1fr;align-items:center;gap:24px}
+.appbar-brand{display:flex;align-items:center;gap:12px;font-size:20px;font-weight:700;letter-spacing:-.02em}
+.appbar-logo{width:30px;height:30px;border-radius:9px;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:800;font-size:16px;line-height:1;position:relative;flex-shrink:0}
+.appbar-logo::after{content:"";position:absolute;inset:3px;border:1px solid rgba(255,255,255,.35);border-radius:6px;pointer-events:none}
+.appbar-name{font-weight:700;font-size:18px;letter-spacing:-.02em}
+.appbar-sub{font-family:var(--font-mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);margin-top:2px;display:block;white-space:nowrap}
+.appbar-right{display:flex;align-items:center;gap:8px;justify-self:end}
+.appbar-crumb{font-family:var(--font-mono);font-size:11px;color:var(--ink-4);display:flex;align-items:center;gap:6px}
+.appbar-crumb a{color:var(--ink-3);transition:color .15s} .appbar-crumb a:hover{color:var(--ink)}
+.appbar-crumb-sep{color:var(--paper-line)}
+.appbar-btn{height:32px;padding:0 12px;border:1px solid var(--paper-line);border-radius:8px;background:var(--paper-2);font-size:12px;color:var(--ink-3);display:inline-flex;align-items:center;gap:6px;transition:all .15s;white-space:nowrap}
+.appbar-btn:hover{color:var(--ink);background:var(--paper-3);border-color:var(--ink-4)}
+.appbar-avatar{width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:700;font-size:13px;flex-shrink:0}
+
+/* ── Shell ── */
+.shell{max-width:var(--maxw);margin:0 auto;padding:0 var(--gutter) 80px}
+
+/* ── Greeting ── */
+.employee-greet{display:grid;grid-template-columns:1.4fr 1fr;gap:28px;align-items:end;padding:56px 0 28px}
+@media(max-width:960px){.employee-greet{grid-template-columns:1fr}}
+.employee-greet-title{font-size:clamp(40px,5.4vw,64px);font-weight:800;letter-spacing:-.035em;line-height:1;margin-top:14px}
+.employee-greet-sub{margin-top:18px;font-size:16px;color:var(--ink-2);line-height:1.55;max-width:48ch}
+.employee-greet-sub strong{color:var(--ink);font-weight:700}
+.eg-card{background:var(--purple);color:#fff;border-radius:var(--radius-l);padding:24px;display:grid;gap:18px;position:relative;overflow:hidden}
+.eg-card::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 90% -10%,rgba(255,255,255,.18),transparent 60%),radial-gradient(circle at -10% 110%,rgba(255,72,0,.32),transparent 50%);pointer-events:none}
+.eg-flag{font-size:48px;line-height:1;position:relative}
+.eg-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;position:relative}
+.eg-v{font-size:28px;font-weight:800;letter-spacing:-.025em;line-height:1}
+.eg-v small{font-size:14px;opacity:.7;font-weight:500}
+.eg-l{font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.7);margin-top:4px}
+
+/* ── Ask Atlas ── */
+.ask-atlas{margin-top:28px;display:grid;gap:14px}
+.ask-atlas-bar{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:8px 8px 8px 18px;background:var(--paper);border:1.5px solid var(--purple-line);border-radius:999px;box-shadow:0 4px 20px -10px rgba(111,79,242,.32);transition:border-color .15s,box-shadow .15s}
+.ask-atlas-bar:focus-within{border-color:var(--purple);box-shadow:0 6px 28px -10px rgba(111,79,242,.45)}
+.ask-atlas-bar input{background:transparent;border:0;outline:0;font-size:17px;font-weight:500;color:var(--ink);padding:14px 4px}
+.ask-atlas-bar input::placeholder{color:var(--ink-4)} .ask-atlas-bar input:disabled{opacity:.6}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:8px;font-size:13px;font-weight:500;border:1px solid var(--paper-line);background:var(--paper);color:var(--ink-2);transition:all .12s;white-space:nowrap}
+.btn:hover{border-color:var(--ink-3);color:var(--ink)}
+.btn-primary{background:var(--purple);border-color:var(--purple);color:#fff;padding:11px 20px;border-radius:999px;font-size:14px}
+.btn-primary:hover:not(:disabled){background:var(--purple-2);border-color:var(--purple-2)}
+.btn-primary:disabled{opacity:.55;cursor:not-allowed}
+.ask-suggestions{display:flex;flex-wrap:wrap;gap:6px;padding-left:18px}
+.ask-suggestion{padding:7px 12px;border-radius:999px;background:var(--purple-soft);color:var(--purple-2);border:1px solid var(--purple-line);font-size:12.5px;font-weight:500;white-space:nowrap;transition:all .12s}
+.ask-suggestion:hover{background:var(--purple);color:#fff;border-color:var(--purple)}
+.ask-answer{background:var(--paper);border:1px solid var(--paper-line);border-left:3px solid var(--purple);border-radius:var(--radius-l);padding:20px 24px;display:grid;gap:12px;animation:ask-in .22s ease both}
+@keyframes ask-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.ask-q{font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--purple-2)}
+.ask-a{font-size:19px;line-height:1.5;font-weight:500;color:var(--ink);letter-spacing:-.005em;white-space:pre-wrap}
+.ask-foot{display:flex;justify-content:space-between;align-items:center;gap:16px;padding-top:8px;border-top:1px dashed var(--paper-line);flex-wrap:wrap}
+.ask-disclaimer{font-family:var(--font-mono);font-size:10.5px;color:var(--ink-3)}
+.ask-jump{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--purple);cursor:pointer;white-space:nowrap}
+.ask-jump:hover{color:var(--purple-2)}
+.ask-loading{display:flex;align-items:center;font-family:var(--font-mono);font-size:13px;color:var(--ink-3)}
+.ask-loading-dot{width:6px;height:6px;background:var(--purple);border-radius:50%;margin-right:5px;animation:ask-pulse 1.2s infinite ease-in-out}
+.ask-loading-dot:nth-child(2){animation-delay:.2s} .ask-loading-dot:nth-child(3){animation-delay:.4s}
+@keyframes ask-pulse{0%,80%,100%{transform:scale(.5);opacity:.5}40%{transform:scale(1);opacity:1}}
+.ask-error{border-left-color:var(--danger)} .ask-error .ask-a{color:var(--danger);font-size:14.5px;font-weight:500}
+.ask-unavailable{margin-top:12px;background:var(--warn-soft);border:1px solid var(--warn);border-radius:var(--radius-m);padding:10px 14px;font-size:13px;color:var(--warn);display:flex;align-items:center;gap:8px}
+
+/* ── Since You Joined ── */
+.syj{margin-top:28px;margin-bottom:0;padding:24px;background:var(--paper-2);border:1px solid var(--paper-line);border-radius:var(--radius-l)}
+.syj-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap}
+.syj-head-text{display:grid;gap:4px}
+.syj-title{font-size:20px;font-weight:700;letter-spacing:-.02em;line-height:1.15}
+.syj-nav{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.syj-counter{font-family:var(--font-mono);font-size:11px;color:var(--ink-3);min-width:40px;text-align:center}
+.syj-nav-btn{width:32px;height:32px;border-radius:50%;background:var(--paper);border:1px solid var(--paper-line);display:grid;place-items:center;cursor:pointer;transition:all .12s;flex-shrink:0;color:var(--ink-2)}
+.syj-nav-btn:hover:not(:disabled){border-color:var(--ink-3);background:var(--paper-3)}
+.syj-nav-btn:disabled{opacity:.3;cursor:default}
+.syj-track{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+.syj-track::-webkit-scrollbar{display:none}
+.syj-track{-ms-overflow-style:none;scrollbar-width:none}
+.syj-track-fill{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));overflow-x:visible;scroll-snap-type:none;scroll-behavior:auto}
+@media(max-width:500px){.syj-track-fill{grid-template-columns:1fr}}
+.syj-item{flex:0 0 252px;scroll-snap-align:start;background:var(--paper);border:1px solid var(--paper-line);border-top:3px solid var(--calm);border-radius:var(--radius-m);padding:16px 18px;display:grid;gap:8px;align-content:start}
+.syj-track-fill .syj-item{flex:none;width:auto;scroll-snap-align:none}
+.syj-item-approved{border-top-color:var(--ok)}
+.syj-item-rejected{border-top-color:var(--danger)}
+.syj-item-default{border-top-color:var(--calm)}
+.syj-item-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.syj-date{font-family:var(--font-mono);font-size:10.5px;color:var(--ink-3);white-space:nowrap;flex-shrink:0}
+.syj-rule{font-size:14px;font-weight:700;letter-spacing:-.015em;line-height:1.25}
+.syj-change{display:grid;gap:3px}
+.syj-change-from{font-size:11px;color:var(--ink-4);font-family:var(--font-mono);text-decoration:line-through;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.7}
+.syj-change-to{font-size:12.5px;color:var(--ink-2);line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.syj-desc{font-size:12px;line-height:1.45;color:var(--ink-3)}
+.syj-jump{display:inline-flex;align-items:center;gap:5px;margin-top:2px;align-self:start;padding:5px 9px;background:transparent;border-radius:6px;font-size:11px;font-weight:600;color:var(--purple);white-space:nowrap;transition:background .12s;border:none;cursor:pointer}
+.syj-jump:hover{background:var(--purple-soft)}
+.change-tag{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;padding:2px 7px;border-radius:999px;white-space:nowrap}
+.change-tag-approved{background:var(--ok-soft);color:var(--ok)}
+.change-tag-rejected{background:var(--danger-soft);color:var(--danger)}
+.change-tag-default{background:var(--calm-soft);color:var(--calm)}
+
+/* ── TL;DR strip ── */
+.tldr-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:28px;border-top:1px solid var(--paper-line);border-bottom:1px solid var(--paper-line);margin-bottom:40px}
+@media(max-width:960px){.tldr-strip{grid-template-columns:repeat(2,1fr)}.tldr:nth-child(2){border-left:1px solid var(--paper-line)}.tldr:nth-child(3){border-left:0;padding-left:0;border-top:1px solid var(--paper-line)}.tldr:nth-child(4){border-top:1px solid var(--paper-line)}}
+.tldr{padding:22px 24px;border-left:1px solid var(--paper-line);display:grid;gap:0;align-content:start}
+.tldr:first-child{border-left:0;padding-left:0}
+.tldr-label{font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+.tldr-val{font-size:36px;font-weight:800;letter-spacing:-.04em;line-height:1;color:var(--ink);margin-top:6px}
+.tldr-unit{font-family:var(--font-mono);font-size:11px;color:var(--ink-3);margin-top:5px;letter-spacing:.03em;line-height:1.4}
+.tldr-prose{font-size:15px;font-weight:600;color:var(--ink);line-height:1.35;margin-top:6px;letter-spacing:-.01em}
+.tldr-empty{font-size:32px;font-weight:800;color:var(--ink-4);margin-top:6px}
+
+/* ── Plain English toggle ── */
+.guide-controls{display:flex;align-items:center;gap:12px;padding:24px 0 20px;flex-wrap:wrap}
+.plain-toggle{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11px;padding:4px 10px;border-radius:999px;background:var(--paper-2);border:1px solid var(--paper-line);color:var(--ink-3);transition:all .15s}
+.plain-toggle.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.toggle-switch{width:22px;height:12px;border-radius:999px;background:var(--paper-line);position:relative;flex-shrink:0}
+.toggle-switch::after{content:"";position:absolute;width:8px;height:8px;border-radius:50%;background:var(--paper);top:2px;left:2px;transition:left .15s}
+.plain-toggle.on .toggle-switch{background:rgba(255,255,255,.3)}
+.plain-toggle.on .toggle-switch::after{left:12px}
+
+/* ── Search ── */
+.search-bar{display:flex;align-items:center;gap:8px;background:var(--paper);border:1px solid var(--paper-line);border-radius:var(--radius-m);padding:0 12px;height:36px;flex:1;max-width:320px;transition:border-color .15s}
+.search-bar:focus-within{border-color:var(--accent-line)}
+.search-bar svg{color:var(--ink-4);flex-shrink:0}
+.search-bar input{border:none;background:none;outline:none;flex:1;font-size:13.5px;color:var(--ink)}
+.search-bar input::placeholder{color:var(--ink-4)}
+.search-clear{background:none;border:none;cursor:pointer;color:var(--ink-4);font-size:18px;padding:0;line-height:1}
+.search-clear:hover{color:var(--ink)}
+.search-meta{font-family:var(--font-mono);font-size:11px;color:var(--ink-3);white-space:nowrap}
+mark{background:rgba(255,72,0,.15);color:inherit;border-radius:2px;padding:0 1px}
+.no-results{padding:48px 0;text-align:center;font-family:var(--font-mono);font-size:13px;color:var(--ink-4)}
+
+/* ── Guide layout ── */
+.guide-layout{display:grid;grid-template-columns:220px 1fr;gap:56px;padding-top:40px}
+@media(max-width:960px){.guide-layout{grid-template-columns:1fr}.guide-toc{display:none}}
+.guide-toc{position:sticky;top:88px;align-self:start;display:grid;gap:2px;padding-right:8px}
+.guide-toc-label{font-family:var(--font-mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);padding:4px 12px 10px}
+.toc-item{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 12px;border-radius:8px;font-size:13.5px;color:var(--ink-3);transition:all .15s;position:relative;cursor:pointer}
+.toc-item::before{content:"";position:absolute;left:-1px;top:12px;bottom:12px;width:2px;border-radius:2px;background:transparent;transition:background .15s}
+.toc-item:hover{color:var(--ink);background:var(--paper-2)}
+.toc-item.active{color:var(--accent)}
+.toc-item.active::before{background:var(--accent)}
+.toc-count{font-family:var(--font-mono);font-size:10.5px;color:var(--ink-4)}
+
+/* ── Guide sections ── */
+.guide-body{min-width:0}
+.guide-section{padding-bottom:56px;scroll-margin-top:80px}
+.guide-section-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:24px;padding-bottom:14px;border-bottom:1px solid var(--paper-line)}
+.guide-section-head h2{font-size:34px;font-weight:700;letter-spacing:-.025em;line-height:1}
+.sec-meta{font-family:var(--font-mono);font-size:11px;color:var(--ink-3)}
+.rule{padding:20px 0;border-bottom:1px dashed var(--paper-line);display:grid;grid-template-columns:160px 1fr;gap:28px;align-items:start}
+.rule:last-child{border-bottom:0}
+.rule-label{font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);padding-top:4px}
+.rule-body{font-size:15.5px;line-height:1.6;color:var(--ink)}
+.rule-body strong{font-weight:600;color:var(--ink);background:linear-gradient(transparent 60%,var(--accent-soft) 60%);padding:0 2px}
+.guide-footer{margin-top:28px;padding:22px 0;border-top:1px solid var(--paper-line);font-family:var(--font-mono);font-size:11px;color:var(--ink-3);display:flex;justify-content:space-between;gap:18px}
+
+/* ── Skeleton ── */
+.skel-line{background:linear-gradient(90deg,var(--paper-3) 25%,var(--paper-2) 50%,var(--paper-3) 75%);background-size:200% 100%;animation:skel-shimmer 1.4s ease infinite;border-radius:4px;height:14px}
+@keyframes skel-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.skel-block{padding:20px;background:var(--paper-2);border:1px solid var(--paper-line);border-radius:var(--radius-m);margin-bottom:10px}
+</style>
+</head>
+<body>
+
+<div id="root">
+  <div style="display:flex;align-items:center;justify-content:center;min-height:100vh;color:var(--ink-4);font-family:var(--font-mono);font-size:13px;">
+    Loading…
+  </div>
+</div>
+
+<script>window._ATLAS_COUNTRY = {{ country | tojson }}; window._ATLAS_FLAG = {{ flag | tojson }};</script>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel" data-presets="react">
+/* global React, ReactDOM */
+const { useState, useEffect, useRef, useMemo } = React;
+
+/* ── helpers ── */
+const params = new URLSearchParams(window.location.search);
+const EMPLOYEE = {
+  name: params.get("name") || "there",
+  role: params.get("role") || "employee",
+  since: params.get("since") || null,
+};
+const COUNTRY_NAME = window._ATLAS_COUNTRY;
+const COUNTRY_FLAG = window._ATLAS_FLAG;
+
+function firstSentence(text) {
+  if (!text) return "";
+  const stripped = text.replace(/\([^)]*\)/g, "").replace(/\s+/g, " ").trim();
+  const m = stripped.match(/^[^.!?]+[.!?]/);
+  return m ? m[0].trim() : stripped.slice(0, 140).trim();
+}
+
+function formatRelDate(iso) {
+  if (!iso) return "—";
+  try {
+    const d = new Date(iso);
+    return d.toLocaleDateString(undefined, { month: "short", day: "2-digit", year: "numeric" });
+  } catch { return iso; }
+}
+
+/* ── Icon components ── */
+function IconSparkle({ style }) {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style={style}>
+      <path d="M8 1.5C8 1.5 8.7 4.5 10 5.8C11.3 7.1 14 8 14 8C14 8 11.3 8.9 10 10.2C8.7 11.5 8 14.5 8 14.5C8 14.5 7.3 11.5 6 10.2C4.7 8.9 2 8 2 8C2 8 4.7 7.1 6 5.8C7.3 4.5 8 1.5 8 1.5Z" fill="currentColor"/>
+    </svg>
+  );
+}
+function IconMoon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+      <path d="M12 7.5A5.5 5.5 0 016.5 2a5.5 5.5 0 100 11A5.5 5.5 0 0112 7.5z" fill="currentColor"/>
+    </svg>
+  );
+}
+function IconSun() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+      <circle cx="7" cy="7" r="3" fill="currentColor"/>
+      <path d="M7 1v1.5M7 11.5V13M1 7h1.5M11.5 7H13M2.93 2.93l1.06 1.06M10.01 10.01l1.06 1.06M2.93 11.07l1.06-1.06M10.01 3.99l1.06-1.06" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+    </svg>
+  );
+}
+function IconArrowRight() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+      <path d="M2.5 6h7M6 2.5L9.5 6 6 9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+}
+function IconSearch() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+      <circle cx="6" cy="6" r="4" stroke="currentColor" strokeWidth="1.5"/>
+      <path d="M9.5 9.5L12.5 12.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+    </svg>
+  );
+}
+function escapeRegex(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+
+const S = {
+  sparkleIcon:   { color: "var(--purple)", flexShrink: 0 },
+  monoCode:      { fontFamily: "var(--font-mono)", fontSize: 11 },
+  loadingText:   { marginLeft: 10, fontSize: 13, color: "var(--ink-3)" },
+  spacer:        { flex: 1 },
+  eyebrowMb:     { marginBottom: 8 },
+  heroSkel:      { paddingTop: 40 },
+  skelTitle:     { width: "40%", height: 36, marginBottom: 12 },
+  skelSub:       { width: "60%", height: 16, marginBottom: 32 },
+  skelW60mb10:   { width: "60%", marginBottom: 10 },
+  skelW90mb6:    { width: "90%", marginBottom: 6 },
+  skelW75:       { width: "75%" },
+  skelW45mb10:   { width: "45%", marginBottom: 10 },
+  skelW85mb6:    { width: "85%", marginBottom: 6 },
+  skelW70:       { width: "70%" },
+  skelW55mb10:   { width: "55%", marginBottom: 10 },
+  skelW95:       { width: "95%" },
+  egUpdated:     { fontSize: 11, opacity: 0.7, fontFamily: "var(--font-mono)" },
+  pageError:     { paddingTop: 60, textAlign: "center", color: "var(--ink-3)", fontFamily: "var(--font-mono)", fontSize: 13 },
+};
+
+function highlight(text, term) {
+  if (!term) return text;
+  const parts = text.split(new RegExp(`(${escapeRegex(term)})`, "gi"));
+  return parts.map((p, i) =>
+    p.toLowerCase() === term.toLowerCase() ? <mark key={i}>{p}</mark> : p
+  );
+}
+
+/* Auto-bold numbers+units and percentages, with optional search highlight inside */
+function renderRuleText(text, term) {
+  if (!text) return null;
+  const boldRe = /(\b\d[\d,.]*(?:-\d[\d,.]*)?(?:\s*(?:working\s+)?(?:days?|weeks?|months?|years?|hours?|minutes?|days per year|weeks per year))|\d+(?:\.\d+)?%)/gi;
+  const result = [];
+  let last = 0, m;
+  while ((m = boldRe.exec(text)) !== null) {
+    if (m.index > last) {
+      result.push(<span key={`t${last}`}>{highlight(text.slice(last, m.index), term)}</span>);
+    }
+    result.push(<strong key={`b${m.index}`}>{highlight(m[0], term)}</strong>);
+    last = boldRe.lastIndex;
+  }
+  if (last < text.length) {
+    result.push(<span key={`t${last}`}>{highlight(text.slice(last), term)}</span>);
+  }
+  return result.length > 0 ? result : highlight(text, term);
+}
+
+/* ── AppBar ── */
+function AppBar({ theme, setTheme }) {
+  const initials = EMPLOYEE.name !== "there"
+    ? EMPLOYEE.name.split(" ").slice(0,2).map(p => p[0]).join("").toUpperCase()
+    : "?";
+  return (
+    <header className="appbar">
+      <div className="appbar-inner">
+        <div className="appbar-brand">
+          <div className="appbar-logo">A</div>
+          <div>
+            <span className="appbar-name">Atlas</span>
+            <span className="appbar-sub">{COUNTRY_NAME} Guide</span>
+          </div>
+        </div>
+        <div className="appbar-right">
+          <div className="appbar-crumb">
+            <a href="/guide">Guides</a>
+            <span className="appbar-crumb-sep">/</span>
+            <span>{COUNTRY_NAME}</span>
+            <span className="appbar-crumb-sep">/</span>
+            <span>Employee</span>
+          </div>
+          <button
+            className="appbar-btn"
+            onClick={() => setTheme(t => t === "light" ? "dark" : "light")}
+            aria-label="Toggle theme"
+          >
+            {theme === "dark" ? <IconSun /> : <IconMoon />}
+            {theme === "dark" ? "Light" : "Dark"}
+          </button>
+          <a href="/" className="appbar-btn">⌂ Hub</a>
+          <a href={`/guide/${encodeURIComponent(COUNTRY_NAME)}`} className="appbar-btn">Ops View</a>
+          <div className="appbar-avatar" aria-hidden="true">{initials}</div>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+/* ── Skeleton ── */
+function Skeleton() {
+  return (
+    <div>
+      <div className="skel-block">
+        <div className="skel-line" style={S.skelW60mb10} />
+        <div className="skel-line" style={S.skelW90mb6} />
+        <div className="skel-line" style={S.skelW75} />
+      </div>
+      <div className="skel-block">
+        <div className="skel-line" style={S.skelW45mb10} />
+        <div className="skel-line" style={S.skelW85mb6} />
+        <div className="skel-line" style={S.skelW70} />
+      </div>
+      <div className="skel-block">
+        <div className="skel-line" style={S.skelW55mb10} />
+        <div className="skel-line" style={S.skelW95} />
+      </div>
+    </div>
+  );
+}
+
+/* ── AskAtlas ── */
+function AskAtlas({ groups, onJump }) {
+  const [q, setQ] = useState("");
+  const [pending, setPending] = useState(false);
+  const [answer, setAnswer] = useState(null);
+  const [error, setError] = useState(null);
+  const [lastQ, setLastQ] = useState("");
+  const [unavailable, setUnavailable] = useState(false);
+
+  const suggestions = [
+    "What is the annual leave entitlement?",
+    "How much notice do I need to give to resign?",
+    "What sick leave am I entitled to?",
+    "What are the working hours rules?",
+  ];
+
+  const ask = async (question) => {
+    const t = question.trim();
+    if (!t || pending) return;
+    setPending(true);
+    setError(null);
+    setAnswer(null);
+    setUnavailable(false);
+    setLastQ(t);
+    try {
+      const context = groups.map(g =>
+        `## ${g.label}\n` + g.rules.map(r => `- ${r.label}: ${r.value}`).join("\n")
+      ).join("\n\n");
+
+      const prompt = `You are Atlas, a friendly employment-rights guide for ${EMPLOYEE.name}, who works in ${COUNTRY_NAME} as a ${EMPLOYEE.role}${EMPLOYEE.since ? `, since ${EMPLOYEE.since}` : ""}.
+
+Answer their question in plain, conversational English. Keep it to 2-4 sentences. Don't speculate. If the answer isn't in the context, say so and suggest they ask HR.
+
+End the answer with one line: "Section: <section group name>" so we know which part of the guide to highlight. Use exactly one of: ${groups.map(g => g.label).join(", ")}.
+
+Context for ${COUNTRY_NAME}:
+${context}
+
+Question: ${t}`;
+
+      const res = await fetch("/api/employee/ask", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt }),
+      });
+      const data = await res.json();
+      if (res.status === 501) {
+        setUnavailable(true);
+        setError(data.error);
+        return;
+      }
+      if (!res.ok) throw new Error(data.error || "Request failed");
+      const reply = data.reply;
+      const m = reply.match(/Section:\s*([^\n]+)/i);
+      const section = m ? m[1].trim() : null;
+      const text = reply.replace(/Section:\s*[^\n]+$/im, "").trim();
+      setAnswer({ text, section });
+    } catch (e) {
+      setError(e?.message || "Couldn't reach Atlas right now. Try again in a moment.");
+    } finally {
+      setPending(false);
+    }
+  };
+
+  const sectionId = answer?.section
+    ? groups.find(g => g.label.toLowerCase() === answer.section.toLowerCase())?.id
+    : null;
+
+  return (
+    <section className="ask-atlas">
+      <div className="ask-atlas-bar">
+        <IconSparkle style={S.sparkleIcon} />
+        <input
+          value={q}
+          onChange={e => setQ(e.target.value)}
+          onKeyDown={e => { if (e.key === "Enter") ask(q); }}
+          placeholder={`Ask anything about your ${COUNTRY_NAME} employment rights…`}
+          disabled={pending}
+        />
+        <button className="btn btn-primary" onClick={() => ask(q)} disabled={pending || !q.trim()}>
+          {pending ? "Thinking…" : "Ask Atlas"}
+        </button>
+      </div>
+
+      {unavailable && (
+        <div className="ask-unavailable">
+          <IconSparkle />
+          <span>Ask Atlas needs a free Groq API key. Get one at <strong>console.groq.com</strong>, then run: <code style={S.monoCode}>export GROQ_API_KEY=your_key</code></span>
+        </div>
+      )}
+
+      {!answer && !pending && !unavailable && (
+        <div className="ask-suggestions">
+          {suggestions.map(s => (
+            <button key={s} className="ask-suggestion" onClick={() => { setQ(s); ask(s); }}>{s}</button>
+          ))}
+        </div>
+      )}
+
+      {pending && (
+        <div className="ask-answer">
+          <div className="ask-q">{lastQ}</div>
+          <div className="ask-loading">
+            <span className="ask-loading-dot" /><span className="ask-loading-dot" /><span className="ask-loading-dot" />
+            <span style={S.loadingText}>Reading your guide…</span>
+          </div>
+        </div>
+      )}
+
+      {answer && (
+        <div className="ask-answer">
+          <div className="ask-q">{lastQ}</div>
+          <div className="ask-a">{answer.text}</div>
+          <div className="ask-foot">
+            {sectionId && (
+              <a className="ask-jump" onClick={() => onJump(sectionId)}>
+                Jump to {answer.section} <IconArrowRight />
+              </a>
+            )}
+            <span className="ask-disclaimer">Generated by Atlas · not legal advice</span>
+          </div>
+        </div>
+      )}
+
+      {error && !unavailable && (
+        <div className="ask-answer ask-error">
+          <div className="ask-q">{lastQ}</div>
+          <div className="ask-a">{error}</div>
+        </div>
+      )}
+    </section>
+  );
+}
+
+/* ── SinceYouJoined ── */
+const SECTION_IMPORTANCE = {
+  annual_leave: 1, working_hours: 1, minimum_wage: 1, termination_notice: 1,
+  sick_leave: 2, maternity_leave: 2, overtime: 2, income_tax: 2,
+  health_insurance: 3, social_security: 3, pension: 3, probation: 3,
+};
+const DECISION_RANK = { approved: 0, rejected: 2 };
+
+function SinceYouJoined({ changes, onJump, sinceLabel }) {
+  if (!changes || changes.length === 0) return null;
+
+  const trackRef = useRef(null);
+  const [idx, setIdx] = useState(0);
+  const CARD_W = 264; // 252px card + 12px gap
+
+  const sorted = [...changes].sort((a, b) => {
+    const dA = DECISION_RANK[a.decision] ?? 1;
+    const dB = DECISION_RANK[b.decision] ?? 1;
+    if (dA !== dB) return dA - dB;
+    const iA = SECTION_IMPORTANCE[a.section] ?? 4;
+    const iB = SECTION_IMPORTANCE[b.section] ?? 4;
+    if (iA !== iB) return iA - iB;
+    return new Date(b.timestamp) - new Date(a.timestamp);
+  });
+
+  const isFill = sorted.length < 4;
+
+  const scrollTo = (n) => {
+    const clamped = Math.max(0, Math.min(n, sorted.length - 1));
+    setIdx(clamped);
+    trackRef.current?.scrollTo({ left: clamped * CARD_W, behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    if (isFill) return;
+    const el = trackRef.current;
+    if (!el) return;
+    const onScroll = () => setIdx(Math.round(el.scrollLeft / CARD_W));
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll);
+  }, [sorted.length, isFill]);
+
+  return (
+    <section className="syj">
+      <div className="syj-head">
+        <div className="syj-head-text">
+          <div className="eyebrow">What changed · {sinceLabel}</div>
+          <h3 className="syj-title">
+            {changes.length} {changes.length === 1 ? "update" : "updates"} to your employment guide
+          </h3>
+        </div>
+        {!isFill && (
+          <div className="syj-nav">
+            <button className="syj-nav-btn" onClick={() => scrollTo(idx - 1)} disabled={idx === 0} aria-label="Previous">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M8.5 2.5L4 7l4.5 4.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </button>
+            <span className="syj-counter">{idx + 1} / {sorted.length}</span>
+            <button className="syj-nav-btn" onClick={() => scrollTo(idx + 1)} disabled={idx >= sorted.length - 1} aria-label="Next">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5.5 2.5L10 7l-4.5 4.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </button>
+          </div>
+        )}
+      </div>
+
+      <div className={`syj-track${isFill ? " syj-track-fill" : ""}`} ref={trackRef}>
+        {sorted.map(a => {
+          const decision = a.decision || "updated";
+          const cardCls = decision === "approved" ? "syj-item syj-item-approved"
+            : decision === "rejected" ? "syj-item syj-item-rejected"
+            : "syj-item syj-item-default";
+          const tagCls = decision === "approved" ? "change-tag change-tag-approved"
+            : decision === "rejected" ? "change-tag change-tag-rejected"
+            : "change-tag change-tag-default";
+          const sectionLabel = a.section
+            ? a.section.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())
+            : "—";
+          const trunc = (s, n) => s && s.length > n ? s.slice(0, n) + "…" : (s || null);
+          const newVal = trunc(a.new_value, 110);
+          const oldVal = decision === "approved" ? trunc(a.old_value, 72) : null;
+          return (
+            <article key={a.id} className={cardCls}>
+              <div className="syj-item-head">
+                <span className={tagCls}>{decision.charAt(0).toUpperCase() + decision.slice(1)}</span>
+                <span className="syj-date">{formatRelDate(a.timestamp)}</span>
+              </div>
+              <div className="syj-rule">{sectionLabel}</div>
+              {(oldVal || newVal) && (
+                <div className="syj-change">
+                  {oldVal && <div className="syj-change-from">{oldVal}</div>}
+                  {newVal && <div className="syj-change-to">{newVal}</div>}
+                </div>
+              )}
+              {a.reviewer_comment && !newVal && (
+                <div className="syj-desc">{trunc(a.reviewer_comment, 90)}</div>
+              )}
+              <button className="syj-jump" onClick={() => onJump(a.section)}>
+                See in guide <IconArrowRight />
+              </button>
+            </article>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+/* ── TLDRStrip ── */
+const TLDR_SECTIONS = [
+  { sectionId: "annual_leave",       label: "Annual Leave" },
+  { sectionId: "working_hours",      label: "Working Hours" },
+  { sectionId: "termination_notice", label: "Notice Period" },
+  { sectionId: "sick_leave",         label: "Sick Leave" },
+];
+
+function parseStat(text) {
+  if (!text) return null;
+  const m = text.match(/(\d+(?:[.,]\d+)?)\s*(days?|working days?|weeks?|months?|years?|hours?)/i);
+  if (!m) return null;
+  const afterIdx = text.indexOf(m[0]) + m[0].length;
+  // Stop at comma, period, newline, or conjunctions like "or"/"and"
+  const extra = text.slice(afterIdx).match(/^([^,\n.]*?)(?:\s+(?:or|and)\s|[,\n.]|$)/i);
+  const extraTrim = extra ? extra[1].trim() : "";
+  const unit = (m[2] + (extraTrim ? " " + extraTrim : "")).toLowerCase();
+  return { num: m[1], unit };
+}
+
+function TLDRStrip({ groups }) {
+  const ruleMap = {};
+  groups.forEach(g => g.rules.forEach(r => { ruleMap[r.id] = r; }));
+
+  return (
+    <div className="tldr-strip">
+      {TLDR_SECTIONS.map(t => {
+        const rule = ruleMap[t.sectionId];
+        const text = rule ? firstSentence(rule.value) : null;
+        const stat = parseStat(text);
+        const isEmpty = !text || /^(not specified|no specific rule|n\/a|—)/i.test(text.trim());
+        return (
+          <div className="tldr" key={t.sectionId}>
+            <div className="tldr-label">{t.label}</div>
+            {stat ? (
+              <>
+                <div className="tldr-val">{stat.num}</div>
+                <div className="tldr-unit">{stat.unit}</div>
+              </>
+            ) : isEmpty ? (
+              <div className="tldr-empty">—</div>
+            ) : (
+              <div className="tldr-prose">{text}</div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ── Rule ── */
+function Rule({ rule, plain, search }) {
+  const term = search?.trim().toLowerCase() || "";
+  const displayText = useMemo(() => {
+    if (!plain) return rule.value;
+    return firstSentence(rule.value) || rule.value;
+  }, [plain, rule.value]);
+
+  if (term && !rule.label.toLowerCase().includes(term) && !rule.value.toLowerCase().includes(term)) {
+    return null;
+  }
+
+  return (
+    <div className="rule">
+      <div className="rule-label">{highlight(rule.label, term)}</div>
+      <div className="rule-body">{renderRuleText(displayText, term)}</div>
+    </div>
+  );
+}
+
+/* ── Main App ── */
+function App() {
+  const [theme, setTheme] = useState(() => localStorage.getItem("atlas:theme") || "light");
+  const [guide, setGuide] = useState(null);
+  const [changes, setChanges] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [plain, setPlain] = useState(true);
+  const [search, setSearch] = useState("");
+  const [activeSection, setActiveSection] = useState(null);
+  const sectionRefs = useRef({});
+
+  useEffect(() => {
+    localStorage.setItem("atlas:theme", theme);
+    document.documentElement.setAttribute("data-mode", theme);
+  }, [theme]);
+
+  useEffect(() => {
+    const twelveMonthsAgo = new Date();
+    twelveMonthsAgo.setFullYear(twelveMonthsAgo.getFullYear() - 1);
+    const sinceDate = EMPLOYEE.since && new Date(EMPLOYEE.since) > twelveMonthsAgo
+      ? EMPLOYEE.since
+      : twelveMonthsAgo.toISOString().split("T")[0];
+    const auditUrl = `/api/audit?country=${encodeURIComponent(COUNTRY_NAME)}&since=${encodeURIComponent(sinceDate)}`;
+    Promise.all([
+      fetch(`/api/employee/guide/${encodeURIComponent(COUNTRY_NAME)}`).then(r => {
+        if (!r.ok) throw new Error(`Guide not found for ${COUNTRY_NAME}`);
+        return r.json();
+      }),
+      fetch(auditUrl).then(r => r.json()).catch(() => []),
+    ]).then(([guideData, auditData]) => {
+      setGuide(guideData);
+      setChanges(Array.isArray(auditData) ? auditData : []);
+      setActiveSection(guideData.groups[0]?.id || null);
+      setLoading(false);
+    }).catch(e => {
+      setError(e.message);
+      setLoading(false);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!guide) return;
+    const observer = new IntersectionObserver(
+      entries => {
+        const visible = entries.filter(e => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+        if (visible[0]) setActiveSection(visible[0].target.dataset.section);
+      },
+      { rootMargin: "-120px 0px -55% 0px", threshold: [0, 0.2, 0.5] }
+    );
+    Object.values(sectionRefs.current).forEach(el => el && observer.observe(el));
+    return () => observer.disconnect();
+  }, [guide]);
+
+  const jumpTo = (idOrSection) => {
+    // Direct group ID match
+    if (sectionRefs.current[idOrSection]) {
+      sectionRefs.current[idOrSection].scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+    // Section ID → find which group contains it
+    if (guide) {
+      const group = guide.groups.find(g => g.rules.some(r => r.id === idOrSection));
+      if (group) sectionRefs.current[group.id]?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
+  const firstName = EMPLOYEE.name !== "there" ? EMPLOYEE.name.split(" ")[0] : "there";
+
+  return (
+    <>
+      <AppBar theme={theme} setTheme={setTheme} />
+      <main className="shell">
+        {loading && (
+          <>
+            <div style={S.heroSkel}>
+              <div className="skel-line" style={S.skelTitle} />
+              <div className="skel-line" style={S.skelSub} />
+            </div>
+            <Skeleton />
+          </>
+        )}
+
+        {error && (
+          <div style={S.pageError}>
+            ⚠ {error}
+          </div>
+        )}
+
+        {!loading && !error && guide && (
+          <>
+            {/* 1. Greeting */}
+            <div className="employee-greet">
+              <div>
+                <div className="eyebrow" style={S.eyebrowMb}>Your country guide</div>
+                <div className="employee-greet-title">Hello, {firstName}.</div>
+                <div className="employee-greet-sub">
+                  You're employed in <strong>{COUNTRY_NAME}</strong>
+                  {EMPLOYEE.role !== "employee" && <> as <strong>{EMPLOYEE.role.toLowerCase()}</strong></>}
+                  {EMPLOYEE.since && <>, since <strong>{new Date(EMPLOYEE.since).toLocaleDateString(undefined,{month:"long",year:"numeric"})}</strong></>}.
+                  {" "}Everything below is reviewed by Atlas and applies to your contract.
+                </div>
+              </div>
+              <div className="eg-card">
+                <div className="eg-flag">{COUNTRY_FLAG}</div>
+                <div className="eg-stats">
+                  <div>
+                    <div className="eg-v">{guide.rule_count}</div>
+                    <div className="eg-l">rules tracked</div>
+                  </div>
+                  <div>
+                    <div className="eg-v">{guide.groups.length}</div>
+                    <div className="eg-l">sections</div>
+                  </div>
+                  <div>
+                    <div className="eg-v"><small>{guide.last_updated || "—"}</small></div>
+                    <div className="eg-l">last updated</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 2. Ask Atlas */}
+            <AskAtlas groups={guide.groups} onJump={jumpTo} />
+
+            {/* 3. Since you joined */}
+            {(() => {
+              const twelveMonthsAgo = new Date();
+              twelveMonthsAgo.setFullYear(twelveMonthsAgo.getFullYear() - 1);
+              const sinceLabel = EMPLOYEE.since && new Date(EMPLOYEE.since) > twelveMonthsAgo
+                ? `since ${new Date(EMPLOYEE.since).toLocaleDateString(undefined, { month: "long", year: "numeric" })}`
+                : "past 12 months";
+              return <SinceYouJoined changes={changes} onJump={jumpTo} sinceLabel={sinceLabel} />;
+            })()}
+
+            {/* 4. TL;DR strip */}
+            <TLDRStrip groups={guide.groups} />
+
+            {/* 5. Guide controls: search + plain English toggle */}
+            {(() => {
+              const term = search.trim().toLowerCase();
+              const matchCount = term ? guide.groups.reduce((n, g) =>
+                n + g.rules.filter(r =>
+                  r.label.toLowerCase().includes(term) || r.value.toLowerCase().includes(term)
+                ).length, 0) : 0;
+              return (
+                <div className="guide-controls">
+                  <div className="search-bar">
+                    <IconSearch />
+                    <input
+                      value={search}
+                      onChange={e => setSearch(e.target.value)}
+                      placeholder="Search rules…"
+                      aria-label="Search rules"
+                    />
+                    {search && (
+                      <button className="search-clear" onClick={() => setSearch("")} aria-label="Clear search">×</button>
+                    )}
+                  </div>
+                  {term && (
+                    <span className="search-meta">
+                      {matchCount} {matchCount === 1 ? "match" : "matches"}
+                    </span>
+                  )}
+                  <div style={S.spacer} />
+                  <span className="eyebrow">View mode</span>
+                  <button
+                    className={`plain-toggle ${plain ? "on" : ""}`}
+                    onClick={() => setPlain(v => !v)}
+                    aria-pressed={plain}
+                  >
+                    <IconSparkle />
+                    Plain English
+                    <span className="toggle-switch" />
+                  </button>
+                </div>
+              );
+            })()}
+
+            {/* 6. Guide body */}
+            {(() => {
+              const term = search.trim().toLowerCase();
+              const visibleGroups = guide.groups.map(g => ({
+                ...g,
+                matchCount: term
+                  ? g.rules.filter(r => r.label.toLowerCase().includes(term) || r.value.toLowerCase().includes(term)).length
+                  : g.rules.length,
+              }));
+              const totalMatches = term ? visibleGroups.reduce((n, g) => n + g.matchCount, 0) : null;
+              return (
+            <div className="guide-layout">
+              <aside className="guide-toc" aria-label="Sections">
+                <div className="guide-toc-label">Sections</div>
+                {visibleGroups.map(g => (
+                  <a
+                    key={g.id}
+                    className={`toc-item ${activeSection === g.id ? "active" : ""}${term && g.matchCount === 0 ? " toc-item-dim" : ""}`}
+                    onClick={e => { e.preventDefault(); jumpTo(g.id); }}
+                    style={term && g.matchCount === 0 ? {opacity: 0.35} : {}}
+                  >
+                    <span>{g.label}</span>
+                    <span className="toc-count">{term ? g.matchCount : g.rules.length}</span>
+                  </a>
+                ))}
+              </aside>
+
+              <div className="guide-body">
+                {totalMatches === 0 && (
+                  <div className="no-results">No rules match "{search}"</div>
+                )}
+                {visibleGroups.map(g => {
+                  if (term && g.matchCount === 0) return null;
+                  return (
+                  <section
+                    key={g.id}
+                    id={g.id}
+                    ref={el => (sectionRefs.current[g.id] = el)}
+                    data-section={g.id}
+                    className="guide-section"
+                  >
+                    <div className="guide-section-head">
+                      <h2>{g.label}</h2>
+                      <div className="sec-meta">
+                        {term ? `${g.matchCount} of ${g.rules.length}` : g.rules.length} {g.rules.length === 1 ? "rule" : "rules"}
+                      </div>
+                    </div>
+                    {g.rules.map(r => (
+                      <Rule key={r.id} rule={r} plain={plain} search={search} />
+                    ))}
+                  </section>
+                  );
+                })}
+
+                <div className="guide-footer">
+                  <span>Reviewed by Atlas Compliance · last sweep {guide.last_updated}</span>
+                  <span>Not legal advice. Verify before policy decisions.</span>
+                </div>
+              </div>
+            </div>
+              );
+            })()}
+          </>
+        )}
+      </main>
+    </>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<App />);
+</script>
+</body>
+</html>

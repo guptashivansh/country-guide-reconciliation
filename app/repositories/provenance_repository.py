@@ -1,13 +1,16 @@
-import sqlite3
 from datetime import datetime
+
+from app.utils.db import Database
 
 
 class ProvenanceRepository:
-    def __init__(self, db_path):
-        self.db_path = db_path
+    def __init__(self, db):
+        if isinstance(db, str):
+            db = Database(db)
+        self.db = db
 
     def connect(self):
-        return sqlite3.connect(self.db_path)
+        return self.db.connect()
 
     def initialize_schema(self):
         conn = self.connect()
@@ -46,8 +49,7 @@ class ProvenanceRepository:
         c.execute("CREATE INDEX IF NOT EXISTS idx_rp_review_queue ON rule_provenance(review_queue_id)")
 
         # Add current_provenance_id to country_guide if not present
-        c.execute("PRAGMA table_info(country_guide)")
-        cg_cols = {row[1] for row in c.fetchall()}
+        cg_cols = self.db.get_table_columns(conn, "country_guide")
         if "current_provenance_id" not in cg_cols:
             c.execute("ALTER TABLE country_guide ADD COLUMN current_provenance_id INTEGER")
 

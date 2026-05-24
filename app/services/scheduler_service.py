@@ -18,7 +18,13 @@ def _run_scheduled_sync(services, slack_webhook_url):
         logger.error("Scheduled sync failed", extra={"stage": "scheduler", "failure": str(e)})
         send_sync_alert(
             slack_webhook_url,
-            {"total_changes": 0, "endpoints_processed": 0, "failures": 1},
+            {
+                "total_changes": 0,
+                "endpoints_processed": 0,
+                "failures": 1,
+                "per_country": {},
+                "sync_error": str(e),
+            },
             triggered_by="scheduler",
         )
 

@@ -1,0 +1,1062 @@
+{% extends "compliance_base.html" %}
+
+{% block title %}Upload PDF · Compliance Intake{% endblock %}
+{% block topbar_section %}Compliance Intake · PDF Upload{% endblock %}
+
+{% block head %}
+<style>
+/* ── WIZARD SHELL ── */
+.wizard {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.wizard-progress {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 32px;
+}
+
+.wizard-step-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.wizard-step-indicator.ws-done { color: var(--state-success); }
+.wizard-step-indicator.ws-active { color: var(--text); }
+
+.wizard-step-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+  border: 2px solid var(--border);
+  color: var(--muted);
+  background: transparent;
+}
+
+.ws-done .wizard-step-dot {
+  background: var(--state-success);
+  border-color: var(--state-success);
+  color: #000;
+}
+
+.ws-active .wizard-step-dot {
+  border-color: var(--text);
+  color: var(--text);
+}
+
+.wizard-step-connector {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+  margin: 0 8px;
+  min-width: 12px;
+}
+
+.ws-done + .wizard-step-connector { background: var(--state-success); }
+
+/* ── WIZARD CARD ── */
+.wizard-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.wizard-card-header {
+  padding: 22px 28px 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.wizard-card-step {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.wizard-card-title {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+.wizard-card-body {
+  padding: 24px 28px 28px;
+}
+
+.wizard-card-footer {
+  padding: 16px 28px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: rgba(2,6,23,0.2);
+}
+
+.wizard-card-footer-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── DROPZONE ── */
+.dropzone {
+  border: 2px dashed var(--border);
+  border-radius: 12px;
+  padding: 48px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.dropzone:hover,
+.dropzone.dragover {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.dropzone-icon {
+  font-size: 32px;
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+
+.dropzone-text {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.dropzone-hint {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.dropzone input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* ── FILE PREVIEW ── */
+.file-preview {
+  display: none;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-top: 16px;
+}
+
+.file-preview.visible { display: block; }
+
+.file-preview-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.file-preview-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.file-preview-icon { font-size: 20px; flex-shrink: 0; }
+
+.file-preview-name {
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-preview-meta {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.file-preview-remove {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--muted);
+  padding: 4px 10px;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.file-preview-remove:hover {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+.file-hash {
+  margin-top: 10px;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  word-break: break-all;
+}
+
+/* ── FORM FIELDS ── */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group:last-child { margin-bottom: 0; }
+
+.form-label {
+  display: block;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+  width: 100%;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  border-color: var(--accent);
+}
+
+.form-input::placeholder,
+.form-textarea::placeholder {
+  color: var(--muted);
+}
+
+.form-select {
+  appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--muted) 50%),
+    linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+  background-position: calc(100% - 14px) calc(50% - 2px), calc(100% - 9px) calc(50% - 2px);
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 30px;
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 80px;
+  font-family: 'DM Mono', monospace;
+}
+
+.form-hint {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* ── JURISDICTION PICKER ── */
+.jurisdiction-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px;
+}
+
+.jurisdiction-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+}
+
+.jurisdiction-chip:hover {
+  border-color: var(--muted);
+}
+
+.jurisdiction-chip.selected {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+
+.jurisdiction-chip input[type="radio"] { display: none; }
+
+.jurisdiction-flag { font-size: 16px; }
+
+/* ── SECTION CHECKS ── */
+.section-check-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 6px;
+}
+
+.section-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.1s;
+  user-select: none;
+}
+
+.section-check:hover { background: rgba(255,255,255,0.03); }
+
+.section-check input[type="checkbox"] {
+  accent-color: var(--accent);
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+/* ── AUTHORITY LEVEL ── */
+.authority-options {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.authority-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+}
+
+.authority-option:hover { border-color: var(--muted); }
+
+.authority-option.selected {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.authority-option input[type="radio"] { display: none; }
+
+.authority-option-label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.authority-option-desc {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.authority-option-badge {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* ── CONFIRMATION SUMMARY ── */
+.confirm-grid {
+  display: grid;
+  gap: 0;
+}
+
+.confirm-row {
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr);
+  gap: 16px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(30,30,46,0.6);
+  font-size: 13px;
+}
+
+.confirm-row:last-child { border-bottom: none; }
+
+.confirm-key {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.confirm-value {
+  font-weight: 600;
+}
+
+.confirm-pipeline-note {
+  margin-top: 20px;
+  padding: 14px 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.confirm-pipeline-note strong {
+  color: var(--text);
+}
+
+/* ── SAVE DRAFT ── */
+.btn-ghost {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 6px;
+  transition: all 0.15s;
+}
+
+.btn-ghost:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 720px) {
+  .wizard { max-width: 100%; }
+  .wizard-step-indicator span:not(.wizard-step-dot) { display: none; }
+  .form-row { grid-template-columns: 1fr; }
+  .confirm-row { grid-template-columns: 120px 1fr; }
+}
+</style>
+{% endblock %}
+
+{% block workspace %}
+<div class="page-header">
+  <div class="page-breadcrumbs">
+    <a href="/compliance/dashboard">Compliance</a>
+    <span aria-hidden="true">/</span>
+    <a href="/compliance/intake">Intake</a>
+    <span aria-hidden="true">/</span>
+    <span>Upload PDF</span>
+  </div>
+  <div class="page-title-row">
+    <div>
+      <h1 class="page-title">Upload Regulatory Document</h1>
+      <p class="page-subtitle">Ingest a PDF through the structured attribution pipeline.</p>
+    </div>
+    <button class="btn-ghost" id="saveDraftBtn" onclick="saveDraft()">Save draft</button>
+  </div>
+</div>
+
+<div class="page-content">
+<div class="wizard">
+
+  <!-- PROGRESS BAR -->
+  <div class="wizard-progress" role="navigation" aria-label="Upload steps">
+    <div class="wizard-step-indicator ws-active" id="wsInd1">
+      <span class="wizard-step-dot">1</span>
+      <span>Upload</span>
+    </div>
+    <div class="wizard-step-connector"></div>
+    <div class="wizard-step-indicator" id="wsInd2">
+      <span class="wizard-step-dot">2</span>
+      <span>Attribution</span>
+    </div>
+    <div class="wizard-step-connector"></div>
+    <div class="wizard-step-indicator" id="wsInd3">
+      <span class="wizard-step-dot">3</span>
+      <span>Jurisdiction</span>
+    </div>
+    <div class="wizard-step-connector"></div>
+    <div class="wizard-step-indicator" id="wsInd4">
+      <span class="wizard-step-dot">4</span>
+      <span>Authority</span>
+    </div>
+    <div class="wizard-step-connector"></div>
+    <div class="wizard-step-indicator" id="wsInd5">
+      <span class="wizard-step-dot">5</span>
+      <span>Confirm</span>
+    </div>
+  </div>
+
+  <!-- STEP 1: UPLOAD -->
+  <div class="wizard-card" id="step1">
+    <div class="wizard-card-header">
+      <div class="wizard-card-step">Step 1 of 5</div>
+      <div class="wizard-card-title">Document upload</div>
+    </div>
+    <div class="wizard-card-body">
+      <div class="dropzone" id="dropzone">
+        <div class="dropzone-icon" aria-hidden="true">&#x1F4C4;</div>
+        <div class="dropzone-text">Drop a PDF here, or click to browse</div>
+        <div class="dropzone-hint">PDF &middot; max 50 MB &middot; OCR will run if scanned</div>
+        <input type="file" id="fileInput" accept=".pdf,application/pdf" aria-label="Select PDF file">
+      </div>
+      <div class="file-preview" id="filePreview">
+        <div class="file-preview-row">
+          <div class="file-preview-info">
+            <span class="file-preview-icon" aria-hidden="true">&#x1F4C4;</span>
+            <div>
+              <div class="file-preview-name" id="fileName"></div>
+              <div class="file-preview-meta" id="fileMeta"></div>
+            </div>
+          </div>
+          <button class="file-preview-remove" id="fileRemove" onclick="removeFile()">Remove</button>
+        </div>
+        <div class="file-hash" id="fileHash"></div>
+      </div>
+    </div>
+    <div class="wizard-card-footer">
+      <a href="/compliance/intake" class="btn-secondary" style="text-decoration:none">&larr; Back to Intake</a>
+      <button class="btn-primary" id="step1Next" disabled onclick="goStep(2)">Continue &rarr;</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: ATTRIBUTION -->
+  <div class="wizard-card" id="step2" style="display:none">
+    <div class="wizard-card-header">
+      <div class="wizard-card-step">Step 2 of 5</div>
+      <div class="wizard-card-title">Metadata attribution</div>
+    </div>
+    <div class="wizard-card-body">
+      <div class="form-group">
+        <label class="form-label" for="publisher">Publisher / authority name</label>
+        <input class="form-input" id="publisher" type="text" placeholder="e.g. Ministry of Labour & Employment">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="sourceUrl">Official URL of record (optional)</label>
+        <input class="form-input" id="sourceUrl" type="url" placeholder="https://...">
+        <div class="form-hint">If this document is available online, enter the canonical URL</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="docTitle">Document title</label>
+        <input class="form-input" id="docTitle" type="text" placeholder="e.g. Gazette Notification — Annual Leave Amendment Act 2026">
+      </div>
+    </div>
+    <div class="wizard-card-footer">
+      <button class="btn-secondary" onclick="goStep(1)">&larr; Back</button>
+      <button class="btn-primary" id="step2Next" onclick="goStep(3)">Continue &rarr;</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: JURISDICTION -->
+  <div class="wizard-card" id="step3" style="display:none">
+    <div class="wizard-card-header">
+      <div class="wizard-card-step">Step 3 of 5</div>
+      <div class="wizard-card-title">Jurisdiction selection</div>
+    </div>
+    <div class="wizard-card-body">
+      <div class="form-group">
+        <label class="form-label">Primary jurisdiction</label>
+        <div class="jurisdiction-grid" id="jurisdictionGrid"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="subJurisdiction">Sub-jurisdiction (optional)</label>
+        <input class="form-input" id="subJurisdiction" type="text" placeholder="e.g. Maharashtra, New South Wales">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Applies to sections</label>
+        <div class="section-check-grid" id="sectionCheckGrid"></div>
+      </div>
+    </div>
+    <div class="wizard-card-footer">
+      <button class="btn-secondary" onclick="goStep(2)">&larr; Back</button>
+      <button class="btn-primary" id="step3Next" onclick="goStep(4)">Continue &rarr;</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: AUTHORITY LEVEL + EFFECTIVE DATE -->
+  <div class="wizard-card" id="step4" style="display:none">
+    <div class="wizard-card-header">
+      <div class="wizard-card-step">Step 4 of 5</div>
+      <div class="wizard-card-title">Authority level &amp; effective date</div>
+    </div>
+    <div class="wizard-card-body">
+      <div class="form-group">
+        <label class="form-label">Authority level</label>
+        <div class="authority-options" id="authorityOptions">
+          <label class="authority-option" data-value="primary_statute">
+            <input type="radio" name="authority" value="primary_statute">
+            <div>
+              <div class="authority-option-label">Primary statute</div>
+              <div class="authority-option-desc">Acts of parliament, national legislation</div>
+            </div>
+            <span class="authority-option-badge severity-badge severity-critical">HIGH</span>
+          </label>
+          <label class="authority-option" data-value="regulation">
+            <input type="radio" name="authority" value="regulation">
+            <div>
+              <div class="authority-option-label">Regulation</div>
+              <div class="authority-option-desc">Subsidiary rules, statutory instruments</div>
+            </div>
+            <span class="authority-option-badge severity-badge severity-high">HIGH</span>
+          </label>
+          <label class="authority-option" data-value="circular">
+            <input type="radio" name="authority" value="circular">
+            <div>
+              <div class="authority-option-label">Circular / directive</div>
+              <div class="authority-option-desc">Departmental circulars, ministry directives</div>
+            </div>
+            <span class="authority-option-badge severity-badge severity-moderate">MED</span>
+          </label>
+          <label class="authority-option" data-value="advisory">
+            <input type="radio" name="authority" value="advisory">
+            <div>
+              <div class="authority-option-label">Advisory / guidance</div>
+              <div class="authority-option-desc">Non-binding interpretive guidance</div>
+            </div>
+            <span class="authority-option-badge severity-badge severity-low">LOW</span>
+          </label>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="effectiveDate">Effective date</label>
+          <input class="form-input" id="effectiveDate" type="date">
+          <div class="form-hint">When this regulation takes effect</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="publishedDate">Published date</label>
+          <input class="form-input" id="publishedDate" type="date">
+          <div class="form-hint">When the document was officially published</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="supersedes">Supersedes rule (optional)</label>
+        <input class="form-input" id="supersedes" type="text" placeholder="e.g. rule_IN_annual_leave_v7">
+        <div class="form-hint">If this document replaces a known canonical rule, enter its rule_id</div>
+      </div>
+    </div>
+    <div class="wizard-card-footer">
+      <button class="btn-secondary" onclick="goStep(3)">&larr; Back</button>
+      <button class="btn-primary" id="step4Next" onclick="goStep(5)">Continue &rarr;</button>
+    </div>
+  </div>
+
+  <!-- STEP 5: CONFIRMATION -->
+  <div class="wizard-card" id="step5" style="display:none">
+    <div class="wizard-card-header">
+      <div class="wizard-card-step">Step 5 of 5</div>
+      <div class="wizard-card-title">Review intake before submitting</div>
+    </div>
+    <div class="wizard-card-body">
+      <div class="confirm-grid" id="confirmGrid"></div>
+      <div class="confirm-pipeline-note">
+        <strong>After submission this document will:</strong><br>
+        register &rarr; OCR extract &rarr; structured parse &rarr; canonical map &rarr; reconcile &rarr; enter the review queue.
+      </div>
+    </div>
+    <div class="wizard-card-footer">
+      <button class="btn-secondary" onclick="goStep(4)">&larr; Back</button>
+      <button class="btn-primary" id="submitBtn" onclick="submitIntake()">Submit intake &rarr;</button>
+    </div>
+  </div>
+
+  <!-- POST-SUBMIT -->
+  <div class="wizard-card" id="stepDone" style="display:none">
+    <div class="wizard-card-header">
+      <div class="wizard-card-step">Complete</div>
+      <div class="wizard-card-title">Document submitted for processing</div>
+    </div>
+    <div class="wizard-card-body" style="text-align:center; padding:40px 28px;">
+      <div style="font-size:32px; margin-bottom:16px; opacity:0.5;" aria-hidden="true">&#x2713;</div>
+      <div style="font-size:14px; font-weight:600; margin-bottom:8px;" id="doneMessage">Your document has been registered.</div>
+      <div style="font-family:'DM Mono',monospace; font-size:12px; color:var(--muted);" id="doneJobId"></div>
+    </div>
+    <div class="wizard-card-footer">
+      <a href="/compliance/intake" class="btn-secondary" style="text-decoration:none">&larr; Back to Intake</a>
+      <div class="wizard-card-footer-right">
+        <a href="/compliance/intake/pdf" class="btn-secondary" style="text-decoration:none">Upload another</a>
+        <a href="" class="btn-primary" id="donePipelineLink" style="text-decoration:none">View in pipeline &rarr;</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function() {
+  var FLAGS = {{ flags | tojson }};
+  var SECTIONS = {{ sections | tojson }};
+  var DRAFT_KEY = 'intake_draft_v1';
+  var currentStep = 1;
+
+  var state = loadDraft() || {
+    file: null,
+    fileName: '',
+    fileSize: 0,
+    fileHash: '',
+    publisher: '',
+    sourceUrl: '',
+    docTitle: '',
+    jurisdiction: '',
+    subJurisdiction: '',
+    selectedSections: [],
+    authority: '',
+    effectiveDate: '',
+    publishedDate: '',
+    supersedes: ''
+  };
+
+  initJurisdictionGrid();
+  initSectionGrid();
+  initAuthorityOptions();
+  initDropzone();
+  restoreFormState();
+  updateURL();
+
+  function initJurisdictionGrid() {
+    var grid = document.getElementById('jurisdictionGrid');
+    var html = '';
+    var countries = Object.keys(FLAGS).sort();
+    countries.forEach(function(c) {
+      var sel = state.jurisdiction === c ? ' selected' : '';
+      html += '<label class="jurisdiction-chip' + sel + '" data-country="' + esc(c) + '">';
+      html += '<input type="radio" name="jurisdiction" value="' + esc(c) + '"' + (sel ? ' checked' : '') + '>';
+      html += '<span class="jurisdiction-flag">' + FLAGS[c] + '</span>';
+      html += '<span>' + esc(c) + '</span>';
+      html += '</label>';
+    });
+    grid.innerHTML = html;
+
+    grid.addEventListener('click', function(e) {
+      var chip = e.target.closest('.jurisdiction-chip');
+      if (!chip) return;
+      grid.querySelectorAll('.jurisdiction-chip').forEach(function(el) { el.classList.remove('selected'); });
+      chip.classList.add('selected');
+      chip.querySelector('input').checked = true;
+      state.jurisdiction = chip.dataset.country;
+    });
+  }
+
+  function initSectionGrid() {
+    var grid = document.getElementById('sectionCheckGrid');
+    var html = '';
+    SECTIONS.forEach(function(g) {
+      g.sections.forEach(function(s) {
+        var checked = state.selectedSections.indexOf(s) !== -1 ? ' checked' : '';
+        var label = s.replace(/_/g, ' ').replace(/\b\w/g, function(c){return c.toUpperCase();});
+        html += '<label class="section-check">';
+        html += '<input type="checkbox" value="' + esc(s) + '"' + checked + '>';
+        html += '<span>' + esc(label) + '</span>';
+        html += '</label>';
+      });
+    });
+    grid.innerHTML = html;
+
+    grid.addEventListener('change', function() {
+      state.selectedSections = [];
+      grid.querySelectorAll('input:checked').forEach(function(el) {
+        state.selectedSections.push(el.value);
+      });
+    });
+  }
+
+  function initAuthorityOptions() {
+    var container = document.getElementById('authorityOptions');
+    container.addEventListener('click', function(e) {
+      var opt = e.target.closest('.authority-option');
+      if (!opt) return;
+      container.querySelectorAll('.authority-option').forEach(function(el) { el.classList.remove('selected'); });
+      opt.classList.add('selected');
+      opt.querySelector('input').checked = true;
+      state.authority = opt.dataset.value;
+    });
+    if (state.authority) {
+      var pre = container.querySelector('[data-value="' + state.authority + '"]');
+      if (pre) { pre.classList.add('selected'); pre.querySelector('input').checked = true; }
+    }
+  }
+
+  function initDropzone() {
+    var dz = document.getElementById('dropzone');
+    var input = document.getElementById('fileInput');
+
+    ['dragenter','dragover'].forEach(function(ev) {
+      dz.addEventListener(ev, function(e) { e.preventDefault(); dz.classList.add('dragover'); });
+    });
+    ['dragleave','drop'].forEach(function(ev) {
+      dz.addEventListener(ev, function(e) { e.preventDefault(); dz.classList.remove('dragover'); });
+    });
+    dz.addEventListener('drop', function(e) {
+      var files = e.dataTransfer.files;
+      if (files.length) handleFile(files[0]);
+    });
+    input.addEventListener('change', function() {
+      if (input.files.length) handleFile(input.files[0]);
+    });
+  }
+
+  function handleFile(file) {
+    if (!file.name.toLowerCase().endsWith('.pdf')) {
+      alert('Only PDF files are supported.');
+      return;
+    }
+    if (file.size > 50 * 1024 * 1024) {
+      alert('File exceeds the 50 MB limit.');
+      return;
+    }
+
+    state.file = file;
+    state.fileName = file.name;
+    state.fileSize = file.size;
+
+    document.getElementById('fileName').textContent = file.name;
+    document.getElementById('fileMeta').textContent = formatSize(file.size);
+    document.getElementById('filePreview').classList.add('visible');
+    document.getElementById('dropzone').style.display = 'none';
+    document.getElementById('step1Next').disabled = false;
+
+    computeHash(file).then(function(hash) {
+      state.fileHash = hash;
+      document.getElementById('fileHash').textContent = 'SHA-256  ' + hash;
+    });
+  }
+
+  window.removeFile = function() {
+    state.file = null;
+    state.fileName = '';
+    state.fileSize = 0;
+    state.fileHash = '';
+    document.getElementById('filePreview').classList.remove('visible');
+    document.getElementById('dropzone').style.display = '';
+    document.getElementById('step1Next').disabled = true;
+    document.getElementById('fileInput').value = '';
+  };
+
+  function computeHash(file) {
+    return file.arrayBuffer().then(function(buf) {
+      return crypto.subtle.digest('SHA-256', buf);
+    }).then(function(hash) {
+      return Array.from(new Uint8Array(hash)).map(function(b) { return b.toString(16).padStart(2,'0'); }).join('');
+    });
+  }
+
+  function formatSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
+    return (bytes/(1024*1024)).toFixed(1) + ' MB';
+  }
+
+  window.goStep = function(n) {
+    collectCurrentStep();
+    document.getElementById('step' + currentStep).style.display = 'none';
+    document.getElementById('step' + n).style.display = '';
+    currentStep = n;
+    updateProgressBar();
+    updateURL();
+    if (n === 5) buildConfirmation();
+    window.scrollTo(0, 0);
+  };
+
+  function collectCurrentStep() {
+    if (currentStep === 2) {
+      state.publisher = document.getElementById('publisher').value.trim();
+      state.sourceUrl = document.getElementById('sourceUrl').value.trim();
+      state.docTitle = document.getElementById('docTitle').value.trim();
+    } else if (currentStep === 3) {
+      state.subJurisdiction = document.getElementById('subJurisdiction').value.trim();
+    } else if (currentStep === 4) {
+      state.effectiveDate = document.getElementById('effectiveDate').value;
+      state.publishedDate = document.getElementById('publishedDate').value;
+      state.supersedes = document.getElementById('supersedes').value.trim();
+    }
+  }
+
+  function restoreFormState() {
+    if (state.fileName) {
+      document.getElementById('fileName').textContent = state.fileName;
+      document.getElementById('fileMeta').textContent = formatSize(state.fileSize);
+      if (state.fileHash) document.getElementById('fileHash').textContent = 'SHA-256  ' + state.fileHash;
+      document.getElementById('filePreview').classList.add('visible');
+      document.getElementById('dropzone').style.display = 'none';
+      document.getElementById('step1Next').disabled = false;
+    }
+    document.getElementById('publisher').value = state.publisher;
+    document.getElementById('sourceUrl').value = state.sourceUrl;
+    document.getElementById('docTitle').value = state.docTitle;
+    document.getElementById('subJurisdiction').value = state.subJurisdiction;
+    document.getElementById('effectiveDate').value = state.effectiveDate;
+    document.getElementById('publishedDate').value = state.publishedDate;
+    document.getElementById('supersedes').value = state.supersedes;
+
+    var urlStep = parseInt(new URLSearchParams(window.location.search).get('step'));
+    if (urlStep >= 1 && urlStep <= 5) {
+      document.getElementById('step1').style.display = 'none';
+      document.getElementById('step' + urlStep).style.display = '';
+      currentStep = urlStep;
+      updateProgressBar();
+    }
+  }
+
+  function updateProgressBar() {
+    for (var i = 1; i <= 5; i++) {
+      var ind = document.getElementById('wsInd' + i);
+      ind.className = 'wizard-step-indicator';
+      if (i < currentStep) ind.classList.add('ws-done');
+      else if (i === currentStep) ind.classList.add('ws-active');
+    }
+  }
+
+  function updateURL() {
+    var url = new URL(window.location);
+    url.searchParams.set('step', currentStep);
+    history.replaceState(null, '', url);
+  }
+
+  function buildConfirmation() {
+    var grid = document.getElementById('confirmGrid');
+    var rows = [
+      ['Document', state.fileName + ' &middot; ' + formatSize(state.fileSize)],
+      ['SHA-256', '<span style="font-family:DM Mono,monospace;font-size:11px;word-break:break-all">' + (state.fileHash || '—') + '</span>'],
+      ['Publisher', state.publisher || '—'],
+      ['Document title', state.docTitle || '—'],
+      ['Source URL', state.sourceUrl || '—'],
+      ['Jurisdiction', (FLAGS[state.jurisdiction] || '') + ' ' + (state.jurisdiction || '—') + (state.subJurisdiction ? ' &middot; ' + esc(state.subJurisdiction) : '')],
+      ['Authority level', state.authority ? state.authority.replace(/_/g, ' ') : '—'],
+      ['Effective date', state.effectiveDate || '—'],
+      ['Published date', state.publishedDate || '—'],
+      ['Sections', state.selectedSections.length ? state.selectedSections.map(function(s){return s.replace(/_/g,' ');}).join(', ') : 'All (auto-detect)'],
+      ['Supersedes', state.supersedes || '—']
+    ];
+    var html = '';
+    rows.forEach(function(r) {
+      html += '<div class="confirm-row">';
+      html += '<div class="confirm-key">' + r[0] + '</div>';
+      html += '<div class="confirm-value">' + r[1] + '</div>';
+      html += '</div>';
+    });
+    grid.innerHTML = html;
+  }
+
+  window.submitIntake = function() {
+    var btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = 'Submitting...';
+
+    collectCurrentStep();
+
+    var formData = new FormData();
+    if (state.file) formData.append('file', state.file);
+    formData.append('publisher', state.publisher);
+    formData.append('source_url', state.sourceUrl);
+    formData.append('doc_title', state.docTitle);
+    formData.append('jurisdiction', state.jurisdiction);
+    formData.append('sub_jurisdiction', state.subJurisdiction);
+    formData.append('sections', JSON.stringify(state.selectedSections));
+    formData.append('authority', state.authority);
+    formData.append('effective_date', state.effectiveDate);
+    formData.append('published_date', state.publishedDate);
+    formData.append('supersedes', state.supersedes);
+    formData.append('file_hash', state.fileHash);
+
+    fetch('/api/intake/pdf', { method: 'POST', body: formData })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.success) {
+          sessionStorage.removeItem(DRAFT_KEY);
+          document.getElementById('step5').style.display = 'none';
+          document.getElementById('stepDone').style.display = '';
+          document.getElementById('doneJobId').textContent = 'Job #' + (data.job_id || '—');
+          document.getElementById('donePipelineLink').href = '/compliance/pipeline/' + (data.job_id || '');
+          for (var i = 1; i <= 5; i++) document.getElementById('wsInd' + i).className = 'wizard-step-indicator ws-done';
+        } else {
+          alert('Submission failed: ' + (data.message || 'Unknown error'));
+          btn.disabled = false;
+          btn.textContent = 'Submit intake →';
+        }
+      })
+      .catch(function(err) {
+        alert('Network error: ' + err.message);
+        btn.disabled = false;
+        btn.textContent = 'Submit intake →';
+      });
+  };
+
+  window.saveDraft = function() {
+    collectCurrentStep();
+    var draft = Object.assign({}, state);
+    delete draft.file;
+    sessionStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+    var btn = document.getElementById('saveDraftBtn');
+    btn.textContent = 'Saved';
+    setTimeout(function() { btn.textContent = 'Save draft'; }, 1500);
+  };
+
+  function loadDraft() {
+    try {
+      var raw = sessionStorage.getItem(DRAFT_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch(e) { return null; }
+  }
+
+  function esc(s) {
+    var d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+})();
+</script>
+{% endblock %}
