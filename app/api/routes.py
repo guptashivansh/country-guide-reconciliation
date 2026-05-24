@@ -2,7 +2,7 @@ import logging
 from datetime import datetime
 
 from flask import Blueprint, abort, jsonify, redirect, render_template, request, url_for
-from app.services.sync_service import run_sync
+from app.services.sync_service import run_sync, run_single_job
 from app.services.slack_service import send_sync_alert
 from app.utils.config import slack_webhook_url
 
@@ -112,6 +112,8 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
             if group_rules:
                 groups.append({"id": g["id"], "label": g["label"], "rules": group_rules})
 
+        notes = review_service.get_country_notes(country)
+
         return render_template(
             "guide_country.html",
             country=country,
@@ -119,8 +121,32 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
             rule_count=len(rows),
             last_updated=last_updated,
             groups=groups,
+            notes=notes,
             nav_active="guides",
         )
+
+    @routes.route("/api/notes/<country>", methods=["GET"])
+    def get_country_notes(country):
+        notes = review_service.get_country_notes(country)
+        return jsonify(notes)
+
+    @routes.route("/api/notes/<country>", methods=["PUT"])
+    def save_country_notes(country):
+        data = request.get_json(silent=True) or {}
+        content = data.get("content", "")
+        result = review_service.save_country_notes(country, content)
+        return jsonify({"success": True, **result})
+
+    @routes.route("/api/guide/<country>/<section>", methods=["PUT"])
+    def edit_rule(country, section):
+        data = request.get_json(silent=True) or {}
+        new_value = data.get("value", "").strip()
+        if not new_value:
+            return jsonify({"success": False, "message": "value is required"}), 400
+        result = review_service.manual_edit_rule(country, section, new_value)
+        if result is None:
+            return jsonify({"success": True, "message": "No change"})
+        return jsonify({"success": True, **result})
 
     @routes.route("/api/guide")
     def get_guide():
@@ -143,11 +169,62 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
                 entries = [e for e in entries if e.get("timestamp") and datetime.fromisoformat(e["timestamp"]) > since_dt]
             except ValueError:
                 pass
+        if request.args.get("dedupe") == "1":
+            seen = {}
+            deduped = []
+            for e in entries:
+                key = (e.get("country"), e.get("section"))
+                if key not in seen:
+                    seen[key] = True
+                    deduped.append(e)
+            entries = deduped
         return jsonify(entries)
 
     @routes.route("/api/ingestion-jobs")
     def get_ingestion_jobs():
         return jsonify(ingestion_job_service.list_recent_jobs())
+
+    @routes.route("/api/retry-job/<int:job_id>", methods=["POST"])
+    def retry_job(job_id):
+        retry_result = ingestion_job_service.retry_job(job_id)
+        if not retry_result:
+            return jsonify({"success": False, "message": "Job not found"}), 404
+
+        new_job_id = retry_result["job_id"]
+        source_url = retry_result["source_url"]
+        country = retry_result.get("country") or ""
+
+        endpoint = None
+        for ep in source_registry_service.list_trusted_source_endpoints():
+            if ep.url == source_url:
+                endpoint = ep
+                break
+
+        services = {
+            "ingestion_service": ingestion_service,
+            "source_snapshot_service": source_snapshot_service,
+            "ingestion_job_service": ingestion_job_service,
+            "extraction_service": extraction_service,
+            "reconciliation_service": reconciliation_service,
+        }
+        pipeline_result = run_single_job(
+            services, new_job_id, source_url,
+            country=endpoint.country if endpoint else country,
+            sections=endpoint.sections if endpoint else None,
+        )
+
+        if pipeline_result["success"]:
+            changes = pipeline_result.get("changes_queued", 0)
+            return jsonify({
+                "success": True,
+                "job_id": new_job_id,
+                "message": f"Job #{job_id} retried as #{new_job_id} — {changes} change(s) queued",
+            })
+        return jsonify({
+            "success": True,
+            "job_id": new_job_id,
+            "message": f"Job #{job_id} retried as #{new_job_id} — pipeline failed: {pipeline_result.get('failure_reason', 'unknown')}",
+        })
 
     @routes.route("/api/metrics")
     def get_metrics():
@@ -393,11 +470,11 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
             return jsonify({"error": "No prompt provided"}), 400
         try:
             from groq import Groq
-            import os
-            api_key = os.environ.get("GROQ_API_KEY")
-            if not api_key:
+            from app.utils.config import groq_api_keys
+            keys = groq_api_keys()
+            if not keys:
                 return jsonify({"error": "GROQ_API_KEY is not set. Get a free key at console.groq.com then run: export GROQ_API_KEY=your_key"}), 501
-            client = Groq(api_key=api_key)
+            client = Groq(api_key=keys[0])
             chat = client.chat.completions.create(
                 model="llama-3.3-70b-versatile",
                 max_tokens=512,
@@ -407,7 +484,7 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
         except ImportError:
             return jsonify({"error": "groq SDK not installed. Run: pip install groq"}), 501
         except Exception as exc:
-            logger.exception("Ask Atlas error")
+            logger.exception("Ask Abdul Kalam AI error")
             return jsonify({"error": str(exc)}), 500
 
     @routes.route("/api/drift/<country>")
@@ -442,11 +519,15 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
 
     @routes.route("/compliance")
     def compliance_root():
-        return redirect(url_for("country_guide_routes.compliance_intake"))
+        return redirect(url_for("country_guide_routes.compliance_intake_select"))
 
     @routes.route("/compliance/intake")
-    def compliance_intake():
-        return render_template("compliance_intake.html", nav_active="intake", flags=FLAGS)
+    def compliance_intake_select():
+        return render_template("compliance_intake_select.html", nav_active="intake", flags=FLAGS)
+
+    @routes.route("/intake/<country>")
+    def compliance_intake_country(country):
+        return render_template("compliance_intake.html", nav_active="intake", flags=FLAGS, country=country, flag=FLAGS.get(country, "🌐"))
 
     @routes.route("/compliance/intake/pdf")
     def compliance_intake_pdf():
@@ -475,7 +556,7 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
         file_hash = request.form.get("file_hash", "").strip()
 
         source_url = f"pdf://{file_hash[:12] if file_hash else 'upload'}#{doc_title or 'untitled'}"
-        job_id = ingestion_job_service.create_job(source_url)
+        job_id = ingestion_job_service.create_job(source_url, country=jurisdiction or None)
 
         logger.info(
             "PDF intake registered",
