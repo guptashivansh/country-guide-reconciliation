@@ -1,5 +1,5 @@
-site_name: Country Guide Reconciliation
-site_description: Automated compliance monitoring for employment guides
+site_name: Country Guide Reconciliation Platform
+site_description: AI-powered compliance governance and regulatory change detection for global employment guides
 repo_url: ""
 
 theme:
@@ -21,30 +21,53 @@ theme:
     - navigation.sections
     - navigation.expand
     - navigation.top
+    - navigation.indexes
     - content.code.copy
     - toc.follow
+    - toc.integrate
 
 markdown_extensions:
   - admonition
   - pymdownx.details
-  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.tabbed:
       alternate_style: true
   - attr_list
   - md_in_html
+  - def_list
+  - tables
   - toc:
       permalink: true
+      toc_depth: 3
   - pymdownx.highlight:
       anchor_linenums: true
   - pymdownx.inlinehilite
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
 
 nav:
   - Home: index.md
-  - Architecture: architecture.md
-  - Pipeline: pipeline.md
-  - User Guide:
+  - Platform Architecture:
+      - System Overview: architecture/overview.md
+      - Database Design: architecture/database.md
+      - Service Dependency Graph: architecture/services.md
+  - Core Modules:
+      - Sync Pipeline: modules/sync-pipeline.md
+      - Semantic Reconciliation Engine: modules/semantic-reconciliation.md
+      - LLM Extraction Service: modules/llm-extraction.md
+      - Review & Approval Workflow: modules/review-workflow.md
+      - Provenance & Audit Trail: modules/provenance.md
+      - Drift Detection: modules/drift-detection.md
+      - Temporal Versioning: modules/temporal-versioning.md
+      - Ingestion Layer: modules/ingestion.md
+  - Operations Guide:
       - Ops Dashboard: guide/ops-dashboard.md
       - Country Guides: guide/country-guides.md
-      - Review Workflow: guide/review-workflow.md
+      - Alerting & Notifications: guide/alerting.md
   - API Reference: api.md
   - Development: development.md
