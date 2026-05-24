@@ -3,18 +3,19 @@ Read-only DB queries that feed the drift detector.
 All methods return plain dicts / lists of dicts — no ORM objects.
 """
 
-import sqlite3
 from typing import List, Optional
+
+from app.utils.db import Database
 
 
 class DriftRepository:
-    def __init__(self, db_path: str):
-        self.db_path = db_path
+    def __init__(self, db):
+        if isinstance(db, str):
+            db = Database(db)
+        self.db = db
 
-    def _connect(self) -> sqlite3.Connection:
-        conn = sqlite3.connect(self.db_path)
-        conn.row_factory = sqlite3.Row
-        return conn
+    def _connect(self):
+        return self.db.dict_connect()
 
     # ── countries ─────────────────────────────────────────────────────────────
 
