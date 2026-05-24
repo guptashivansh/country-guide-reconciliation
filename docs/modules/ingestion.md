@@ -1,103 +1,143 @@
 # Ingestion Layer
 
-## 1. Feature Name
+## Operational Purpose
 
-**Multi-Source Regulatory Content Ingestion (HTML, Notion, PDF)**
+The ingestion layer is the first stage of the compliance pipeline. Its responsibility is narrow and precisely defined: retrieve content from official government sources, sanitize it, archive a complete snapshot with a content hash, and produce cleaned text for downstream extraction. It does not interpret content; it preserves it.
 
-## 2. Business Problem Solved
+The ingestion layer's reliability is a prerequisite for the accuracy of everything downstream. A missed fetch means no extracted rule. A corrupted fetch means a potentially incorrect extraction. An unarchived fetch means no evidence for the provenance chain.
 
-Employment regulations are published across heterogeneous formats — government ministry websites (HTML), internal knowledge bases (Notion), and official gazette documents (PDF). The ingestion layer normalizes all sources into clean text with content hashing, snapshot archival, and pipeline tracking, providing a unified input to the extraction engine regardless of source format.
+---
 
-## 3. Operational Pain Points Addressed
+## Source Snapshot Guarantee
 
-- **Source format diversity**: HTML, Notion pages, and PDFs each require different parsing strategies
-- **Content deduplication**: Without hashing, the pipeline re-processes unchanged sources, wasting LLM quota
-- **No archive of source material**: When a government website changes, the previous version is lost unless archived
-- **Ingestion failures are invisible**: Timeouts, 404s, and rate limits happen silently; no tracking means no accountability
+Every successful fetch produces a `source_snapshot` record before any extraction occurs. The snapshot contains the raw cleaned text and its MD5 hash, captured at fetch time. This snapshot is:
 
-## 4. User Personas Involved
+- **Immutable after creation.** The `raw_text` and `content_hash` fields are never updated.
+- **Preserved regardless of extraction outcome.** If extraction fails, the snapshot is still in the database. The failed extraction can be retried without re-crawling.
+- **The evidentiary basis for provenance.** Every provenance chain links back to the snapshot that provided the evidence for an extraction. If a reviewer or auditor questions an extraction, the archived source text is the reference.
 
-| Persona | Interaction |
-|---------|-------------|
-| Platform Engineer | Configures source endpoints, monitors ingestion job logs, debugs failures |
-| Compliance Analyst | Views source evidence (snapshot) when reviewing changes |
-| Compliance Lead | Monitors ingestion success rates and failure patterns |
+---
 
-## 5. Functional Overview
-
-![Multi-Source Ingestion — Pipeline job tracking with per-stage progress dots, status indicators, and source URLs](../assets/screenshots/multi_source_ingestion.png){ loading=lazy }
-
-
-Three ingestion adapters feed into a common pipeline:
-
-| Adapter | Source | Use Case |
-|---------|--------|----------|
-| `HtmlIngestionService` | Government websites | Ongoing regulatory monitoring |
-| `NotionIngestionService` | Skuad Notion workspace | One-time baseline import |
-| PDF intake (via `/api/intake/pdf`) | Uploaded gazette documents | Ad-hoc regulatory document processing |
-
-All adapters produce the same output: cleaned text + content hash, stored as a source snapshot.
-
-## 6. End-to-End Workflow
-
-### HTML Ingestion
+## HTML Ingestion Processing Steps
 
 ```mermaid
 flowchart LR
-    A[Source URL] --> B[HTTP GET]
-    B --> C{Response?}
-    C -- 2xx --> D[BeautifulSoup Parse]
-    C -- 5xx/Timeout --> E[Retry once]
-    C -- 4xx --> F[Fail immediately]
+    A[Source URL] --> B[HTTP GET with browser User-Agent]
+    B --> C{Response code}
+    C -- 2xx --> D[BeautifulSoup parse]
+    C -- 5xx or timeout --> E[Retry once]
+    C -- 4xx --> F[Fail immediately — record reason]
     E --> C
-    D --> G[Strip script/style/nav/footer/header/aside]
-    G --> H[Extract text lines > 30 chars]
-    H --> I[Truncate to 6000 chars]
-    I --> J[MD5 Content Hash]
+    D --> G[Strip script, style, nav, footer, header, aside]
+    G --> H[Extract text lines longer than 30 chars]
+    H --> I[Truncate to 6000 chars per chunk]
+    I --> J[MD5 content hash]
     J --> K[IngestionResult]
 ```
 
-**Configuration**:
+### Processing Parameters
 
-| Parameter | Value |
-|-----------|-------|
-| Timeout | 30 seconds |
-| Max retries | 2 (1 initial + 1 retry) |
-| User-Agent | Browser-like string |
-| Min line length | 30 characters |
-| Max content length | 6,000 characters |
-| Hash algorithm | MD5 |
+| Parameter | Value | Rationale |
+|-----------|-------|-----------|
+| HTTP timeout | 30 seconds | Government websites can be slow; 30 seconds captures most responses while bounding per-source wait time |
+| Max retries | 2 (1 initial + 1 retry) | Retry on transient 5xx or timeout; fail fast on 4xx (client errors do not resolve with retries) |
+| User-Agent | Browser-like string | Reduces the likelihood of automated request blocking; does not misrepresent the system as human |
+| Minimum line length | 30 characters | Filters navigation elements, breadcrumbs, and UI chrome that survived HTML stripping |
+| Max content length | 6,000 characters per chunk | LLM context budget management; see ContentChunker |
+| Hash algorithm | MD5 | Deduplication and change detection, not security; MD5 is appropriate for this use case |
 
-### Notion Ingestion
+---
 
-The Notion adapter uses the unofficial `loadPageChunk` API to traverse a specific page hierarchy:
+## Why 4xx Fails Immediately (No Retry)
+
+A 4xx response indicates a client error — typically that the URL is no longer valid (404 Not Found) or access is restricted (403 Forbidden). These conditions will not resolve with a retry:
+
+- A 404 means the government page has been restructured, renamed, or removed. Retrying does not fix this.
+- A 403 means the server is explicitly rejecting the request. Retrying the same request will produce the same rejection.
+
+The correct operational response to a 4xx is to investigate and update the source URL in the source registry. The failure is recorded with its reason; the platform engineering team can identify 4xx failures in the `ingestion_jobs` table and take corrective action.
+
+Automatic retry on 4xx would mask this signal by appearing to "process" the source when it is actually unreachable, potentially causing the previous stale snapshot to be re-used for extraction.
+
+---
+
+## Content Sanitization
+
+The HTML sanitization pipeline removes elements that contain page structure rather than regulatory content:
+
+```
+<script>  — Executable code
+<style>   — CSS stylesheets
+<nav>     — Navigation menus
+<footer>  — Page footers (disclaimers, copyright notices)
+<header>  — Page headers (logos, site navigation)
+<aside>   — Sidebars (related links, advertisements)
+```
+
+This stripping is not complete HTML sanitization — it does not protect against all web injection vectors. Its purpose is content normalization: extracting the substantive regulatory text from the structural chrome of government websites, which otherwise pollutes the LLM's extraction context.
+
+**What remains after stripping:** The main body content — tables, paragraphs, headings, and list items — which is where regulatory rules are published.
+
+---
+
+## Content Hash and Deduplication
+
+After cleaning and truncation, an MD5 hash is computed over the processed text. This hash serves two functions:
+
+**Change detection at sync time:** If the hash matches the hash of the most recent snapshot for the same URL, the content has not changed. Extraction and reconciliation are skipped. This prevents unnecessary LLM calls for unchanged sources.
+
+**Integrity verification in provenance:** The hash is stored in the snapshot record and carried through to the provenance chain. An auditor examining a published rule can verify that the snapshot's content hash matches the hash in the provenance record — a mismatch would indicate post-hoc modification of the snapshot.
+
+---
+
+## Notion Ingestion (Baseline Import Only)
+
+The Notion ingestion service is used exclusively for the one-time baseline import of existing country guides. It is not used for ongoing regulatory monitoring.
+
+The Notion adapter traverses a specific page hierarchy in the organization's Notion workspace:
 
 ```
 Root Page
   → "Quick Country Guides" header
     → column_list → columns
       → Sub-headers (APAC, MEA, etc.)
-        → ‣ Page mentions (country employment guide links)
+        → Page mentions (country employment guide links)
           → Individual country page content
 ```
 
-**Rate limiting**: 1.5-second sleep between API calls; exponential backoff (5s + doubling) on 429 responses.
+**Rate limiting:** 1.5-second sleep between API calls; exponential backoff (5 seconds, doubling) on 429 responses.
 
-**Country discovery**: Regex pattern `^(.+?)\s*[-–]\s*Employment Guide` auto-discovers country names from page titles.
+**Content format:** Notion pages contain pipe-separated tables in a deterministic format. No LLM is required — the tables are parsed directly. This is the appropriate architecture for structured internal content.
 
-**Content format**: Notion pages contain pipe-separated tables which are parsed deterministically — no LLM is needed for this structured format.
+**Ongoing monitoring:** For ongoing regulatory monitoring, HTML ingestion from official government sources replaces Notion as the authoritative source. Notion content represents the organization's prior interpretation of the law; government sources represent the law itself.
 
-### PDF Intake
+---
 
-![PDF Compliance Parsing — Document upload interface with processing pipeline status and ingestion activity feed](../assets/screenshots/pdf_compliance_parsing.png){ loading=lazy }
+## PDF Intake
 
-![Compliance Pipeline — Job-level tracking with stage progress dots, pagination, and source URL display](../assets/screenshots/compliance_pipeline.png){ loading=lazy }
+The `/api/intake/pdf` endpoint accepts multipart form uploads of gazette documents and other PDF-based official publications. PDF text is extracted, passed through the same cleaning and truncation pipeline as HTML content, and fed into the standard extraction workflow.
 
-The `/api/intake/pdf` endpoint accepts multipart form uploads, extracts text content, and feeds it into the standard extraction pipeline.
+PDF intake is an ad-hoc capability for regulatory documents that are not published as web pages (official gazettes, ministry circulars). It follows the same governance protocol as HTML-sourced changes: extraction → review queue → human approval.
 
-## 7. Technical Architecture
+---
 
-### Source Snapshot Lifecycle
+## Ingestion Job Lifecycle
+
+Each source processed by the sync pipeline creates an `ingestion_job` record. The job tracks the source through five states:
+
+```
+queued → fetched → normalized → extracted → reconciled
+                                               ↑
+                     failed ← (from any state)
+```
+
+Each state transition sets a timestamp column, providing a built-in latency profile per source. A source where `extracted_at - normalized_at` is unexpectedly long signals an extraction bottleneck for that specific URL.
+
+**Failure recording:** When a job fails, `failed_at` is set and `failure_reason` records the specific error. This is the primary diagnostic data for platform engineers investigating why a source was not updated on a given sync cycle.
+
+---
+
+## Source Snapshot Lifecycle
 
 ```mermaid
 stateDiagram-v2
@@ -105,88 +145,33 @@ stateDiagram-v2
     Created --> Pending: extraction_status = "pending"
     Pending --> Succeeded: mark_extraction_succeeded()
     Pending --> Failed: mark_extraction_failed()
+    note right of Failed: Snapshot preserved for retry\nRaw text available for manual inspection
 ```
 
-Every snapshot is immutable after creation. The `extraction_status` field tracks whether the downstream LLM extraction succeeded or failed, allowing failed extractions to be retried without re-crawling.
+A failed extraction snapshot is never deleted. The raw text is available for manual inspection or re-extraction via a subsequent sync.
 
-### Ingestion Job State Machine
+---
 
-```mermaid
-stateDiagram-v2
-    [*] --> queued: create_job()
-    queued --> fetched: mark_fetched()
-    fetched --> normalized: mark_normalized(snapshot_id)
-    normalized --> extracted: mark_extracted()
-    extracted --> reconciled: mark_reconciled()
-    queued --> failed: mark_failed(reason)
-    fetched --> failed: mark_failed(reason)
-    normalized --> failed: mark_failed(reason)
-    extracted --> failed: mark_failed(reason)
-```
-
-Each state transition sets the corresponding timestamp column, creating a per-stage latency profile:
-
-```json
-{
-    "id": 89,
-    "source_url": "https://labour.gov.in/...",
-    "state": "reconciled",
-    "queued_at": "2025-03-14T07:59:00",
-    "fetched_at": "2025-03-14T08:00:02",
-    "normalized_at": "2025-03-14T08:00:03",
-    "extracted_at": "2025-03-14T08:00:45",
-    "reconciled_at": "2025-03-14T08:01:30",
-    "failed_at": null,
-    "failure_reason": null
-}
-```
-
-## 8. Backend Components
+## Backend Components
 
 | Component | File | Lines | Responsibility |
 |-----------|------|-------|----------------|
-| `HtmlIngestionService` | `app/ingestion/html_ingestion_service.py` | 120 | HTTP fetch, HTML cleaning, content hashing |
-| `NotionIngestionService` | `app/ingestion/notion_ingestion_service.py` | 287 | Notion API traversal, page content extraction |
-| `SourceSnapshotService` | `app/ingestion/source_snapshot_service.py` | 45 | Snapshot persistence and status tracking |
-| `IngestionJobService` | `app/ingestion/ingestion_job_service.py` | 55 | Job lifecycle management |
+| `HtmlIngestionService` | `app/ingestion/html_ingestion_service.py` | 120 | HTTP fetch, HTML sanitization, content hashing |
+| `NotionIngestionService` | `app/ingestion/notion_ingestion_service.py` | 287 | Notion API traversal, page content extraction (baseline import only) |
+| `SourceSnapshotService` | `app/ingestion/source_snapshot_service.py` | 45 | Snapshot persistence and extraction status tracking |
+| `IngestionJobService` | `app/ingestion/ingestion_job_service.py` | 55 | Job lifecycle state machine |
 | `SourceSnapshotRepository` | `app/repositories/source_snapshot_repository.py` | 74 | SQL operations for snapshots |
 | `IngestionJobRepository` | `app/repositories/ingestion_job_repository.py` | 103 | SQL operations for jobs |
 
-## 9. APIs Involved
+---
 
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `GET /api/ingestion-jobs` | GET | List recent ingestion jobs with states and timestamps |
-| `POST /api/intake/pdf` | POST | Upload and process a PDF document |
-| `POST /api/sync` | POST | Trigger sync (which internally creates ingestion jobs) |
-
-## 10. Database Design Implications
-
-**`source_snapshots`**: Stores the raw text of every crawled page. This grows linearly with (sources × sync frequency). For 87 countries × 3 sources each × daily sync = ~261 snapshots/day, or ~95K/year. At ~6KB average, this is ~570MB/year — manageable for SQLite or PostgreSQL.
-
-**`ingestion_jobs`**: One row per source per sync. The `list_recent_jobs(limit=25)` query keeps the API lightweight; historical jobs remain queryable for debugging.
-
-## 11. Risk Mitigation
+## Risk Mitigation
 
 | Risk | Mitigation |
 |------|-----------|
-| Government website blocks crawlers | Browser-like User-Agent; configurable retry logic |
-| Government website serves stale cached content | Content hashing detects unchanged pages; no duplicate review items created |
-| Notion API changes or breaks | Used only for one-time baseline import; ongoing sync uses HTML ingestion |
-| Large pages exceed LLM context | 6,000-character truncation + chunking in extraction layer |
-| Source URL returns malicious content | BeautifulSoup strips executable tags; content is processed as text only |
-
-## 12. Observability & Monitoring
-
-- **Ingestion job log**: Per-source state machine with timestamps for every stage
-- **Failure tracking**: Failed jobs record the reason and timestamp; queryable via API
-- **Snapshot archive**: Every crawled page is archived for debugging extraction issues
-- **Latency profiling**: Stage timestamps reveal bottlenecks (fetch slow? extraction slow? reconciliation slow?)
-
-## 13. Future Enhancements
-
-- **RSS/Atom feed monitoring**: Subscribe to government publication feeds for real-time change detection
-- **Headless browser ingestion**: Use Playwright for JavaScript-rendered government sites
-- **Content hash deduplication**: Skip extraction entirely when the snapshot hash matches the previous crawl
-- **Parallel ingestion**: Fetch multiple sources concurrently with rate limiting per domain
-- **Source health dashboard**: Track per-source uptime, response time, and extraction success rate over time
+| Government website blocks automated requests | Browser-like User-Agent; retry logic; failure is recorded for engineering follow-up |
+| Government website serves stale cached content | Content hash detects unchanged content; stale content produces the same hash as the previous crawl, suppressing duplicate review items |
+| Website restructured — meaningful content moves | HTML stripping removes chrome; body content is preserved; extraction confidence drops if the structure changes significantly, alerting reviewers |
+| Large pages exceed LLM context | 6,000-character chunking ensures all content is covered across multiple chunks; aggregation preserves the highest-confidence extraction per section |
+| Source content contains injection attempts | BeautifulSoup strips executable elements; content is processed as text; the LLM is not given tool-use capability |
+| Snapshot corrupted post-creation | MD5 hash stored at creation time; hash is carried to provenance record; mismatch detectable |

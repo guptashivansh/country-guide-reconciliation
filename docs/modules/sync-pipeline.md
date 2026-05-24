@@ -1,90 +1,26 @@
 # Sync Pipeline
 
-## 1. Feature Name
+## Operational Role
 
-**Automated Regulatory Source Synchronization Pipeline**
+The sync pipeline is the scheduled execution unit that coordinates all pipeline stages for all configured source endpoints. It is not a feature that users trigger casually — it is the core operational process whose reliability determines whether the system maintains current regulatory coverage.
 
-## 2. Business Problem Solved
+Every sync run produces a complete execution record: which sources were processed, which succeeded, which failed, and why. This record is the primary operational input for the compliance team and the platform engineering team.
 
-Compliance teams cannot manually track regulatory changes across dozens of government websites for 87 countries. Changes to employment law — minimum wage adjustments, leave entitlement modifications, new tax brackets — are published without notification on ministry websites, official gazettes, and immigration portals. The sync pipeline automates the entire detection lifecycle.
+---
 
-## 3. Operational Pain Points Addressed
+## Execution Model
 
-- **Missed regulatory updates**: Government websites change without notification; manual checks are sporadic and unreliable
-- **Fragmented sources**: Each country has multiple authorities (labor ministry, tax authority, immigration department) publishing independently
-- **No change tracking**: Without snapshots, there is no way to determine when a source changed or what changed
-- **Inconsistent extraction**: Manual reading of unstructured government HTML produces inconsistent interpretations across analysts
+The pipeline is sequential per source endpoint, fault-isolated across endpoints:
 
-## 4. User Personas Involved
+- **Sequential:** Each source endpoint is processed in order — fetch, extract, reconcile, record. There is no parallelism within the sync run.
+- **Fault-isolated:** A failure on one source endpoint (website down, Groq API limit, invalid content) does not halt processing of subsequent endpoints. The failed job is recorded with its failure reason; other endpoints continue.
+- **Idempotent design:** The same source URL can be processed repeatedly without corrupting data. If a source produces the same content hash as the previous crawl, the extraction and reconciliation steps produce no new review items. Duplicate review items for the same (country, section, new_value) triple are suppressed.
 
-| Persona | Interaction |
-|---------|-------------|
-| Compliance Lead | Triggers manual sync, monitors pipeline health via metrics cards |
-| Platform Engineer | Configures source registry, monitors ingestion job logs, debugs failures |
-| Scheduler (automated) | Triggers sync on cron schedule (e.g., daily at 08:00 UTC) |
+---
 
-## 5. Functional Overview
+## Source Registry
 
-![CMS Synchronization — Country-scoped sync with source selection](../assets/screenshots/cms_synchronization.png){ loading=lazy }
-
-
-The sync pipeline is a sequential, source-by-source orchestration that:
-
-1. Resolves the list of trusted government source endpoints
-2. For each endpoint: fetches HTML, snapshots content, extracts structured rules via LLM, reconciles against the live guide, and enqueues changes for review
-3. Tracks every step through an ingestion job state machine
-4. Reports results via Slack (region-routed) and API metrics
-
-## 6. End-to-End Workflow
-
-```mermaid
-sequenceDiagram
-    participant Trigger as Trigger (Manual/Cron)
-    participant Sync as SyncService
-    participant Registry as SourceRegistry
-    participant Ingest as HtmlIngestionService
-    participant Snapshot as SnapshotService
-    participant Job as IngestionJobService
-    participant Extract as GroqExtractionService
-    participant Recon as ReconciliationService
-    participant Queue as ReviewQueue
-    participant Slack as SlackService
-
-    Trigger->>Sync: run_sync(services, countries?)
-    Sync->>Registry: list_trusted_source_endpoints()
-    Registry-->>Sync: [SourceEndpoint, ...]
-
-    loop Each SourceEndpoint
-        Sync->>Job: create_job(url)
-        Sync->>Ingest: fetch_clean_text(url)
-        alt Success
-            Ingest-->>Sync: IngestionResult(raw_text, content_hash)
-            Sync->>Snapshot: persist_snapshot(url, text, hash)
-            Sync->>Job: mark_fetched(job_id)
-            Sync->>Extract: extract_employment_rules(text, url, country, sections)
-            alt Extraction succeeds
-                Extract-->>Sync: ExtractionResult(rules)
-                Sync->>Job: mark_extracted(job_id)
-                Sync->>Recon: reconcile_extracted_rules(country, rules, url, hash, snapshot_id)
-                Recon-->>Queue: enqueue_review_item() for each change
-                Sync->>Job: mark_reconciled(job_id)
-            else Extraction fails
-                Sync->>Job: mark_failed(job_id, reason)
-            end
-        else Fetch fails
-            Sync->>Job: mark_failed(job_id, reason)
-        end
-    end
-
-    Sync-->>Trigger: {total_changes, endpoints_processed, failures, per_country}
-    Trigger->>Slack: send_sync_alert(result)
-```
-
-## 7. Technical Architecture
-
-### Source Registry
-
-Sources are defined in an external GitHub-hosted JSON file with a three-level hierarchy:
+The set of official government source URLs is maintained in a GitHub-hosted JSON file with a three-tier hierarchy:
 
 ```
 countries → authorities → source_endpoints
@@ -98,35 +34,85 @@ class SourceEndpoint:
     country: str
     authority: str
     url: str
-    sections: tuple[str, ...]
+    sections: tuple[str, ...]  # Which regulatory sections this source covers
 ```
 
-Only endpoints with `status: "active"` under authorities with `is_active: true` are returned. This allows individual sources to be disabled without code changes.
+**Active filtering:** Only endpoints where `status: "active"` under authorities with `is_active: true` are included in a sync run. Disabling a source requires no code change — it requires only updating the JSON file in the source registry repository.
 
-### HTML Ingestion
+**Governance implication of external registry:** Source URL changes are tracked in git. Adding a new source, modifying an existing URL, or disabling a source all produce a commit with author, timestamp, and message. This is the compliance record of source management decisions.
 
-`HtmlIngestionService.fetch_clean_text(url)`:
+---
 
-1. HTTP GET with 30-second timeout and browser-like User-Agent
-2. Retry on 5xx/timeout (max 2 attempts); fail fast on 4xx
-3. BeautifulSoup parse → strip `<script>`, `<style>`, `<nav>`, `<footer>`, `<header>`, `<aside>`
-4. Extract text → filter lines > 30 characters
-5. Truncate to 6,000 characters (LLM context budget)
-6. Compute MD5 content hash for deduplication
+## Pipeline State Machine
 
-Returns an `IngestionResult` with `status`, `raw_text`, `content_hash`, and failure details if applicable.
-
-### Ingestion Job State Machine
+Each source endpoint processed by the sync pipeline creates an `ingestion_job` record that transitions through a defined state machine. The state machine is the operational record of what happened to each source on each sync run.
 
 ```
 queued → fetched → normalized → extracted → reconciled
-                                     ↘
-                                   failed
+                                               ↑
+                     failed ← (from any state above)
 ```
 
-Each state transition sets the corresponding timestamp column (`queued_at`, `fetched_at`, ..., `failed_at`), creating a built-in latency profile.
+Each transition sets the corresponding timestamp column (`queued_at`, `fetched_at`, `normalized_at`, `extracted_at`, `reconciled_at`, `failed_at`). The `failure_reason` column records the error detail when a job fails.
 
-### Sync Result
+**Latency profiling from timestamps:** The difference between any two timestamps reveals stage latency for a specific source. If `extracted_at - normalized_at` is unusually long for a given source, it indicates an extraction bottleneck for that source. This data is available without separate instrumentation.
+
+---
+
+## End-to-End Sequence
+
+```mermaid
+sequenceDiagram
+    participant Trigger as Trigger (Schedule/Manual)
+    participant Sync as SyncService
+    participant Registry as SourceRegistryService
+    participant Ingest as HtmlIngestionService
+    participant Snapshot as SourceSnapshotService
+    participant Job as IngestionJobService
+    participant Extract as GroqExtractionService
+    participant Recon as ReconciliationService
+    participant Slack as SlackService
+
+    Trigger->>Sync: run_sync(services, countries=None)
+    Sync->>Registry: list_trusted_source_endpoints(countries)
+    Registry-->>Sync: [SourceEndpoint, ...]
+
+    loop Each SourceEndpoint (fault-isolated)
+        Sync->>Job: create_job(url)  → state=queued
+        Sync->>Ingest: fetch_clean_text(url)
+
+        alt HTTP success
+            Ingest-->>Sync: IngestionResult(raw_text, content_hash)
+            Sync->>Snapshot: persist_snapshot(url, text, hash)
+            Sync->>Job: mark_fetched(job_id)
+
+            Sync->>Extract: extract_employment_rules(text, url, country, sections)
+
+            alt Extraction succeeds
+                Extract-->>Sync: ExtractionResult(rules[])
+                Sync->>Job: mark_extracted(job_id)
+                Sync->>Recon: reconcile_extracted_rules(country, rules, url, hash, snapshot_id)
+                Recon-->>Sync: changes_count
+                Sync->>Job: mark_reconciled(job_id)
+
+            else Extraction fails
+                Sync->>Job: mark_failed(job_id, reason)
+            end
+
+        else HTTP failure (4xx / 5xx / timeout)
+            Sync->>Job: mark_failed(job_id, reason)
+        end
+    end
+
+    Sync-->>Trigger: SyncResult {total_changes, endpoints_processed, failures, per_country}
+    Trigger->>Slack: send_sync_alert(result)
+```
+
+---
+
+## Sync Result Contract
+
+Every sync run returns a `SyncResult` object:
 
 ```python
 {
@@ -135,91 +121,98 @@ Each state transition sets the corresponding timestamp column (`queued_at`, `fet
     "failures": 2,
     "per_country": {
         "India": {"changes": 5, "failures": 0},
-        "Singapore": {"changes": 3, "failures": 1},
+        "Singapore": {"changes": 3, "failures": 1, "failure_reason": "Groq rate limit exhausted"},
         ...
     }
 }
 ```
 
-## 8. Data Flow
+This result is:
+1. Returned to the trigger (API response for manual syncs, return value for scheduled syncs)
+2. Sent to Slack via the regional alerting service
+3. Preserved in the `ingestion_jobs` table (each job carries its own result)
 
-```
-External JSON (GitHub) → SourceEndpoint list
-    ↓
-Government URL → HTTP GET → raw HTML
-    ↓
-BeautifulSoup → cleaned text (≤6000 chars) + MD5 hash
-    ↓
-source_snapshots table (immutable archive)
-    ↓
-ContentChunker → [chunk_1, chunk_2, ...]
-    ↓
-Groq LLM → raw JSON response per chunk
-    ↓
-EmploymentRuleParser → validated EmploymentRule objects
-    ↓
-EmploymentRuleAggregator → deduplicated by section (highest confidence wins)
-    ↓
-ReconciliationService → compare against country_guide table
-    ↓
-review_queue table (if change detected)
-```
+The result is not cached or stored as a separate entity. The source of truth for sync history is always the `ingestion_jobs` table.
 
-## 9. Backend Components
+---
 
-| Component | File | Lines | Key Method |
-|-----------|------|-------|------------|
-| `run_sync` | `app/services/sync_service.py` | 129 | `run_sync(services, countries=None)` |
-| `HtmlIngestionService` | `app/ingestion/html_ingestion_service.py` | 120 | `fetch_clean_text(url)` |
-| `SourceSnapshotService` | `app/ingestion/source_snapshot_service.py` | 45 | `persist_snapshot(url, text, hash)` |
-| `IngestionJobService` | `app/ingestion/ingestion_job_service.py` | 55 | `create_job()`, `mark_*()` |
-| `SourceRegistryService` | `app/services/source_registry_service.py` | 7 | `list_trusted_source_endpoints()` |
+## Failure Handling
 
-## 10. APIs Involved
+### Stage-Level Failures
 
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `POST /api/sync` | POST | Trigger manual sync; body: `{"countries": ["India", ...]}` |
-| `GET /api/ingestion-jobs` | GET | List recent ingestion jobs with state and timestamps |
-| `GET /api/metrics` | GET | Pipeline health KPIs (pending, critical, failures) |
+Each stage of the pipeline has defined failure behavior:
 
-## 11. Risk Mitigation
+| Stage | Failure Condition | Handling |
+|-------|------------------|----------|
+| Fetch | 4xx response | Fail immediately; log `failure_reason`; no retry |
+| Fetch | 5xx or timeout | Retry once; if second attempt fails, mark job `failed` |
+| Fetch | Connection refused | Mark job `failed`; subsequent endpoints unaffected |
+| Extraction | Groq 429 (rate limit) | Rotate to next key; retry immediately |
+| Extraction | All keys rate-limited | Mark job `failed`; previous published rule unchanged |
+| Extraction | JSON parse error | Mark job `failed`; log raw response at WARNING |
+| Reconciliation | Database error | Mark job `failed`; source snapshot preserved for manual retry |
 
-| Risk | Mitigation |
-|------|-----------|
-| Government website returns stale cached content | Content hashing detects no-change; review item not created |
-| Government website blocks automated requests | Browser-like User-Agent header; configurable retry with backoff |
-| LLM extracts hallucinated rules | Confidence scoring + human review gate; low-confidence items are flagged |
-| Sync runs during source maintenance window | Failures are logged per-endpoint; other endpoints proceed independently |
-| Rate limiting across multiple Groq keys | Keys rotated automatically; failed extractions retry on next sync |
+### Cross-Endpoint Failure Isolation
 
-## 12. Observability & Monitoring
+A failure on endpoint N does not prevent processing of endpoint N+1. The loop continues to completion, recording a final failure count in the sync result. This means a single unreachable government website does not halt coverage updates for all other monitored countries.
 
-- **Ingestion job table**: Every pipeline execution is tracked with per-stage timestamps and failure reasons
-- **API metrics endpoint**: Exposes pending reviews, critical changes, average confidence, and failure counts
-- **Slack alerts**: Post-sync summary with per-region breakdown, change counts, and failure details
-- **Source snapshot archive**: Historical record of every crawled page for debugging extraction quality
+### Recovery from Sync Failures
 
-## 13. Business Impact
+Failed jobs do not automatically retry within the same sync run. Recovery occurs on the next scheduled sync, which re-attempts all active source endpoints from the beginning. This design is correct because:
 
-- **Reduction in regulatory blind spots**: Every monitored source is checked on schedule, not when an analyst remembers
-- **Faster detection-to-awareness cycle**: Changes detected within hours of publication, not weeks
-- **Quantifiable coverage**: Metrics dashboard shows exactly how many sources are monitored, how many changes are pending, and where failures occurred
-- **Regional accountability**: Slack alerts route to the responsible compliance owner (APAC: Divya, EMEA: Shweta, Americas: Kathryn)
+- The failure may be transient (government website maintenance window)
+- Immediate retry loops can exacerbate rate limit failures
+- The next scheduled sync provides a natural retry interval
 
-## 14. Why This Design Is Better Than Manual Workflows
+For urgent cases (e.g., a critical minimum wage update was missed due to source unavailability), a manual sync can be triggered immediately via the ops dashboard, scoped to the affected country.
 
-| Manual Workflow | Automated Pipeline |
-|----------------|-------------------|
-| Analyst visits government website ad-hoc | Every source crawled on schedule |
-| Changes noticed by reading; no diff | Semantic diff with before/after comparison |
-| No record of when a source was checked | Snapshot with timestamp and content hash |
-| Change communicated via email/chat | Structured review queue with materiality scoring |
-| No audit trail of detection | Ingestion job log + snapshot + provenance chain |
+---
 
-## 15. Future Enhancements
+## Scheduled vs. Manual Trigger
 
-- **Webhook-based triggers**: Subscribe to government RSS feeds or gazette APIs for real-time change detection
-- **Parallel sync execution**: Worker pool with per-country locking for higher throughput
-- **Content hash deduplication**: Skip extraction entirely when snapshot hash matches the previous crawl
-- **Source health scoring**: Track per-source reliability (uptime, response time, extraction success rate) over time
+| Trigger Type | Use Case | Configuration |
+|-------------|---------|---------------|
+| Scheduled (APScheduler) | Routine regulatory monitoring | Configured in `SchedulerService`; default daily at 08:00 UTC |
+| Manual (POST /api/sync) | Targeted check after alert of regulatory change | Country-scoped to minimize Groq API quota consumption |
+| Selective manual (POST /api/sync with country list) | Re-sync after known failure | Payload: `{"countries": ["India", "Singapore"]}` |
+
+**Misfire handling:** APScheduler is configured with `misfire_grace_time=300` seconds. If the scheduler was offline when a sync was due, it will run the sync within 5 minutes of coming back online, not skip it entirely.
+
+---
+
+## Operational Observability
+
+The sync pipeline exposes its state through three channels:
+
+**Ingestion job table:** Every pipeline execution produces one row per source endpoint with full state machine timestamps and failure reasons. Query via `GET /api/ingestion-jobs`.
+
+**Sync result metrics:** The post-sync Slack alert includes total changes, endpoints processed, failure count, and per-country breakdown. This gives regional owners immediate visibility without requiring dashboard access.
+
+**Pipeline health API:** `GET /api/metrics` aggregates the current pipeline state — pending reviews, critical changes, failure counts — updated on each API call from current database state.
+
+---
+
+## Content Hash Deduplication
+
+After a successful fetch, the content hash of the raw text is compared against the most recent snapshot for the same source URL. If the hashes match, the content has not changed since the last crawl. In this case:
+
+- The new snapshot is still stored (for audit completeness)
+- Extraction and reconciliation are skipped
+- The ingestion job advances to `reconciled` without creating a review item
+
+This suppresses unnecessary LLM calls and review items for unchanged sources. It does not suppress processing for sources that have changed in any way — including minor formatting changes that would produce a different hash.
+
+**Important limitation:** Hash comparison is against the raw cleaned text, not the published rule values. A source could change its HTML formatting without changing its content in a way that affects extracted rule values. In this case, the hash differs, extraction runs, but reconciliation finds no semantic change and produces no review item. This is the correct behavior.
+
+---
+
+## Backend Components
+
+| Component | File | Key Method |
+|-----------|------|------------|
+| `SyncService` | `app/services/sync_service.py` | `run_sync(services, countries=None)` |
+| `HtmlIngestionService` | `app/ingestion/html_ingestion_service.py` | `fetch_clean_text(url)` |
+| `SourceSnapshotService` | `app/ingestion/source_snapshot_service.py` | `persist_snapshot(url, text, hash)` |
+| `IngestionJobService` | `app/ingestion/ingestion_job_service.py` | `create_job()`, `mark_fetched()`, `mark_extracted()`, `mark_reconciled()`, `mark_failed()` |
+| `SourceRegistryService` | `app/services/source_registry_service.py` | `list_trusted_source_endpoints()` |
+| `SchedulerService` | `app/services/scheduler_service.py` | APScheduler cron configuration |
