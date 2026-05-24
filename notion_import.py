@@ -21,10 +21,10 @@ from app.utils.logging_config import configure_logging
 NOTION_PAGE_ID = "7ed6a2f53972448db2cb107a8d20b661"
 NOTION_SOURCE_URL = "https://skuad.notion.site/Skuad-Country-Product-Guides-7ed6a2f53972448db2cb107a8d20b661"
 
-COUNTRY_NAMES = [
-    "India", "Australia", "Singapore", "South Africa",
-    "UAE", "United Arab Emirates", "New Zealand", "Philippines", "Pakistan",
-]
+# Title-derived names that should be canonicalised before writing to the DB.
+COUNTRY_ALIASES = {
+    "united arab emirates": "UAE",
+}
 
 # Maps Notion field labels (normalised) → section key in our schema.
 # Keys are lowercase, parentheticals stripped, separators normalised to spaces.
@@ -65,12 +65,8 @@ FIELD_TO_SECTION = {
     "expatriate employment": "expatriate_employment",
 }
 
-# Canonical storage name for UAE regardless of how Notion titles it
-_UAE_ALIASES = {"united arab emirates", "uae"}
-
-
 def _canonical_country(name: str) -> str:
-    return "UAE" if name.lower() in _UAE_ALIASES else name
+    return COUNTRY_ALIASES.get(name.lower(), name.strip())
 
 
 def _normalise_label(text: str) -> str:
@@ -163,13 +159,10 @@ def main():
     provenance_repo.initialize_schema()
     provenance_service = ProvenanceService(provenance_repo, parser_version=parser_version())
 
-    notion_service = NotionIngestionService(
-        page_id=NOTION_PAGE_ID,
-        country_names=COUNTRY_NAMES,
-    )
+    notion_service = NotionIngestionService(page_id=NOTION_PAGE_ID)
 
-    print("Fetching country pages from Notion (this takes ~7–10 min due to rate limits)...")
-    country_texts = notion_service.fetch_country_texts()
+    print("Auto-discovering all country guides on the Notion page (this takes ~15–20 min due to rate limits)...")
+    country_texts = notion_service.fetch_all_employment_guides()
 
     if not country_texts:
         print("ERROR: No matching country pages found. Check the Notion page structure.", file=sys.stderr)

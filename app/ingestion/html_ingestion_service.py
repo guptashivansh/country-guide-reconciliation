@@ -1,5 +1,6 @@
 import hashlib
 import logging
+import time
 
 import requests
 from bs4 import BeautifulSoup
@@ -9,17 +10,73 @@ from app.models.workflow_results import FailureDetail, IngestionResult
 
 logger = logging.getLogger(__name__)
 
+_HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/124.0.0.0 Safari/537.36"
+    ),
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Accept-Encoding": "gzip, deflate, br",
+}
+_TIMEOUT = 30       # seconds — up from 15; slow govt sites need the headroom
+_MAX_RETRIES = 2    # one initial attempt + one retry on timeout / 5xx
+
 
 class HtmlIngestionService:
     def fetch_clean_text(self, url):
-        try:
-            logger.info(
-                "Fetching source content",
-                extra={"stage": "ingestion_fetch", "source_url": url},
+        last_exc = None
+        for attempt in range(_MAX_RETRIES):
+            try:
+                logger.info(
+                    "Fetching source content",
+                    extra={"stage": "ingestion_fetch", "source_url": url, "attempt": attempt + 1},
+                )
+                resp = requests.get(url, headers=_HEADERS, timeout=_TIMEOUT)
+                resp.raise_for_status()
+                break  # success
+            except requests.exceptions.Timeout as exc:
+                last_exc = exc
+                logger.warning(
+                    "Timeout fetching source — will retry",
+                    extra={"stage": "ingestion_fetch", "source_url": url, "attempt": attempt + 1},
+                )
+                time.sleep(2)
+            except requests.exceptions.HTTPError as exc:
+                if exc.response is not None and exc.response.status_code >= 500 and attempt < _MAX_RETRIES - 1:
+                    last_exc = exc
+                    logger.warning(
+                        "5xx from source — will retry",
+                        extra={"stage": "ingestion_fetch", "source_url": url,
+                               "status_code": exc.response.status_code, "attempt": attempt + 1},
+                    )
+                    time.sleep(2)
+                else:
+                    last_exc = exc
+                    break  # 4xx or final 5xx — no point retrying
+            except Exception as exc:
+                last_exc = exc
+                break  # non-retryable
+
+        if last_exc is not None:
+            failure_type = "network_error" if isinstance(last_exc, requests.RequestException) else "unknown_error"
+            logger.error(
+                "Failed to fetch or normalize source content",
+                extra={"stage": "ingestion", "source_url": url,
+                       "failure": str(last_exc), "failure_type": failure_type},
             )
-            headers = {"User-Agent": "Mozilla/5.0 (compatible; CountryGuideBot/1.0)"}
-            resp = requests.get(url, headers=headers, timeout=15)
-            resp.raise_for_status()
+            return IngestionResult(
+                status="failed",
+                source_url=url,
+                failure=FailureDetail(
+                    type=failure_type,
+                    reason=str(last_exc),
+                    metadata={"stage": "ingestion"},
+                ),
+            )
+
+        try:
             logger.info(
                 "Fetched source content",
                 extra={"stage": "ingestion_fetch", "source_url": url, "status_code": resp.status_code},

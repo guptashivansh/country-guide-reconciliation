@@ -1,0 +1,759 @@
+{% extends "compliance_base.html" %}
+
+{% block title %}Processing Pipeline{% endblock %}
+{% block topbar_section %}Processing Pipeline{% endblock %}
+
+{% block head %}
+<style>
+/* ── PIPELINE HEADER STATS ── */
+.pipeline-stats {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.pipeline-stat {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: 2px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px 12px;
+}
+
+.pipeline-stat-value {
+  font-family: 'DM Mono', monospace;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.pipeline-stat-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.ps-ok { border-top-color: var(--state-success); }
+.ps-ok .pipeline-stat-value { color: var(--state-success); }
+.ps-warn { border-top-color: var(--warn); }
+.ps-warn .pipeline-stat-value { color: var(--warn); }
+.ps-err { border-top-color: var(--state-blocked); }
+.ps-err .pipeline-stat-value { color: var(--state-blocked); }
+.ps-info { border-top-color: var(--state-progress); }
+.ps-info .pipeline-stat-value { color: var(--state-progress); }
+.ps-neutral { border-top-color: var(--muted); }
+.ps-neutral .pipeline-stat-value { color: var(--muted); }
+
+/* ── FILTER BAR ── */
+.pl-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.pl-search {
+  position: relative;
+}
+
+.pl-search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  font-size: 12px;
+  pointer-events: none;
+}
+
+.pl-search input {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  padding: 7px 12px 7px 28px;
+  width: 240px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.pl-search input:focus { border-color: rgba(110,231,183,0.4); }
+.pl-search input::placeholder { color: var(--muted); }
+
+.pl-divider {
+  width: 1px;
+  height: 22px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+.pl-pills {
+  display: flex;
+  gap: 4px;
+}
+
+.pl-pill {
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  transition: all 0.15s;
+}
+
+.pl-pill:hover { color: var(--text); border-color: rgba(255,255,255,0.14); }
+.pl-pill.active { background: var(--accent-dim); border-color: rgba(110,231,183,0.32); color: var(--accent); }
+.pl-pill[data-state="failed"].active { background: var(--danger-dim); border-color: rgba(248,113,113,0.32); color: var(--danger); }
+.pl-pill[data-state="running"].active { background: rgba(96,165,250,0.09); border-color: rgba(96,165,250,0.32); color: #93c5fd; }
+
+.pl-count {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  margin-left: auto;
+}
+
+/* ── JOB TABLE ── */
+.job-table-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.job-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.job-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--surface);
+}
+
+.job-table th {
+  padding: 11px 14px;
+  text-align: left;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.job-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(30,30,46,0.65);
+  vertical-align: middle;
+}
+
+.job-row {
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.job-row:hover td { background: rgba(255,255,255,0.018); }
+
+.job-row.row-reconciled td:first-child { border-left: 2px solid var(--state-success); }
+.job-row.row-failed td:first-child { border-left: 2px solid var(--state-blocked); }
+.job-row.row-running td:first-child { border-left: 2px solid var(--state-progress); }
+
+/* ── JOB STATUS CELL ── */
+.job-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.job-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.jsd-ok { background: var(--state-success); }
+.jsd-running { background: var(--state-progress); animation: jsd-blink 1.5s ease-in-out infinite; }
+.jsd-failed { background: var(--state-blocked); }
+.jsd-queued { background: rgba(100,116,139,0.55); }
+@keyframes jsd-blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+.job-status-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.jsl-ok { color: var(--state-success); }
+.jsl-running { color: #93c5fd; }
+.jsl-failed { color: var(--state-blocked); }
+.jsl-queued { color: var(--muted); }
+
+/* ── SOURCE CELL ── */
+.job-source {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  max-width: 260px;
+  overflow: hidden;
+}
+
+.job-source-host {
+  color: var(--text);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.job-source-path {
+  color: var(--muted);
+  font-size: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 1px;
+}
+
+/* ── STAGE DOTS ── */
+.stage-dots {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.stage-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+}
+
+.sd-done { background: rgba(110,231,183,0.5); }
+.sd-current { background: var(--accent); }
+.sd-fail { background: var(--danger); }
+.sd-pending { background: rgba(100,116,139,0.18); }
+
+.stage-sep {
+  width: 3px;
+  height: 1px;
+  background: rgba(100,116,139,0.2);
+}
+
+/* ── TIMESTAMP / DURATION ── */
+.job-ts {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* ── EXPAND BUTTON ── */
+.job-expand-btn {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 3px 5px;
+  border-radius: 4px;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+}
+
+.job-expand-btn:hover { color: var(--text); background: rgba(255,255,255,0.06); }
+.job-expand-btn.open { color: var(--accent); transform: rotate(90deg); }
+
+/* ── DETAIL ROW ── */
+.job-detail-row { background: rgba(8,5,16,0.65); }
+.job-detail-row td { padding: 0 !important; border-bottom: 1px solid var(--border) !important; }
+
+.job-detail-inner {
+  padding: 16px 20px 20px 48px;
+  border-top: 1px solid rgba(30,30,46,0.9);
+  display: none;
+}
+
+.job-detail-inner.open { display: block; }
+
+.job-error-pre {
+  background: rgba(248,113,113,0.06);
+  border: 1px solid rgba(248,113,113,0.18);
+  border-radius: 7px;
+  padding: 12px 14px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: #fca5a5;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-all;
+  margin-bottom: 14px;
+}
+
+.job-detail-meta {
+  display: flex;
+  gap: 28px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.job-dm {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.job-dm-key {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.job-dm-val {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--text);
+}
+
+/* ── STAGE LOG (per-job detail) ── */
+.stage-log {
+  list-style: none;
+}
+
+.stage-log-item {
+  display: grid;
+  grid-template-columns: 80px 110px minmax(0, 1fr);
+  gap: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(30,30,46,0.5);
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+}
+
+.stage-log-item:last-child { border-bottom: none; }
+
+.stage-log-ts { color: var(--muted); }
+
+.stage-log-stage {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.sls-done { color: var(--state-success); }
+.sls-active { color: var(--state-progress); }
+.sls-failed { color: var(--state-blocked); }
+
+.stage-log-detail { color: var(--muted); }
+
+/* ── PAGINATION ── */
+.job-pagination {
+  padding: 12px 14px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.jp-pages { display: flex; gap: 4px; }
+
+.jp-btn {
+  padding: 4px 10px;
+  border-radius: 5px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  transition: all 0.12s;
+}
+
+.jp-btn:hover:not(:disabled):not(.active) { color: var(--text); border-color: rgba(255,255,255,0.16); }
+.jp-btn.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+.jp-btn:disabled { opacity: 0.3; cursor: default; }
+
+.jp-info {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* ── EMPTY STATE ── */
+.job-empty {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  gap: 10px;
+}
+
+.job-empty.show { display: flex; }
+.job-empty-icon { font-size: 24px; opacity: 0.2; }
+.job-empty-title { font-size: 14px; font-weight: 700; color: var(--muted); }
+.job-empty-sub { font-size: 12px; color: rgba(100,116,139,0.65); text-align: center; max-width: 320px; line-height: 1.5; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 1100px) {
+  .pipeline-stats { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 720px) {
+  .pipeline-stats { grid-template-columns: repeat(2, 1fr); }
+  .job-table th:nth-child(4),
+  .job-table td:nth-child(4),
+  .job-table th:nth-child(5),
+  .job-table td:nth-child(5) { display: none; }
+}
+</style>
+{% endblock %}
+
+{% block workspace %}
+<div class="page-header">
+  <div class="page-breadcrumbs">
+    <a href="/compliance/dashboard">Compliance</a>
+    <span aria-hidden="true">/</span>
+    <span>Pipeline</span>
+  </div>
+  <div class="page-title-row">
+    <div>
+      <h1 class="page-title">Processing Pipeline</h1>
+      <p class="page-subtitle">Track ingestion jobs from registration through reconciliation.</p>
+    </div>
+    <a href="/compliance/intake" class="btn-secondary" style="text-decoration:none">+ New intake</a>
+  </div>
+</div>
+
+<div class="page-content">
+
+  <!-- STATS ROW -->
+  <div class="pipeline-stats">
+    <div class="pipeline-stat ps-neutral" id="psTotalCard">
+      <div class="pipeline-stat-value" id="psTotal">&mdash;</div>
+      <div class="pipeline-stat-label">Total jobs</div>
+    </div>
+    <div class="pipeline-stat ps-info" id="psRunningCard">
+      <div class="pipeline-stat-value" id="psRunningVal">&mdash;</div>
+      <div class="pipeline-stat-label">Processing</div>
+    </div>
+    <div class="pipeline-stat ps-ok">
+      <div class="pipeline-stat-value" id="psReconciledVal">&mdash;</div>
+      <div class="pipeline-stat-label">Reconciled</div>
+    </div>
+    <div class="pipeline-stat ps-err">
+      <div class="pipeline-stat-value" id="psFailedVal">&mdash;</div>
+      <div class="pipeline-stat-label">Failed</div>
+    </div>
+    <div class="pipeline-stat ps-neutral">
+      <div class="pipeline-stat-value" id="psQueuedVal">&mdash;</div>
+      <div class="pipeline-stat-label">Queued</div>
+    </div>
+  </div>
+
+  <!-- FILTER BAR -->
+  <div class="pl-filter-bar">
+    <div class="pl-search">
+      <span class="pl-search-icon" aria-hidden="true">&#x1F50D;</span>
+      <input type="text" id="plSearch" placeholder="Search by source URL..." aria-label="Search jobs">
+    </div>
+    <div class="pl-divider"></div>
+    <div class="pl-pills" id="plPills">
+      <button class="pl-pill active" data-state="all">All</button>
+      <button class="pl-pill" data-state="running">Processing</button>
+      <button class="pl-pill" data-state="reconciled">Reconciled</button>
+      <button class="pl-pill" data-state="failed">Failed</button>
+      <button class="pl-pill" data-state="queued">Queued</button>
+    </div>
+    <span class="pl-count" id="plCount"></span>
+  </div>
+
+  <!-- JOB TABLE -->
+  <div class="job-table-wrap">
+    <table class="job-table" id="jobTable">
+      <thead>
+        <tr>
+          <th style="width:36px"></th>
+          <th>Status</th>
+          <th>Source</th>
+          <th>Stages</th>
+          <th>Timestamp</th>
+          <th style="width:36px"></th>
+        </tr>
+      </thead>
+      <tbody id="jobTableBody">
+      </tbody>
+    </table>
+
+    <div class="job-empty" id="jobEmpty">
+      <div class="job-empty-icon" aria-hidden="true">&#x2014;&#x2014;&#x2014;</div>
+      <div class="job-empty-title">No jobs found</div>
+      <div class="job-empty-sub">Adjust filters or start a new intake.</div>
+    </div>
+
+    <div class="job-pagination" id="jobPagination" style="display:none">
+      <div class="jp-pages" id="jpPages"></div>
+      <span class="jp-info" id="jpInfo"></span>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function() {
+  var STAGES = ['queued','fetched','normalized','extracted','reconciled'];
+  var STAGE_LABELS = ['REG','FETCH','NORM','EXTR','RECON'];
+  var allJobs = [];
+  var filteredJobs = [];
+  var currentFilter = 'all';
+  var searchQuery = '';
+  var currentPage = 1;
+  var PAGE_SIZE = 20;
+
+  function classifyState(job) {
+    if (job.state === 'failed') return 'failed';
+    if (job.state === 'reconciled') return 'reconciled';
+    if (job.state === 'queued') return 'queued';
+    return 'running';
+  }
+
+  function stageIndex(state) {
+    var i = STAGES.indexOf(state);
+    return i >= 0 ? i : 0;
+  }
+
+  function sourceLabel(url) {
+    if (!url) return { host: 'Unknown', path: '' };
+    try {
+      if (url.indexOf('notion') !== -1) return { host: 'Notion import', path: '' };
+      var u = new URL(url);
+      return { host: u.hostname.replace('www.',''), path: u.pathname };
+    } catch(e) {
+      return { host: url.substring(0, 40), path: '' };
+    }
+  }
+
+  function fmtTime(iso) {
+    if (!iso) return '—';
+    try {
+      var d = new Date(iso);
+      return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })
+        + ' ' + d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    } catch(e) { return iso; }
+  }
+
+  function escHtml(s) {
+    var d = document.createElement('div');
+    d.textContent = s || '';
+    return d.innerHTML;
+  }
+
+  function loadJobs() {
+    fetch('/api/ingestion-jobs')
+      .then(function(r) { return r.json(); })
+      .then(function(jobs) {
+        allJobs = jobs || [];
+        updateStats();
+        applyFilters();
+      })
+      .catch(function() {
+        document.getElementById('jobEmpty').classList.add('show');
+      });
+  }
+
+  function updateStats() {
+    var total = allJobs.length;
+    var running = 0, reconciled = 0, failed = 0, queued = 0;
+    allJobs.forEach(function(j) {
+      var cls = classifyState(j);
+      if (cls === 'running') running++;
+      else if (cls === 'reconciled') reconciled++;
+      else if (cls === 'failed') failed++;
+      else queued++;
+    });
+    document.getElementById('psTotal').textContent = total;
+    document.getElementById('psRunningVal').textContent = running;
+    document.getElementById('psReconciledVal').textContent = reconciled;
+    document.getElementById('psFailedVal').textContent = failed;
+    document.getElementById('psQueuedVal').textContent = queued;
+  }
+
+  function applyFilters() {
+    filteredJobs = allJobs.filter(function(j) {
+      if (currentFilter !== 'all' && classifyState(j) !== currentFilter) return false;
+      if (searchQuery && (j.source_url || '').toLowerCase().indexOf(searchQuery) === -1) return false;
+      return true;
+    });
+    currentPage = 1;
+    renderTable();
+  }
+
+  function renderTable() {
+    var tbody = document.getElementById('jobTableBody');
+    var empty = document.getElementById('jobEmpty');
+    var pagination = document.getElementById('jobPagination');
+
+    if (filteredJobs.length === 0) {
+      tbody.innerHTML = '';
+      empty.classList.add('show');
+      pagination.style.display = 'none';
+      document.getElementById('plCount').textContent = '0 jobs';
+      return;
+    }
+
+    empty.classList.remove('show');
+    document.getElementById('plCount').textContent = filteredJobs.length + ' job' + (filteredJobs.length !== 1 ? 's' : '');
+
+    var start = (currentPage - 1) * PAGE_SIZE;
+    var pageJobs = filteredJobs.slice(start, start + PAGE_SIZE);
+    var html = '';
+
+    pageJobs.forEach(function(job, idx) {
+      var cls = classifyState(job);
+      var si = stageIndex(job.state);
+      var src = sourceLabel(job.source_url);
+      var rowClass = 'row-' + cls;
+      var globalIdx = start + idx;
+
+      var dotCls = cls === 'reconciled' ? 'jsd-ok' : cls === 'failed' ? 'jsd-failed' : cls === 'running' ? 'jsd-running' : 'jsd-queued';
+      var lblCls = cls === 'reconciled' ? 'jsl-ok' : cls === 'failed' ? 'jsl-failed' : cls === 'running' ? 'jsl-running' : 'jsl-queued';
+
+      html += '<tr class="job-row ' + rowClass + '" data-idx="' + globalIdx + '">';
+
+      html += '<td style="width:36px; text-align:center">';
+      if (job.country) html += '<span style="font-size:16px">' + escHtml(job.country_flag || '') + '</span>';
+      html += '</td>';
+
+      html += '<td><div class="job-status"><span class="job-status-dot ' + dotCls + '"></span>';
+      html += '<span class="job-status-label ' + lblCls + '">' + escHtml(job.state || 'queued').toUpperCase() + '</span></div></td>';
+
+      html += '<td><div class="job-source"><div class="job-source-host">' + escHtml(src.host) + '</div>';
+      if (src.path) html += '<div class="job-source-path">' + escHtml(src.path) + '</div>';
+      html += '</div></td>';
+
+      html += '<td><div class="stage-dots">';
+      for (var s = 0; s < STAGES.length; s++) {
+        if (s > 0) html += '<span class="stage-sep"></span>';
+        var sdCls = 'sd-pending';
+        if (cls === 'failed' && s === si) sdCls = 'sd-fail';
+        else if (s < si) sdCls = 'sd-done';
+        else if (s === si && cls !== 'failed') sdCls = cls === 'reconciled' ? 'sd-done' : 'sd-current';
+        html += '<span class="stage-dot ' + sdCls + '" title="' + STAGE_LABELS[s] + '"></span>';
+      }
+      html += '</div></td>';
+
+      html += '<td><span class="job-ts">' + fmtTime(job.created_at || job.reconciled_at) + '</span></td>';
+
+      var hasDetail = cls === 'failed' || job.source_snapshot_id;
+      html += '<td><button class="job-expand-btn' + (hasDetail ? '' : ' invisible') + '" data-idx="' + globalIdx + '" aria-label="Expand details">&#x25B6;</button></td>';
+      html += '</tr>';
+
+      html += '<tr class="job-detail-row"><td colspan="6"><div class="job-detail-inner" id="detail_' + globalIdx + '">';
+      if (cls === 'failed' && job.failure_reason) {
+        html += '<div class="job-error-pre">' + escHtml(job.failure_reason) + '</div>';
+      }
+      html += '<div class="job-detail-meta">';
+      html += '<div class="job-dm"><div class="job-dm-key">Job ID</div><div class="job-dm-val">#' + (job.id || '—') + '</div></div>';
+      if (job.source_snapshot_id) html += '<div class="job-dm"><div class="job-dm-key">Snapshot</div><div class="job-dm-val">' + job.source_snapshot_id + '</div></div>';
+      if (job.source_url) html += '<div class="job-dm"><div class="job-dm-key">Source</div><div class="job-dm-val" style="max-width:300px;overflow-wrap:anywhere;font-size:10px">' + escHtml(job.source_url) + '</div></div>';
+      html += '</div>';
+
+      html += '<div style="font-family:DM Mono,monospace;font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Stage Log</div>';
+      html += '<ul class="stage-log">';
+      STAGES.forEach(function(stage, sIdx) {
+        var active = false, done = false, fail = false;
+        if (cls === 'failed' && sIdx === si) fail = true;
+        else if (sIdx < si || (sIdx === si && cls === 'reconciled')) done = true;
+        else if (sIdx === si) active = true;
+
+        if (done || active || fail) {
+          var slsCls = fail ? 'sls-failed' : done ? 'sls-done' : 'sls-active';
+          html += '<li class="stage-log-item">';
+          html += '<span class="stage-log-ts">' + (done || fail ? '&#x2713;' : '&#x25CF;') + '</span>';
+          html += '<span class="stage-log-stage ' + slsCls + '">' + STAGE_LABELS[sIdx] + '</span>';
+          html += '<span class="stage-log-detail">' + stage + (fail ? ' — failed' : '') + '</span>';
+          html += '</li>';
+        }
+      });
+      html += '</ul>';
+      html += '</div></td></tr>';
+    });
+
+    tbody.innerHTML = html;
+
+    var totalPages = Math.ceil(filteredJobs.length / PAGE_SIZE);
+    if (totalPages > 1) {
+      pagination.style.display = '';
+      var pagesHtml = '';
+      pagesHtml += '<button class="jp-btn" ' + (currentPage <= 1 ? 'disabled' : '') + ' onclick="window._plPage(' + (currentPage-1) + ')">&larr;</button>';
+      for (var p = 1; p <= totalPages; p++) {
+        pagesHtml += '<button class="jp-btn' + (p === currentPage ? ' active' : '') + '" onclick="window._plPage(' + p + ')">' + p + '</button>';
+      }
+      pagesHtml += '<button class="jp-btn" ' + (currentPage >= totalPages ? 'disabled' : '') + ' onclick="window._plPage(' + (currentPage+1) + ')">&rarr;</button>';
+      document.getElementById('jpPages').innerHTML = pagesHtml;
+      document.getElementById('jpInfo').textContent = 'Showing ' + (start+1) + '–' + Math.min(start + PAGE_SIZE, filteredJobs.length) + ' of ' + filteredJobs.length;
+    } else {
+      pagination.style.display = 'none';
+    }
+
+    tbody.querySelectorAll('.job-expand-btn:not(.invisible)').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var detail = document.getElementById('detail_' + btn.dataset.idx);
+        var isOpen = detail.classList.contains('open');
+        detail.classList.toggle('open');
+        btn.classList.toggle('open');
+      });
+    });
+  }
+
+  window._plPage = function(p) {
+    currentPage = p;
+    renderTable();
+    window.scrollTo(0, document.querySelector('.job-table-wrap').offsetTop - 80);
+  };
+
+  document.getElementById('plPills').addEventListener('click', function(e) {
+    var pill = e.target.closest('.pl-pill');
+    if (!pill) return;
+    document.querySelectorAll('.pl-pill').forEach(function(el) { el.classList.remove('active'); });
+    pill.classList.add('active');
+    currentFilter = pill.dataset.state;
+    applyFilters();
+  });
+
+  document.getElementById('plSearch').addEventListener('input', function(e) {
+    searchQuery = e.target.value.toLowerCase().trim();
+    applyFilters();
+  });
+
+  loadJobs();
+  setInterval(loadJobs, 10000);
+})();
+</script>
+{% endblock %}

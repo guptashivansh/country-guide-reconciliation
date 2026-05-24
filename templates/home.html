@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en" data-mode="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Atlas · Navigation Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+/* ── Tokens ── */
+:root {
+  --paper:       #FFFFFF;
+  --paper-2:     #F6F7F9;
+  --paper-3:     #ECEEF2;
+  --paper-line:  #E2E5EB;
+  --ink:         #0E1014;
+  --ink-2:       #2E323B;
+  --ink-3:       #6B7180;
+  --ink-4:       #A2A8B5;
+  --accent:      #FF4800;
+  --accent-2:    #E03E00;
+  --accent-soft: #FFE7DC;
+  --accent-line: #FFBFA0;
+  --purple:      #6F4FF2;
+  --purple-2:    #5B3FE0;
+  --purple-soft: #ECE7FF;
+  --purple-line: #C6B8FF;
+  --ok:          #1E8A5F;
+  --ok-soft:     #DCF1E6;
+  --ok-line:     #86CFB0;
+  --font-ui:     "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-mono:   "JetBrains Mono", ui-monospace, monospace;
+  --radius-s: 6px; --radius-m: 10px; --radius-l: 16px; --radius-xl: 24px;
+  --shadow-1: 0 1px 0 rgba(14,16,20,0.04), 0 1px 3px rgba(14,16,20,0.06);
+  --shadow-2: 0 2px 8px rgba(14,16,20,0.06), 0 16px 40px -20px rgba(14,16,20,0.16);
+  --shadow-hover: 0 4px 16px rgba(14,16,20,0.08), 0 20px 48px -20px rgba(14,16,20,0.22);
+}
+[data-mode="dark"] {
+  --paper:       #0B0D11;
+  --paper-2:     #131620;
+  --paper-3:     #1B1F2A;
+  --paper-line:  #262B38;
+  --ink:         #F5F6F8;
+  --ink-2:       #D8DBE2;
+  --ink-3:       #9097A4;
+  --ink-4:       #5A6273;
+  --accent:      #FF6A33;
+  --accent-soft: rgba(255,106,51,0.12);
+  --accent-line: rgba(255,106,51,0.36);
+  --purple:      #9B85FF;
+  --purple-soft: rgba(155,133,255,0.14);
+  --purple-line: rgba(155,133,255,0.36);
+  --ok:          #5BBE92;
+  --ok-soft:     rgba(91,190,146,0.10);
+  --ok-line:     rgba(91,190,146,0.36);
+  --shadow-1: 0 1px 0 rgba(0,0,0,0.3), 0 1px 3px rgba(0,0,0,0.3);
+  --shadow-2: 0 2px 8px rgba(0,0,0,0.4), 0 16px 40px -20px rgba(0,0,0,0.5);
+  --shadow-hover: 0 4px 16px rgba(0,0,0,0.5), 0 20px 48px -20px rgba(0,0,0,0.6);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: var(--paper-2); color: var(--ink); font-family: var(--font-ui); font-size: 15px; line-height: 1.55; -webkit-font-smoothing: antialiased; min-height: 100vh; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; cursor: pointer; border: 0; background: transparent; }
+.eyebrow { font-family: var(--font-mono); font-size: 10.5px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
+::-webkit-scrollbar { width: 8px; } ::-webkit-scrollbar-thumb { background: var(--paper-line); border-radius: 99px; border: 2px solid var(--paper-2); }
+
+/* ── AppBar ── */
+.appbar {
+  position: sticky; top: 0; z-index: 50;
+  height: 56px; padding: 0 40px;
+  display: flex; align-items: center; gap: 12px;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border-bottom: 1px solid var(--paper-line);
+}
+[data-mode="dark"] .appbar { background: rgba(11,13,17,0.88); }
+.appbar-logo { width: 28px; height: 28px; background: var(--accent); border-radius: var(--radius-s); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: #fff; flex-shrink: 0; }
+.appbar-name { font-weight: 700; font-size: 16px; letter-spacing: -0.3px; }
+.appbar-sep { color: var(--paper-line); font-size: 18px; font-weight: 200; }
+.appbar-subtitle { font-family: var(--font-mono); font-size: 11px; color: var(--ink-4); }
+.appbar-spacer { flex: 1; }
+.appbar-theme {
+  height: 32px; padding: 0 12px;
+  border: 1px solid var(--paper-line); border-radius: var(--radius-s);
+  background: var(--paper); font-size: 12px; color: var(--ink-3);
+  display: flex; align-items: center; gap: 6px; transition: all 0.15s;
+}
+.appbar-theme:hover { color: var(--ink); background: var(--paper-3); }
+
+/* ── Main layout ── */
+.hub-main { max-width: 1160px; margin: 0 auto; padding: 56px 40px 80px; }
+
+/* ── Intro ── */
+.hub-intro { margin-bottom: 48px; }
+.hub-intro .eyebrow { margin-bottom: 10px; }
+.hub-title { font-size: 36px; font-weight: 800; letter-spacing: -1px; line-height: 1.1; margin-bottom: 10px; }
+.hub-sub { font-size: 15px; color: var(--ink-3); }
+
+/* ── Top 3 cards ── */
+.top-cards { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+@media (max-width: 860px) { .top-cards { grid-template-columns: 1fr; } }
+
+/* ── Base card ── */
+.pcard {
+  background: var(--paper);
+  border: 1px solid var(--paper-line);
+  border-top: 3px solid var(--paper-line);
+  border-radius: var(--radius-l);
+  padding: 28px 28px 24px;
+  display: flex; flex-direction: column; gap: 0;
+  box-shadow: var(--shadow-1);
+  transition: transform 0.18s, box-shadow 0.18s, border-top-color 0.18s;
+  cursor: pointer; position: relative; overflow: hidden;
+}
+a.pcard:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); }
+
+.pcard-icon { font-size: 28px; margin-bottom: 16px; display: block; }
+.pcard-eyebrow { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 6px; }
+.pcard-title { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 10px; }
+.pcard-desc { font-size: 13.5px; color: var(--ink-3); line-height: 1.6; margin-bottom: 18px; flex: 1; }
+.pcard-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 22px; }
+.pcard-tag {
+  font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.05em;
+  padding: 3px 10px; border-radius: 20px;
+  background: var(--paper-2); border: 1px solid var(--paper-line);
+  color: var(--ink-3);
+}
+.pcard-cta { font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 5px; }
+.pcard-cta-arrow { transition: transform 0.15s; }
+a.pcard:hover .pcard-cta-arrow { transform: translateX(3px); }
+
+/* ── Compliance card ── */
+.pcard-compliance { border-top-color: var(--purple); }
+.pcard-compliance .pcard-eyebrow { color: var(--purple); }
+.pcard-compliance .pcard-cta { color: var(--purple); }
+.pcard-compliance .pcard-tag { background: var(--purple-soft); border-color: var(--purple-line); color: var(--purple); }
+.pcard-compliance:hover { border-top-color: var(--purple-2); }
+
+/* ── Ops card ── */
+.pcard-ops { border-top-color: var(--accent); }
+.pcard-ops .pcard-eyebrow { color: var(--accent); }
+.pcard-ops .pcard-cta { color: var(--accent-2); }
+.pcard-ops .pcard-tag { background: var(--accent-soft); border-color: var(--accent-line); color: var(--accent-2); }
+.pcard-ops:hover { border-top-color: var(--accent-2); }
+
+/* ── Client card ── */
+.pcard-client-live { border-top-color: #1B2336; }
+.pcard-client-live .pcard-eyebrow { color: #1B2336; }
+.pcard-client-live .pcard-cta { color: #1B2336; }
+.pcard-client-live .pcard-tag { background: var(--paper-3); border-color: var(--paper-line); color: var(--ink-3); }
+.pcard-client-live:hover { border-top-color: var(--ink); }
+
+/* ── Employee card (wide) ── */
+.emp-card {
+  background: var(--paper);
+  border: 1px solid var(--paper-line);
+  border-top: 3px solid var(--ok);
+  border-radius: var(--radius-l);
+  box-shadow: var(--shadow-1);
+  display: grid; grid-template-columns: 280px 1px 1fr;
+  gap: 0; overflow: hidden;
+}
+@media (max-width: 860px) { .emp-card { grid-template-columns: 1fr; } }
+.emp-left { padding: 28px 32px 28px 28px; display: flex; flex-direction: column; gap: 0; }
+.emp-left .pcard-icon { margin-bottom: 12px; }
+.emp-left .pcard-eyebrow { color: var(--ok); margin-bottom: 6px; }
+.emp-title { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 10px; }
+.emp-desc { font-size: 13.5px; color: var(--ink-3); line-height: 1.65; }
+.emp-divider { background: var(--paper-line); width: 1px; }
+.emp-right { padding: 28px; }
+.emp-prompt { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-4); margin-bottom: 14px; }
+.emp-countries { display: flex; flex-wrap: wrap; gap: 8px; }
+.country-btn {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 16px;
+  background: var(--paper-2); border: 1px solid var(--paper-line);
+  border-radius: var(--radius-m); font-size: 13.5px; font-weight: 500;
+  color: var(--ink-2); transition: all 0.15s;
+}
+.country-btn:hover { background: var(--ok-soft); border-color: var(--ok-line); color: var(--ok); transform: translateY(-1px); box-shadow: 0 2px 8px rgba(30,138,95,0.12); }
+.country-btn-flag { font-size: 18px; line-height: 1; }
+
+/* ── Footer ── */
+.hub-footer { max-width: 1160px; margin: 0 auto; padding: 20px 40px 40px; display: flex; align-items: center; justify-content: space-between; }
+.hub-footer-left { font-family: var(--font-mono); font-size: 10.5px; color: var(--ink-4); }
+.hub-footer-dot { display: inline-block; width: 6px; height: 6px; background: var(--ok); border-radius: 50%; margin-right: 6px; animation: pulse 2s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.85)} }
+</style>
+</head>
+<body>
+
+<header class="appbar">
+  <div class="appbar-logo">A</div>
+  <span class="appbar-name">Atlas</span>
+  <span class="appbar-sep">/</span>
+  <span class="appbar-subtitle">Navigation Hub</span>
+  <div class="appbar-spacer"></div>
+  <button class="appbar-theme" id="themeBtn" onclick="toggleTheme()">
+    <span id="themeIcon">☾</span>
+    <span id="themeLabel">Dark</span>
+  </button>
+</header>
+
+<main class="hub-main">
+
+  <div class="hub-intro">
+    <div class="eyebrow">Navigation Hub</div>
+    <h1 class="hub-title">Choose your workspace.</h1>
+    <p class="hub-sub">Select a persona to open the right view of the system.</p>
+  </div>
+
+  <!-- Top row: 3 persona cards -->
+  <div class="top-cards">
+
+    <!-- Compliance -->
+    <a href="/ops" class="pcard pcard-compliance">
+      <span class="pcard-icon">⚖️</span>
+      <div class="pcard-eyebrow">Compliance</div>
+      <div class="pcard-title">Compliance Intelligence</div>
+      <div class="pcard-desc">Ingest regulatory documents, review semantic changes, monitor compliance drift, and manage the full intake-to-approval pipeline.</div>
+      <div class="pcard-tags">
+        <span class="pcard-tag">Intake Center</span>
+        <span class="pcard-tag">Review Queue</span>
+        <span class="pcard-tag">Audit Trail</span>
+        <span class="pcard-tag">Drift Monitor</span>
+      </div>
+      <div class="pcard-cta">Open Platform <span class="pcard-cta-arrow">→</span></div>
+    </a>
+
+    <!-- Ops / Employment Guide -->
+    <a href="/guide" class="pcard pcard-ops">
+      <span class="pcard-icon">📋</span>
+      <div class="pcard-eyebrow">Operations</div>
+      <div class="pcard-title">Employment Guides</div>
+      <div class="pcard-desc">Browse the full library of country employment laws, leave entitlements, compensation rules, and compliance requirements.</div>
+      <div class="pcard-tags">
+        <span class="pcard-tag">{{ countries | length }} Countries</span>
+        <span class="pcard-tag">Leave Policies</span>
+        <span class="pcard-tag">Compensation</span>
+        <span class="pcard-tag">Compliance</span>
+      </div>
+      <div class="pcard-cta">Browse Guides <span class="pcard-cta-arrow">→</span></div>
+    </a>
+
+    <!-- Client -->
+    <a href="/client" class="pcard pcard-client-live">
+      <span class="pcard-icon">🏢</span>
+      <div class="pcard-eyebrow">Client</div>
+      <div class="pcard-title">Client Portal</div>
+      <div class="pcard-desc">Workforce overview, country cost comparison, compliance feed, and expansion planning — the employer's view of Atlas.</div>
+      <div class="pcard-tags">
+        <span class="pcard-tag">Workforce</span>
+        <span class="pcard-tag">Cost Compare</span>
+        <span class="pcard-tag">Compliance</span>
+        <span class="pcard-tag">Ask Atlas</span>
+      </div>
+      <div class="pcard-cta">Open Portal <span class="pcard-cta-arrow">→</span></div>
+    </a>
+
+  </div>
+
+  <!-- Employee card (wide, country picker) -->
+  <div class="emp-card">
+    <div class="emp-left">
+      <span class="pcard-icon">👤</span>
+      <div class="pcard-eyebrow">Employee</div>
+      <div class="emp-title">Employee View</div>
+      <div class="emp-desc">Choose a country below to see exactly what your employee sees — their entitlements, plain-English guide, and any rule changes since they joined.</div>
+    </div>
+    <div class="emp-divider"></div>
+    <div class="emp-right">
+      <div class="emp-prompt">Select a country to explore</div>
+      <div class="emp-countries">
+        {% for c in countries %}
+        <a href="/employee/{{ c.name }}" class="country-btn">
+          <span class="country-btn-flag">{{ c.flag }}</span>
+          <span>{{ c.name }}</span>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer class="hub-footer">
+  <div class="hub-footer-left">
+    <span class="hub-footer-dot"></span>
+    Atlas Compliance · {{ countries | length }} countries monitored
+  </div>
+  <div style="font-family:var(--font-mono);font-size:10.5px;color:var(--ink-4)">Not legal advice</div>
+</footer>
+
+<script>
+  const html = document.documentElement;
+  const saved = localStorage.getItem('atlas:theme') || 'light';
+  applyTheme(saved);
+
+  function toggleTheme() {
+    const next = html.getAttribute('data-mode') === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('atlas:theme', next);
+    applyTheme(next);
+  }
+  function applyTheme(mode) {
+    html.setAttribute('data-mode', mode);
+    document.getElementById('themeIcon').textContent  = mode === 'dark' ? '☀' : '☾';
+    document.getElementById('themeLabel').textContent = mode === 'dark' ? 'Light' : 'Dark';
+  }
+</script>
+
+</body>
+</html>

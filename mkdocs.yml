@@ -1,0 +1,50 @@
+site_name: Country Guide Reconciliation
+site_description: Automated compliance monitoring for employment guides
+repo_url: ""
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - content.code.copy
+    - toc.follow
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+
+nav:
+  - Home: index.md
+  - Architecture: architecture.md
+  - Pipeline: pipeline.md
+  - User Guide:
+      - Ops Dashboard: guide/ops-dashboard.md
+      - Country Guides: guide/country-guides.md
+      - Review Workflow: guide/review-workflow.md
+  - API Reference: api.md
+  - Development: development.md

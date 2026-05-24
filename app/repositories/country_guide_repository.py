@@ -1,13 +1,16 @@
-import sqlite3
 from datetime import date, datetime
+
+from app.utils.db import Database
 
 
 class CountryGuideRepository:
-    def __init__(self, db_path):
-        self.db_path = db_path
+    def __init__(self, db):
+        if isinstance(db, str):
+            db = Database(db)
+        self.db = db
 
     def connect(self):
-        return sqlite3.connect(self.db_path)
+        return self.db.connect()
 
     def _now(self):
         return datetime.now().isoformat()
@@ -152,8 +155,7 @@ class CountryGuideRepository:
             )
         ''')
 
-        c.execute("PRAGMA table_info(country_guide)")
-        guide_columns = {row[1] for row in c.fetchall()}
+        guide_columns = self.db.get_table_columns(conn, "country_guide")
         if "effective_date" not in guide_columns:
             c.execute("ALTER TABLE country_guide ADD COLUMN effective_date TEXT")
         if "created_at" not in guide_columns:
@@ -228,8 +230,7 @@ class CountryGuideRepository:
             )
         ''')
 
-        c.execute("PRAGMA table_info(review_queue)")
-        review_columns = {row[1] for row in c.fetchall()}
+        review_columns = self.db.get_table_columns(conn, "review_queue")
         if "source_hash" not in review_columns:
             c.execute("ALTER TABLE review_queue ADD COLUMN source_hash TEXT")
         if "source_snapshot_id" not in review_columns:
@@ -259,8 +260,7 @@ class CountryGuideRepository:
             )
         ''')
 
-        c.execute("PRAGMA table_info(audit_log)")
-        audit_columns = {row[1] for row in c.fetchall()}
+        audit_columns = self.db.get_table_columns(conn, "audit_log")
         if "reviewer_assignee" not in audit_columns:
             c.execute("ALTER TABLE audit_log ADD COLUMN reviewer_assignee TEXT")
         if "reviewer_rationale" not in audit_columns:

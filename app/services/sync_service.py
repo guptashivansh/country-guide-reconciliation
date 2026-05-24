@@ -22,6 +22,10 @@ def run_sync(services, countries=None):
 
     total_changes = 0
     failures = 0
+    per_country = {}
+
+    def _country_stats(country):
+        return per_country.setdefault(country, {"changes": 0, "failed": False})
 
     logger.info(
         "Country guide sync started",
@@ -29,6 +33,7 @@ def run_sync(services, countries=None):
     )
 
     for source_endpoint in endpoints:
+        stats = _country_stats(source_endpoint.country)
         job_id = ingestion_job_service.create_job(source_endpoint.url)
         try:
             ingestion_result = ingestion_service.fetch_clean_text(source_endpoint.url)
@@ -46,6 +51,7 @@ def run_sync(services, countries=None):
                 )
                 ingestion_job_service.mark_failed(job_id, failure_reason)
                 failures += 1
+                stats["failed"] = True
                 continue
 
             ingestion_job_service.mark_fetched(job_id)
@@ -70,6 +76,7 @@ def run_sync(services, countries=None):
                 source_snapshot_service.mark_extraction_failed(snapshot_id)
                 ingestion_job_service.mark_failed(job_id, failure_reason)
                 failures += 1
+                stats["failed"] = True
                 continue
 
             reconciliation_result = reconciliation_service.reconcile_extracted_rules(
@@ -83,10 +90,12 @@ def run_sync(services, countries=None):
                 failure_reason = reconciliation_result.failure.reason if reconciliation_result.failure else "reconciliation failed"
                 ingestion_job_service.mark_failed(job_id, failure_reason)
                 failures += 1
+                stats["failed"] = True
                 continue
 
             changes_queued = reconciliation_result.changes_queued
             total_changes += changes_queued
+            stats["changes"] += changes_queued
             ingestion_job_service.mark_reconciled(job_id)
 
             logger.info(
@@ -105,6 +114,7 @@ def run_sync(services, countries=None):
             )
             ingestion_job_service.mark_failed(job_id, str(e))
             failures += 1
+            stats["failed"] = True
 
     logger.info(
         "Country guide sync completed",
@@ -114,4 +124,5 @@ def run_sync(services, countries=None):
         "total_changes": total_changes,
         "endpoints_processed": len(endpoints),
         "failures": failures,
+        "per_country": per_country,
     }

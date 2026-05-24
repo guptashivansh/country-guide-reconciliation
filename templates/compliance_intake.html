@@ -1,0 +1,669 @@
+{% extends "compliance_base.html" %}
+
+{% block title %}Compliance Intake{% endblock %}
+{% block topbar_section %}Compliance Intake{% endblock %}
+
+{% block head %}
+<style>
+/* ── SOURCE CARDS ── */
+.source-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 36px;
+}
+
+.source-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 22px 20px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  transition: border-color 0.15s, transform 0.15s;
+  position: relative;
+}
+
+.source-card:hover {
+  border-color: rgba(110,231,183,0.28);
+  transform: translateY(-2px);
+}
+
+.source-card-icon {
+  font-size: 24px;
+  margin-bottom: 14px;
+}
+
+.source-card-title {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.source-card-desc {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+  margin-bottom: 14px;
+  flex: 1;
+}
+
+.source-card-meta {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.source-card-meta-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(100,116,139,0.4);
+  flex-shrink: 0;
+}
+
+.source-card-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  text-decoration: none;
+  padding: 8px 14px;
+  border: 1px solid rgba(110,231,183,0.24);
+  border-radius: 7px;
+  background: var(--accent-dim);
+  transition: all 0.15s;
+  align-self: flex-start;
+}
+
+.source-card-cta:hover {
+  background: rgba(110,231,183,0.18);
+  border-color: rgba(110,231,183,0.42);
+}
+
+/* ── ACTIVITY FEED ── */
+.intake-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 24px;
+}
+
+.feed-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.feed-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.feed-title {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.feed-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.feed-filter {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--muted);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+  appearance: none;
+  outline: none;
+}
+
+.feed-filter:hover,
+.feed-filter:focus {
+  border-color: var(--muted);
+  color: var(--text);
+}
+
+.feed-link {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.feed-link:hover { text-decoration: underline; }
+
+.feed-list {
+  list-style: none;
+}
+
+.feed-item {
+  padding: 14px 20px;
+  border-bottom: 1px solid rgba(30,30,46,0.7);
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: start;
+  transition: background 0.1s;
+}
+
+.feed-item:last-child { border-bottom: none; }
+.feed-item:hover { background: rgba(255,255,255,0.015); }
+
+.feed-item-flag {
+  font-size: 18px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.feed-item-body {
+  min-width: 0;
+}
+
+.feed-item-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.feed-item-sub {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.feed-item-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.feed-empty {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* ── SIDEBAR PANELS ── */
+.sidebar-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.sidebar-panel + .sidebar-panel {
+  margin-top: 14px;
+}
+
+.sidebar-header {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+
+.sidebar-body {
+  padding: 16px 18px;
+}
+
+/* ── PIPELINE SUMMARY ── */
+.pipeline-summary-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.pipeline-summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(30,30,46,0.5);
+  font-size: 12px;
+}
+
+.pipeline-summary-row:last-child { border-bottom: none; }
+
+.pipeline-summary-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+}
+
+.pipeline-summary-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.pipeline-summary-count {
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  min-width: 24px;
+  text-align: right;
+}
+
+.ps-dot-queued { background: rgba(100,116,139,0.5); }
+.ps-dot-running { background: var(--state-progress); animation: ps-pulse 1.5s ease-in-out infinite; }
+.ps-dot-done { background: var(--state-success); }
+.ps-dot-failed { background: var(--state-blocked); }
+
+.ps-count-failed { color: var(--danger); }
+.ps-count-running { color: var(--state-progress); }
+.ps-count-done { color: var(--state-success); }
+
+/* ── STATS GRID ── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.stat-cell {
+  padding: 10px 0;
+}
+
+.stat-value {
+  font-family: 'DM Mono', monospace;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.stat-trend {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  margin-top: 2px;
+}
+
+.stat-trend-up { color: var(--accent); }
+.stat-trend-down { color: var(--danger); }
+.stat-trend-neutral { color: var(--muted); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 1100px) {
+  .source-cards { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 900px) {
+  .intake-columns { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 720px) {
+  .source-cards { grid-template-columns: 1fr; }
+}
+</style>
+{% endblock %}
+
+{% block workspace %}
+<div class="page-header">
+  <div class="page-breadcrumbs">
+    <a href="/compliance/dashboard">Compliance</a>
+    <span aria-hidden="true">/</span>
+    <span>Intake</span>
+  </div>
+  <div class="page-title-row">
+    <div>
+      <h1 class="page-title">Compliance Intake</h1>
+      <p class="page-subtitle">Ingest regulatory documents, official sources, and compliance updates into the canonical rule graph.</p>
+    </div>
+  </div>
+</div>
+
+<div class="page-content">
+
+  <!-- INGESTION SOURCE CARDS -->
+  <div class="section-kicker">Ingestion Sources</div>
+  <div class="source-cards">
+
+    <div class="source-card">
+      <div class="source-card-icon" aria-hidden="true">&#x1F4C4;</div>
+      <div class="source-card-title">Upload PDF</div>
+      <div class="source-card-desc">Ingest statutes, gazettes, circulars, and regulatory publications via document upload.</div>
+      <div class="source-card-meta">
+        <span class="source-card-meta-dot"></span>
+        <span id="pdfLastUsed">No uploads yet</span>
+      </div>
+      <a href="/compliance/intake/pdf" class="source-card-cta">Start upload <span aria-hidden="true">&rarr;</span></a>
+    </div>
+
+    <div class="source-card">
+      <div class="source-card-icon" aria-hidden="true">&#x1F310;</div>
+      <div class="source-card-title">Official Source URL</div>
+      <div class="source-card-desc">Register and monitor government feeds, regulatory portals, and authoritative web sources.</div>
+      <div class="source-card-meta">
+        <span class="source-card-meta-dot" style="background:var(--state-success)"></span>
+        <span id="sourceCount">Loading...</span>
+      </div>
+      <a href="/compliance/intake/source" class="source-card-cta">Register source <span aria-hidden="true">&rarr;</span></a>
+    </div>
+
+    <div class="source-card">
+      <div class="source-card-icon" aria-hidden="true">&#x270E;</div>
+      <div class="source-card-title">Manual Entry</div>
+      <div class="source-card-desc">Enter approved memos, internal updates, or corrections from verified subject-matter experts.</div>
+      <div class="source-card-meta">
+        <span class="source-card-meta-dot"></span>
+        <span id="manualLastUsed">No entries yet</span>
+      </div>
+      <a href="/compliance/intake/manual" class="source-card-cta">Create entry <span aria-hidden="true">&rarr;</span></a>
+    </div>
+
+    <div class="source-card">
+      <div class="source-card-icon" aria-hidden="true">&#x21BB;</div>
+      <div class="source-card-title">Re-ingest Guides</div>
+      <div class="source-card-desc">Re-run extraction and reconciliation on existing published country guides to detect drift.</div>
+      <div class="source-card-meta">
+        <span class="source-card-meta-dot"></span>
+        <span id="reingestMeta">On demand</span>
+      </div>
+      <a href="/compliance/intake/guides" class="source-card-cta">Re-ingest <span aria-hidden="true">&rarr;</span></a>
+    </div>
+
+  </div>
+
+  <!-- ACTIVITY + SIDEBAR -->
+  <div class="intake-columns">
+
+    <!-- RECENT INTAKE ACTIVITY -->
+    <div class="feed-panel">
+      <div class="feed-header">
+        <span class="feed-title">Recent Intake Activity</span>
+        <div class="feed-header-actions">
+          <select class="feed-filter" id="feedTimeFilter" aria-label="Time range filter">
+            <option value="24h">Last 24h</option>
+            <option value="7d">Last 7 days</option>
+            <option value="30d">Last 30 days</option>
+          </select>
+          <a href="/compliance/pipeline" class="feed-link">View all pipeline &rarr;</a>
+        </div>
+      </div>
+      <ul class="feed-list" id="feedList">
+        <li class="feed-empty" id="feedLoading">Loading intake activity...</li>
+      </ul>
+    </div>
+
+    <!-- RIGHT SIDEBAR -->
+    <div>
+
+      <!-- PIPELINE SUMMARY -->
+      <div class="sidebar-panel">
+        <div class="sidebar-header">
+          <div class="sidebar-title">Processing Pipeline</div>
+        </div>
+        <div class="sidebar-body">
+          <ul class="pipeline-summary-list" id="pipelineSummary">
+            <li class="pipeline-summary-row">
+              <span class="pipeline-summary-label">
+                <span class="pipeline-summary-dot ps-dot-queued"></span>
+                Queued
+              </span>
+              <span class="pipeline-summary-count" id="psQueued">&mdash;</span>
+            </li>
+            <li class="pipeline-summary-row">
+              <span class="pipeline-summary-label">
+                <span class="pipeline-summary-dot ps-dot-running"></span>
+                Processing
+              </span>
+              <span class="pipeline-summary-count ps-count-running" id="psRunning">&mdash;</span>
+            </li>
+            <li class="pipeline-summary-row">
+              <span class="pipeline-summary-label">
+                <span class="pipeline-summary-dot ps-dot-done"></span>
+                Reconciled
+              </span>
+              <span class="pipeline-summary-count ps-count-done" id="psReconciled">&mdash;</span>
+            </li>
+            <li class="pipeline-summary-row">
+              <span class="pipeline-summary-label">
+                <span class="pipeline-summary-dot ps-dot-failed"></span>
+                Failed (24h)
+              </span>
+              <span class="pipeline-summary-count ps-count-failed" id="psFailed">&mdash;</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- INTAKE STATS -->
+      <div class="sidebar-panel">
+        <div class="sidebar-header">
+          <div class="sidebar-title">This Week</div>
+        </div>
+        <div class="sidebar-body">
+          <div class="stats-grid">
+            <div class="stat-cell">
+              <div class="stat-value" id="statIngested">&mdash;</div>
+              <div class="stat-label">Documents ingested</div>
+            </div>
+            <div class="stat-cell">
+              <div class="stat-value" id="statRules">&mdash;</div>
+              <div class="stat-label">Rules extracted</div>
+            </div>
+            <div class="stat-cell">
+              <div class="stat-value" id="statConfidence">&mdash;</div>
+              <div class="stat-label">Avg confidence</div>
+            </div>
+            <div class="stat-cell">
+              <div class="stat-value" id="statPending">&mdash;</div>
+              <div class="stat-label">Awaiting review</div>
+            </div>
+            <div class="stat-cell">
+              <div class="stat-value ps-count-failed" id="statFailures">&mdash;</div>
+              <div class="stat-label">Failures</div>
+            </div>
+            <div class="stat-cell">
+              <div class="stat-value" id="statCritical">&mdash;</div>
+              <div class="stat-label">Critical changes</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function() {
+  var FLAGS = {{ flags | tojson }};
+
+  function stageState(job) {
+    var stages = ['queued','fetched','normalized','extracted','reconciled'];
+    var current = job.state || 'queued';
+    if (current === 'failed') return { failedAt: job.failed_stage || 'unknown', stages: stages };
+    var idx = stages.indexOf(current);
+    return { currentIdx: idx, stages: stages };
+  }
+
+  function renderPipelineStrip(job) {
+    var info = stageState(job);
+    var html = '<div class="pipeline-strip">';
+    var labels = ['REG','FETCH','NORM','EXTR','RECON'];
+    for (var i = 0; i < info.stages.length; i++) {
+      if (i > 0) html += '<span class="pipeline-stage-connector"></span>';
+      var cls = 'ps-pending';
+      if (job.state === 'failed') {
+        cls = i <= (info.currentIdx || 0) ? 'ps-done' : 'ps-pending';
+        if (info.stages[i] === info.failedAt) cls = 'ps-failed';
+      } else if (i < info.currentIdx) {
+        cls = 'ps-done';
+      } else if (i === info.currentIdx) {
+        cls = job.state === 'reconciled' ? 'ps-done' : 'ps-active';
+      }
+      html += '<span class="pipeline-stage ' + cls + '"><span class="pipeline-stage-dot"></span></span>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function sourceLabel(url) {
+    if (!url) return 'Unknown source';
+    try {
+      if (url.indexOf('notion') !== -1) return 'Notion import';
+      var u = new URL(url);
+      return u.hostname.replace('www.','');
+    } catch(e) {
+      return url.length > 40 ? url.substring(0, 37) + '...' : url;
+    }
+  }
+
+  function timeAgo(iso) {
+    if (!iso) return '';
+    var d = new Date(iso);
+    var now = new Date();
+    var sec = Math.floor((now - d) / 1000);
+    if (sec < 60) return sec + 's ago';
+    var min = Math.floor(sec / 60);
+    if (min < 60) return min + 'm ago';
+    var hr = Math.floor(min / 60);
+    if (hr < 24) return hr + 'h ago';
+    return Math.floor(hr / 24) + 'd ago';
+  }
+
+  function loadFeed() {
+    fetch('/api/ingestion-jobs')
+      .then(function(r) { return r.json(); })
+      .then(function(jobs) {
+        var list = document.getElementById('feedList');
+        if (!jobs || jobs.length === 0) {
+          list.innerHTML = '<li class="feed-empty">No intake activity yet. Start by uploading a document or registering a source.</li>';
+          return;
+        }
+
+        var queued = 0, running = 0, reconciled = 0, failed = 0;
+        jobs.forEach(function(j) {
+          if (j.state === 'queued') queued++;
+          else if (j.state === 'failed') failed++;
+          else if (j.state === 'reconciled') reconciled++;
+          else running++;
+        });
+
+        document.getElementById('psQueued').textContent = queued;
+        document.getElementById('psRunning').textContent = running;
+        document.getElementById('psReconciled').textContent = reconciled;
+        document.getElementById('psFailed').textContent = failed;
+
+        var html = '';
+        var shown = jobs.slice(0, 15);
+        shown.forEach(function(job) {
+          var country = job.country || '';
+          var flag = FLAGS[country] || '';
+          var stateClass = 'state-' + (job.state || 'queued');
+          var stateLabel = (job.state || 'queued').toUpperCase();
+
+          html += '<li class="feed-item">';
+          html += '<span class="feed-item-flag">' + (flag || '&#x1F4C4;') + '</span>';
+          html += '<div class="feed-item-body">';
+          html += '<div class="feed-item-title">' + escHtml(sourceLabel(job.source_url)) + '</div>';
+          html += '<div class="feed-item-sub">';
+          if (country) html += country + ' &middot; ';
+          html += 'job #' + (job.id || '?');
+          if (job.rules_extracted) html += ' &middot; ' + job.rules_extracted + ' rules';
+          html += '</div>';
+          html += '</div>';
+          html += '<div class="feed-item-right">';
+          html += '<span class="state-chip ' + stateClass + '">' + stateLabel + '</span>';
+          html += '<span class="timestamp-mono">' + timeAgo(job.created_at || job.reconciled_at) + '</span>';
+          html += '</div>';
+          html += '</li>';
+        });
+
+        list.innerHTML = html;
+      })
+      .catch(function() {
+        document.getElementById('feedList').innerHTML = '<li class="feed-empty">Unable to load intake activity.</li>';
+      });
+  }
+
+  function loadMetrics() {
+    fetch('/api/metrics')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        var el;
+        el = document.getElementById('sourceCount');
+        if (el) el.textContent = (data.sources_monitored || 0) + ' active feeds';
+
+        el = document.getElementById('statPending');
+        if (el) el.textContent = data.pending_reviews || 0;
+
+        el = document.getElementById('statConfidence');
+        if (el) el.textContent = data.avg_confidence != null ? data.avg_confidence + '%' : '—';
+
+        el = document.getElementById('statCritical');
+        if (el) {
+          el.textContent = data.critical_changes || 0;
+          if (data.critical_changes > 0) el.style.color = 'var(--danger)';
+        }
+
+        el = document.getElementById('statFailures');
+        if (el) el.textContent = data.crawl_failures || 0;
+      })
+      .catch(function() {});
+  }
+
+  function escHtml(s) {
+    var d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  loadFeed();
+  loadMetrics();
+})();
+</script>
+{% endblock %}
