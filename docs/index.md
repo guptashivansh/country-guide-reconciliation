@@ -10,13 +10,29 @@ Multi-jurisdiction employment compliance operates under a fundamental constraint
 
 This system is built around four principles that govern every architectural decision:
 
-**Provenance-first.** No rule is considered authoritative unless its origin can be traced to a specific government document, captured at a specific time, extracted by a versioned model, reviewed by an identified person, and approved with a documented rationale. This chain cannot be bypassed, bypassing it produces an audit finding.
+---
+
+**Provenance-first.** No rule is considered authoritative unless its origin can be traced to a specific government document, captured at a specific time, extracted by a versioned model, reviewed by an identified person, and approved with a documented rationale. This chain cannot be bypassed; bypassing it produces an audit finding.
+
+![Every review item exposes its full audit trail — reviewer, section, timestamp, and a direct link to the complete provenance chain](assets/screenshots/gp_provenance_chain.png){ loading=lazy }
+
+---
 
 **Human authority over AI output.** The LLM extracts; humans decide. The system uses a large language model to convert unstructured government HTML into structured rule objects — a task for which AI generalization across heterogeneous formats is appropriate. The system never allows AI output to become a published rule without explicit human approval. This is not a limitation of the AI; it is a deliberate governance control.
 
+![Every review decision is gated by three explicit actions — Escalate, Reject, or Approve & publish — each logged immutably to the audit trail](assets/screenshots/gp_human_authority.png){ loading=lazy }
+
+---
+
 **Deterministic classification over probabilistic judgment.** Change classification — determining whether a detected difference is a numeric threshold change, an eligibility scope modification, or a formatting artifact — uses a deterministic regex-based engine, not an LLM. The same (old, new) pair always produces the same classification. Auditors can reconstruct the reasoning. LLM classification would undermine that reproducibility.
 
+![Classification output: CRITICAL severity badge with section type label — produced deterministically, not by probabilistic AI judgment](assets/screenshots/gp_deterministic_classification.png){ loading=lazy }
+
+---
+
 **Immutable audit record.** Every decision, at every stage of the pipeline, is written to append-only tables. No UPDATE or DELETE operation exists for audit data. The complete history of who decided what, when, and why is always reconstructable from the database.
+
+![Append-only audit timeline: each entry records the reviewer identity, decision (ESCALATED / APPROVED / REJECTED), affected section, rationale, and UTC timestamp](assets/screenshots/gp_immutable_audit.png){ loading=lazy }
 
 ---
 
