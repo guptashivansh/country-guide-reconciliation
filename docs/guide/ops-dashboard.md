@@ -8,6 +8,8 @@ The ops dashboard (`/ops`) is the primary interface for compliance operations �
 
 ## Metrics Cards
 
+![Regulatory Risk Scoring — Real-time KPIs with critical counts, confidence scores, and crawl failure tracking](../assets/screenshots/regulatory_risk_scoring.png)
+
 The top row displays real-time KPIs pulled from `GET /api/metrics`:
 
 | Metric | Source | What It Tells You |
@@ -37,6 +39,8 @@ Items are sorted by:
 
 ### Per-Item Display
 
+![Materiality Classification — Severity badges, change type chips, and confidence-based prioritization](../assets/screenshots/materiality_classification.png)
+
 - **Severity badge**: Color-coded (red = critical, orange = major, blue = minor)
 - **Materiality chip**: CRITICAL / HIGH / MODERATE / LOW / INFORMATIONAL
 - **Change type**: NUMERIC_THRESHOLD_CHANGE, ELIGIBILITY_CHANGE, REQUIREMENT_ADDED, etc.
@@ -46,6 +50,8 @@ Items are sorted by:
 - **Source URL**: Link to the original government page
 
 ### Actions
+
+![Manual Override Controls — Approve, Reject, and Escalate decision buttons with audit trail linkage](../assets/screenshots/manual_override_controls.png)
 
 | Action | Button | Effect |
 |--------|--------|--------|
@@ -65,6 +71,8 @@ Items are sorted by:
 
 ## Sync Controls
 
+![CMS Synchronization — Source selection modal for targeted country sync](../assets/screenshots/cms_synchronization.png)
+
 Click **Sync Now** to trigger a manual pipeline run. A modal allows selecting specific countries to sync, conserving Groq API quota for targeted checks.
 
 After sync completes, the metrics cards refresh and any detected changes appear in the review queue.
@@ -72,6 +80,8 @@ After sync completes, the metrics cards refresh and any detected changes appear 
 ---
 
 ## Audit Log Tab
+
+![Review Rationale Capture — Immutable audit timeline with reviewer identity, rationale text, and decision badges](../assets/screenshots/provenance_audit_trail.png)
 
 The audit log tab displays an immutable record of every review decision:
 
@@ -91,6 +101,8 @@ Filterable by country and date range via `GET /api/audit?country=India&since=202
 
 ## Drift Reports
 
+![Drift Monitoring Dashboard — Country-level drift status with severity filters](../assets/screenshots/drift_monitoring_dashboard.png)
+
 The drift tab shows compliance drift reports per country:
 
 - **Overall severity**: CRITICAL / WARNING / INFO / NONE
@@ -101,6 +113,8 @@ The drift tab shows compliance drift reports per country:
 ---
 
 ## Pipeline Health
+
+![Multi-Source Ingestion Pipeline — Job status tracking with per-stage progress dots and source URLs](../assets/screenshots/multi_source_ingestion.png)
 
 The pipeline tab shows recent ingestion jobs with:
 
