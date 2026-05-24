@@ -19,6 +19,7 @@ from app.services.temporal_rule_service import TemporalRuleService
 from app.drift.detector import DriftDetector
 from app.drift.repository import DriftRepository
 from app.utils.config import database_path, extraction_chunk_size, groq_api_keys, load_env_file, official_sources_json_url, slack_webhook_url, sync_cron_schedule, parser_version
+from app.utils.db import Database
 from app.utils.logging_config import configure_logging
 
 
@@ -26,16 +27,18 @@ def build_services(db_path=None):
     load_env_file()
     configure_logging()
 
-    country_guide_repository = CountryGuideRepository(db_path or database_path())
-    source_snapshot_repository = SourceSnapshotRepository(db_path or database_path())
-    ingestion_job_repository = IngestionJobRepository(db_path or database_path())
+    db = Database(db_path or database_path())
+
+    country_guide_repository = CountryGuideRepository(db)
+    source_snapshot_repository = SourceSnapshotRepository(db)
+    ingestion_job_repository = IngestionJobRepository(db)
     source_endpoint_repository = TrustedSourceEndpointRepository(json_url=official_sources_json_url())
     source_endpoint_repository.list_active_source_endpoints()
 
-    provenance_repository = ProvenanceRepository(db_path or database_path())
+    provenance_repository = ProvenanceRepository(db)
     provenance_service = ProvenanceService(provenance_repository, parser_version=parser_version())
     temporal_rule_service = TemporalRuleService(country_guide_repository)
-    drift_repository = DriftRepository(db_path or database_path())
+    drift_repository = DriftRepository(db)
     drift_detector = DriftDetector(drift_repository)
 
     return {
