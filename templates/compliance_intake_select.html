@@ -1,0 +1,451 @@
+{% extends "compliance_base.html" %}
+
+{% block title %}Intake Center{% endblock %}
+{% block topbar_section %}Intake Center{% endblock %}
+
+{% block head %}
+<style>
+.intake-hero {
+  padding: 48px 0 32px;
+}
+.intake-hero-title {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+.intake-hero-sub {
+  margin-top: 10px;
+  font-size: 14px;
+  color: var(--ink-3);
+  max-width: 52ch;
+  line-height: 1.6;
+}
+
+.intake-search {
+  margin-bottom: 28px;
+  position: relative;
+}
+.intake-search input {
+  width: 100%;
+  max-width: 420px;
+  height: 42px;
+  padding: 0 16px 0 40px;
+  border: 1px solid var(--paper-line);
+  border-radius: var(--radius-m);
+  background: var(--paper);
+  font: inherit;
+  font-size: 14px;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.15s;
+}
+.intake-search input:focus {
+  border-color: var(--accent);
+}
+.intake-search-icon {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--ink-4);
+  font-size: 14px;
+  pointer-events: none;
+}
+
+.country-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+.country-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--paper);
+  border: 1px solid var(--paper-line);
+  border-radius: var(--radius-m);
+  text-decoration: none;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 600;
+  transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+}
+.country-card:hover {
+  border-color: var(--accent-line);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-2);
+}
+.country-card-flag {
+  font-size: 24px;
+  line-height: 1;
+}
+.country-card-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.no-results {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 48px 0;
+  color: var(--ink-4);
+  font-size: 14px;
+}
+
+/* ── HISTORY SECTION ── */
+.history-section {
+  margin-top: 48px;
+}
+.history-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 24px;
+}
+@media (max-width: 860px) {
+  .history-columns { grid-template-columns: 1fr; }
+}
+
+.feed-panel {
+  background: var(--paper-2);
+  border: 1px solid var(--paper-line);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.feed-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--paper-line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.feed-title {
+  font-size: 13px;
+  font-weight: 700;
+}
+.feed-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.feed-link {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--accent);
+  text-decoration: none;
+}
+.feed-link:hover { text-decoration: underline; }
+.feed-list {
+  list-style: none;
+  max-height: 520px;
+  overflow-y: auto;
+}
+.feed-item {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--paper-line);
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: start;
+  transition: background 0.1s;
+  text-decoration: none;
+  color: inherit;
+}
+.feed-item:last-child { border-bottom: none; }
+.feed-item:hover { background: rgba(0,0,0,0.02); }
+[data-mode="dark"] .feed-item:hover { background: rgba(255,255,255,0.015); }
+.feed-item-flag {
+  font-size: 18px;
+  line-height: 1.4;
+  text-align: center;
+}
+.feed-item-body { min-width: 0; }
+.feed-item-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.feed-item-sub {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-3);
+  line-height: 1.5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.feed-item-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.feed-empty {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--ink-4);
+  font-size: 13px;
+}
+
+/* ── PIPELINE SIDEBAR ── */
+.sidebar-panel {
+  background: var(--paper-2);
+  border: 1px solid var(--paper-line);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.sidebar-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--paper-line);
+}
+.sidebar-title {
+  font-size: 13px;
+  font-weight: 700;
+}
+.sidebar-body {
+  padding: 16px 20px;
+}
+.pipeline-summary-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.pipeline-summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.pipeline-summary-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+.pipeline-summary-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.ps-dot-queued   { background: var(--ink-4); }
+.ps-dot-running  { background: var(--purple); }
+.ps-dot-done     { background: var(--ok); }
+.ps-dot-failed   { background: var(--danger); }
+.pipeline-summary-count {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.ps-count-running { color: var(--purple); }
+.ps-count-done    { color: var(--ok); }
+.ps-count-failed  { color: var(--danger); }
+</style>
+{% endblock %}
+
+{% block workspace %}
+<div style="max-width:1200px;margin:0 auto;padding:0 40px 80px">
+
+  <div class="intake-hero">
+    <div class="eyebrow">Intake Center</div>
+    <h1 class="intake-hero-title">Select a Country</h1>
+    <p class="intake-hero-sub">Choose a country to view and manage its compliance intake data, source documents, and extraction pipeline.</p>
+  </div>
+
+  <div class="intake-search">
+    <span class="intake-search-icon">&#128269;</span>
+    <input type="text" id="countrySearch" placeholder="Search countries..." autocomplete="off" />
+  </div>
+
+  <div class="country-grid" id="countryGrid">
+    {% for name, flag in flags | dictsort %}
+    <a href="/intake/{{ name }}" class="country-card" data-country="{{ name | lower }}">
+      <span class="country-card-flag">{{ flag }}</span>
+      <span class="country-card-name">{{ name }}</span>
+    </a>
+    {% endfor %}
+  </div>
+
+  <!-- INTAKE HISTORY -->
+  <div class="history-section">
+    <div class="history-columns">
+
+      <div class="feed-panel">
+        <div class="feed-header">
+          <span class="feed-title">Recent Intake Activity</span>
+          <div class="feed-header-actions">
+            <a href="/compliance/pipeline" class="feed-link">View pipeline &rarr;</a>
+          </div>
+        </div>
+        <ul class="feed-list" id="feedList">
+          <li class="feed-empty" id="feedLoading">Loading intake activity&hellip;</li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="sidebar-panel">
+          <div class="sidebar-header">
+            <div class="sidebar-title">Processing Pipeline</div>
+          </div>
+          <div class="sidebar-body">
+            <ul class="pipeline-summary-list" id="pipelineSummary">
+              <li class="pipeline-summary-row">
+                <span class="pipeline-summary-label">
+                  <span class="pipeline-summary-dot ps-dot-queued"></span>Queued
+                </span>
+                <span class="pipeline-summary-count" id="psQueued">&mdash;</span>
+              </li>
+              <li class="pipeline-summary-row">
+                <span class="pipeline-summary-label">
+                  <span class="pipeline-summary-dot ps-dot-running"></span>Processing
+                </span>
+                <span class="pipeline-summary-count ps-count-running" id="psRunning">&mdash;</span>
+              </li>
+              <li class="pipeline-summary-row">
+                <span class="pipeline-summary-label">
+                  <span class="pipeline-summary-dot ps-dot-done"></span>Reconciled
+                </span>
+                <span class="pipeline-summary-count ps-count-done" id="psReconciled">&mdash;</span>
+              </li>
+              <li class="pipeline-summary-row">
+                <span class="pipeline-summary-label">
+                  <span class="pipeline-summary-dot ps-dot-failed"></span>Failed
+                </span>
+                <span class="pipeline-summary-count ps-count-failed" id="psFailed">&mdash;</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function() {
+  var FLAGS = {{ flags | tojson }};
+
+  function escHtml(s) {
+    var d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  function sourceLabel(url) {
+    if (!url) return 'Unknown source';
+    try {
+      if (url.indexOf('notion') !== -1) return 'Notion import';
+      if (url.indexOf('pdf://') === 0) {
+        var h = url.indexOf('#');
+        return h !== -1 ? decodeURIComponent(url.substring(h + 1)) : 'PDF upload';
+      }
+      var u = new URL(url);
+      return u.hostname.replace('www.', '');
+    } catch(e) {
+      return url.length > 40 ? url.substring(0, 37) + '...' : url;
+    }
+  }
+
+  function timeAgo(iso) {
+    if (!iso) return '';
+    var d = new Date(iso);
+    var now = new Date();
+    var sec = Math.floor((now - d) / 1000);
+    if (sec < 60) return sec + 's ago';
+    var min = Math.floor(sec / 60);
+    if (min < 60) return min + 'm ago';
+    var hr = Math.floor(min / 60);
+    if (hr < 24) return hr + 'h ago';
+    return Math.floor(hr / 24) + 'd ago';
+  }
+
+  // Country search filter
+  document.getElementById('countrySearch').addEventListener('input', function() {
+    var q = this.value.toLowerCase().trim();
+    var cards = document.querySelectorAll('.country-card');
+    var visible = 0;
+    cards.forEach(function(c) {
+      var match = !q || c.dataset.country.indexOf(q) !== -1;
+      c.style.display = match ? '' : 'none';
+      if (match) visible++;
+    });
+    var noRes = document.getElementById('noResults');
+    if (!visible && !noRes) {
+      noRes = document.createElement('div');
+      noRes.id = 'noResults';
+      noRes.className = 'no-results';
+      noRes.textContent = 'No countries match your search.';
+      document.getElementById('countryGrid').appendChild(noRes);
+    } else if (visible && noRes) {
+      noRes.remove();
+    }
+  });
+
+  // Load intake history feed
+  fetch('/api/ingestion-jobs')
+    .then(function(r) { return r.json(); })
+    .then(function(jobs) {
+      var list = document.getElementById('feedList');
+      if (!jobs || jobs.length === 0) {
+        list.innerHTML = '<li class="feed-empty">No intake activity yet.</li>';
+        return;
+      }
+
+      var queued = 0, running = 0, reconciled = 0, failed = 0;
+      jobs.forEach(function(j) {
+        if (j.state === 'queued') queued++;
+        else if (j.state === 'failed') failed++;
+        else if (j.state === 'reconciled') reconciled++;
+        else running++;
+      });
+      document.getElementById('psQueued').textContent = queued;
+      document.getElementById('psRunning').textContent = running;
+      document.getElementById('psReconciled').textContent = reconciled;
+      document.getElementById('psFailed').textContent = failed;
+
+      var html = '';
+      jobs.forEach(function(job) {
+        var country = job.country || '';
+        var flag = FLAGS[country] || '';
+        var stateClass = 'state-' + (job.state || 'queued');
+        var stateLabel = (job.state || 'queued').toUpperCase();
+        var href = country ? '/intake/' + encodeURIComponent(country) : '#';
+
+        html += '<a class="feed-item" href="' + escHtml(href) + '">';
+        html += '<span class="feed-item-flag">' + (flag || '&#x1F4C4;') + '</span>';
+        html += '<div class="feed-item-body">';
+        html += '<div class="feed-item-title">' + escHtml(sourceLabel(job.source_url)) + '</div>';
+        html += '<div class="feed-item-sub">';
+        if (country) html += escHtml(country) + ' &middot; ';
+        html += 'Job #' + (job.id || '?');
+        html += '</div>';
+        html += '</div>';
+        html += '<div class="feed-item-right">';
+        html += '<span class="state-chip ' + stateClass + '">' + stateLabel + '</span>';
+        html += '<span class="timestamp-mono">' + timeAgo(job.queued_at || job.created_at || job.reconciled_at) + '</span>';
+        html += '</div>';
+        html += '</a>';
+      });
+
+      list.innerHTML = html;
+    })
+    .catch(function() {
+      document.getElementById('feedList').innerHTML = '<li class="feed-empty">Unable to load intake activity.</li>';
+    });
+})();
+</script>
+{% endblock %}

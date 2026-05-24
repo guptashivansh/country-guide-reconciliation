@@ -1,7 +1,8 @@
 {% extends "compliance_base.html" %}
 
-{% block title %}Compliance Intake{% endblock %}
-{% block topbar_section %}Compliance Intake{% endblock %}
+{% block title %}Intake · {{ country }}{% endblock %}
+{% block topbar_section %}Intake{% endblock %}
+{% block appbar_tabs %}{% endblock %}
 
 {% block head %}
 <style>
@@ -50,7 +51,7 @@
 }
 
 .source-card-meta {
-  font-family: 'DM Mono', monospace;
+  font-family: var(--font-mono);
   font-size: 10px;
   color: var(--muted);
   margin-bottom: 16px;
@@ -123,7 +124,7 @@
 }
 
 .feed-filter {
-  font-family: 'DM Mono', monospace;
+  font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 600;
   color: var(--muted);
@@ -144,7 +145,7 @@
 }
 
 .feed-link {
-  font-family: 'DM Mono', monospace;
+  font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.5px;
@@ -192,7 +193,7 @@
 }
 
 .feed-item-sub {
-  font-family: 'DM Mono', monospace;
+  font-family: var(--font-mono);
   font-size: 11px;
   color: var(--muted);
   line-height: 1.5;
@@ -277,7 +278,7 @@
 }
 
 .pipeline-summary-count {
-  font-family: 'DM Mono', monospace;
+  font-family: var(--font-mono);
   font-size: 13px;
   font-weight: 700;
   min-width: 24px;
@@ -305,7 +306,7 @@
 }
 
 .stat-value {
-  font-family: 'DM Mono', monospace;
+  font-family: var(--font-mono);
   font-size: 20px;
   font-weight: 700;
   line-height: 1;
@@ -313,7 +314,7 @@
 }
 
 .stat-label {
-  font-family: 'DM Mono', monospace;
+  font-family: var(--font-mono);
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 1px;
@@ -322,7 +323,7 @@
 }
 
 .stat-trend {
-  font-family: 'DM Mono', monospace;
+  font-family: var(--font-mono);
   font-size: 10px;
   margin-top: 2px;
 }
@@ -349,14 +350,16 @@
 {% block workspace %}
 <div class="page-header">
   <div class="page-breadcrumbs">
-    <a href="/compliance/dashboard">Compliance</a>
+    <a href="/">Home</a>
     <span aria-hidden="true">/</span>
-    <span>Intake</span>
+    <a href="/guide">Guides</a>
+    <span aria-hidden="true">/</span>
+    <span>{{ country }}</span>
   </div>
   <div class="page-title-row">
     <div>
-      <h1 class="page-title">Compliance Intake</h1>
-      <p class="page-subtitle">Ingest regulatory documents, official sources, and compliance updates into the canonical rule graph.</p>
+      <h1 class="page-title">{{ flag }} {{ country }} — Intake</h1>
+      <p class="page-subtitle">Ingest regulatory documents, official sources, and compliance updates for {{ country }}.</p>
     </div>
   </div>
 </div>
@@ -389,18 +392,7 @@
       <a href="/compliance/intake/source" class="source-card-cta">Register source <span aria-hidden="true">&rarr;</span></a>
     </div>
 
-    <div class="source-card">
-      <div class="source-card-icon" aria-hidden="true">&#x270E;</div>
-      <div class="source-card-title">Manual Entry</div>
-      <div class="source-card-desc">Enter approved memos, internal updates, or corrections from verified subject-matter experts.</div>
-      <div class="source-card-meta">
-        <span class="source-card-meta-dot"></span>
-        <span id="manualLastUsed">No entries yet</span>
-      </div>
-      <a href="/compliance/intake/manual" class="source-card-cta">Create entry <span aria-hidden="true">&rarr;</span></a>
-    </div>
-
-    <div class="source-card">
+<div class="source-card">
       <div class="source-card-icon" aria-hidden="true">&#x21BB;</div>
       <div class="source-card-title">Re-ingest Guides</div>
       <div class="source-card-desc">Re-run extraction and reconciliation on existing published country guides to detect drift.</div>
