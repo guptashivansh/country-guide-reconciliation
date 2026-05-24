@@ -25,7 +25,7 @@ Government employment law is published as unstructured HTML across hundreds of p
 
 ## 5. Functional Overview
 
-![AI Recommendation Layer — Confidence scoring, change classification, and approval recommendation](../assets/screenshots/ai_recommendation_layer.png)
+![AI Recommendation Layer — Confidence scoring, change classification, and approval recommendation](../assets/screenshots/ai_recommendation_layer.png){ loading=lazy }
 
 
 The extraction service takes cleaned HTML text and a target country/sections list, then:
@@ -166,7 +166,7 @@ Extraction outputs flow into:
 - **`rule_provenance.extraction_confidence`**: Recorded in the provenance chain
 - **`rule_provenance.parser_version`**: Fixed string `"groq/llama-3.3-70b-versatile/v1"` for model lineage
 
-![Regulatory Risk Scoring — Dashboard metrics showing critical counts, average confidence, and crawl failure rate](../assets/screenshots/regulatory_risk_scoring.png)
+![Regulatory Risk Scoring — Dashboard metrics showing critical counts, average confidence, and crawl failure rate](../assets/screenshots/regulatory_risk_scoring.png){ loading=lazy }
 
 ## 11. AI/LLM Usage
 

@@ -26,7 +26,7 @@ When a government source changes, the raw text diff is often unhelpful. A format
 
 ## 5. Functional Overview
 
-![Semantic Diff Engine — Before/after comparison with word-level highlighting and change classification](../assets/screenshots/semantic_diff_engine.png)
+![Semantic Diff Engine — Before/after comparison with word-level highlighting and change classification](../assets/screenshots/semantic_diff_engine.png){ loading=lazy }
 
 
 The engine compares an old rule value against a new rule value and produces a `SemanticReconciliationResult` with:
@@ -160,7 +160,7 @@ Stored in review_queue.materiality_level and review_queue.change_type
 | `ChangeType` | `app/reconciliation/schemas.py` | Enum: 6 change types |
 | `SemanticReconciliationResult` | `app/reconciliation/schemas.py` | Pydantic model for engine output |
 
-![Materiality Classification — Severity badges and materiality chips on review queue items](../assets/screenshots/materiality_classification.png)
+![Materiality Classification — Severity badges and materiality chips on review queue items](../assets/screenshots/materiality_classification.png){ loading=lazy }
 
 ## 10. Database Design Implications
 

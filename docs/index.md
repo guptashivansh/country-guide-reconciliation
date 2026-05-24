@@ -2,7 +2,7 @@
 
 An AI-powered compliance governance platform that continuously monitors official government sources, detects regulatory changes to employment guides, and routes them through a human-in-the-loop approval workflow with full provenance tracking.
 
-![Home Page](assets/screenshots/home.png)
+![Home Page](assets/screenshots/home.png){ loading=lazy }
 
 ---
 

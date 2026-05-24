@@ -25,7 +25,7 @@ Employment regulations are published across heterogeneous formats — government
 
 ## 5. Functional Overview
 
-![Multi-Source Ingestion — Pipeline job tracking with per-stage progress dots, status indicators, and source URLs](../assets/screenshots/multi_source_ingestion.png)
+![Multi-Source Ingestion — Pipeline job tracking with per-stage progress dots, status indicators, and source URLs](../assets/screenshots/multi_source_ingestion.png){ loading=lazy }
 
 
 Three ingestion adapters feed into a common pipeline:
@@ -89,9 +89,9 @@ Root Page
 
 ### PDF Intake
 
-![PDF Compliance Parsing — Document upload interface with processing pipeline status and ingestion activity feed](../assets/screenshots/pdf_compliance_parsing.png)
+![PDF Compliance Parsing — Document upload interface with processing pipeline status and ingestion activity feed](../assets/screenshots/pdf_compliance_parsing.png){ loading=lazy }
 
-![Compliance Pipeline — Job-level tracking with stage progress dots, pagination, and source URL display](../assets/screenshots/compliance_pipeline.png)
+![Compliance Pipeline — Job-level tracking with stage progress dots, pagination, and source URL display](../assets/screenshots/compliance_pipeline.png){ loading=lazy }
 
 The `/api/intake/pdf` endpoint accepts multipart form uploads, extracts text content, and feeds it into the standard extraction pipeline.
 

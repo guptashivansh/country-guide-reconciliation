@@ -4,7 +4,7 @@ The country guide pages are the client-facing output of the reconciliation pipel
 
 ## Guide List
 
-![Guide List](../assets/screenshots/guide_list.png)
+![Guide List](../assets/screenshots/guide_list.png){ loading=lazy }
 
 The guide list (`/guide`) displays a card grid of all monitored countries with:
 
@@ -16,7 +16,7 @@ The guide list (`/guide`) displays a card grid of all monitored countries with:
 
 ## Country Detail
 
-![Country Guide Detail](../assets/screenshots/guide_country.png)
+![Country Guide Detail](../assets/screenshots/guide_country.png){ loading=lazy }
 
 Each country page (`/guide/<country>`) shows the full employment guide organized into 7 categories:
 

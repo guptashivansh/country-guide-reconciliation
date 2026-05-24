@@ -25,7 +25,7 @@ Even with automated pipelines, compliance gaps emerge: reviews sit unactioned fo
 
 ## 5. Functional Overview
 
-![Drift Monitoring Dashboard — Country-level compliance drift status with severity breakdown and suggested actions](../assets/screenshots/drift_monitoring_dashboard.png)
+![Drift Monitoring Dashboard — Country-level compliance drift status with severity breakdown and suggested actions](../assets/screenshots/drift_monitoring_dashboard.png){ loading=lazy }
 
 
 The drift detector evaluates two categories of rules:
