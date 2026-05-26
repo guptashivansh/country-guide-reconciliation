@@ -29,24 +29,48 @@ class IngestionJobRepository:
                 reconciled_at TEXT,
                 failed_at TEXT,
                 failure_reason TEXT,
-                source_snapshot_id INTEGER
+                source_snapshot_id INTEGER,
+                country TEXT
             )
         ''')
+        try:
+            c.execute("ALTER TABLE ingestion_jobs ADD COLUMN country TEXT")
+        except Exception:
+            pass
         conn.commit()
         conn.close()
 
-    def create_job(self, source_url):
+    def create_job(self, source_url, country=None):
         conn = self.connect()
         c = conn.cursor()
         now = datetime.now().isoformat()
         c.execute('''
-            INSERT INTO ingestion_jobs (source_url, state, queued_at)
-            VALUES (?, 'queued', ?)
-        ''', (source_url, now))
+            INSERT INTO ingestion_jobs (source_url, state, queued_at, country)
+            VALUES (?, 'queued', ?, ?)
+        ''', (source_url, now, country))
         job_id = c.lastrowid
         conn.commit()
         conn.close()
         return job_id
+
+    def get_job(self, job_id):
+        conn = self.connect()
+        c = conn.cursor()
+        c.execute("""
+            SELECT id, source_url, state, queued_at, fetched_at, normalized_at, extracted_at,
+                   reconciled_at, failed_at, failure_reason, source_snapshot_id, country
+            FROM ingestion_jobs WHERE id = ?
+        """, (job_id,))
+        r = c.fetchone()
+        conn.close()
+        if not r:
+            return None
+        return {
+            "id": r[0], "source_url": r[1], "state": r[2],
+            "queued_at": r[3], "fetched_at": r[4], "normalized_at": r[5],
+            "extracted_at": r[6], "reconciled_at": r[7], "failed_at": r[8],
+            "failure_reason": r[9], "source_snapshot_id": r[10], "country": r[11],
+        }
 
     def transition_job(self, job_id, state, failure_reason=None, source_snapshot_id=None):
         if state not in self.VALID_STATES:
@@ -80,7 +104,7 @@ class IngestionJobRepository:
         c = conn.cursor()
         c.execute("""
             SELECT id, source_url, state, queued_at, fetched_at, normalized_at, extracted_at,
-                   reconciled_at, failed_at, failure_reason, source_snapshot_id
+                   reconciled_at, failed_at, failure_reason, source_snapshot_id, country
             FROM ingestion_jobs
             ORDER BY id DESC
             LIMIT ?
@@ -99,4 +123,5 @@ class IngestionJobRepository:
             "failed_at": r[8],
             "failure_reason": r[9],
             "source_snapshot_id": r[10],
+            "country": r[11],
         } for r in rows]

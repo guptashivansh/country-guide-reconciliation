@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Atlas · Compliance Intelligence</title>
+<title>Abdul Kalam AI · Compliance Intelligence</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -429,6 +429,8 @@ input:focus, button:focus, select:focus, textarea:focus, [tabindex]:focus { outl
   border: 1px solid var(--paper-line);
   border-radius: 999px;
   font-size: 12.5px; font-weight: 500;
+  color: var(--ink-2);
+  text-decoration: none;
   cursor: pointer;
   transition: all 0.15s;
 }
@@ -443,6 +445,8 @@ input:focus, button:focus, select:focus, textarea:focus, [tabindex]:focus { outl
 .country-pill.warn .dot { background: var(--warn); }
 .country-pill.warn .ct { color: var(--warn-2); }
 .country-pill.ok .dot { background: var(--ok); }
+.country-pill.selected { background: var(--orange-soft); border-color: var(--orange-line); color: var(--orange-2); }
+.country-pill.selected .dot { background: var(--orange); box-shadow: 0 0 0 3px rgba(255,72,0,0.18); }
 .country-pill.more { color: var(--ink-3); border-style: dashed; }
 
 /* ── Tabs ── */
@@ -498,6 +502,201 @@ input:focus, button:focus, select:focus, textarea:focus, [tabindex]:focus { outl
 .tabpanel { display: none; padding: 24px 28px 48px; }
 .tabpanel.active { display: block; animation: panelIn 0.22s ease-out; }
 @keyframes panelIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+/* ─────────────────────────────────────────────
+   SUMMARY TAB
+   ───────────────────────────────────────────── */
+.sum-kpis {
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px;
+  margin-bottom: 28px;
+}
+@media (max-width: 1100px) { .sum-kpis { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 680px)  { .sum-kpis { grid-template-columns: repeat(2, 1fr); } }
+.sum-kpi {
+  background: var(--paper); border: 1px solid var(--paper-line);
+  border-radius: var(--r-l); padding: 18px 20px;
+  position: relative; overflow: hidden;
+  transition: box-shadow 0.15s, border-color 0.15s;
+}
+.sum-kpi:hover { box-shadow: var(--sh-1); border-color: var(--paper-line-2); }
+.sum-kpi .strip {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+}
+.sum-kpi.crit .strip { background: var(--crit); }
+.sum-kpi.warn .strip { background: var(--warn); }
+.sum-kpi.ok .strip   { background: var(--ok); }
+.sum-kpi.info .strip  { background: var(--info); }
+.sum-kpi .kpi-label {
+  font-size: 12px; font-weight: 600; color: var(--ink-3);
+  text-transform: uppercase; letter-spacing: 0.06em;
+  margin-bottom: 6px;
+}
+.sum-kpi .kpi-value {
+  font-size: 28px; font-weight: 800; letter-spacing: -0.5px;
+  font-family: var(--font-ui); line-height: 1.1;
+}
+.sum-kpi.crit .kpi-value { color: var(--crit); }
+.sum-kpi.warn .kpi-value { color: var(--warn); }
+.sum-kpi.ok .kpi-value   { color: var(--ok); }
+.sum-kpi .kpi-sub {
+  font-size: 12px; color: var(--ink-4); margin-top: 4px;
+  font-family: var(--font-mono); font-weight: 500;
+}
+
+.sum-mid {
+  display: grid; grid-template-columns: 340px 1fr; gap: 20px;
+  margin-bottom: 28px;
+}
+@media (max-width: 900px) { .sum-mid { grid-template-columns: 1fr; } }
+
+.sum-donut-card {
+  background: var(--paper); border: 1px solid var(--paper-line);
+  border-radius: var(--r-l); padding: 24px;
+  display: flex; flex-direction: column; align-items: center;
+}
+.sum-donut-card .card-title {
+  font-size: 13px; font-weight: 700; color: var(--ink-2);
+  text-transform: uppercase; letter-spacing: 0.06em;
+  margin-bottom: 18px; align-self: flex-start;
+}
+.sum-donut-wrap {
+  position: relative; width: 180px; height: 180px;
+  margin-bottom: 18px;
+}
+.sum-donut-wrap canvas { width: 180px; height: 180px; }
+.sum-donut-center {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+.sum-donut-center .big {
+  font-size: 26px; font-weight: 800; letter-spacing: -0.5px; line-height: 1;
+}
+.sum-donut-center .sub {
+  font-size: 11px; color: var(--ink-3); font-weight: 600;
+}
+.sum-donut-legend {
+  display: flex; gap: 18px; flex-wrap: wrap; justify-content: center;
+}
+.sum-donut-legend .leg {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12.5px; font-weight: 600; color: var(--ink-2);
+}
+.sum-donut-legend .leg .dot {
+  width: 10px; height: 10px; border-radius: 50%;
+}
+
+.sum-actions {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+}
+@media (max-width: 700px) { .sum-actions { grid-template-columns: 1fr; } }
+.sum-action-card {
+  background: var(--paper); border: 1px solid var(--paper-line);
+  border-radius: var(--r-l); overflow: hidden;
+  display: flex; flex-direction: column;
+}
+.sum-action-card .card-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid var(--paper-line);
+}
+.sum-action-card .card-head .card-title {
+  font-size: 13px; font-weight: 700; color: var(--ink-2);
+  text-transform: uppercase; letter-spacing: 0.06em;
+}
+.sum-action-card .card-head .ct {
+  font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+  padding: 2px 8px; border-radius: 999px;
+}
+.sum-action-card .card-head .ct.crit { background: var(--crit-soft); color: var(--crit-2); border: 1px solid var(--crit-line); }
+.sum-action-card .card-head .ct.warn { background: var(--warn-soft); color: var(--warn-2); border: 1px solid var(--warn-line); }
+.sum-action-card .card-body {
+  flex: 1; padding: 0; max-height: 260px; overflow-y: auto;
+}
+.sum-action-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--paper-line);
+  cursor: pointer; transition: background 0.12s;
+}
+.sum-action-item:last-child { border-bottom: none; }
+.sum-action-item:hover { background: var(--paper-2); }
+.sum-action-item .sev-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+.sum-action-item .sev-dot.crit { background: var(--crit); }
+.sum-action-item .sev-dot.warn { background: var(--warn); }
+.sum-action-item .sev-dot.fail { background: var(--crit); }
+.sum-action-item .item-info { flex: 1; min-width: 0; }
+.sum-action-item .item-title {
+  font-size: 13px; font-weight: 600; color: var(--ink);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.sum-action-item .item-sub {
+  font-size: 11.5px; color: var(--ink-3);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.sum-action-item .item-time {
+  font-family: var(--font-mono); font-size: 10.5px; color: var(--ink-4);
+  white-space: nowrap;
+}
+.sum-action-card .card-empty {
+  padding: 28px 20px; text-align: center;
+  font-size: 13px; color: var(--ink-4);
+}
+.sum-action-card .card-foot {
+  padding: 10px 20px; border-top: 1px solid var(--paper-line);
+  text-align: right;
+}
+.sum-action-card .card-foot a {
+  font-size: 12.5px; font-weight: 600; color: var(--purple-2);
+  cursor: pointer;
+}
+.sum-action-card .card-foot a:hover { color: var(--purple); text-decoration: underline; }
+
+.sum-coverage {
+  margin-top: 28px;
+}
+.sum-coverage .cov-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px;
+}
+.sum-coverage .cov-head .card-title {
+  font-size: 13px; font-weight: 700; color: var(--ink-2);
+  text-transform: uppercase; letter-spacing: 0.06em;
+}
+.sum-coverage .cov-head .cov-legend {
+  display: flex; gap: 14px;
+}
+.sum-coverage .cov-head .cov-legend .leg {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 11.5px; font-weight: 600; color: var(--ink-3);
+}
+.sum-coverage .cov-head .cov-legend .leg .dot {
+  width: 8px; height: 8px; border-radius: 3px;
+}
+.sum-cov-grid {
+  display: flex; flex-wrap: wrap; gap: 8px;
+}
+.sum-cov-chip {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 12px 6px 10px;
+  background: var(--paper); border: 1px solid var(--paper-line);
+  border-radius: var(--r-m); font-size: 12.5px; font-weight: 600;
+  cursor: pointer; transition: box-shadow 0.12s, border-color 0.12s, background 0.12s;
+  color: var(--ink-2);
+}
+.sum-cov-chip:hover { box-shadow: var(--sh-1); border-color: var(--paper-line-2); }
+.sum-cov-chip .flag { font-size: 15px; }
+.sum-cov-chip .status-dot {
+  width: 7px; height: 7px; border-radius: 50%; margin-left: 2px;
+}
+.sum-cov-chip.crit { border-left: 3px solid var(--crit); background: var(--crit-soft); }
+.sum-cov-chip.warn { border-left: 3px solid var(--warn); background: var(--warn-soft); }
+.sum-cov-chip.ok   { border-left: 3px solid var(--ok); }
+.sum-cov-chip.crit .status-dot { background: var(--crit); }
+.sum-cov-chip.warn .status-dot { background: var(--warn); }
+.sum-cov-chip.ok   .status-dot { background: var(--ok); }
 
 /* ─────────────────────────────────────────────
    COMMON COMPONENTS
@@ -669,6 +868,15 @@ input:focus, button:focus, select:focus, textarea:focus, [tabindex]:focus { outl
 .rcard-expand svg { width: 12px; height: 12px; transition: transform 0.2s; }
 .rcard:not(.collapsed) .rcard-expand svg { transform: rotate(180deg); }
 
+.rcard-title { cursor: pointer; }
+.rcard-title:hover { color: var(--purple-2); }
+
+/* Header action buttons */
+.rcard-head-actions {
+  display: flex; gap: 6px; align-items: center; margin-left: 4px;
+}
+.rcard.collapsed .rcard-head-actions { display: none; }
+
 .rcard.collapsed .rcard-grid,
 .rcard.collapsed .rcard-actions { display: none; }
 .rcard.collapsed .rcard-body { padding-bottom: 14px; cursor: pointer; }
@@ -679,7 +887,7 @@ input:focus, button:focus, select:focus, textarea:focus, [tabindex]:focus { outl
 
 .rcard-grid {
   display: grid; grid-template-columns: minmax(0, 1fr) 300px;
-  gap: 18px;
+  gap: 18px; align-items: start;
 }
 @media (max-width: 1024px) { .rcard-grid { grid-template-columns: 1fr; } }
 
@@ -749,49 +957,100 @@ input:focus, button:focus, select:focus, textarea:focus, [tabindex]:focus { outl
 }
 @media (max-width: 1024px) { .rai { padding-left: 0; border-left: 0; border-top: 1px solid var(--paper-line); padding-top: 14px; } }
 
+.rai-block { margin-bottom: 2px; }
 .rai-block .lbl {
-  font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+  font-family: var(--font-mono); font-size: 11px; font-weight: 700;
   letter-spacing: 0.12em; text-transform: uppercase;
-  color: var(--ink-3); margin-bottom: 6px;
-  display: flex; align-items: center; gap: 6px;
+  color: var(--ink-2); margin-bottom: 8px;
+  display: flex; align-items: center; gap: 7px;
 }
 .rai-block .lbl .ai-pill {
   background: linear-gradient(135deg, var(--info), #4475C9);
   color: white;
-  font-size: 9px; font-weight: 700;
-  padding: 1px 6px; border-radius: 999px;
+  font-size: 9.5px; font-weight: 700;
+  padding: 2px 7px; border-radius: 999px;
   letter-spacing: 0.06em;
 }
 .rai-block .reason {
-  font-size: 13px; line-height: 1.5; color: var(--ink-2);
+  font-size: 13.5px; line-height: 1.65; color: var(--ink-2);
 }
 .rai-block .reason b { color: var(--ink); font-weight: 700; }
 .rai-block .verdict {
-  font-size: 16px; font-weight: 700; letter-spacing: -0.2px;
-  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 17px; font-weight: 800; letter-spacing: -0.3px;
+  display: inline-flex; align-items: center; gap: 7px;
 }
 .rai-block .verdict.ok   { color: var(--ok); }
 .rai-block .verdict.warn { color: var(--warn-2); }
+
+/* ── Provenance drawer — in left column ── */
+.prov-drawer { border-top: 1px solid var(--paper-line); margin-top: 14px; }
+.prov-drawer summary { list-style: none; }
+.prov-drawer summary::-webkit-details-marker { display: none; }
+.prov-toggle {
+  padding: 13px 0; display: flex; align-items: center;
+  justify-content: space-between; gap: 16px;
+  cursor: pointer; user-select: none;
+}
+.prov-toggle:hover { opacity: 0.85; }
+.prov-title { display: flex; align-items: center; gap: 10px; }
+.prov-caret {
+  font-family: var(--font-mono); font-size: 13px; font-weight: 700;
+  color: var(--ink-4); transition: transform 0.2s ease;
+}
+.prov-drawer[open] .prov-caret { transform: rotate(90deg); }
+.prov-label {
+  font-family: var(--font-mono); font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3);
+}
+.prov-trust {
+  border-radius: 6px; padding: 4px 10px;
+  font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap;
+}
+.prov-trust.verified { background: var(--ok-soft); color: var(--ok-2); border: 1px solid var(--ok-line); }
+.prov-trust.review   { background: var(--warn-soft); color: var(--warn-2); border: 1px solid var(--warn-line); }
+.prov-trust.unknown  { background: var(--paper-3); color: var(--ink-3); border: 1px solid var(--paper-line-2); }
+.prov-body { border-top: 1px solid var(--paper-line); padding: 16px 0 6px; }
+.prov-grid {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 18px;
+}
+@media (max-width: 540px) { .prov-grid { grid-template-columns: 1fr; } }
+.prov-field-wide { grid-column: span 2; }
+.prov-key {
+  font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--ink-4); margin-bottom: 5px;
+}
+.prov-value {
+  font-family: var(--font-mono); font-size: 12px; font-weight: 500;
+  line-height: 1.5; color: var(--ink-2); overflow-wrap: anywhere; min-height: 20px;
+}
+.prov-value a {
+  color: var(--info); text-decoration: none;
+  border-bottom: 1px solid rgba(47,91,183,0.25);
+}
+.prov-value a:hover { color: var(--purple); border-bottom-color: var(--purple); }
+.prov-value .prov-trust { display: inline-flex; align-items: center; vertical-align: middle; }
 .rai-block .verdict.crit { color: var(--crit); }
 
 .conf {
   display: flex; align-items: center; gap: 10px;
-  margin-top: 6px;
-  font-family: var(--font-mono); font-size: 11.5px; font-weight: 600;
-  color: var(--ink-2);
+  margin-top: 8px;
+  font-family: var(--font-mono); font-size: 13px; font-weight: 700;
+  color: var(--ink);
 }
 .conf-track {
-  flex: 1; height: 6px; background: var(--paper-3); border-radius: 99px;
+  flex: 1; height: 7px; background: var(--paper-3); border-radius: 99px;
   overflow: hidden;
 }
 .conf-fill { height: 100%; background: var(--ok); border-radius: 99px; transition: width 0.6s ease; }
 .conf-fill.warn { background: var(--warn); }
 
-.section-chips { display: flex; gap: 4px; flex-wrap: wrap; }
+.section-chips { display: flex; gap: 5px; flex-wrap: wrap; }
 .section-chip {
-  font-family: var(--font-mono); font-size: 10.5px; font-weight: 600;
+  font-family: var(--font-mono); font-size: 11px; font-weight: 600;
   letter-spacing: 0.02em;
-  padding: 3px 7px; border-radius: var(--r-s);
+  padding: 4px 9px; border-radius: var(--r-s);
   background: var(--paper-2); color: var(--ink-2);
   border: 1px solid var(--paper-line);
 }
@@ -803,21 +1062,224 @@ input:focus, button:focus, select:focus, textarea:focus, [tabindex]:focus { outl
 .audit-mini .row {
   display: grid; grid-template-columns: 14px 1fr auto;
   gap: 8px; align-items: center;
-  font-size: 12.5px; color: var(--ink-2);
+  font-size: 13px; color: var(--ink-2); font-weight: 500;
 }
 .audit-mini .dot {
-  width: 8px; height: 8px; border-radius: 50%;
+  width: 9px; height: 9px; border-radius: 50%;
   background: var(--info);
   margin-left: 3px;
 }
 .audit-mini .row.human .dot { background: var(--ok); }
-.audit-mini .t { font-family: var(--font-mono); font-size: 10.5px; color: var(--ink-3); }
+.audit-mini .t { font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); font-weight: 600; }
 .audit-mini-link {
-  font-size: 12px; font-weight: 600; color: var(--purple-2);
+  font-size: 12.5px; font-weight: 600; color: var(--purple-2);
   display: inline-flex; align-items: center; gap: 4px;
-  margin-top: 2px;
+  margin-top: 4px;
 }
 .audit-mini-link:hover { color: var(--purple); text-decoration: underline; }
+
+/* ── Section chips: trim / view more ── */
+.section-chips { max-height: 34px; overflow: hidden; transition: max-height 0.3s ease; }
+.section-chips.expanded { max-height: 500px; }
+.section-toggle {
+  font-family: var(--font-mono); font-size: 10.5px; font-weight: 700;
+  color: var(--purple-2); cursor: pointer; margin-top: 6px;
+  display: none; /* shown via JS when overflow */
+}
+.section-toggle:hover { color: var(--purple); text-decoration: underline; }
+
+/* ── Source evidence card ── */
+.src-evidence { border-top: 1px solid var(--paper-line); margin-top: 14px; margin-bottom: 0; }
+.src-evidence summary { list-style: none; }
+.src-evidence summary::-webkit-details-marker { display: none; }
+.src-evidence-toggle {
+  padding: 13px 0; display: flex; align-items: center;
+  justify-content: space-between; gap: 16px;
+  cursor: pointer; user-select: none;
+}
+.src-evidence-toggle:hover { opacity: 0.85; }
+.src-evidence-heading { display: grid; gap: 4px; min-width: 0; }
+.src-evidence-title {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--font-mono); font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3);
+}
+.src-evidence-icon { font-size: 14px; color: var(--info); font-weight: 800; }
+.src-evidence-preview {
+  font-family: var(--font-mono); font-size: 11.5px; line-height: 1.45;
+  color: var(--ink-4); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.src-evidence-action {
+  font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-4); white-space: nowrap;
+}
+.src-evidence[open] .src-evidence-action::before { content: "Collapse"; }
+.src-evidence:not([open]) .src-evidence-action::before { content: "Expand"; }
+.src-evidence-body { border-top: 1px solid var(--paper-line); padding: 14px 0 6px; }
+.src-snippet {
+  background: var(--paper-2); border: 1px solid var(--paper-line);
+  border-left: 3px solid var(--info-line);
+  border-radius: var(--r-m); padding: 14px 16px;
+  font-family: var(--font-mono); font-size: 12.5px; line-height: 1.7;
+  color: var(--ink-2); white-space: pre-wrap; margin: 0;
+  max-height: 220px; overflow: auto;
+}
+.src-attribution {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+  margin-top: 10px; font-family: var(--font-mono); font-size: 10.5px;
+  color: var(--ink-4); line-height: 1.5;
+}
+.src-attribution a { color: var(--info); text-decoration: none; border-bottom: 1px solid rgba(47,91,183,0.25); }
+.src-attribution a:hover { color: var(--purple); border-bottom-color: var(--purple); }
+
+/* ── Triage strip ── */
+.triage-strip {
+  display: grid; grid-template-columns: 140px minmax(0,1fr) auto;
+  gap: 12px; align-items: end;
+  background: var(--paper); border: 1px solid var(--paper-line);
+  border-radius: var(--r-l); padding: 14px 18px;
+  margin-bottom: 16px; box-shadow: var(--sh-1);
+}
+@media (max-width: 900px) { .triage-strip { grid-template-columns: 1fr; } }
+.triage-summary {
+  align-self: stretch; border-right: 1px solid var(--paper-line);
+  display: grid; gap: 3px; padding-right: 14px;
+}
+@media (max-width: 900px) { .triage-summary { border-right: 0; border-bottom: 1px solid var(--paper-line); padding-bottom: 10px; } }
+.triage-summary .label {
+  font-family: var(--font-mono); font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3);
+}
+.triage-summary .count {
+  font-family: var(--font-mono); font-size: 13px; font-weight: 700; color: var(--ink);
+}
+.triage-grid {
+  display: grid; grid-template-columns: repeat(5, minmax(100px,1fr)); gap: 8px;
+}
+@media (max-width: 900px) { .triage-grid { grid-template-columns: repeat(3, 1fr); } }
+.triage-field { display: grid; gap: 4px; min-width: 0; }
+.triage-label {
+  font-family: var(--font-mono); font-size: 9.5px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-4);
+}
+.triage-select {
+  appearance: none;
+  background: var(--paper-2) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'><polyline points='1 1 5 5 9 1' fill='none' stroke='%236B7180' stroke-width='1.5' stroke-linecap='round'/></svg>") calc(100% - 10px) center / 10px no-repeat;
+  border: 1px solid var(--paper-line); border-radius: var(--r-s);
+  font-family: var(--font-mono); font-size: 11.5px; font-weight: 500;
+  color: var(--ink-2); height: 32px; padding: 0 26px 0 10px;
+  outline: none; width: 100%; cursor: pointer;
+}
+.triage-select:hover { border-color: var(--paper-line-2); }
+.triage-select:focus { border-color: var(--purple); box-shadow: var(--focus); }
+.triage-reset {
+  font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--ink-3); background: var(--paper-2);
+  border: 1px solid var(--paper-line); border-radius: var(--r-s);
+  padding: 0 14px; height: 32px; cursor: pointer; white-space: nowrap;
+}
+.triage-reset:hover { background: var(--paper-3); color: var(--ink-2); border-color: var(--paper-line-2); }
+
+/* ── Reject rationale modal ── */
+.reject-modal textarea {
+  width: 100%; min-height: 90px; resize: vertical;
+  font-family: var(--font-ui); font-size: 13.5px; line-height: 1.6;
+  padding: 12px 14px; border: 1px solid var(--paper-line);
+  border-radius: var(--r-m); background: var(--paper-2); color: var(--ink);
+  outline: none;
+}
+.reject-modal textarea:focus { border-color: var(--purple); box-shadow: var(--focus); }
+.reject-modal select {
+  width: 100%; height: 36px; font-family: var(--font-mono); font-size: 12px;
+  padding: 0 12px; border: 1px solid var(--paper-line); border-radius: var(--r-s);
+  background: var(--paper-2); color: var(--ink); outline: none; appearance: auto;
+}
+.reject-modal select:focus { border-color: var(--purple); box-shadow: var(--focus); }
+.reject-modal .field-label {
+  font-family: var(--font-mono); font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3);
+  margin-bottom: 8px;
+}
+.reject-modal .field-group { margin-bottom: 18px; }
+
+/* ── Compare Versions modal ── */
+.ver-modal .modal { max-width: 860px; }
+.ver-header {
+  display: flex; align-items: baseline; gap: 10px;
+  margin-bottom: 6px;
+}
+.ver-header h3 { flex: 1; }
+.ver-header .flag { font-size: 20px; }
+.ver-selector {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 18px; padding: 12px 14px;
+  background: var(--paper-2); border: 1px solid var(--paper-line);
+  border-radius: var(--r-m);
+}
+.ver-selector label {
+  font-family: var(--font-mono); font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3);
+}
+.ver-selector select {
+  font-family: var(--font-mono); font-size: 12px; font-weight: 500;
+  height: 30px; padding: 0 10px; border: 1px solid var(--paper-line);
+  border-radius: var(--r-s); background: var(--paper); color: var(--ink);
+  outline: none; min-width: 200px;
+}
+.ver-selector select:focus { border-color: var(--purple); box-shadow: var(--focus); }
+.ver-selector .vs-label {
+  font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+  color: var(--ink-4); letter-spacing: 0.06em;
+}
+.ver-diff { border: 1px solid var(--paper-line); border-radius: var(--r-l); overflow: hidden; margin-bottom: 16px; }
+.ver-diff-head {
+  display: grid; grid-template-columns: 1fr 1fr;
+  background: var(--paper); border-bottom: 1px solid var(--paper-line);
+}
+.ver-diff-head > div {
+  padding: 10px 14px;
+  font-family: var(--font-mono); font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  display: flex; align-items: center; gap: 8px;
+}
+.ver-diff-head > div:first-child { border-right: 1px solid var(--paper-line); color: var(--crit-2); }
+.ver-diff-head > div:last-child { color: var(--ok-2); }
+.ver-diff-body { display: grid; grid-template-columns: 1fr 1fr; }
+.ver-diff-side {
+  padding: 16px 18px;
+  font-size: 13.5px; line-height: 1.7;
+  color: var(--ink-2); background: var(--paper);
+  white-space: pre-wrap; word-break: break-word;
+  max-height: 400px; overflow: auto;
+}
+.ver-diff-side:first-child { border-right: 1px solid var(--paper-line); }
+.ver-diff-side.empty { color: var(--ink-4); font-style: italic; }
+.ver-meta-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px 18px;
+  margin-bottom: 14px;
+}
+.ver-meta-grid .mk { font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-4); margin-bottom: 3px; }
+.ver-meta-grid .mv { font-family: var(--font-mono); font-size: 12px; font-weight: 500; color: var(--ink-2); }
+.ver-timeline {
+  display: flex; flex-direction: column; gap: 0;
+  max-height: 240px; overflow: auto;
+  border: 1px solid var(--paper-line); border-radius: var(--r-m);
+}
+.ver-row {
+  display: grid; grid-template-columns: 50px 1fr 120px 100px;
+  gap: 10px; align-items: center; padding: 9px 14px;
+  font-size: 12.5px; border-bottom: 1px solid var(--paper-line);
+  cursor: pointer; transition: background 0.1s;
+}
+.ver-row:last-child { border-bottom: 0; }
+.ver-row:hover { background: var(--paper-2); }
+.ver-row.active { background: var(--purple-soft); }
+.ver-row .vn { font-family: var(--font-mono); font-weight: 700; color: var(--ink); }
+.ver-row .vval { color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ver-row .vdate { font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); }
+.ver-row .vsrc { font-family: var(--font-mono); font-size: 10.5px; color: var(--ink-4); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ver-row.current .vn::after { content: ' (current)'; font-weight: 500; color: var(--ok-2); font-size: 10px; }
 
 .rcard-actions {
   display: flex; gap: 8px; flex-wrap: wrap;
@@ -1196,6 +1658,41 @@ input:focus, button:focus, select:focus, textarea:focus, [tabindex]:focus { outl
 .pip-status.fail  { color: var(--crit-2); }   .pip-status.fail .d { background: var(--crit); }
 .pip-status.queue { color: var(--ink-3); }    .pip-status.queue .d { background: var(--ink-4); }
 
+/* ── Country-level pipeline rows ── */
+.pipe-country-row {
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.pipe-country-row:hover { background: var(--paper-2); }
+.pipe-country-row td { font-weight: 600; }
+.pipe-country-row .country-cell { display: flex; align-items: center; gap: 10px; }
+.pipe-country-row .country-cell .flag { font-size: 18px; }
+.pipe-country-row .country-cell .name { font-weight: 700; color: var(--ink); font-size: 14px; }
+.pipe-country-row .source-ct {
+  font-family: var(--font-mono); font-size: 10.5px; color: var(--ink-3);
+  font-weight: 600;
+}
+.pipe-country-row .expand-btn {
+  width: 24px; height: 24px;
+  background: var(--paper-2); border: 1px solid var(--paper-line);
+  border-radius: var(--r-s);
+  display: grid; place-items: center;
+  color: var(--ink-3);
+  transition: all 0.15s;
+}
+.pipe-country-row .expand-btn svg { width: 10px; height: 10px; transition: transform 0.2s; }
+.pipe-country-row.expanded .expand-btn { background: var(--purple); border-color: var(--purple); color: white; }
+.pipe-country-row.expanded .expand-btn svg { transform: rotate(180deg); }
+.pipe-country-row.has-fail td:first-child { box-shadow: inset 3px 0 0 var(--crit); }
+
+.pipe-source-row td { background: var(--paper-2); padding: 10px 16px 10px 52px; font-size: 12.5px; }
+.pipe-source-row.fail-row td:first-child { box-shadow: inset 3px 0 0 var(--crit); }
+.pipe-source-row.fail-row { cursor: pointer; }
+.pipe-source-row.fail-row:hover td { background: var(--paper-3); }
+.pipe-source-row + .pipe-error-row { display: none; }
+.pipe-source-row.fail-row.expanded + .pipe-error-row { display: table-row !important; }
+.pipe-error-row[data-pipe-country] td { background: var(--paper-2); padding: 4px 16px 16px 52px !important; }
+
 .pipe-legend {
   display: flex; align-items: center; gap: 10px;
   margin-top: 14px;
@@ -1210,6 +1707,14 @@ input:focus, button:focus, select:focus, textarea:focus, [tabindex]:focus { outl
 .pipe-legend .seq .stage { width: 14px; }
 .pipe-legend .seq span { font-size: 11px; }
 .pipe-legend .right { margin-left: auto; }
+
+/* ─────────────────────────────────────────────
+   SOURCES TAB
+   ───────────────────────────────────────────── */
+.sources-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+}
+@media (max-width: 1024px) { .sources-grid { grid-template-columns: 1fr; } }
 
 /* ─────────────────────────────────────────────
    SYNC MODAL
@@ -1393,12 +1898,12 @@ input:focus, button:focus, select:focus, textarea:focus, [tabindex]:focus { outl
 
 <!-- ─── App bar ─── -->
 <header class="appbar">
-  <div class="brand">
+  <a href="/" class="brand" style="text-decoration:none;color:inherit">
     <div class="brand-mark">A</div>
-    <span class="brand-name">Atlas</span>
+    <span class="brand-name">Abdul Kalam AI</span>
     <span class="brand-slash">/</span>
     <span class="brand-tag">Compliance Intelligence</span>
-  </div>
+  </a>
   <div class="spacer"></div>
   <div class="search-bar" role="search">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
@@ -1444,10 +1949,6 @@ input:focus, button:focus, select:focus, textarea:focus, [tabindex]:focus { outl
     Sync sources
     <span class="kbd">S</span>
   </button>
-  <button class="user" title="Account">
-    <span class="avatar">SK</span>
-    <span><span class="name">Shivansh K.</span><span class="role">Reviewer</span></span>
-  </button>
 </header>
 
 <!-- ─── Sync running banner ─── -->
@@ -1479,7 +1980,10 @@ input:focus, button:focus, select:focus, textarea:focus, [tabindex]:focus { outl
 
   <!-- ── Tabs ── -->
   <nav class="tabs" role="tablist">
-    <button class="tab" data-tab="review" aria-current="true" onclick="goTab('review')">
+    <button class="tab" data-tab="summary" aria-current="true" onclick="goTab('summary')">
+      Summary
+    </button>
+    <button class="tab" data-tab="review" onclick="goTab('review')">
       Review queue <span class="ct crit" id="tabReviewCt">0</span>
     </button>
     <button class="tab" data-tab="drift" onclick="goTab('drift')">
@@ -1491,6 +1995,9 @@ input:focus, button:focus, select:focus, textarea:focus, [tabindex]:focus { outl
     <button class="tab" data-tab="pipeline" onclick="goTab('pipeline')">
       Pipeline <span class="ct" id="tabPipeCt">0</span>
     </button>
+    <button class="tab" data-tab="sources" onclick="goTab('sources')">
+      Sources <span class="ct" id="tabSourcesCt">0</span>
+    </button>
     <div class="spacer"></div>
     <span class="meta" id="tabMeta">
       <span class="live-dot"></span>
@@ -1498,8 +2005,51 @@ input:focus, button:focus, select:focus, textarea:focus, [tabindex]:focus { outl
     </span>
   </nav>
 
+  <!-- ── Summary tab ── -->
+  <section class="tabpanel active" data-tab="summary">
+    <div class="sum-kpis" id="sumKpis"></div>
+    <div class="sum-mid">
+      <div class="sum-donut-card">
+        <div class="card-title">Compliance health</div>
+        <div class="sum-donut-wrap"><canvas id="sumDonut" width="180" height="180"></canvas>
+          <div class="sum-donut-center"><div class="big" id="sumDonutTotal">0</div><div class="sub">countries</div></div>
+        </div>
+        <div class="sum-donut-legend" id="sumDonutLegend"></div>
+      </div>
+      <div class="sum-actions">
+        <div class="sum-action-card">
+          <div class="card-head">
+            <span class="card-title">Critical reviews</span>
+            <span class="ct crit" id="sumCritCt">0</span>
+          </div>
+          <div class="card-body" id="sumCritList"></div>
+          <div class="card-foot"><a onclick="goTab('review'); metricClick('critical');">View all in review queue &rarr;</a></div>
+        </div>
+        <div class="sum-action-card">
+          <div class="card-head">
+            <span class="card-title">Pipeline failures</span>
+            <span class="ct warn" id="sumFailCt">0</span>
+          </div>
+          <div class="card-body" id="sumFailList"></div>
+          <div class="card-foot"><a onclick="goTab('pipeline');">View pipeline &rarr;</a></div>
+        </div>
+      </div>
+    </div>
+    <div class="sum-coverage">
+      <div class="cov-head">
+        <span class="card-title">Country coverage</span>
+        <div class="cov-legend">
+          <span class="leg"><span class="dot" style="background:var(--crit);"></span>Critical</span>
+          <span class="leg"><span class="dot" style="background:var(--warn);"></span>Warning</span>
+          <span class="leg"><span class="dot" style="background:var(--ok);"></span>Stable</span>
+        </div>
+      </div>
+      <div class="sum-cov-grid" id="sumCovGrid"></div>
+    </div>
+  </section>
+
   <!-- ── Review tab ── -->
-  <section class="tabpanel active" data-tab="review">
+  <section class="tabpanel" data-tab="review">
     <div class="review-toolbar">
       <div class="left">
         <div class="chips" id="reviewChips">
@@ -1522,6 +2072,55 @@ input:focus, button:focus, select:focus, textarea:focus, [tabindex]:focus { outl
         </button>
       </div>
     </div>
+    <!-- Triage strip -->
+    <div class="triage-strip" id="triageStrip">
+      <div class="triage-summary">
+        <span class="label">Triage view</span>
+        <strong class="count" id="triageCount">0 shown</strong>
+      </div>
+      <div class="triage-grid">
+        <div class="triage-field">
+          <span class="triage-label">Severity</span>
+          <select class="triage-select" id="triageSeverity" onchange="applyTriage()">
+            <option value="">All</option>
+            <option value="critical">Critical</option>
+            <option value="major">Major</option>
+            <option value="minor">Minor</option>
+          </select>
+        </div>
+        <div class="triage-field">
+          <span class="triage-label">Confidence</span>
+          <select class="triage-select" id="triageConfidence" onchange="applyTriage()">
+            <option value="">All</option>
+            <option value="high">≥ 90%</option>
+            <option value="mid">70–89%</option>
+            <option value="low">&lt; 70%</option>
+          </select>
+        </div>
+        <div class="triage-field">
+          <span class="triage-label">Country</span>
+          <select class="triage-select" id="triageCountry" onchange="applyTriage()">
+            <option value="">All</option>
+          </select>
+        </div>
+        <div class="triage-field">
+          <span class="triage-label">Change type</span>
+          <select class="triage-select" id="triageChangeType" onchange="applyTriage()">
+            <option value="">All</option>
+          </select>
+        </div>
+        <div class="triage-field">
+          <span class="triage-label">Status</span>
+          <select class="triage-select" id="triageStatus" onchange="applyTriage()">
+            <option value="">All</option>
+            <option value="pending">Pending</option>
+            <option value="escalated">Escalated</option>
+          </select>
+        </div>
+      </div>
+      <button class="triage-reset" onclick="resetTriage()">Reset</button>
+    </div>
+
     <div class="bulk-bar" id="bulkBar" style="display:none;">
       <div>
         <span class="selected-text"><b id="selectedCount">0</b> selected of <span id="selectedTotal">0</span></span>
@@ -1603,12 +2202,13 @@ input:focus, button:focus, select:focus, textarea:focus, [tabindex]:focus { outl
       </div>
     </div>
     <div class="pipe-summary" id="pipeSummary"></div>
-    <table class="pipe-table">
+    <table class="pipe-table" id="pipeTable">
       <thead>
         <tr>
-          <th style="width:130px;">Status</th>
-          <th>Source</th>
-          <th style="width:180px;">Pipeline stages</th>
+          <th style="width:40px;"></th>
+          <th>Country</th>
+          <th>Status</th>
+          <th>Sources</th>
           <th>Last activity</th>
           <th style="text-align:right; width:140px;">Action</th>
         </tr>
@@ -1631,12 +2231,58 @@ input:focus, button:focus, select:focus, textarea:focus, [tabindex]:focus { outl
     <div id="pipeEmpty" class="empty-state" style="display:none;">No ingestion jobs found.</div>
   </section>
 
+  <!-- ── Sources tab ── -->
+  <section class="tabpanel" data-tab="sources">
+    <div class="sources-grid">
+      <!-- Left: URL Verifier -->
+      <div>
+        <div class="eyebrow" style="color:var(--purple); margin-bottom:10px;">URL verification</div>
+        <div style="font-size:18px; font-weight:800; letter-spacing:-0.4px; margin-bottom:16px;">Check &amp; classify source URLs</div>
+
+        <div style="display:flex; gap:8px; margin-bottom:18px;">
+          <div class="search-bar" style="flex:1;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            <input id="verifyUrlInput" placeholder="Paste a URL to verify…" onkeydown="if(event.key==='Enter') verifyUrl()" />
+          </div>
+          <button class="btn btn-primary" onclick="verifyUrl()">Verify</button>
+        </div>
+
+        <!-- Verification result -->
+        <div id="verifyResult" style="display:none;">
+          <div id="verifyResultInner"></div>
+        </div>
+
+        <!-- Classification history -->
+        <div style="margin-top:28px;">
+          <div class="eyebrow" style="margin-bottom:12px;">Recent classifications</div>
+          <div id="classificationList"></div>
+          <div id="classEmpty" class="empty-state" style="display:none; padding:24px;">No URLs classified yet.</div>
+        </div>
+      </div>
+
+      <!-- Right: PDF uploads -->
+      <div>
+        <div class="eyebrow" style="color:var(--purple); margin-bottom:10px;">Compliance intake</div>
+        <div style="font-size:18px; font-weight:800; letter-spacing:-0.4px; margin-bottom:6px;">Uploaded PDFs</div>
+        <p style="font-size:13px; color:var(--ink-3); margin-bottom:16px;">Documents uploaded via <a href="/compliance/intake/pdf" style="color:var(--purple-2); font-weight:600;">compliance intake</a></p>
+        <div id="pdfList"></div>
+        <div id="pdfEmpty" class="empty-state" style="display:none; padding:24px;">No PDF uploads found.</div>
+      </div>
+    </div>
+
+    <!-- Registry stats bar -->
+    <div style="margin-top:32px; padding-top:24px; border-top:1px solid var(--paper-line);">
+      <div class="eyebrow" style="margin-bottom:12px;">Official source registry</div>
+      <div id="registryStats" style="display:flex; gap:14px; flex-wrap:wrap;"></div>
+    </div>
+  </section>
+
 </div>
 
 <!-- ─── Footer ─── -->
 <footer class="foot">
   <div class="left">
-    <span class="live"><span class="d"></span><span id="footerLabel">Atlas Compliance</span></span>
+    <span class="live"><span class="d"></span><span id="footerLabel">Abdul Kalam AI Compliance</span></span>
     <span>·</span><span>v0.7</span><span>·</span><span>not legal advice</span>
   </div>
   <div class="right">
@@ -1644,6 +2290,39 @@ input:focus, button:focus, select:focus, textarea:focus, [tabindex]:focus { outl
     <a href="/guide">Guides</a>
   </div>
 </footer>
+
+<!-- ── Reject Rationale Modal ── -->
+<div class="modal-scrim" id="rejectModal" onclick="if(event.target===this) closeRejectModal()">
+  <div class="modal reject-modal" style="width:480px;">
+    <button class="close" onclick="closeRejectModal()" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <h3>Reject change</h3>
+    <p class="sub">Provide a rationale for rejecting this update. The current guide value will be retained.</p>
+    <input type="hidden" id="rejectItemId" value="" />
+    <div class="field-group">
+      <div class="field-label">Rationale</div>
+      <select id="rejectRationale">
+        <option value="Outdated or superseded source">Outdated or superseded source</option>
+        <option value="Insufficient evidence">Insufficient evidence</option>
+        <option value="Incorrect extraction">Incorrect extraction</option>
+        <option value="Duplicate change">Duplicate change</option>
+        <option value="Not applicable to scope">Not applicable to scope</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+    <div class="field-group">
+      <div class="field-label">Notes (optional)</div>
+      <textarea id="rejectNotes" placeholder="Additional context for the audit trail…"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeRejectModal()">Cancel</button>
+      <button class="btn btn-danger" onclick="confirmReject()">
+        Reject &amp; log to audit
+      </button>
+    </div>
+  </div>
+</div>
 
 <!-- ── Sync Modal ── -->
 <div class="modal-scrim" id="syncModal" onclick="if(event.target===this) closeSync()">
@@ -1677,8 +2356,8 @@ input:focus, button:focus, select:focus, textarea:focus, [tabindex]:focus { outl
     <button class="close" onclick="closeDriftModal()" aria-label="Close">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>
-    <h3>Drift by country</h3>
-    <p class="sub">Select countries to monitor in the manager strip. Click a pill to jump to that country's drift details.</p>
+    <h3>Country</h3>
+    <p class="sub">Pick which countries appear in the strip. Click a pill there to filter the dashboard.</p>
     <div class="modal-section">
       <h4>
         <span>All countries with drift data</span>
@@ -1704,7 +2383,7 @@ input:focus, button:focus, select:focus, textarea:focus, [tabindex]:focus { outl
 // ═══════════════════════════════════════════════════
 //  CONSTANTS & STATE
 // ═══════════════════════════════════════════════════
-const FLAGS = {"India":"🇮🇳","Australia":"🇦🇺","Singapore":"🇸🇬","South Africa":"🇿🇦","UAE":"🇦🇪","New Zealand":"🇳🇿","Philippines":"🇵🇭","Pakistan":"🇵🇰","Germany":"🇩🇪","Brazil":"🇧🇷","United Kingdom":"🇬🇧","Canada":"🇨🇦","Mexico":"🇲🇽","France":"🇫🇷","Spain":"🇪🇸","Italy":"🇮🇹","Netherlands":"🇳🇱","United States":"🇺🇸","Japan":"🇯🇵","South Korea":"🇰🇷"};
+const FLAGS = {"Argentina":"🇦🇷","Australia":"🇦🇺","Austria":"🇦🇹","Azerbaijan":"🇦🇿","Bahrain":"🇧🇭","Bangladesh":"🇧🇩","Belgium":"🇧🇪","Belize":"🇧🇿","Bolivia":"🇧🇴","Bosnia And Herzegovina":"🇧🇦","Botswana":"🇧🇼","Brazil":"🇧🇷","Bulgaria":"🇧🇬","Cameroon":"🇨🇲","Canada":"🇨🇦","Chile":"🇨🇱","China":"🇨🇳","Colombia":"🇨🇴","Congo (Republic of Congo)":"🇨🇬","Costa Rica":"🇨🇷","Croatia":"🇭🇷","Cyprus":"🇨🇾","Czech Republic":"🇨🇿","Denmark":"🇩🇰","Dominican Republic":"🇩🇴","Egypt":"🇪🇬","Estonia":"🇪🇪","France":"🇫🇷","Georgia":"🇬🇪","Germany":"🇩🇪","Ghana":"🇬🇭","Greece":"🇬🇷","Guatemala":"🇬🇹","Hong Kong":"🇭🇰","Hungary":"🇭🇺","India":"🇮🇳","Indonesia":"🇮🇩","Israel":"🇮🇱","Italy":"🇮🇹","Jamaica":"🇯🇲","Japan":"🇯🇵","Jordan":"🇯🇴","Kenya":"🇰🇪","Kuwait":"🇰🇼","Lebanon":"🇱🇧","Lithuania":"🇱🇹","Luxembourg":"🇱🇺","Madagascar":"🇲🇬","Malawi":"🇲🇼","Malaysia":"🇲🇾","Malta":"🇲🇹","Mauritius":"🇲🇺","Mexico":"🇲🇽","Morocco":"🇲🇦","Nepal":"🇳🇵","Netherlands":"🇳🇱","New Zealand":"🇳🇿","Nicaragua":"🇳🇮","Nigeria":"🇳🇬","Norway":"🇳🇴","Oman":"🇴🇲","Pakistan":"🇵🇰","Panama":"🇵🇦","Paraguay":"🇵🇾","Peru":"🇵🇪","Philippines":"🇵🇭","Poland":"🇵🇱","Portugal":"🇵🇹","Puerto Rico":"🇵🇷","Qatar":"🇶🇦","Romania":"🇷🇴","Rwanda":"🇷🇼","Saudi Arabia":"🇸🇦","Serbia":"🇷🇸","Singapore":"🇸🇬","Slovakia":"🇸🇰","South Africa":"🇿🇦","South Korea":"🇰🇷","Spain":"🇪🇸","Sri Lanka":"🇱🇰","Switzerland":"🇨🇭","Taiwan":"🇹🇼","Thailand":"🇹🇭","Turkey":"🇹🇷","UAE":"🇦🇪","Uganda":"🇺🇬","Ukraine":"🇺🇦","United Kingdom":"🇬🇧","United States":"🇺🇸","Vietnam":"🇻🇳"};
 const SECTION_LABELS = {annual_leave:"Annual Leave",sick_leave:"Sick Leave",maternity_leave:"Maternity Leave",public_holidays:"Public Holidays",working_hours:"Working Hours",overtime:"Overtime",probation:"Probation",minimum_wage:"Minimum Wage",income_tax:"Income Tax",payroll_tax:"Payroll Tax",withholding_tax:"Withholding Tax",health_insurance:"Health Insurance",social_security:"Social Security",pension:"Pension",employee_benefits:"Employee Benefits",termination_notice:"Termination Notice",employer_obligations:"Employer Obligations",industrial_relations:"Industrial Relations",work_permit:"Work Permit",work_visa:"Work Visa",expatriate_employment:"Expatriate Employment",workplace_safety:"Workplace Safety",osh_obligations:"OSH Obligations"};
 
 let DATA = { queue: [], audit: [], drift: [], jobs: [], metrics: {} };
@@ -1716,6 +2395,7 @@ let selectedDriftCountries = new Set();
 let reviewPageSize = 10;
 let reviewShowing = 10;
 let sortMode = 'severity'; // 'severity' | 'time' | 'confidence'
+let activeCountryFilter = new URLSearchParams(location.search).get('country') || null;
 
 function flag(country) { return FLAGS[country] || '🌐'; }
 function sectionLabel(s) { return SECTION_LABELS[s] || s.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase()); }
@@ -1766,8 +2446,10 @@ async function loadAll() {
 
 function renderAll() {
   renderMetrics();
+  renderSummary();
   renderDriftPills();
   renderTabCounts();
+  populateTriageOptions();
   renderReview();
   renderDrift();
   renderAudit();
@@ -1838,6 +2520,156 @@ function renderMetrics() {
 }
 
 // ═══════════════════════════════════════════════════
+//  SUMMARY TAB
+// ═══════════════════════════════════════════════════
+function renderSummary() {
+  const m = DATA.metrics;
+  const queue = DATA.queue || [];
+  const drift = DATA.drift || [];
+  const jobs = DATA.jobs || [];
+
+  const pending = queue.filter(i => i.status === 'pending');
+  const critical = pending.filter(i => (i.severity||'').toLowerCase() === 'critical');
+  const avgConf = m.avg_confidence != null ? m.avg_confidence + '%' : '—';
+  const failures = jobs.filter(j => j.state === 'failed');
+  const lastSync = m.last_successful_sync ? timeAgo(m.last_successful_sync) : 'never';
+
+  // KPIs
+  document.getElementById('sumKpis').innerHTML = `
+    <div class="sum-kpi ok">
+      <div class="strip"></div>
+      <div class="kpi-label">Countries covered</div>
+      <div class="kpi-value">${m.trusted_source_count || 0}</div>
+      <div class="kpi-sub">${m.sources_monitored || 0} source endpoints</div>
+    </div>
+    <div class="sum-kpi ${critical.length > 0 ? 'crit' : 'info'}">
+      <div class="strip"></div>
+      <div class="kpi-label">Pending reviews</div>
+      <div class="kpi-value">${pending.length}</div>
+      <div class="kpi-sub">${critical.length} critical</div>
+    </div>
+    <div class="sum-kpi info">
+      <div class="strip"></div>
+      <div class="kpi-label">Sources monitored</div>
+      <div class="kpi-value">${m.sources_monitored || 0}</div>
+      <div class="kpi-sub">${m.trusted_source_count || 0} countries</div>
+    </div>
+    <div class="sum-kpi ${m.avg_confidence != null && m.avg_confidence < 80 ? 'warn' : 'ok'}">
+      <div class="strip"></div>
+      <div class="kpi-label">Avg confidence</div>
+      <div class="kpi-value">${avgConf}</div>
+      <div class="kpi-sub">AI extraction</div>
+    </div>
+    <div class="sum-kpi ${failures.length > 0 ? 'crit' : 'ok'}">
+      <div class="strip"></div>
+      <div class="kpi-label">Last sync</div>
+      <div class="kpi-value" style="font-size:20px;">${lastSync}</div>
+      <div class="kpi-sub">${failures.length} failure${failures.length !== 1 ? 's' : ''}</div>
+    </div>
+  `;
+
+  // Donut
+  const critDrift = drift.filter(d => d.severity === 'CRITICAL').length;
+  const warnDrift = drift.filter(d => d.severity === 'WARNING').length;
+  const stableDrift = drift.filter(d => !d.drift_detected || d.severity === 'NONE' || d.severity === 'INFO').length;
+  const total = drift.length;
+
+  document.getElementById('sumDonutTotal').textContent = total;
+  document.getElementById('sumDonutLegend').innerHTML = `
+    <span class="leg"><span class="dot" style="background:var(--crit);"></span>${critDrift} Critical</span>
+    <span class="leg"><span class="dot" style="background:var(--warn);"></span>${warnDrift} Warning</span>
+    <span class="leg"><span class="dot" style="background:var(--ok);"></span>${stableDrift} Stable</span>
+  `;
+
+  const canvas = document.getElementById('sumDonut');
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = 180 * dpr;
+  canvas.height = 180 * dpr;
+  ctx.scale(dpr, dpr);
+  const cx = 90, cy = 90, r = 70, lw = 22;
+  ctx.clearRect(0, 0, 180, 180);
+  const segments = [
+    { val: critDrift, color: getComputedStyle(document.documentElement).getPropertyValue('--crit').trim() },
+    { val: warnDrift, color: getComputedStyle(document.documentElement).getPropertyValue('--warn').trim() },
+    { val: stableDrift, color: getComputedStyle(document.documentElement).getPropertyValue('--ok').trim() },
+  ];
+  if (total === 0) {
+    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--paper-line').trim();
+    ctx.lineWidth = lw; ctx.stroke();
+  } else {
+    let angle = -Math.PI / 2;
+    const gap = 0.04;
+    segments.forEach(seg => {
+      if (seg.val === 0) return;
+      const sweep = (seg.val / total) * Math.PI * 2 - gap;
+      if (sweep <= 0) return;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, angle + gap / 2, angle + sweep + gap / 2);
+      ctx.strokeStyle = seg.color;
+      ctx.lineWidth = lw;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+      angle += (seg.val / total) * Math.PI * 2;
+    });
+  }
+
+  // Critical reviews list
+  const critItems = critical.slice(0, 5);
+  const critListEl = document.getElementById('sumCritList');
+  document.getElementById('sumCritCt').textContent = critical.length;
+  if (critItems.length === 0) {
+    critListEl.innerHTML = '<div class="card-empty">No critical items — all clear</div>';
+  } else {
+    critListEl.innerHTML = critItems.map(i => `
+      <div class="sum-action-item" onclick="goTab('review'); metricClick('critical');">
+        <span class="sev-dot crit"></span>
+        <div class="item-info">
+          <div class="item-title">${flag(i.country)} ${escHtml(i.country)} · ${sectionLabel(i.section)}</div>
+          <div class="item-sub">${escHtml(truncate(i.new_value || i.change_summary || '', 60))}</div>
+        </div>
+        <span class="item-time">${i.detected_at ? timeAgo(i.detected_at) : ''}</span>
+      </div>
+    `).join('');
+  }
+
+  // Pipeline failures list
+  const failItems = failures.slice(0, 5);
+  const failListEl = document.getElementById('sumFailList');
+  document.getElementById('sumFailCt').textContent = failures.length;
+  if (failItems.length === 0) {
+    failListEl.innerHTML = '<div class="card-empty">No pipeline failures</div>';
+  } else {
+    failListEl.innerHTML = failItems.map(j => `
+      <div class="sum-action-item" onclick="goTab('pipeline');">
+        <span class="sev-dot fail"></span>
+        <div class="item-info">
+          <div class="item-title">${flag(j.country)} ${escHtml(j.country)}</div>
+          <div class="item-sub">${escHtml(truncate(j.error || j.state || '', 60))}</div>
+        </div>
+        <span class="item-time">${j.started_at ? timeAgo(j.started_at) : ''}</span>
+      </div>
+    `).join('');
+  }
+
+  // Country coverage grid
+  const sorted = [...drift].sort((a, b) => {
+    const ord = { CRITICAL: 0, WARNING: 1, INFO: 2, NONE: 3 };
+    const cmp = (ord[a.severity] ?? 3) - (ord[b.severity] ?? 3);
+    return cmp !== 0 ? cmp : a.country.localeCompare(b.country);
+  });
+  document.getElementById('sumCovGrid').innerHTML = sorted.map(d => {
+    const cls = d.severity === 'CRITICAL' ? 'crit' : d.severity === 'WARNING' ? 'warn' : 'ok';
+    return `<div class="sum-cov-chip ${cls}" onclick="goTab('drift');" title="${escHtml(d.country)}: ${d.drift_detected ? d.severity : 'Stable'}">
+      <span class="flag">${flag(d.country)}</span>
+      <span>${escHtml(d.country)}</span>
+      <span class="status-dot"></span>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════
 //  DRIFT PILLS (manager strip) — top 5 + view more
 // ═══════════════════════════════════════════════════
 function renderDriftPills() {
@@ -1855,19 +2687,40 @@ function renderDriftPills() {
     if (!selectedDriftCountries.size) sorted.slice(0, 5).forEach(d => selectedDriftCountries.add(d.country));
   }
 
-  const visible = sorted.filter(d => selectedDriftCountries.has(d.country));
+  // Ensure the actively filtered country always appears in the strip
+  if (activeCountryFilter && sorted.some(d => d.country === activeCountryFilter)) {
+    selectedDriftCountries.add(activeCountryFilter);
+  }
+  // Always show Singapore in the strip when drift data exists for it
+  if (sorted.some(d => d.country === 'Singapore')) {
+    selectedDriftCountries.add('Singapore');
+  }
+
+  let visible = sorted.filter(d => selectedDriftCountries.has(d.country));
+  // Pin Singapore first, then the active filter, then everything else
+  const pinOrder = (c) => c === 'Singapore' ? 0 : (c === activeCountryFilter ? 1 : 2);
+  visible = visible.slice().sort((a, b) => pinOrder(a.country) - pinOrder(b.country));
   const remainingCount = sorted.length - visible.length;
 
-  let html = '<span class="label">Drift by country</span>';
+  let html = '<span class="label">Country</span>';
   visible.forEach(d => {
-    const cls = d.severity === 'CRITICAL' ? 'crit' : d.severity === 'WARNING' ? 'warn' : d.severity === 'INFO' ? 'ok' : '';
-    const ct = d.affected_sections ? d.affected_sections.length : 0;
-    html += `<span class="country-pill ${cls}" onclick="goTab('drift')"><span class="dot"></span><span class="flag">${flag(d.country)}</span> ${escHtml(d.country)} ${ct ? '<span class="ct">' + ct + '</span>' : ''}</span>`;
+    const cls = d.country === activeCountryFilter ? 'selected' : '';
+    html += `<span class="country-pill ${cls}" data-country="${escAttr(d.country)}" onclick="toggleCountryFilter(this)" title="Filter by ${escHtml(d.country)}" style="cursor:pointer"><span class="dot"></span><span class="flag">${flag(d.country)}</span> ${escHtml(d.country)}</span>`;
   });
   if (remainingCount > 0) {
     html += `<span class="country-pill more" onclick="openDriftModal()">+${remainingCount} more →</span>`;
   }
   el.innerHTML = html;
+}
+
+function toggleCountryFilter(el) {
+  const country = el.dataset.country;
+  activeCountryFilter = (activeCountryFilter === country) ? null : country;
+  renderDriftPills();
+  renderPipeline();
+  renderReview();
+  renderDrift();
+  renderAudit();
 }
 
 // ═══════════════════════════════════════════════════
@@ -1962,7 +2815,8 @@ function applyFilter(items) {
 
 function renderReview() {
   const list = document.getElementById('reviewList');
-  const items = DATA.queue.filter(q => q.status === 'pending' || q.status === 'escalated');
+  let items = DATA.queue.filter(q => q.status === 'pending' || q.status === 'escalated');
+  if (activeCountryFilter) items = items.filter(q => q.country === activeCountryFilter);
 
   // chip counts
   const all = items.length;
@@ -1978,7 +2832,10 @@ function renderReview() {
   document.getElementById('chipEsc').textContent = esc;
   document.getElementById('chipUnassigned').textContent = unassigned;
 
-  let filtered = sortItems(applyFilter(items));
+  let filtered = sortItems(applyFilter(applyTriageToItems(items)));
+
+  // triage count
+  document.getElementById('triageCount').textContent = filtered.length + ' shown';
 
   // bulk bar
   const minorItems = items.filter(i=>{ const s=(i.severity||'').toLowerCase(); return s!=='critical'&&s!=='major'; });
@@ -2041,7 +2898,7 @@ function renderReview() {
         <div class="rcard-head">
           <span class="rcard-check ${checked}" onclick="toggleCheck(event, ${item.id})"></span>
           <span class="flag">${flag(item.country)}</span>
-          <h3 class="rcard-title">${escHtml(item.country)} · ${sectionLabel(item.section)}</h3>
+          <h3 class="rcard-title" onclick="openFullDiff(${item.id}); event.stopPropagation();">${escHtml(item.country)} · ${sectionLabel(item.section)}</h3>
           <span class="badge ${sc}"><span class="d"></span>${sevLabel(item.severity)}</span>
           ${item.change_type ? '<span class="badge info">' + escHtml(item.change_type) + '</span>' : ''}
           ${item.status === 'escalated' ? '<span class="badge major">Escalated</span>' : ''}
@@ -2049,6 +2906,14 @@ function renderReview() {
           <span class="rcard-spacer"></span>
           ${isAutoApprovable ? '<span class="auto-approvable">' + conf + '% · auto-approvable</span>' : ''}
           <span class="rcard-time">${timeAgo(item.created_at)}${item.source_url ? ' · ' + extractHost(item.source_url) : ''}</span>
+          <div class="rcard-head-actions">
+            <button class="btn btn-warn" onclick="doAction('escalate',${item.id}); event.stopPropagation();" title="Escalate [E]">Escalate</button>
+            <button class="btn btn-danger" onclick="openRejectModal(${item.id}); event.stopPropagation();" title="Reject [R]">Reject</button>
+            <button class="btn btn-primary" onclick="doAction('approve',${item.id}); event.stopPropagation();" title="Approve [A]">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              Approve
+            </button>
+          </div>
           <button class="rcard-expand" onclick="toggleCollapse(this)" title="Expand/Collapse">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
@@ -2068,6 +2933,92 @@ function renderReview() {
                 <div class="diff-side diff-new">${escHtml(item.new_value || '')}</div>
               </div>
             </div>
+
+            ${(() => {
+              const snippet = String(item.source_paragraph || '').trim();
+              const hasEvidence = snippet.length > 0;
+              const preview = snippet.length > 120 ? snippet.slice(0, 120) + '…' : snippet;
+              const srcDisplay = item.source_url ? extractHost(item.source_url) : '';
+              return hasEvidence ? `
+            <details class="src-evidence">
+              <summary class="src-evidence-toggle">
+                <div class="src-evidence-heading">
+                  <div class="src-evidence-title"><span class="src-evidence-icon">"</span> Source Evidence</div>
+                  <div class="src-evidence-preview">${escHtml(preview)}</div>
+                </div>
+                <span class="src-evidence-action"></span>
+              </summary>
+              <div class="src-evidence-body">
+                <pre class="src-snippet">${escHtml(snippet)}</pre>
+                <div class="src-attribution">
+                  <span>Extracted from ${item.source_url ? '<a href="' + escAttr(item.source_url) + '" target="_blank" rel="noopener">' + escHtml(srcDisplay) + '</a>' : 'source'}</span>
+                  <span style="color:var(--paper-line-2);">·</span>
+                  <span>${item.created_at ? fmtTime(item.created_at) : ''}</span>
+                  <span style="color:var(--paper-line-2);">·</span>
+                  <span>${sectionLabel(item.section)}</span>
+                  ${item.source_url ? '<span style="color:var(--paper-line-2);">·</span><a href="' + escAttr(item.source_url) + '" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg> View source page</a>' : ''}
+                </div>
+              </div>
+            </details>` : '';
+            })()}
+
+            ${(() => {
+              const job = DATA.jobs.find(j => j.source_snapshot_id && j.source_snapshot_id === item.source_snapshot_id);
+              const trustLevel = (conf !== null && conf >= 90) ? 'verified' : (conf !== null && conf >= 70) ? 'review' : 'unknown';
+              const trustLabel = trustLevel === 'verified' ? 'Verified' : trustLevel === 'review' ? 'Review required' : 'Unverified';
+              const srcType = item.source_url ? (item.source_url.includes('.gov') ? 'Government portal' : item.source_url.includes('notion') ? 'Notion page' : 'Web source') : 'Unknown';
+              return `
+            <details class="prov-drawer">
+              <summary class="prov-toggle">
+                <div class="prov-title">
+                  <span class="prov-caret">›</span>
+                  <span class="prov-label">Provenance</span>
+                </div>
+                <span class="prov-trust ${trustLevel}">${trustLabel}</span>
+              </summary>
+              <div class="prov-body">
+                <div class="prov-grid">
+                  <div class="prov-field-wide">
+                    <div class="prov-key">Source URL</div>
+                    <div class="prov-value">${item.source_url ? '<a href="' + escAttr(item.source_url) + '" target="_blank" rel="noopener">' + escHtml(item.source_url) + '</a>' : 'Not recorded'}</div>
+                  </div>
+                  <div>
+                    <div class="prov-key">Source type</div>
+                    <div class="prov-value">${escHtml(srcType)}</div>
+                  </div>
+                  <div>
+                    <div class="prov-key">Crawl timestamp</div>
+                    <div class="prov-value">${item.created_at ? fmtTime(item.created_at) : '—'}</div>
+                  </div>
+                  <div>
+                    <div class="prov-key">Section</div>
+                    <div class="prov-value">${sectionLabel(item.section)}</div>
+                  </div>
+                  <div>
+                    <div class="prov-key">Parser confidence</div>
+                    <div class="prov-value">${conf !== null ? conf + '%' : '—'}</div>
+                  </div>
+                  <div>
+                    <div class="prov-key">Model version</div>
+                    <div class="prov-value">llama-3.3-70b-versatile</div>
+                  </div>
+                  <div>
+                    <div class="prov-key">Trust level</div>
+                    <div class="prov-value"><span class="prov-trust ${trustLevel}">${trustLabel}</span></div>
+                  </div>
+                  ${job ? `
+                  <div>
+                    <div class="prov-key">Pipeline job</div>
+                    <div class="prov-value">#${job.id} · ${job.state}</div>
+                  </div>
+                  <div>
+                    <div class="prov-key">Fetched at</div>
+                    <div class="prov-value">${job.fetched_at ? fmtTime(job.fetched_at) : '—'}</div>
+                  </div>` : ''}
+                </div>
+              </div>
+            </details>`;
+            })()}
           </div>
 
           <aside class="rai">
@@ -2093,9 +3044,10 @@ function renderReview() {
             ${relatedSections.length > 0 ? `
             <div class="rai-block">
               <div class="lbl">Impacted sections (${relatedSections.length})</div>
-              <div class="section-chips">
+              <div class="section-chips" id="sections-${item.id}">
                 ${relatedSections.map(s => '<span class="section-chip">' + sectionLabel(s.section) + '</span>').join('')}
               </div>
+              ${relatedSections.length > 3 ? '<a class="section-toggle" id="sectoggle-' + item.id + '" onclick="toggleSections(' + item.id + ')">View all ' + relatedSections.length + ' sections</a>' : ''}
             </div>` : `
             <div class="rai-block">
               <div class="lbl">Section</div>
@@ -2126,20 +3078,18 @@ function renderReview() {
         </div>
 
         <div class="rcard-actions">
-          <button class="btn btn-ghost" onclick="openFullDiff(${item.id})">Open full diff</button>
-          ${item.source_url ? '<a class="btn btn-ghost" href="' + escAttr(item.source_url) + '" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg> Source page</a>' : ''}
-          <button class="btn btn-ghost" onclick="viewHistory('${escAttr(item.country)}','${escAttr(item.section)}')">Compare versions</button>
-          <span class="hint">Decision is logged immutably to audit trail</span>
-          <button class="btn btn-warn" onclick="doAction('escalate',${item.id})">Escalate <span class="kbd">E</span></button>
-          <button class="btn btn-danger" onclick="doAction('reject',${item.id})">Reject <span class="kbd">R</span></button>
-          <button class="btn btn-primary" onclick="doAction('approve',${item.id})">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            Approve &amp; publish <span class="kbd">A</span>
+          <button class="btn btn-ghost" onclick="viewHistory('${escAttr(item.country)}','${escAttr(item.section)}')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg>
+            Compare versions
           </button>
+          <span class="hint">Decision is logged immutably to audit trail · <span class="mono" style="font-size:10px;">A</span> approve · <span class="mono" style="font-size:10px;">R</span> reject · <span class="mono" style="font-size:10px;">E</span> escalate</span>
         </div>
       </div>
     </article>`;
   }).join('');
+
+  // init section chip toggles after DOM update
+  setTimeout(initSectionToggles, 0);
 }
 
 // ═══════════════════════════════════════════════════
@@ -2148,7 +3098,7 @@ function renderReview() {
 function renderDrift() {
   const body = document.getElementById('driftBody');
 
-  let items = DATA.drift;
+  let items = activeCountryFilter ? DATA.drift.filter(d => d.country === activeCountryFilter) : DATA.drift;
   const allCount = items.length;
   const critCount = items.filter(d=>d.severity==='CRITICAL').length;
   const warnCount = items.filter(d=>d.severity==='WARNING').length;
@@ -2243,7 +3193,8 @@ function filterDriftTable() {
 // ═══════════════════════════════════════════════════
 function renderAudit() {
   const el = document.getElementById('auditTimeline');
-  const items = DATA.audit;
+  let items = DATA.audit;
+  if (activeCountryFilter) items = items.filter(a => a.country === activeCountryFilter);
   document.getElementById('auditCount').textContent = items.length;
 
   if (!items.length) {
@@ -2283,19 +3234,51 @@ function renderAudit() {
 // ═══════════════════════════════════════════════════
 const STAGES = ['queued','fetched','normalized','extracted','reconciled'];
 
-function stageIndex(state) {
-  const i = STAGES.indexOf(state);
-  return i >= 0 ? i : (state === 'failed' ? -1 : -1);
+function jobStagesHtml(j) {
+  const isFailed = j.state === 'failed';
+  const curStage = STAGES.indexOf(j.state);
+  let failStage = -1;
+  if (isFailed) {
+    if (j.reconciled_at) failStage = 4;
+    else if (j.extracted_at) failStage = 3;
+    else if (j.normalized_at) failStage = 2;
+    else if (j.fetched_at) failStage = 1;
+    else failStage = 0;
+  }
+  return STAGES.map((s, idx) => {
+    let cls = '';
+    if (isFailed) {
+      if (idx < failStage) cls = 'done';
+      else if (idx === failStage) cls = 'fail';
+    } else if (j.state === 'reconciled') {
+      cls = 'done';
+    } else {
+      if (idx < curStage) cls = 'done';
+      else if (idx === curStage) cls = 'cur';
+    }
+    return `<div class="stage ${cls}"></div>`;
+  }).join('');
+}
+
+function countryOverallStatus(cJobs) {
+  const hasFailed = cJobs.some(j => j.state === 'failed');
+  const hasRunning = cJobs.some(j => ['queued','fetched','normalized','extracted'].includes(j.state));
+  const allDone = cJobs.every(j => j.state === 'reconciled');
+  if (hasFailed) return { cls: 'fail', label: 'Has failures' };
+  if (hasRunning) return { cls: 'run', label: 'Processing' };
+  if (allDone) return { cls: 'ok', label: 'All reconciled' };
+  return { cls: 'queue', label: 'Queued' };
 }
 
 function renderPipeline() {
-  const jobs = DATA.jobs;
+  let jobs = DATA.jobs;
+  if (activeCountryFilter) {
+    jobs = jobs.filter(j => j.country === activeCountryFilter);
+  }
 
-  // summary cards
   const reconciled = jobs.filter(j=>j.state==='reconciled').length;
   const running = jobs.filter(j=>['queued','fetched','normalized','extracted'].includes(j.state)).length;
   const failed = jobs.filter(j=>j.state==='failed').length;
-  const queued = jobs.filter(j=>j.state==='queued').length;
 
   document.getElementById('pipeSummary').innerHTML = `
     <div class="pipe-card ok"><div class="strip"></div><div class="v">${reconciled}</div><div class="l">Reconciled</div></div>
@@ -2312,63 +3295,82 @@ function renderPipeline() {
   }
   document.getElementById('pipeEmpty').style.display = 'none';
 
-  body.innerHTML = jobs.map(j => {
-    const isFailed = j.state === 'failed';
-    const curStage = STAGES.indexOf(j.state);
-    let failStage = -1;
-    if (isFailed) {
-      if (j.reconciled_at) failStage = 4;
-      else if (j.extracted_at) failStage = 3;
-      else if (j.normalized_at) failStage = 2;
-      else if (j.fetched_at) failStage = 1;
-      else failStage = 0;
-    }
+  const byCountry = {};
+  jobs.forEach(j => {
+    const c = j.country || 'Unknown';
+    if (!byCountry[c]) byCountry[c] = [];
+    byCountry[c].push(j);
+  });
 
-    const stagesHtml = STAGES.map((s, idx) => {
-      let cls = '';
-      if (isFailed) {
-        if (idx < failStage) cls = 'done';
-        else if (idx === failStage) cls = 'fail';
-      } else if (j.state === 'reconciled') {
-        cls = 'done';
-      } else {
-        if (idx < curStage) cls = 'done';
-        else if (idx === curStage) cls = 'cur';
-      }
-      return `<div class="stage ${cls}"></div>`;
-    }).join('');
+  const countryKeys = Object.keys(byCountry).sort((a, b) => {
+    if (a === 'Unknown') return 1;
+    if (b === 'Unknown') return -1;
+    const aFail = byCountry[a].some(j => j.state === 'failed');
+    const bFail = byCountry[b].some(j => j.state === 'failed');
+    if (aFail !== bFail) return aFail ? -1 : 1;
+    return a.localeCompare(b);
+  });
 
-    const statusCls = isFailed ? 'fail' : j.state === 'reconciled' ? 'ok' : 'run';
-    const statusLabel = isFailed ? 'Failed' : j.state === 'reconciled' ? 'Done' : j.state.charAt(0).toUpperCase() + j.state.slice(1);
+  let html = '';
+  countryKeys.forEach(country => {
+    const cJobs = byCountry[country];
+    const status = countryOverallStatus(cJobs);
+    const hasFail = cJobs.some(j => j.state === 'failed');
+    const cReconciled = cJobs.filter(j => j.state === 'reconciled').length;
+    const cFailed = cJobs.filter(j => j.state === 'failed').length;
+    const lastTime = cJobs.reduce((latest, j) => {
+      const t = j.failed_at || j.reconciled_at || j.extracted_at || j.normalized_at || j.fetched_at || j.queued_at;
+      return t > latest ? t : latest;
+    }, '');
+    const cKey = escAttr(country);
 
-    const lastTime = j.failed_at || j.reconciled_at || j.extracted_at || j.normalized_at || j.fetched_at || j.queued_at;
+    html += `<tr class="pipe-country-row ${hasFail ? 'has-fail' : ''}" data-pipe-country="${cKey}" onclick="togglePipeCountry(this)">
+      <td><button class="expand-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button></td>
+      <td><div class="country-cell"><span class="flag">${flag(country)}</span><span class="name">${escHtml(country)}</span></div></td>
+      <td><span class="pip-status ${status.cls}"><span class="d"></span>${status.label}</span></td>
+      <td>
+        <span class="source-ct">${cJobs.length} source${cJobs.length !== 1 ? 's' : ''}</span>
+        ${cReconciled ? ' <span class="badge minor" style="margin-left:4px;">' + cReconciled + ' ok</span>' : ''}
+        ${cFailed ? ' <span class="badge crit" style="margin-left:4px;">' + cFailed + ' failed</span>' : ''}
+      </td>
+      <td><span class="mono" style="color:var(--ink-3);">${timeAgo(lastTime)}</span></td>
+      <td style="text-align:right;">
+        <button class="btn btn-ghost" onclick="syncCountry('${cKey}', event)">Sync</button>
+      </td>
+    </tr>`;
 
-    let errorRow = '';
-    if (isFailed) {
-      errorRow = `<tr class="pipe-error-row"><td colspan="5">
-        <div class="pipe-error-box">
-          <div class="pipe-error-title">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            <span>Pipeline failure</span>
-          </div>
-          <div class="pipe-error-msg">${escHtml(j.failure_reason || 'Unknown error')}</div>
-        </div>
-      </td></tr>`;
-    }
+    cJobs.forEach(j => {
+      const isFailed = j.state === 'failed';
+      const statusCls = isFailed ? 'fail' : j.state === 'reconciled' ? 'ok' : 'run';
+      const statusLabel = isFailed ? 'Failed' : j.state === 'reconciled' ? 'Done' : j.state.charAt(0).toUpperCase() + j.state.slice(1);
+      const jLastTime = j.failed_at || j.reconciled_at || j.extracted_at || j.normalized_at || j.fetched_at || j.queued_at;
 
-    return `
-      <tr class="${isFailed ? 'fail-row' : ''}" ${isFailed ? 'onclick="togglePipeRow(this)"' : ''}>
-        <td><span class="pip-status ${statusCls}"><span class="d"></span>${statusLabel}</span></td>
+      html += `<tr class="pipe-source-row ${isFailed ? 'fail-row' : ''}" data-pipe-country="${cKey}" style="display:none" ${isFailed ? 'onclick="togglePipeRow(this)"' : ''}>
+        <td></td>
         <td class="pipe-source"><span class="host">${extractHost(j.source_url)}</span><span class="path">${extractPath(j.source_url)}</span></td>
-        <td><div class="stages">${stagesHtml}</div></td>
-        <td><span class="mono" style="color:var(--ink-3);">${timeAgo(lastTime)}</span></td>
+        <td><span class="pip-status ${statusCls}"><span class="d"></span>${statusLabel}</span></td>
+        <td><div class="stages">${jobStagesHtml(j)}</div></td>
+        <td><span class="mono" style="color:var(--ink-3);">${timeAgo(jLastTime)}</span></td>
         <td style="text-align:right;">
-          ${isFailed ? '<button class="btn btn-danger" onclick="event.stopPropagation()">Retry</button>' : ''}
-          ${j.state === 'reconciled' ? '<button class="btn btn-ghost" onclick="goTab(\'review\')">View changes →</button>' : ''}
+          ${isFailed ? `<button class="btn btn-danger" onclick="retryJob(${j.id}, event)">Retry</button>` : ''}
+          ${j.state === 'reconciled' ? '<button class="btn btn-ghost" onclick="goTab(\'review\')">View changes</button>' : ''}
         </td>
-      </tr>
-      ${errorRow}`;
-  }).join('');
+      </tr>`;
+      if (isFailed) {
+        html += `<tr class="pipe-error-row" data-pipe-country="${cKey}" style="display:none"><td colspan="6">
+          <div class="pipe-error-box">
+            <div class="pipe-error-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span>Pipeline failure</span>
+            </div>
+            <div class="pipe-error-msg">${escHtml(j.failure_reason || 'Unknown error')}</div>
+          </div>
+        </td></tr>`;
+      }
+    });
+  });
+
+  body.innerHTML = html;
 }
 
 // ═══════════════════════════════════════════════════
@@ -2448,18 +3450,19 @@ async function runSync() {
 // ═══════════════════════════════════════════════════
 function renderFooter() {
   const m = DATA.metrics;
-  document.getElementById('footerLabel').textContent = `Atlas Compliance · ${m.trusted_source_count || 0} countries monitored`;
+  document.getElementById('footerLabel').textContent = `Abdul Kalam AI Compliance · ${m.trusted_source_count || 0} countries monitored`;
 }
 
 // ═══════════════════════════════════════════════════
 //  ACTIONS
 // ═══════════════════════════════════════════════════
-async function doAction(action, id) {
+async function doAction(action, id, extra) {
   try {
+    const payload = Object.assign({ notes: '', assignee: 'Abdul Kalam AI Compliance' }, extra || {});
     const res = await fetch(`/api/${action}/${id}`, {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ notes: '', assignee: 'Shivansh K.' })
+      body: JSON.stringify(payload)
     });
     const data = await res.json();
     if (data.success) {
@@ -2475,6 +3478,96 @@ async function doAction(action, id) {
   }
 }
 
+// ── Reject modal ──
+function openRejectModal(id) {
+  document.getElementById('rejectItemId').value = id;
+  document.getElementById('rejectRationale').value = 'Outdated or superseded source';
+  document.getElementById('rejectNotes').value = '';
+  document.getElementById('rejectModal').classList.add('open');
+}
+function closeRejectModal() {
+  document.getElementById('rejectModal').classList.remove('open');
+}
+async function confirmReject() {
+  const id = document.getElementById('rejectItemId').value;
+  const rationale = document.getElementById('rejectRationale').value;
+  const notes = document.getElementById('rejectNotes').value;
+  closeRejectModal();
+  await doAction('reject', id, { rationale, notes });
+}
+
+// ── Section chips trim / view more ──
+function toggleSections(itemId) {
+  const el = document.getElementById('sections-' + itemId);
+  const btn = document.getElementById('sectoggle-' + itemId);
+  if (!el || !btn) return;
+  el.classList.toggle('expanded');
+  btn.textContent = el.classList.contains('expanded') ? 'Show fewer' : 'View all';
+}
+function initSectionToggles() {
+  document.querySelectorAll('.section-chips').forEach(el => {
+    const id = el.id ? el.id.replace('sections-', '') : '';
+    const btn = document.getElementById('sectoggle-' + id);
+    if (!btn) return;
+    // Show toggle only if chips overflow the trimmed height
+    if (el.scrollHeight > 40) { btn.style.display = 'inline'; }
+    else { btn.style.display = 'none'; }
+  });
+}
+
+// ── Triage filters ──
+let triageFilters = { severity: '', confidence: '', country: '', changeType: '', status: '' };
+function populateTriageOptions() {
+  const countries = new Set();
+  const changeTypes = new Set();
+  DATA.queue.forEach(q => {
+    if (q.country) countries.add(q.country);
+    if (q.change_type) changeTypes.add(q.change_type);
+  });
+  const cSel = document.getElementById('triageCountry');
+  const ctSel = document.getElementById('triageChangeType');
+  // keep first "All" option, clear rest
+  cSel.innerHTML = '<option value="">All</option>' + [...countries].sort().map(c => '<option value="' + escHtml(c) + '">' + escHtml(c) + '</option>').join('');
+  ctSel.innerHTML = '<option value="">All</option>' + [...changeTypes].sort().map(t => '<option value="' + escHtml(t) + '">' + escHtml(t) + '</option>').join('');
+}
+function applyTriage() {
+  triageFilters.severity = document.getElementById('triageSeverity').value;
+  triageFilters.confidence = document.getElementById('triageConfidence').value;
+  triageFilters.country = document.getElementById('triageCountry').value;
+  triageFilters.changeType = document.getElementById('triageChangeType').value;
+  triageFilters.status = document.getElementById('triageStatus').value;
+  reviewShowing = reviewPageSize;
+  renderReview();
+}
+function resetTriage() {
+  document.getElementById('triageSeverity').value = '';
+  document.getElementById('triageConfidence').value = '';
+  document.getElementById('triageCountry').value = '';
+  document.getElementById('triageChangeType').value = '';
+  document.getElementById('triageStatus').value = '';
+  triageFilters = { severity: '', confidence: '', country: '', changeType: '', status: '' };
+  reviewShowing = reviewPageSize;
+  renderReview();
+}
+function applyTriageToItems(items) {
+  let r = items;
+  if (triageFilters.severity) r = r.filter(i => (i.severity||'').toLowerCase() === triageFilters.severity);
+  if (triageFilters.confidence) {
+    r = r.filter(i => {
+      const c = i.confidence != null ? i.confidence * 100 : null;
+      if (c === null) return false;
+      if (triageFilters.confidence === 'high') return c >= 90;
+      if (triageFilters.confidence === 'mid') return c >= 70 && c < 90;
+      if (triageFilters.confidence === 'low') return c < 70;
+      return true;
+    });
+  }
+  if (triageFilters.country) r = r.filter(i => i.country === triageFilters.country);
+  if (triageFilters.changeType) r = r.filter(i => i.change_type === triageFilters.changeType);
+  if (triageFilters.status) r = r.filter(i => i.status === triageFilters.status);
+  return r;
+}
+
 async function bulkApproveSelected() {
   if (!selectedIds.size) return;
   let approved = 0;
@@ -2483,7 +3576,7 @@ async function bulkApproveSelected() {
       const res = await fetch('/api/approve/' + id, {
         method: 'POST',
         headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({ notes: 'Bulk approval from ops dashboard', assignee: 'Shivansh K.' })
+        body: JSON.stringify({ notes: 'Bulk approval from ops dashboard', assignee: 'Abdul Kalam AI Compliance' })
       });
       const data = await res.json();
       if (data.success) approved++;
@@ -2503,8 +3596,8 @@ function goTab(name) {
   document.querySelectorAll('.tabpanel').forEach(p => p.classList.toggle('active', p.dataset.tab === name));
   history.replaceState(null, '', '#' + name);
 }
-const startTab = (location.hash || '#review').slice(1);
-if (['review','drift','audit','pipeline'].includes(startTab)) goTab(startTab);
+const startTab = (location.hash || '#summary').slice(1);
+if (['summary','review','drift','audit','pipeline','sources'].includes(startTab)) goTab(startTab);
 
 function toggleMgr() {
   const s = document.getElementById('mgrStrip');
@@ -2572,6 +3665,52 @@ function toggleDriftRow(tr) {
 
 function togglePipeRow(tr) { tr.classList.toggle('expanded'); }
 
+function togglePipeCountry(tr) {
+  const isExpanded = tr.classList.toggle('expanded');
+  const cKey = tr.dataset.pipeCountry;
+  document.querySelectorAll(`tr.pipe-source-row[data-pipe-country="${CSS.escape(cKey)}"]`).forEach(row => {
+    row.style.display = isExpanded ? '' : 'none';
+    if (!isExpanded) row.classList.remove('expanded');
+  });
+  document.querySelectorAll(`tr.pipe-error-row[data-pipe-country="${CSS.escape(cKey)}"]`).forEach(row => {
+    row.style.display = 'none';
+  });
+}
+
+async function syncCountry(country, event) {
+  if (event) event.stopPropagation();
+  toast('Syncing ' + country + '…', 'info');
+  try {
+    const res = await fetch('/api/sync', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ countries: [country] }),
+    });
+    const data = await res.json();
+    toast(data.message || ('Sync complete for ' + country), data.success ? 'info' : 'danger');
+    loadAll();
+  } catch (err) {
+    toast('Sync failed: ' + err.message, 'danger');
+  }
+}
+
+async function retryJob(id, event) {
+  if (event) event.stopPropagation();
+  toast('Re-queuing job #' + id + '…', 'info');
+  try {
+    const res = await fetch('/api/retry-job/' + id, { method: 'POST', headers: {'Content-Type':'application/json'} });
+    const data = await res.json();
+    if (data.success) {
+      toast(data.message || 'Job re-queued', 'info');
+      loadAll();
+    } else {
+      toast('Retry failed: ' + (data.message || 'unknown error'), 'danger');
+    }
+  } catch (err) {
+    toast('Retry failed: ' + err.message, 'danger');
+  }
+}
+
 function openSync() { document.getElementById('syncModal').classList.add('open'); }
 function closeSync() { document.getElementById('syncModal').classList.remove('open'); }
 
@@ -2598,7 +3737,7 @@ async function bulkMarkReviewed() {
   let count = 0;
   for (const id of selectedIds) {
     try {
-      const res = await fetch('/api/approve/' + id, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ notes:'Marked as reviewed', assignee:'Shivansh K.' }) });
+      const res = await fetch('/api/approve/' + id, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ notes:'Marked as reviewed', assignee:'Abdul Kalam AI Compliance' }) });
       const data = await res.json();
       if (data.success) count++;
     } catch {}
@@ -2614,7 +3753,7 @@ async function bulkEscalate() {
   let count = 0;
   for (const id of selectedIds) {
     try {
-      const res = await fetch('/api/escalate/' + id, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ notes:'Bulk escalation', assignee:'Shivansh K.' }) });
+      const res = await fetch('/api/escalate/' + id, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ notes:'Bulk escalation', assignee:'Abdul Kalam AI Compliance' }) });
       const data = await res.json();
       if (data.success) count++;
     } catch {}
@@ -2630,7 +3769,7 @@ async function bulkReject() {
   let count = 0;
   for (const id of selectedIds) {
     try {
-      const res = await fetch('/api/reject/' + id, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ notes:'Bulk rejection', assignee:'Shivansh K.' }) });
+      const res = await fetch('/api/reject/' + id, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ notes:'Bulk rejection', assignee:'Abdul Kalam AI Compliance' }) });
       const data = await res.json();
       if (data.success) count++;
     } catch {}
@@ -2685,19 +3824,20 @@ document.addEventListener('keydown', e => {
   if (e.metaKey || e.ctrlKey) {
     if (e.key.toLowerCase() === 'k') { e.preventDefault(); document.getElementById('globalSearch').focus(); return; }
   }
-  if (e.key === '1') goTab('review');
-  if (e.key === '2') goTab('drift');
-  if (e.key === '3') goTab('audit');
-  if (e.key === '4') goTab('pipeline');
+  if (e.key === '1') goTab('summary');
+  if (e.key === '2') goTab('review');
+  if (e.key === '3') goTab('drift');
+  if (e.key === '4') goTab('audit');
+  if (e.key === '5') goTab('pipeline');
   if (e.key === 's' || e.key === 'S') openSync();
-  if (e.key === 'Escape') closeSync();
+  if (e.key === 'Escape') { closeSync(); closeNotifPanel(); }
   const activeTab = document.querySelector('.tabpanel.active');
   if (activeTab && activeTab.dataset.tab === 'review') {
     const expanded = activeTab.querySelector('.rcard:not(.collapsed)');
     if (expanded) {
       const id = parseInt(expanded.dataset.id);
       if (e.key === 'a' || e.key === 'A') { doAction('approve', id); }
-      if (e.key === 'r' || e.key === 'R') { doAction('reject', id); }
+      if (e.key === 'r' || e.key === 'R') { openRejectModal(id); }
       if (e.key === 'e' || e.key === 'E') { doAction('escalate', id); }
     }
   }
@@ -2746,28 +3886,110 @@ function openFullDiff(id) {
   if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
+let _verData = null; // cached version data for compare modal
+
 async function viewHistory(country, section) {
   try {
     const res = await fetch('/api/guide/' + encodeURIComponent(country) + '/' + encodeURIComponent(section) + '/history');
     if (!res.ok) { toast('No version history available for ' + country + ' · ' + sectionLabel(section), 'info'); return; }
     const data = await res.json();
-    const versions = data.history || [];
-    if (!versions.length) { toast('No previous versions found', 'info'); return; }
-    let html = '<h3 style="margin-bottom:12px;">Version history: ' + escHtml(country) + ' · ' + sectionLabel(section) + '</h3>';
-    html += '<div style="display:flex;flex-direction:column;gap:10px;max-height:60vh;overflow:auto;">';
-    if (data.current) {
-      html += '<div style="padding:12px 14px;background:var(--ok-soft);border:1px solid var(--ok-line);border-radius:var(--r-m);">';
-      html += '<div style="font-weight:700;margin-bottom:4px;color:var(--ok-2);">Current · v' + (data.current.version_number||'?') + ' <span style="font-weight:400;color:var(--ink-3);font-size:12px;"> · ' + fmtDate(data.current.effective_date) + '</span></div>';
-      html += '<div style="font-size:13px;color:var(--ink-2);">' + escHtml(truncate(data.current.value, 200)) + '</div></div>';
-    }
-    versions.forEach(v => {
-      html += '<div style="padding:12px 14px;background:var(--paper-2);border:1px solid var(--paper-line);border-radius:var(--r-m);">';
-      html += '<div style="font-weight:700;margin-bottom:4px;">v' + (v.version_number||'?') + ' <span style="font-weight:400;color:var(--ink-3);font-size:12px;"> · ' + fmtDate(v.effective_date) + (v.superseded_at ? ' → superseded ' + fmtDate(v.superseded_at) : '') + '</span></div>';
-      html += '<div style="font-size:13px;color:var(--ink-2);">' + escHtml(truncate(v.value, 200)) + '</div></div>';
-    });
-    html += '</div>';
-    showInfoModal(html);
+    const allVersions = [];
+    if (data.current) allVersions.push(Object.assign({}, data.current, { _isCurrent: true }));
+    (data.history || []).forEach(v => allVersions.push(v));
+    if (!allVersions.length) { toast('No previous versions found', 'info'); return; }
+    // sort newest first
+    allVersions.sort((a, b) => (b.version_number || 0) - (a.version_number || 0));
+    _verData = { country, section, versions: allVersions };
+    renderCompareModal(0, Math.min(1, allVersions.length - 1));
   } catch { toast('Could not load version history', 'danger'); }
+}
+
+function renderCompareModal(leftIdx, rightIdx) {
+  const d = _verData;
+  if (!d) return;
+  const vs = d.versions;
+  const left = vs[leftIdx];
+  const right = vs[rightIdx];
+
+  // build version select options
+  const opts = vs.map((v, i) => {
+    const label = 'v' + (v.version_number || '?') + (v._isCurrent ? ' (current)' : '') + ' · ' + fmtDate(v.effective_date);
+    return '<option value="' + i + '"' + '>' + escHtml(label) + '</option>';
+  }).join('');
+
+  const leftSrc = left.source_url ? extractHost(left.source_url) : '—';
+  const rightSrc = right.source_url ? extractHost(right.source_url) : '—';
+  const leftRef = left.approval_reference || '—';
+  const rightRef = right.approval_reference || '—';
+
+  let html = `
+    <div class="ver-header">
+      <span class="flag">${flag(d.country)}</span>
+      <h3>${escHtml(d.country)} · ${sectionLabel(d.section)}</h3>
+    </div>
+    <p class="sub">${vs.length} version${vs.length !== 1 ? 's' : ''} recorded — select two to compare side-by-side</p>
+
+    <div class="ver-selector">
+      <label>Left</label>
+      <select id="verLeft" onchange="renderCompareModal(+this.value, +document.getElementById('verRight').value)">
+        ${opts.replace('value="' + leftIdx + '"', 'value="' + leftIdx + '" selected')}
+      </select>
+      <span class="vs-label">vs</span>
+      <label>Right</label>
+      <select id="verRight" onchange="renderCompareModal(+document.getElementById('verLeft').value, +this.value)">
+        ${opts.replace('value="' + rightIdx + '"', 'value="' + rightIdx + '" selected')}
+      </select>
+    </div>
+
+    <div class="ver-meta-grid">
+      <div><div class="mk">Left version</div><div class="mv">v${left.version_number || '?'}${left._isCurrent ? ' (current)' : ''}</div></div>
+      <div><div class="mk">Effective</div><div class="mv">${fmtDate(left.effective_date)}</div></div>
+      <div><div class="mk">Right version</div><div class="mv">v${right.version_number || '?'}${right._isCurrent ? ' (current)' : ''}</div></div>
+      <div><div class="mk">Effective</div><div class="mv">${fmtDate(right.effective_date)}</div></div>
+      <div><div class="mk">Source</div><div class="mv">${escHtml(leftSrc)}</div></div>
+      <div><div class="mk">Approval ref</div><div class="mv" style="word-break:break-all;">${escHtml(leftRef)}</div></div>
+      <div><div class="mk">Source</div><div class="mv">${escHtml(rightSrc)}</div></div>
+      <div><div class="mk">Approval ref</div><div class="mv" style="word-break:break-all;">${escHtml(rightRef)}</div></div>
+    </div>
+
+    <div class="ver-diff">
+      <div class="ver-diff-head">
+        <div>v${left.version_number || '?'} <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--ink-4);font-size:11px;margin-left:auto;">${fmtDate(left.effective_date)}</span></div>
+        <div>v${right.version_number || '?'} <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--ink-4);font-size:11px;margin-left:auto;">${fmtDate(right.effective_date)}</span></div>
+      </div>
+      <div class="ver-diff-body">
+        <div class="ver-diff-side ${left.value ? '' : 'empty'}">${left.value ? escHtml(left.value) : '(no value)'}</div>
+        <div class="ver-diff-side ${right.value ? '' : 'empty'}">${right.value ? escHtml(right.value) : '(no value)'}</div>
+      </div>
+    </div>
+
+    <details style="margin-top:4px;">
+      <summary style="cursor:pointer;font-family:var(--font-mono);font-size:10.5px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-3);user-select:none;">All versions (${vs.length})</summary>
+      <div class="ver-timeline" style="margin-top:10px;">
+        ${vs.map((v, i) => `
+          <div class="ver-row ${v._isCurrent ? 'current' : ''} ${i === leftIdx || i === rightIdx ? 'active' : ''}" onclick="renderCompareModal(${leftIdx === i ? rightIdx : i}, ${rightIdx === i ? leftIdx : i})">
+            <span class="vn">v${v.version_number || '?'}</span>
+            <span class="vval">${escHtml(truncate(v.value || '', 80))}</span>
+            <span class="vdate">${fmtDate(v.effective_date)}</span>
+            <span class="vsrc">${v.source_url ? extractHost(v.source_url) : '—'}</span>
+          </div>
+        `).join('')}
+      </div>
+    </details>
+  `;
+
+  // use a dedicated modal with ver-modal class
+  let modal = document.getElementById('verModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'verModal';
+    modal.className = 'modal-scrim ver-modal';
+    modal.onclick = e => { if (e.target === modal) modal.classList.remove('open'); };
+    modal.innerHTML = '<div class="modal"><button class="close" onclick="document.getElementById(\'verModal\').classList.remove(\'open\')" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button><div id="verModalContent"></div></div>';
+    document.body.appendChild(modal);
+  }
+  document.getElementById('verModalContent').innerHTML = html;
+  modal.classList.add('open');
 }
 
 function showInfoModal(contentHtml) {
@@ -3008,9 +4230,205 @@ document.getElementById('globalSearch').addEventListener('input', e => {
 });
 
 // ═══════════════════════════════════════════════════
+//  SOURCES TAB
+// ═══════════════════════════════════════════════════
+let _verifyResult = null;
+
+async function loadSourcesTab() {
+  const [statsRes, classRes, pdfRes] = await Promise.all([
+    fetch('/api/sources/stats').then(r => r.json()),
+    fetch('/api/sources/classifications').then(r => r.json()),
+    fetch('/api/sources/pdfs').then(r => r.json()),
+  ]);
+
+  // Registry stats bar
+  const statsEl = document.getElementById('registryStats');
+  statsEl.innerHTML = [
+    { l: 'Countries', v: statsRes.countries, cls: 'info' },
+    { l: 'Authorities', v: statsRes.authorities, cls: 'neut' },
+    { l: 'Endpoints', v: statsRes.endpoints, cls: 'ok' },
+    { l: 'Parsers', v: statsRes.parsers, cls: 'neut' },
+  ].map(s => `
+    <div class="metric ${s.cls}" style="flex:1; min-width:140px; cursor:default;">
+      <div class="strip"></div>
+      <div class="l">${s.l}</div>
+      <div class="v">${s.v}</div>
+    </div>
+  `).join('');
+
+  // Tab badge
+  document.getElementById('tabSourcesCt').textContent = statsRes.endpoints;
+
+  // Classifications list
+  renderClassifications(classRes);
+
+  // PDF uploads list
+  renderPdfs(pdfRes);
+}
+
+function renderClassifications(items) {
+  const el = document.getElementById('classificationList');
+  const empty = document.getElementById('classEmpty');
+  if (!items.length) { el.innerHTML = ''; empty.style.display = ''; return; }
+  empty.style.display = 'none';
+
+  el.innerHTML = `<div style="display:flex; flex-direction:column; gap:0; border:1px solid var(--paper-line); border-radius:var(--r-l); overflow:hidden; background:var(--paper);">
+    ${items.map(c => {
+      const cls = c.classification === 'official' ? 'ok' : c.classification === 'unofficial_trusted' ? 'warn' : 'crit';
+      const label = c.classification === 'official' ? 'Official' : c.classification === 'unofficial_trusted' ? 'Unofficial · Trusted' : 'Not official';
+      const ts = fmtTime(c.created_at);
+      return `<div style="display:flex; align-items:center; gap:12px; padding:12px 16px; border-bottom:1px solid var(--paper-line);">
+        <span class="badge ${cls}" style="min-width:110px; justify-content:center;"><span class="d"></span> ${label}</span>
+        <div style="flex:1; min-width:0;">
+          <div style="font-size:13px; font-weight:600; color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+            <a href="${escHtml(c.url)}" target="_blank" rel="noopener" style="color:var(--info); border-bottom:1px solid rgba(47,91,183,0.25);">${escHtml(c.url)}</a>
+          </div>
+          ${c.matched_country ? `<span style="font-size:11.5px; color:var(--ink-3);">${escHtml(c.matched_country)}${c.matched_authority ? ' · ' + escHtml(c.matched_authority) : ''}</span>` : ''}
+        </div>
+        ${c.notes ? `<span style="font-size:12px; color:var(--ink-3); max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${escHtml(c.notes)}">${escHtml(c.notes)}</span>` : ''}
+        <span style="font-family:var(--font-mono); font-size:10.5px; color:var(--ink-4); white-space:nowrap;">${ts}</span>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+function renderPdfs(jobs) {
+  const el = document.getElementById('pdfList');
+  const empty = document.getElementById('pdfEmpty');
+  if (!jobs.length) { el.innerHTML = ''; empty.style.display = ''; return; }
+  empty.style.display = 'none';
+
+  el.innerHTML = `<div style="display:flex; flex-direction:column; gap:0; border:1px solid var(--paper-line); border-radius:var(--r-l); overflow:hidden; background:var(--paper);">
+    ${jobs.map(j => {
+      const stCls = j.state === 'reconciled' ? 'ok' : j.state === 'failed' ? 'crit' : j.state === 'extracted' ? 'info' : 'neut';
+      const src = j.source_url || '';
+      const title = src.includes('#') ? src.split('#').pop() : src.replace('pdf://', '');
+      const ts = fmtTime(j.queued_at);
+      return `<div style="display:flex; align-items:center; gap:12px; padding:12px 16px; border-bottom:1px solid var(--paper-line); cursor:pointer;" onclick="window.location='/compliance/pipeline/${j.id}'">
+        <div style="width:32px; height:32px; border-radius:var(--r-s); background:var(--crit-soft); display:grid; place-items:center; flex-shrink:0;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--crit-2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+        <div style="flex:1; min-width:0;">
+          <div style="font-size:13.5px; font-weight:600; color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escHtml(title)}</div>
+          <div style="font-size:11.5px; color:var(--ink-3);">${j.country ? escHtml(j.country) + ' · ' : ''}Job #${j.id}</div>
+        </div>
+        <span class="badge ${stCls}"><span class="d"></span> ${j.state}</span>
+        <span style="font-family:var(--font-mono); font-size:10.5px; color:var(--ink-4); white-space:nowrap;">${ts}</span>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+async function verifyUrl() {
+  const input = document.getElementById('verifyUrlInput');
+  const url = input.value.trim();
+  if (!url) return;
+
+  const res = await fetch('/api/sources/verify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ url }),
+  });
+  _verifyResult = await res.json();
+  _verifyResult._url = url;
+  renderVerifyResult();
+}
+
+function renderVerifyResult() {
+  const wrap = document.getElementById('verifyResult');
+  const inner = document.getElementById('verifyResultInner');
+  wrap.style.display = '';
+
+  const r = _verifyResult;
+  const url = r._url;
+
+  if (r.match === 'exact' || r.match === 'domain') {
+    const matchLabel = r.match === 'exact' ? 'Exact endpoint match' : 'Domain match';
+    inner.innerHTML = `
+      <div style="background:var(--ok-soft); border:1px solid var(--ok-line); border-radius:var(--r-l); padding:18px 20px;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+          <span class="badge ok"><span class="d"></span> Official</span>
+          <span style="font-family:var(--font-mono); font-size:11px; color:var(--ok-2); font-weight:600;">${matchLabel}</span>
+          ${r.escalation_required ? '<span class="badge major"><span class="d"></span> Escalation required</span>' : ''}
+        </div>
+        <div style="font-size:15px; font-weight:700; color:var(--ink); margin-bottom:6px;">${escHtml(r.authority || '')}</div>
+        <div style="font-size:13px; color:var(--ink-2); margin-bottom:4px;">
+          ${r.country ? '<span class="flag" style="font-size:14px;">' + (FLAGS[r.country] || '') + '</span> ' + escHtml(r.country) : ''}
+          ${r.authority_type ? ' · <span style="font-family:var(--font-mono); font-size:11px;">' + escHtml(r.authority_type) + '</span>' : ''}
+        </div>
+        ${r.authority_url ? '<div style="font-size:12.5px; margin-top:4px;"><a href="' + escHtml(r.authority_url) + '" target="_blank" rel="noopener" style="color:var(--info); border-bottom:1px solid rgba(47,91,183,0.25);">' + escHtml(r.authority_url) + '</a></div>' : ''}
+        ${r.sections && r.sections.length ? '<div style="margin-top:10px; display:flex; gap:5px; flex-wrap:wrap;">' + r.sections.map(s => '<span class="section-chip">' + escHtml(s) + '</span>').join('') + '</div>' : ''}
+        <div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--ok-line); display:flex; gap:8px;">
+          <button class="btn btn-primary" style="font-size:12px; height:30px;" onclick="classifyVerified('official')">Confirm official</button>
+          <button class="btn" style="font-size:12px; height:30px;" onclick="classifyVerified('unofficial_trusted')">Mark as trusted (unofficial)</button>
+        </div>
+      </div>`;
+  } else if (r.match === 'previously_classified') {
+    const cls = r.classification === 'official' ? 'ok' : r.classification === 'unofficial_trusted' ? 'warn' : 'crit';
+    const label = r.classification === 'official' ? 'Official' : r.classification === 'unofficial_trusted' ? 'Unofficial · Trusted' : 'Not official';
+    inner.innerHTML = `
+      <div style="background:var(--${cls}-soft); border:1px solid var(--${cls}-line); border-radius:var(--r-l); padding:18px 20px;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+          <span class="badge ${cls}"><span class="d"></span> ${label}</span>
+          <span style="font-family:var(--font-mono); font-size:11px; color:var(--ink-3); font-weight:600;">Previously classified</span>
+        </div>
+        ${r.country ? '<div style="font-size:14px; font-weight:600; color:var(--ink); margin-bottom:4px;">' + escHtml(r.country) + (r.authority ? ' · ' + escHtml(r.authority) : '') + '</div>' : ''}
+        ${r.notes ? '<div style="font-size:12.5px; color:var(--ink-2); margin-top:6px;">' + escHtml(r.notes) + '</div>' : ''}
+        <div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--${cls}-line); display:flex; gap:8px;">
+          <button class="btn" style="font-size:12px; height:30px;" onclick="classifyVerified('official')">Reclassify: Official</button>
+          <button class="btn" style="font-size:12px; height:30px;" onclick="classifyVerified('unofficial_trusted')">Reclassify: Trusted</button>
+          <button class="btn btn-danger" style="font-size:12px; height:30px;" onclick="classifyVerified('not_official')">Reclassify: Not official</button>
+        </div>
+      </div>`;
+  } else {
+    inner.innerHTML = `
+      <div style="background:var(--paper-2); border:1px solid var(--paper-line); border-radius:var(--r-l); padding:18px 20px;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+          <span class="badge neut"><span class="d"></span> Unknown</span>
+          <span style="font-family:var(--font-mono); font-size:11px; color:var(--ink-3); font-weight:600;">Not in registry · domain: ${escHtml(r.domain || '')}</span>
+        </div>
+        <div style="font-size:13.5px; color:var(--ink-2); margin-bottom:14px;">This URL doesn't match any known official source. Classify it below.</div>
+        <div style="margin-bottom:12px;">
+          <div style="font-family:var(--font-mono); font-size:10px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-3); margin-bottom:6px;">Notes (optional)</div>
+          <input id="classifyNotes" style="width:100%; height:32px; padding:0 10px; font-family:var(--font-ui); font-size:13px; border:1px solid var(--paper-line); border-radius:var(--r-s); background:var(--paper); color:var(--ink); outline:none;" placeholder="e.g. Well-known law firm, government gazette…" />
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-primary" style="font-size:12px; height:30px;" onclick="classifyVerified('official')">Official</button>
+          <button class="btn btn-warn" style="font-size:12px; height:30px;" onclick="classifyVerified('unofficial_trusted')">Unofficial · Trusted</button>
+          <button class="btn btn-danger" style="font-size:12px; height:30px;" onclick="classifyVerified('not_official')">Not official</button>
+        </div>
+      </div>`;
+  }
+}
+
+async function classifyVerified(classification) {
+  if (!_verifyResult) return;
+  const notes = document.getElementById('classifyNotes')?.value || '';
+  await fetch('/api/sources/classify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      url: _verifyResult._url,
+      classification,
+      notes,
+      classified_by: 'Shivansh Gupta | Product',
+      matched_authority: _verifyResult.authority || '',
+      matched_country: _verifyResult.country || '',
+    }),
+  });
+  document.getElementById('verifyResult').style.display = 'none';
+  document.getElementById('verifyUrlInput').value = '';
+  _verifyResult = null;
+  // Refresh classifications list
+  const classRes = await fetch('/api/sources/classifications').then(r => r.json());
+  renderClassifications(classRes);
+}
+
+// ═══════════════════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════════════════
 loadAll();
+loadSourcesTab();
 </script>
 
 </body>

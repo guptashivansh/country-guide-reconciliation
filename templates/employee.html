@@ -228,9 +228,60 @@ const EMPLOYEE = {
 const COUNTRY_NAME = window._ATLAS_COUNTRY;
 const COUNTRY_FLAG = window._ATLAS_FLAG;
 
+// ───────────────────────────────────────────────────────────────────────────
+// TEXT FORMATTING PIPELINE
+// One pipeline used by all consumers (guide body, preview cards, TLDR):
+//   raw text
+//     → preCleanMarkdown      (strip heading #'s, unwrap [text](url))
+//     → parseInlineMarkdown   (tokenize ***, **, *, __, _, ` into typed segments)
+//     → renderRichText        (auto-bold numbers + search highlight per segment,
+//                              wrap in <strong>/<em>/<code> as needed)
+// stripMarkdownToPlain is the plain-string sibling for truncation / search /
+// length measurement — anywhere we can't render React nodes.
+// ───────────────────────────────────────────────────────────────────────────
+
+function preCleanMarkdown(text) {
+  if (!text) return "";
+  return text
+    .replace(/^\s*#{1,6}\s+/gm, "")           // # headings → text
+    .replace(/\[([^\]]+?)\]\([^)]+?\)/g, "$1"); // [text](url) → text
+}
+
+function parseInlineMarkdown(text) {
+  // Returns an array of { text, strong?, em?, code? } segments.
+  // Order in the regex matters: longest delimiter first.
+  if (!text) return [];
+  const re = /\*\*\*([^*]+?)\*\*\*|\*\*([^*]+?)\*\*|\*([^*]+?)\*|___([^_]+?)___|__([^_]+?)__|_([^_]+?)_|`([^`]+?)`/g;
+  const segs = [];
+  let last = 0, m;
+  while ((m = re.exec(text)) !== null) {
+    if (m.index > last) segs.push({ text: text.slice(last, m.index) });
+    if (m[1] !== undefined)      segs.push({ text: m[1], strong: true, em: true });
+    else if (m[2] !== undefined) segs.push({ text: m[2], strong: true });
+    else if (m[3] !== undefined) segs.push({ text: m[3], em: true });
+    else if (m[4] !== undefined) segs.push({ text: m[4], strong: true, em: true });
+    else if (m[5] !== undefined) segs.push({ text: m[5], strong: true });
+    else if (m[6] !== undefined) segs.push({ text: m[6], em: true });
+    else if (m[7] !== undefined) segs.push({ text: m[7], code: true });
+    last = re.lastIndex;
+  }
+  if (last < text.length) segs.push({ text: text.slice(last) });
+  return segs;
+}
+
+function stripMarkdownToPlain(text) {
+  if (!text) return text;
+  return preCleanMarkdown(text)
+    .replace(/\*{1,3}([^*]+?)\*{1,3}/g, "$1")
+    .replace(/_{1,3}([^_]+?)_{1,3}/g, "$1")
+    .replace(/`([^`]+?)`/g, "$1")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function firstSentence(text) {
   if (!text) return "";
-  const stripped = text.replace(/\([^)]*\)/g, "").replace(/\s+/g, " ").trim();
+  const stripped = stripMarkdownToPlain(text).replace(/\([^)]*\)/g, "").replace(/\s+/g, " ").trim();
   const m = stripped.match(/^[^.!?]+[.!?]/);
   return m ? m[0].trim() : stripped.slice(0, 140).trim();
 }
@@ -312,23 +363,41 @@ function highlight(text, term) {
   );
 }
 
-/* Auto-bold numbers+units and percentages, with optional search highlight inside */
-function renderRuleText(text, term) {
-  if (!text) return null;
+/* Render a plain-text run with auto-bolding for numbers+units+percentages and
+   optional search highlighting. Returns an array of React nodes / strings. */
+function autoBoldNumbers(text, term, keyPrefix) {
+  if (!text) return [];
   const boldRe = /(\b\d[\d,.]*(?:-\d[\d,.]*)?(?:\s*(?:working\s+)?(?:days?|weeks?|months?|years?|hours?|minutes?|days per year|weeks per year))|\d+(?:\.\d+)?%)/gi;
-  const result = [];
-  let last = 0, m;
+  const out = [];
+  let last = 0, m, i = 0;
   while ((m = boldRe.exec(text)) !== null) {
     if (m.index > last) {
-      result.push(<span key={`t${last}`}>{highlight(text.slice(last, m.index), term)}</span>);
+      out.push(<React.Fragment key={`${keyPrefix}t${i++}`}>{highlight(text.slice(last, m.index), term)}</React.Fragment>);
     }
-    result.push(<strong key={`b${m.index}`}>{highlight(m[0], term)}</strong>);
+    out.push(<strong key={`${keyPrefix}b${i++}`}>{highlight(m[0], term)}</strong>);
     last = boldRe.lastIndex;
   }
   if (last < text.length) {
-    result.push(<span key={`t${last}`}>{highlight(text.slice(last), term)}</span>);
+    out.push(<React.Fragment key={`${keyPrefix}t${i++}`}>{highlight(text.slice(last), term)}</React.Fragment>);
   }
-  return result.length > 0 ? result : highlight(text, term);
+  return out.length ? out : [highlight(text, term)];
+}
+
+/* Full pipeline: markdown emphasis → auto-bold numbers → search highlight.
+   The single source of truth for guide-body text rendering. */
+function renderRuleText(text, term) {
+  if (!text) return null;
+  const cleaned = preCleanMarkdown(text);
+  const segments = parseInlineMarkdown(cleaned);
+  if (!segments.length) return null;
+  return segments.map((seg, i) => {
+    const inner = autoBoldNumbers(seg.text, term, `s${i}-`);
+    if (seg.code)                return <code key={`seg${i}`}>{inner}</code>;
+    if (seg.strong && seg.em)    return <strong key={`seg${i}`}><em>{inner}</em></strong>;
+    if (seg.strong)              return <strong key={`seg${i}`}>{inner}</strong>;
+    if (seg.em)                  return <em key={`seg${i}`}>{inner}</em>;
+    return <React.Fragment key={`seg${i}`}>{inner}</React.Fragment>;
+  });
 }
 
 /* ── AppBar ── */
@@ -582,9 +651,11 @@ function SinceYouJoined({ changes, onJump, sinceLabel }) {
           const sectionLabel = a.section
             ? a.section.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())
             : "—";
+          // Preview cards show plain text only — markdown stripped for at-a-glance scan.
+          // Guide body uses renderRuleText (which preserves markdown emphasis).
           const trunc = (s, n) => s && s.length > n ? s.slice(0, n) + "…" : (s || null);
-          const newVal = trunc(a.new_value, 110);
-          const oldVal = decision === "approved" ? trunc(a.old_value, 72) : null;
+          const newVal = trunc(stripMarkdownToPlain(a.new_value), 110);
+          const oldVal = decision === "approved" ? trunc(stripMarkdownToPlain(a.old_value), 72) : null;
           return (
             <article key={a.id} className={cardCls}>
               <div className="syj-item-head">
@@ -599,7 +670,7 @@ function SinceYouJoined({ changes, onJump, sinceLabel }) {
                 </div>
               )}
               {a.reviewer_comment && !newVal && (
-                <div className="syj-desc">{trunc(a.reviewer_comment, 90)}</div>
+                <div className="syj-desc">{trunc(stripMarkdownToPlain(a.reviewer_comment), 90)}</div>
               )}
               <button className="syj-jump" onClick={() => onJump(a.section)}>
                 See in guide <IconArrowRight />
@@ -671,7 +742,9 @@ function Rule({ rule, plain, search }) {
     return firstSentence(rule.value) || rule.value;
   }, [plain, rule.value]);
 
-  if (term && !rule.label.toLowerCase().includes(term) && !rule.value.toLowerCase().includes(term)) {
+  // Match search term against the *visible* (markdown-stripped) text so users
+  // aren't matched against asterisks they can't see.
+  if (term && !rule.label.toLowerCase().includes(term) && !stripMarkdownToPlain(rule.value).toLowerCase().includes(term)) {
     return null;
   }
 
@@ -849,16 +922,6 @@ function App() {
                     </span>
                   )}
                   <div style={S.spacer} />
-                  <span className="eyebrow">View mode</span>
-                  <button
-                    className={`plain-toggle ${plain ? "on" : ""}`}
-                    onClick={() => setPlain(v => !v)}
-                    aria-pressed={plain}
-                  >
-                    <IconSparkle />
-                    Plain English
-                    <span className="toggle-switch" />
-                  </button>
                 </div>
               );
             })()}

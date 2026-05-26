@@ -266,8 +266,67 @@ class CountryGuideRepository:
         if "reviewer_rationale" not in audit_columns:
             c.execute("ALTER TABLE audit_log ADD COLUMN reviewer_rationale TEXT")
 
+        c.execute('''
+            CREATE TABLE IF NOT EXISTS country_notes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                country TEXT NOT NULL UNIQUE,
+                content TEXT NOT NULL DEFAULT '',
+                updated_at TEXT NOT NULL
+            )
+        ''')
+
         conn.commit()
         conn.close()
+
+    def get_country_notes(self, country):
+        conn = self.connect()
+        c = conn.cursor()
+        c.execute("SELECT content, updated_at FROM country_notes WHERE country = ?", (country,))
+        row = c.fetchone()
+        conn.close()
+        if row:
+            return {"content": row[0], "updated_at": row[1]}
+        return {"content": "", "updated_at": None}
+
+    def save_country_notes(self, country, content):
+        conn = self.connect()
+        c = conn.cursor()
+        timestamp = self._now()
+        c.execute('''
+            INSERT INTO country_notes (country, content, updated_at)
+            VALUES (?, ?, ?)
+            ON CONFLICT(country) DO UPDATE SET content=excluded.content, updated_at=excluded.updated_at
+        ''', (country, content, timestamp))
+        conn.commit()
+        conn.close()
+        return {"content": content, "updated_at": timestamp}
+
+    def manual_edit_rule(self, country, section, new_value):
+        conn = self.connect()
+        c = conn.cursor()
+        c.execute("SELECT value FROM country_guide WHERE country=? AND section=?", (country, section))
+        row = c.fetchone()
+        old_value = row[0] if row else "Not previously recorded"
+        if row and row[0] == new_value:
+            conn.close()
+            return None
+
+        timestamp = self._now()
+        approval_reference = f"manual_edit:{timestamp}"
+        self._publish_rule_version(
+            c, country, section, new_value, "manual_edit", "",
+            effective_date=timestamp[:10],
+            created_at=timestamp,
+            approval_reference=approval_reference,
+        )
+        c.execute('''
+            INSERT INTO audit_log
+            (action, country, section, old_value, new_value, decision, reviewer_comment, timestamp, reviewer_assignee)
+            VALUES ('MANUAL_EDIT', ?, ?, ?, ?, 'applied', 'Manual edit via guide page', ?, 'Shivansh Gupta | Product')
+        ''', (country, section, old_value, new_value, timestamp))
+        conn.commit()
+        conn.close()
+        return {"country": country, "section": section, "old_value": old_value, "new_value": new_value, "updated_at": timestamp}
 
     def seed_initial_country_guide(self):
         initial_data = [

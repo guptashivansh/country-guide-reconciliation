@@ -100,6 +100,15 @@ class ReviewService:
             self.provenance_service.record_bulk_approval(result["items"])
         return result
 
+    def get_country_notes(self, country):
+        return self.country_guide_repository.get_country_notes(country)
+
+    def save_country_notes(self, country, content):
+        return self.country_guide_repository.save_country_notes(country, content)
+
+    def manual_edit_rule(self, country, section, new_value):
+        return self.country_guide_repository.manual_edit_rule(country, section, new_value)
+
     def escalate_review_item(self, item_id, comment, assignee="", rationale=""):
         logger.info(
             "Escalating review item",

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Atlas · Country Guides</title>
+<title>Abdul Kalam AI · Country Guides</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -38,18 +38,15 @@ a{color:inherit;text-decoration:none} button{font:inherit;color:inherit;cursor:p
 ::-webkit-scrollbar{width:10px} ::-webkit-scrollbar-thumb{background:var(--paper-line);border-radius:999px;border:2px solid var(--paper)} ::-webkit-scrollbar-thumb:hover{background:var(--ink-4)}
 
 /* AppBar */
-.appbar{position:sticky;top:0;z-index:60;background:color-mix(in srgb,var(--paper) 92%,transparent);backdrop-filter:saturate(140%) blur(12px);border-bottom:1px solid var(--paper-line)}
-.appbar-inner{max-width:var(--maxw);margin:0 auto;padding:14px var(--gutter);display:flex;align-items:center;gap:18px}
-.appbar-brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
-.appbar-logo{width:28px;height:28px;border-radius:8px;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:800;font-size:14px;flex-shrink:0}
-.appbar-name{font-weight:700;font-size:17px;letter-spacing:-.02em}
-.appbar-sub{font-family:var(--font-mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);margin-top:2px;display:block}
-.appbar-right{display:flex;align-items:center;gap:8px;margin-left:auto}
-.appbar-crumb{font-family:var(--font-mono);font-size:11px;color:var(--ink-4);display:flex;align-items:center;gap:6px}
-.appbar-crumb a{color:var(--ink-3);transition:color .15s} .appbar-crumb a:hover{color:var(--ink)}
-.appbar-crumb-sep{color:var(--paper-line)}
-.appbar-btn{height:32px;padding:0 12px;border:1px solid var(--paper-line);border-radius:8px;background:var(--paper-2);font-size:12px;color:var(--ink-3);display:inline-flex;align-items:center;gap:6px;transition:all .15s;white-space:nowrap}
-.appbar-btn:hover{color:var(--ink);background:var(--paper-3);border-color:var(--ink-4)}
+.appbar{position:sticky;top:0;z-index:100;height:56px;display:flex;align-items:center;padding:0 40px;gap:14px;background:rgba(255,255,255,0.88);backdrop-filter:blur(16px) saturate(160%);-webkit-backdrop-filter:blur(16px) saturate(160%);border-bottom:1px solid var(--paper-line)}
+[data-mode="dark"] .appbar{background:rgba(11,13,17,0.88)}
+.appbar-logo{width:28px;height:28px;background:var(--accent);border-radius:var(--radius-s);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0}
+.appbar-name{font-weight:700;font-size:16px;letter-spacing:-0.3px}
+.appbar-sep{color:var(--paper-line);font-size:18px;font-weight:200}
+.appbar-subtitle{font-family:var(--font-mono);font-size:11px;color:var(--ink-4)}
+.appbar-spacer{flex:1}
+.appbar-theme{height:32px;padding:0 12px;border:1px solid var(--paper-line);border-radius:var(--radius-s);background:var(--paper);font-size:12px;color:var(--ink-3);display:flex;align-items:center;gap:6px;transition:all .15s}
+.appbar-theme:hover{color:var(--ink);background:var(--paper-3)}
 
 /* Shell */
 .shell{max-width:var(--maxw);margin:0 auto;padding:0 var(--gutter) 80px}
@@ -111,34 +108,24 @@ a{color:inherit;text-decoration:none} button{font:inherit;color:inherit;cursor:p
 <body>
 
 <header class="appbar">
-  <div class="appbar-inner">
-    <div class="appbar-brand">
-      <div class="appbar-logo">A</div>
-      <div>
-        <span class="appbar-name">Atlas</span>
-        <span class="appbar-sub">Country Guides</span>
-      </div>
-    </div>
-    <div class="appbar-crumb">
-      <a href="/">Hub</a>
-      <span class="appbar-crumb-sep">/</span>
-      <span>Guides</span>
-    </div>
-    <div class="appbar-right">
-      <button class="appbar-btn" id="themeBtn" onclick="toggleTheme()">
-        <span id="themeIcon">&#9790;</span>
-        <span id="themeLabel">Dark</span>
-      </button>
-      <a href="/" class="appbar-btn">&#8962; Hub</a>
-    </div>
-  </div>
+  <a href="/" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit">
+    <div class="appbar-logo">A</div>
+    <span class="appbar-name">Abdul Kalam AI</span>
+  </a>
+  <span class="appbar-sep">/</span>
+  <span class="appbar-subtitle">Country Guides</span>
+  <div class="appbar-spacer"></div>
+  <button class="appbar-theme" id="themeBtn" onclick="toggleTheme()">
+    <span id="themeIcon">&#9790;</span>
+    <span id="themeLabel">Dark</span>
+  </button>
 </header>
 
 <main class="shell">
   <div class="page-hero">
     <div class="eyebrow">{{ countries|length }} countries monitored</div>
     <h1 class="page-hero-title">Country Employment Guides</h1>
-    <p class="page-hero-sub">Official employment laws, leave policies, compensation rules, and compliance requirements for every country Atlas monitors.</p>
+    <p class="page-hero-sub">Official employment laws, leave policies, compensation rules, and compliance requirements for every country Abdul Kalam AI monitors.</p>
   </div>
 
   <div class="guide-toolbar">
@@ -152,7 +139,7 @@ a{color:inherit;text-decoration:none} button{font:inherit;color:inherit;cursor:p
 
   <div class="guide-grid" id="guideGrid">
     {% for c in countries %}
-    <div class="guide-card" data-name="{{ c.name|lower }}" onclick="window.location='/guide/{{ c.name }}'">
+    <div class="guide-card" data-name="{{ c.name|lower }}" onclick="window.location='/guide/ops/{{ c.name }}'">
       <div class="guide-card-head">
         <div class="guide-card-flag">{{ c.flag }}</div>
         <div>
@@ -171,8 +158,9 @@ a{color:inherit;text-decoration:none} button{font:inherit;color:inherit;cursor:p
         </div>
       </div>
       <div class="guide-card-foot" onclick="event.stopPropagation()">
-        <a href="/guide/{{ c.name }}" class="guide-card-link guide-card-link-primary">View guide &rarr;</a>
-        <a href="/employee/{{ c.name }}" class="guide-card-link guide-card-link-employee">Employee view</a>
+        <a href="/guide/employee/{{ c.name }}" class="guide-card-link guide-card-link-employee">Employee</a>
+        <a href="/guide/client/{{ c.name }}" class="guide-card-link guide-card-link-primary">Client</a>
+        <a href="/guide/ops/{{ c.name }}" class="guide-card-link">Ops</a>
       </div>
     </div>
     {% endfor %}
@@ -181,7 +169,7 @@ a{color:inherit;text-decoration:none} button{font:inherit;color:inherit;cursor:p
   <div class="no-results" id="noResults" style="display:none">No countries match your search.</div>
 
   <div class="guide-footer">
-    <span>Atlas Compliance &middot; {{ countries|length }} countries</span>
+    <span>Abdul Kalam AI Compliance &middot; {{ countries|length }} countries</span>
     <span>Not legal advice</span>
   </div>
 </main>
