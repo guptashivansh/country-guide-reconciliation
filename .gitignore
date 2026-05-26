@@ -3,6 +3,7 @@
 __pycache__/
 *.pyc
 .DS_Store
+.playwright-mcp/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

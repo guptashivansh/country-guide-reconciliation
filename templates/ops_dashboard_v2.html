@@ -1154,9 +1154,9 @@ input:focus, button:focus, select:focus, textarea:focus, [tabindex]:focus { outl
   font-family: var(--font-mono); font-size: 13px; font-weight: 700; color: var(--ink);
 }
 .triage-grid {
-  display: grid; grid-template-columns: repeat(5, minmax(100px,1fr)); gap: 8px;
+  display: flex; flex-wrap: wrap; gap: 8px;
 }
-@media (max-width: 900px) { .triage-grid { grid-template-columns: repeat(3, 1fr); } }
+.triage-grid .triage-field { flex: 1 1 120px; min-width: 100px; max-width: 220px; }
 .triage-field { display: grid; gap: 4px; min-width: 0; }
 .triage-label {
   font-family: var(--font-mono); font-size: 9.5px; font-weight: 700;
@@ -1202,6 +1202,22 @@ input:focus, button:focus, select:focus, textarea:focus, [tabindex]:focus { outl
   margin-bottom: 8px;
 }
 .reject-modal .field-group { margin-bottom: 18px; }
+
+/* ── Add source modal ── */
+#addSourceModal select {
+  width: 100%; height: 36px; font-family: var(--font-mono); font-size: 12px;
+  padding: 0 12px; border: 1px solid var(--paper-line); border-radius: var(--r-s);
+  background: var(--paper-2); color: var(--ink); outline: none; appearance: auto;
+}
+#addSourceModal select:focus { border-color: var(--purple); box-shadow: var(--focus); }
+#addSourceModal select:disabled { opacity: 0.5; cursor: not-allowed; }
+#addSourceModal .field-label {
+  font-family: var(--font-mono); font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3);
+  margin-bottom: 8px;
+}
+#addSourceModal .field-group { margin-bottom: 14px; }
+#addSourceModal input:focus, #addSourceModal textarea:focus { border-color: var(--purple); box-shadow: var(--focus); }
 
 /* ── Compare Versions modal ── */
 .ver-modal .modal { max-width: 860px; }
@@ -1539,6 +1555,33 @@ input:focus, button:focus, select:focus, textarea:focus, [tabindex]:focus { outl
   border-left: 2px solid var(--paper-line-2);
 }
 .audit-row .right { display: flex; align-items: center; gap: 6px; align-self: center; }
+.audit-diff {
+  margin-top: 8px;
+  display: grid; grid-template-columns: 1fr 1fr;
+  border: 1px solid var(--paper-line);
+  border-radius: var(--r-s);
+  overflow: hidden;
+  font-size: 12px; line-height: 1.5;
+}
+.audit-diff .audit-diff-side {
+  padding: 6px 10px;
+  font-family: var(--font-mono); font-size: 11.5px;
+  white-space: pre-wrap; word-break: break-word;
+}
+.audit-diff .audit-diff-old {
+  background: color-mix(in srgb, var(--crit) 6%, var(--paper));
+  border-right: 1px solid var(--paper-line);
+  color: var(--crit-2);
+}
+.audit-diff .audit-diff-new {
+  background: color-mix(in srgb, var(--ok) 6%, var(--paper));
+  color: var(--ok-2);
+}
+.audit-diff .audit-diff-label {
+  font-family: var(--font-mono); font-size: 9.5px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ink-4); margin-bottom: 2px;
+}
 
 /* ─────────────────────────────────────────────
    PIPELINE TAB
@@ -1940,10 +1983,6 @@ input:focus, button:focus, select:focus, textarea:focus, [tabindex]:focus { outl
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
     Live Guide
   </a>
-  <a href="/compliance/intake" class="btn" style="text-decoration:none; border-color:var(--orange-line); color:var(--orange-2); background:var(--orange-soft);">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
-    Intake
-  </a>
   <button class="btn-sync" onclick="openSync()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
     Sync sources
@@ -1960,23 +1999,6 @@ input:focus, button:focus, select:focus, textarea:focus, [tabindex]:focus { outl
 </div>
 
 <div class="page">
-
-  <!-- ── Manager strip ── -->
-  <section class="mgr" id="mgrStrip">
-    <div class="mgr-head">
-      <div>
-        <div class="eyebrow">For the ops manager</div>
-        <h2>Global compliance overview</h2>
-      </div>
-      <div class="mgr-collapsed" id="mgrCollapsedSummary"></div>
-      <button class="mgr-toggle" onclick="toggleMgr()" id="mgrToggleBtn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" id="mgrToggleIcon"><polyline points="18 15 12 9 6 15"/></svg>
-        <span id="mgrToggleLabel">Collapse</span>
-      </button>
-    </div>
-    <div class="mgr-metrics" id="mgrMetrics"></div>
-    <div class="mgr-pills" id="mgrPills"></div>
-  </section>
 
   <!-- ── Tabs ── -->
   <nav class="tabs" role="tablist">
@@ -2004,6 +2026,55 @@ input:focus, button:focus, select:focus, textarea:focus, [tabindex]:focus { outl
       <span id="lastSyncLabel">Loading…</span>
     </span>
   </nav>
+
+  <!-- ── Global triage strip (applies to all tabs) ── -->
+  <div class="triage-strip" id="globalTriageStrip">
+    <div class="triage-summary">
+      <span class="label">Triage view</span>
+      <strong class="count" id="globalTriageCount">All data</strong>
+    </div>
+    <div class="triage-grid">
+      <div class="triage-field">
+        <span class="triage-label">Country</span>
+        <select class="triage-select" id="globalTriageCountry" onchange="applyGlobalTriage()">
+          <option value="">All</option>
+        </select>
+      </div>
+      <div class="triage-field">
+        <span class="triage-label">Severity</span>
+        <select class="triage-select" id="triageSeverity" onchange="applyGlobalTriage()">
+          <option value="">All</option>
+          <option value="critical">Critical</option>
+          <option value="major">Major</option>
+          <option value="minor">Minor</option>
+        </select>
+      </div>
+      <div class="triage-field">
+        <span class="triage-label">Confidence</span>
+        <select class="triage-select" id="triageConfidence" onchange="applyGlobalTriage()">
+          <option value="">All</option>
+          <option value="high">&ge; 90%</option>
+          <option value="mid">70–89%</option>
+          <option value="low">&lt; 70%</option>
+        </select>
+      </div>
+      <div class="triage-field">
+        <span class="triage-label">Change type</span>
+        <select class="triage-select" id="triageChangeType" onchange="applyGlobalTriage()">
+          <option value="">All</option>
+        </select>
+      </div>
+      <div class="triage-field">
+        <span class="triage-label">Status</span>
+        <select class="triage-select" id="triageStatus" onchange="applyGlobalTriage()">
+          <option value="">All</option>
+          <option value="pending">Pending</option>
+          <option value="escalated">Escalated</option>
+        </select>
+      </div>
+    </div>
+    <button class="triage-reset" onclick="resetGlobalTriage()">Reset</button>
+  </div>
 
   <!-- ── Summary tab ── -->
   <section class="tabpanel active" data-tab="summary">
@@ -2072,54 +2143,7 @@ input:focus, button:focus, select:focus, textarea:focus, [tabindex]:focus { outl
         </button>
       </div>
     </div>
-    <!-- Triage strip -->
-    <div class="triage-strip" id="triageStrip">
-      <div class="triage-summary">
-        <span class="label">Triage view</span>
-        <strong class="count" id="triageCount">0 shown</strong>
-      </div>
-      <div class="triage-grid">
-        <div class="triage-field">
-          <span class="triage-label">Severity</span>
-          <select class="triage-select" id="triageSeverity" onchange="applyTriage()">
-            <option value="">All</option>
-            <option value="critical">Critical</option>
-            <option value="major">Major</option>
-            <option value="minor">Minor</option>
-          </select>
-        </div>
-        <div class="triage-field">
-          <span class="triage-label">Confidence</span>
-          <select class="triage-select" id="triageConfidence" onchange="applyTriage()">
-            <option value="">All</option>
-            <option value="high">≥ 90%</option>
-            <option value="mid">70–89%</option>
-            <option value="low">&lt; 70%</option>
-          </select>
-        </div>
-        <div class="triage-field">
-          <span class="triage-label">Country</span>
-          <select class="triage-select" id="triageCountry" onchange="applyTriage()">
-            <option value="">All</option>
-          </select>
-        </div>
-        <div class="triage-field">
-          <span class="triage-label">Change type</span>
-          <select class="triage-select" id="triageChangeType" onchange="applyTriage()">
-            <option value="">All</option>
-          </select>
-        </div>
-        <div class="triage-field">
-          <span class="triage-label">Status</span>
-          <select class="triage-select" id="triageStatus" onchange="applyTriage()">
-            <option value="">All</option>
-            <option value="pending">Pending</option>
-            <option value="escalated">Escalated</option>
-          </select>
-        </div>
-      </div>
-      <button class="triage-reset" onclick="resetTriage()">Reset</button>
-    </div>
+    <!-- Triage strip moved to global position above all tabs -->
 
     <div class="bulk-bar" id="bulkBar" style="display:none;">
       <div>
@@ -2164,6 +2188,7 @@ input:focus, button:focus, select:focus, textarea:focus, [tabindex]:focus { outl
         <tr>
           <th style="width:36px;"></th>
           <th>Country</th>
+          <th>Last sync</th>
           <th>Drift status</th>
           <th>Sections affected</th>
           <th>Severity breakdown</th>
@@ -2233,6 +2258,26 @@ input:focus, button:focus, select:focus, textarea:focus, [tabindex]:focus { outl
 
   <!-- ── Sources tab ── -->
   <section class="tabpanel" data-tab="sources">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
+      <div>
+        <div class="eyebrow" style="color:var(--purple); margin-bottom:6px;">Source registry</div>
+        <div style="font-size:18px; font-weight:800; letter-spacing:-0.4px;">Manage source endpoints</div>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button class="btn btn-primary" onclick="openAddSourceModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          URL Source
+        </button>
+        <a href="/compliance/intake/pdf" class="btn btn-primary" style="text-decoration:none;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Intake PDF
+        </a>
+      </div>
+    </div>
+
+    <!-- Registry stats (metrics at top, consistent with other tabs) -->
+    <div id="registryStats" style="display:flex; gap:14px; flex-wrap:wrap; margin-bottom:24px;"></div>
+
     <div class="sources-grid">
       <!-- Left: URL Verifier -->
       <div>
@@ -2270,11 +2315,6 @@ input:focus, button:focus, select:focus, textarea:focus, [tabindex]:focus { outl
       </div>
     </div>
 
-    <!-- Registry stats bar -->
-    <div style="margin-top:32px; padding-top:24px; border-top:1px solid var(--paper-line);">
-      <div class="eyebrow" style="margin-bottom:12px;">Official source registry</div>
-      <div id="registryStats" style="display:flex; gap:14px; flex-wrap:wrap;"></div>
-    </div>
   </section>
 
 </div>
@@ -2337,7 +2377,12 @@ input:focus, button:focus, select:focus, textarea:focus, [tabindex]:focus { outl
         <span>Countries to sync</span>
         <a class="all-link" onclick="toggleAllCountries()">Select / deselect all</a>
       </h4>
+      <div class="search-bar" style="margin-bottom:12px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="syncCountrySearch" placeholder="Search countries…" oninput="filterSyncCountries()" />
+      </div>
       <div class="country-grid" id="countryGrid"></div>
+      <div id="syncCountryEmpty" style="display:none; padding:16px; text-align:center; color:var(--ink-3); font-size:13px; grid-column:1/-1;">No countries match your search.</div>
     </div>
     <div class="modal-actions">
       <span class="est">Selected: <b id="modalCount">0</b></span>
@@ -2369,6 +2414,104 @@ input:focus, button:focus, select:focus, textarea:focus, [tabindex]:focus { outl
       <span class="est">Showing: <b id="driftModalCount">0</b> in strip</span>
       <button class="btn" onclick="closeDriftModal()">Cancel</button>
       <button class="btn btn-primary btn-lg" onclick="applyDriftSelection()">Apply</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Add Source Modal ── -->
+<div class="modal-scrim" id="addSourceModal" onclick="if(event.target===this) closeAddSourceModal()">
+  <div class="modal" style="width:560px;">
+    <button class="close" onclick="closeAddSourceModal()" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <h3>Add source endpoint</h3>
+    <p class="sub">Register a new government source endpoint for the compliance sync pipeline.</p>
+
+    <div class="field-group" style="margin-top:18px;">
+      <div class="field-label">Country</div>
+      <select id="addSrcCountry" onchange="onAddSrcCountryChange()">
+        <option value="">Select a country…</option>
+      </select>
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">Authority</div>
+      <select id="addSrcAuthority" disabled>
+        <option value="">Select a country first…</option>
+      </select>
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">Endpoint name</div>
+      <input id="addSrcName" type="text" placeholder="e.g. Employment Standards — Leave entitlements" style="width:100%; height:36px; padding:0 12px; font-family:var(--font-ui); font-size:13px; border:1px solid var(--paper-line); border-radius:var(--r-s); background:var(--paper-2); color:var(--ink); outline:none;" />
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">URL</div>
+      <input id="addSrcUrl" type="url" placeholder="https://…" style="width:100%; height:36px; padding:0 12px; font-family:var(--font-mono); font-size:12px; border:1px solid var(--paper-line); border-radius:var(--r-s); background:var(--paper-2); color:var(--ink); outline:none;" />
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+      <div class="field-group">
+        <div class="field-label">Source type</div>
+        <select id="addSrcType">
+          <option value="html">HTML</option>
+          <option value="pdf">PDF</option>
+          <option value="api">API</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Crawl frequency</div>
+        <select id="addSrcFreq">
+          <option value="weekly">Weekly</option>
+          <option value="monthly" selected>Monthly</option>
+          <option value="quarterly">Quarterly</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+      <div class="field-group">
+        <div class="field-label">Extraction strategy</div>
+        <select id="addSrcStrategy">
+          <option value="html_readability">HTML Readability</option>
+          <option value="pdf_extract">PDF Extract</option>
+          <option value="api_json">API JSON</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Content language</div>
+        <select id="addSrcLang">
+          <option value="en" selected>English</option>
+          <option value="es">Spanish</option>
+          <option value="fr">French</option>
+          <option value="de">German</option>
+          <option value="pt">Portuguese</option>
+          <option value="ar">Arabic</option>
+          <option value="zh">Chinese</option>
+          <option value="ja">Japanese</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">Sections covered</div>
+      <div id="addSrcSections" style="display:flex; gap:6px; flex-wrap:wrap;"></div>
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">Notes (optional)</div>
+      <textarea id="addSrcNotes" placeholder="Any additional context about this source…" style="width:100%; min-height:60px; resize:vertical; font-family:var(--font-ui); font-size:13px; line-height:1.5; padding:10px 12px; border:1px solid var(--paper-line); border-radius:var(--r-m); background:var(--paper-2); color:var(--ink); outline:none;"></textarea>
+    </div>
+
+    <div id="addSrcError" style="display:none; padding:10px 14px; background:var(--crit-soft); border:1px solid var(--crit-line); border-radius:var(--r-m); color:var(--crit-2); font-size:13px; font-weight:600; margin-bottom:12px;"></div>
+
+    <div class="modal-actions">
+      <button class="btn" onclick="closeAddSourceModal()">Cancel</button>
+      <button class="btn btn-primary btn-lg" id="addSrcSubmit" onclick="submitAddSource()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Create endpoint
+      </button>
     </div>
   </div>
 </div>
@@ -2463,60 +2606,13 @@ function renderAll() {
 // ═══════════════════════════════════════════════════
 function renderMetrics() {
   const m = DATA.metrics;
-  const el = document.getElementById('mgrMetrics');
-
-  const critCount = m.critical_changes || 0;
-  const pendingCount = m.pending_reviews || 0;
-  const avgConf = m.avg_confidence != null ? m.avg_confidence + '%' : '—';
-  const failures = m.crawl_failures || 0;
   const lastSync = m.last_successful_sync ? timeAgo(m.last_successful_sync) : 'never';
-
-  el.innerHTML = `
-    <div class="metric ${critCount > 0 ? 'crit' : 'ok'}" onclick="metricClick('critical')" title="View critical items">
-      <div class="strip"></div>
-      <div class="l">Critical · awaiting review</div>
-      <div class="v">${critCount}</div>
-      <div class="delta ${critCount > 0 ? 'up' : 'flat'}">${critCount > 0 ? 'needs attention' : 'all clear'}</div>
-    </div>
-    <div class="metric ${pendingCount > 5 ? 'warn' : 'info'}" onclick="metricClick('all')" title="View review queue">
-      <div class="strip"></div>
-      <div class="l">Total in queue</div>
-      <div class="v">${pendingCount}</div>
-      <div class="delta flat">pending review</div>
-    </div>
-    <div class="metric info" onclick="metricClick('confidence')" title="Sort by confidence">
-      <div class="strip"></div>
-      <div class="l">Avg confidence</div>
-      <div class="v">${avgConf}</div>
-      <div class="delta flat">AI classifier</div>
-    </div>
-    <div class="metric ok" onclick="metricClick('drift')" title="View drift map">
-      <div class="strip"></div>
-      <div class="l">Countries monitored</div>
-      <div class="v">${m.trusted_source_count || 0}</div>
-      <div class="delta flat">${m.sources_monitored || 0} sources</div>
-    </div>
-    <div class="metric ${failures > 0 ? 'crit' : 'neut'}" onclick="metricClick('pipeline')" title="View pipeline">
-      <div class="strip"></div>
-      <div class="l">Crawl failures</div>
-      <div class="v">${failures}</div>
-      <div class="delta flat">last sync ${lastSync}</div>
-    </div>
-  `;
 
   document.getElementById('lastSyncLabel').textContent = 'Last sync ' + lastSync;
   const notifEl = document.getElementById('notifCount');
   const totalNotifs = buildNotifications().length;
   notifEl.textContent = totalNotifs;
   notifEl.style.display = totalNotifs > 0 ? '' : 'none';
-  document.getElementById('mgrCollapsedSummary').innerHTML = `
-    ${critCount > 0 ? '<span class="badge crit"><span class="d"></span>' + critCount + ' critical</span><span class="sep">·</span>' : ''}
-    <span><b>${pendingCount}</b> in queue</span>
-    <span class="sep">·</span>
-    <span>Avg conf <b>${avgConf}</b></span>
-    <span class="sep">·</span>
-    <span class="mono">last sync ${lastSync}</span>
-  `;
 }
 
 // ═══════════════════════════════════════════════════
@@ -2524,9 +2620,12 @@ function renderMetrics() {
 // ═══════════════════════════════════════════════════
 function renderSummary() {
   const m = DATA.metrics;
-  const queue = DATA.queue || [];
-  const drift = DATA.drift || [];
-  const jobs = DATA.jobs || [];
+  let queue = DATA.queue || [];
+  let drift = DATA.drift || [];
+  if (activeCountryFilter) { queue = queue.filter(q => q.country === activeCountryFilter); drift = drift.filter(d => d.country === activeCountryFilter); }
+  if (triageFilters.severity) { queue = queue.filter(q => (q.severity||'').toLowerCase() === triageFilters.severity); drift = drift.filter(d => (d.severity||'').toLowerCase() === triageFilters.severity); }
+  if (triageFilters.status) queue = queue.filter(q => (q.status||'').toLowerCase() === triageFilters.status);
+  const jobs = activeCountryFilter ? (DATA.jobs || []).filter(j => j.country === activeCountryFilter) : (DATA.jobs || []);
 
   const pending = queue.filter(i => i.status === 'pending');
   const critical = pending.filter(i => (i.severity||'').toLowerCase() === 'critical');
@@ -2629,7 +2728,7 @@ function renderSummary() {
           <div class="item-title">${flag(i.country)} ${escHtml(i.country)} · ${sectionLabel(i.section)}</div>
           <div class="item-sub">${escHtml(truncate(i.new_value || i.change_summary || '', 60))}</div>
         </div>
-        <span class="item-time">${i.detected_at ? timeAgo(i.detected_at) : ''}</span>
+        <span class="item-time">${i.created_at ? timeAgo(i.created_at) : ''}</span>
       </div>
     `).join('');
   }
@@ -2674,6 +2773,7 @@ function renderSummary() {
 // ═══════════════════════════════════════════════════
 function renderDriftPills() {
   const el = document.getElementById('mgrPills');
+  if (!el) return; // manager strip removed — country selection logic preserved below
   if (!DATA.drift.length) { el.innerHTML = '<span class="label">No drift data</span>'; return; }
 
   const sorted = [...DATA.drift].sort((a,b) => {
@@ -2716,6 +2816,9 @@ function renderDriftPills() {
 function toggleCountryFilter(el) {
   const country = el.dataset.country;
   activeCountryFilter = (activeCountryFilter === country) ? null : country;
+  document.getElementById('globalTriageCountry').value = activeCountryFilter || '';
+  updateTriageCount();
+  renderSummary();
   renderDriftPills();
   renderPipeline();
   renderReview();
@@ -2834,9 +2937,6 @@ function renderReview() {
 
   let filtered = sortItems(applyFilter(applyTriageToItems(items)));
 
-  // triage count
-  document.getElementById('triageCount').textContent = filtered.length + ' shown';
-
   // bulk bar
   const minorItems = items.filter(i=>{ const s=(i.severity||'').toLowerCase(); return s!=='critical'&&s!=='major'; });
   document.getElementById('bulkMinorCount').textContent = '(' + minorItems.length + ')';
@@ -2905,7 +3005,7 @@ function renderReview() {
           <span class="rcard-meta">${countryCode} · ${sectionLabel(item.section)}</span>
           <span class="rcard-spacer"></span>
           ${isAutoApprovable ? '<span class="auto-approvable">' + conf + '% · auto-approvable</span>' : ''}
-          <span class="rcard-time">${timeAgo(item.created_at)}${item.source_url ? ' · ' + extractHost(item.source_url) : ''}</span>
+          <span class="rcard-time" title="Detected ${item.created_at ? fmtTime(item.created_at) : ''}">Detected ${timeAgo(item.created_at)}${item.created_at ? ' · ' + fmtDate(item.created_at) : ''}${item.source_url ? ' · ' + extractHost(item.source_url) : ''}</span>
           <div class="rcard-head-actions">
             <button class="btn btn-warn" onclick="doAction('escalate',${item.id}); event.stopPropagation();" title="Escalate [E]">Escalate</button>
             <button class="btn btn-danger" onclick="openRejectModal(${item.id}); event.stopPropagation();" title="Reject [R]">Reject</button>
@@ -2966,7 +3066,7 @@ function renderReview() {
               const job = DATA.jobs.find(j => j.source_snapshot_id && j.source_snapshot_id === item.source_snapshot_id);
               const trustLevel = (conf !== null && conf >= 90) ? 'verified' : (conf !== null && conf >= 70) ? 'review' : 'unknown';
               const trustLabel = trustLevel === 'verified' ? 'Verified' : trustLevel === 'review' ? 'Review required' : 'Unverified';
-              const srcType = item.source_url ? (item.source_url.includes('.gov') ? 'Government portal' : item.source_url.includes('notion') ? 'Notion page' : 'Web source') : 'Unknown';
+              const srcType = item.source_url ? (item.source_url.startsWith('seed://') ? 'Seed data' : item.source_url.includes('notion') ? 'Notion import' : 'Government source') : 'Unknown';
               return `
             <details class="prov-drawer">
               <summary class="prov-toggle">
@@ -2987,7 +3087,7 @@ function renderReview() {
                     <div class="prov-value">${escHtml(srcType)}</div>
                   </div>
                   <div>
-                    <div class="prov-key">Crawl timestamp</div>
+                    <div class="prov-key">Detected at</div>
                     <div class="prov-value">${item.created_at ? fmtTime(item.created_at) : '—'}</div>
                   </div>
                   <div>
@@ -3099,6 +3199,7 @@ function renderDrift() {
   const body = document.getElementById('driftBody');
 
   let items = activeCountryFilter ? DATA.drift.filter(d => d.country === activeCountryFilter) : DATA.drift;
+  if (triageFilters.severity) items = items.filter(d => (d.severity||'').toLowerCase() === triageFilters.severity);
   const allCount = items.length;
   const critCount = items.filter(d=>d.severity==='CRITICAL').length;
   const warnCount = items.filter(d=>d.severity==='WARNING').length;
@@ -3121,6 +3222,16 @@ function renderDrift() {
     return (ord[a.severity]||3) - (ord[b.severity]||3);
   });
 
+  // Build per-country last sync lookup from ingestion jobs
+  const lastSyncByCountry = {};
+  (DATA.jobs || []).forEach(j => {
+    const ts = j.reconciled_at || j.fetched_at || j.failed_at || j.queued_at;
+    if (!ts || !j.country) return;
+    if (!lastSyncByCountry[j.country] || ts > lastSyncByCountry[j.country].ts) {
+      lastSyncByCountry[j.country] = { ts, state: j.state };
+    }
+  });
+
   body.innerHTML = items.map(d => {
     const sevCls = d.severity === 'CRITICAL' ? 'crit' : d.severity === 'WARNING' ? 'warn' : 'stable';
     const sections = d.affected_sections || [];
@@ -3134,9 +3245,14 @@ function renderDrift() {
     if (infoSec) badges += `<span class="badge minor">${infoSec} info</span>`;
     if (!badges) badges = '<span style="color:var(--ink-3); font-style:italic;">no changes</span>';
 
+    const syncInfo = lastSyncByCountry[d.country];
+    const syncDisplay = syncInfo
+      ? `<span title="${fmtTime(syncInfo.ts)}">${timeAgo(syncInfo.ts)}</span>`
+      : '<span style="color:var(--ink-4); font-style:italic;">never</span>';
+
     let detailHtml = '';
     if (sections.length) {
-      detailHtml = `<tr class="detail-row"><td colspan="6"><div class="drift-row-inner">${
+      detailHtml = `<tr class="detail-row"><td colspan="7"><div class="drift-row-inner">${
         sections.map(s => {
           const sCls = s.severity === 'CRITICAL' ? 'crit' : s.severity === 'WARNING' ? 'major' : 'minor';
           return `<div class="section-card ${sCls}">
@@ -3152,6 +3268,7 @@ function renderDrift() {
       <tr class="parent ${sections.length ? '' : ''}" onclick="toggleDriftRow(this)">
         <td>${sections.length ? '<span class="expand-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>' : ''}</td>
         <td><div class="country-cell"><span class="flag">${flag(d.country)}</span><div class="info"><span class="name">${escHtml(d.country)}</span></div></div></td>
+        <td><span class="mono" style="font-size:12px; color:var(--ink-3); white-space:nowrap;">${syncDisplay}</span></td>
         <td><span class="drift-sev ${sevCls}"><span class="d"></span><span class="lbl">${d.drift_detected ? d.severity : 'Stable'}</span></span></td>
         <td>${sections.length} section${sections.length!==1?'s':''}</td>
         <td><div class="dct-counts">${badges}</div></td>
@@ -3195,6 +3312,8 @@ function renderAudit() {
   const el = document.getElementById('auditTimeline');
   let items = DATA.audit;
   if (activeCountryFilter) items = items.filter(a => a.country === activeCountryFilter);
+  if (triageFilters.severity) items = items.filter(a => (a.severity||'').toLowerCase() === triageFilters.severity);
+  if (triageFilters.status) items = items.filter(a => (a.status||'').toLowerCase() === triageFilters.status);
   document.getElementById('auditCount').textContent = items.length;
 
   if (!items.length) {
@@ -3219,6 +3338,10 @@ function renderAudit() {
           <span class="badge ${decBadge}"><span class="d"></span>${sevLabel(a.decision || a.action)}</span>
         </div>
         <div class="target">${flag(a.country)} ${escHtml(a.country)} · <b>${sectionLabel(a.section)}</b></div>
+        ${(a.old_value || a.new_value) ? `<div class="audit-diff">
+          <div class="audit-diff-side audit-diff-old"><div class="audit-diff-label">Before</div>${escHtml(a.old_value || '—')}</div>
+          <div class="audit-diff-side audit-diff-new"><div class="audit-diff-label">After</div>${escHtml(a.new_value || '—')}</div>
+        </div>` : ''}
         ${a.reviewer_comment ? '<div class="note">' + escHtml(a.reviewer_comment) + '</div>' : ''}
         ${a.reviewer_rationale ? '<div class="note"><em>' + escHtml(a.reviewer_rationale) + '</em></div>' : ''}
       </div>
@@ -3275,20 +3398,31 @@ function renderPipeline() {
   if (activeCountryFilter) {
     jobs = jobs.filter(j => j.country === activeCountryFilter);
   }
+  if (triageFilters.status === 'pending') jobs = jobs.filter(j => ['queued','fetched','normalized','extracted'].includes(j.state));
+  else if (triageFilters.status === 'escalated') jobs = jobs.filter(j => j.state === 'failed');
 
   const reconciled = jobs.filter(j=>j.state==='reconciled').length;
   const running = jobs.filter(j=>['queued','fetched','normalized','extracted'].includes(j.state)).length;
   const failed = jobs.filter(j=>j.state==='failed').length;
 
+  // Collect all countries from every data source
+  const allCountries = new Set();
+  DATA.drift.forEach(d => { if (d.country) allCountries.add(d.country); });
+  DATA.queue.forEach(q => { if (q.country) allCountries.add(q.country); });
+  jobs.forEach(j => { if (j.country) allCountries.add(j.country); });
+
+  const countriesWithJobs = new Set(jobs.filter(j => j.country).map(j => j.country));
+  const notSynced = allCountries.size - countriesWithJobs.size;
+
   document.getElementById('pipeSummary').innerHTML = `
     <div class="pipe-card ok"><div class="strip"></div><div class="v">${reconciled}</div><div class="l">Reconciled</div></div>
     <div class="pipe-card ${running?'run':'queue'}"><div class="strip"></div><div class="v">${running}</div><div class="l">In progress</div></div>
     <div class="pipe-card ${failed?'fail':'ok'}"><div class="strip"></div><div class="v">${failed}</div><div class="l">Failed</div></div>
-    <div class="pipe-card queue"><div class="strip"></div><div class="v">${jobs.length}</div><div class="l">Total jobs</div></div>
+    <div class="pipe-card queue"><div class="strip"></div><div class="v">${allCountries.size}</div><div class="l">Countries</div></div>
   `;
 
   const body = document.getElementById('pipeBody');
-  if (!jobs.length) {
+  if (!allCountries.size) {
     body.innerHTML = '';
     document.getElementById('pipeEmpty').style.display = 'block';
     return;
@@ -3302,18 +3436,38 @@ function renderPipeline() {
     byCountry[c].push(j);
   });
 
-  const countryKeys = Object.keys(byCountry).sort((a, b) => {
+  const countryKeys = [...allCountries].sort((a, b) => {
     if (a === 'Unknown') return 1;
     if (b === 'Unknown') return -1;
-    const aFail = byCountry[a].some(j => j.state === 'failed');
-    const bFail = byCountry[b].some(j => j.state === 'failed');
+    const aFail = (byCountry[a] || []).some(j => j.state === 'failed');
+    const bFail = (byCountry[b] || []).some(j => j.state === 'failed');
     if (aFail !== bFail) return aFail ? -1 : 1;
+    const aHasJobs = byCountry[a] ? 1 : 0;
+    const bHasJobs = byCountry[b] ? 1 : 0;
+    if (aHasJobs !== bHasJobs) return bHasJobs - aHasJobs;
     return a.localeCompare(b);
   });
 
   let html = '';
   countryKeys.forEach(country => {
-    const cJobs = byCountry[country];
+    const cJobs = byCountry[country] || [];
+    const cKey = escAttr(country);
+    const hasJobs = cJobs.length > 0;
+
+    if (!hasJobs) {
+      html += `<tr class="pipe-country-row" data-pipe-country="${cKey}">
+        <td></td>
+        <td><div class="country-cell"><span class="flag">${flag(country)}</span><span class="name">${escHtml(country)}</span></div></td>
+        <td><span class="pip-status queue"><span class="d"></span>Not synced</span></td>
+        <td><span class="source-ct muted">0 sources</span></td>
+        <td><span class="mono muted">—</span></td>
+        <td style="text-align:right;">
+          <button class="btn btn-ghost" onclick="syncCountry('${cKey}', event)">Sync</button>
+        </td>
+      </tr>`;
+      return;
+    }
+
     const status = countryOverallStatus(cJobs);
     const hasFail = cJobs.some(j => j.state === 'failed');
     const cReconciled = cJobs.filter(j => j.state === 'reconciled').length;
@@ -3322,7 +3476,6 @@ function renderPipeline() {
       const t = j.failed_at || j.reconciled_at || j.extracted_at || j.normalized_at || j.fetched_at || j.queued_at;
       return t > latest ? t : latest;
     }, '');
-    const cKey = escAttr(country);
 
     html += `<tr class="pipe-country-row ${hasFail ? 'has-fail' : ''}" data-pipe-country="${cKey}" onclick="togglePipeCountry(this)">
       <td><button class="expand-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button></td>
@@ -3406,9 +3559,21 @@ function updateModalCount() {
   document.getElementById('modalCount').textContent = n;
 }
 
-function toggleAllCountries() {
+function filterSyncCountries() {
+  const q = document.getElementById('syncCountrySearch').value.trim().toLowerCase();
   const items = document.querySelectorAll('#countryGrid .country-cb');
-  const allOn = [...items].every(i => i.classList.contains('checked'));
+  let visible = 0;
+  items.forEach(cb => {
+    const match = !q || cb.dataset.country.toLowerCase().includes(q);
+    cb.style.display = match ? '' : 'none';
+    if (match) visible++;
+  });
+  document.getElementById('syncCountryEmpty').style.display = visible ? 'none' : '';
+}
+
+function toggleAllCountries() {
+  const items = [...document.querySelectorAll('#countryGrid .country-cb')].filter(i => i.style.display !== 'none');
+  const allOn = items.every(i => i.classList.contains('checked'));
   items.forEach(i => i.classList.toggle('checked', !allOn));
   updateModalCount();
 }
@@ -3515,40 +3680,78 @@ function initSectionToggles() {
   });
 }
 
-// ── Triage filters ──
-let triageFilters = { severity: '', confidence: '', country: '', changeType: '', status: '' };
+// ── Global triage (all filters apply across all tabs) ──
+let triageFilters = { severity: '', confidence: '', changeType: '', status: '' };
+
 function populateTriageOptions() {
   const countries = new Set();
   const changeTypes = new Set();
-  DATA.queue.forEach(q => {
-    if (q.country) countries.add(q.country);
-    if (q.change_type) changeTypes.add(q.change_type);
-  });
-  const cSel = document.getElementById('triageCountry');
+  (DATA.queue || []).forEach(q => { if (q.country) countries.add(q.country); if (q.change_type) changeTypes.add(q.change_type); });
+  (DATA.drift || []).forEach(d => { if (d.country) countries.add(d.country); });
+  (DATA.audit || []).forEach(a => { if (a.country) countries.add(a.country); });
+  (DATA.jobs || []).forEach(j => { if (j.country) countries.add(j.country); });
+
+  const cSel = document.getElementById('globalTriageCountry');
   const ctSel = document.getElementById('triageChangeType');
-  // keep first "All" option, clear rest
+  const prev = cSel.value;
   cSel.innerHTML = '<option value="">All</option>' + [...countries].sort().map(c => '<option value="' + escHtml(c) + '">' + escHtml(c) + '</option>').join('');
+  if (prev) cSel.value = prev;
   ctSel.innerHTML = '<option value="">All</option>' + [...changeTypes].sort().map(t => '<option value="' + escHtml(t) + '">' + escHtml(t) + '</option>').join('');
+
+  if (activeCountryFilter) {
+    cSel.value = activeCountryFilter;
+  }
 }
-function applyTriage() {
+
+function readTriageSelects() {
+  activeCountryFilter = document.getElementById('globalTriageCountry').value || null;
   triageFilters.severity = document.getElementById('triageSeverity').value;
   triageFilters.confidence = document.getElementById('triageConfidence').value;
-  triageFilters.country = document.getElementById('triageCountry').value;
   triageFilters.changeType = document.getElementById('triageChangeType').value;
   triageFilters.status = document.getElementById('triageStatus').value;
-  reviewShowing = reviewPageSize;
-  renderReview();
 }
-function resetTriage() {
+
+function applyGlobalTriage() {
+  readTriageSelects();
+  reviewShowing = reviewPageSize;
+  updateTriageCount();
+  renderSummary();
+  renderDriftPills();
+  renderReview();
+  renderDrift();
+  renderAudit();
+  renderPipeline();
+}
+
+function resetGlobalTriage() {
+  document.getElementById('globalTriageCountry').value = '';
   document.getElementById('triageSeverity').value = '';
   document.getElementById('triageConfidence').value = '';
-  document.getElementById('triageCountry').value = '';
   document.getElementById('triageChangeType').value = '';
   document.getElementById('triageStatus').value = '';
-  triageFilters = { severity: '', confidence: '', country: '', changeType: '', status: '' };
+  activeCountryFilter = null;
+  triageFilters = { severity: '', confidence: '', changeType: '', status: '' };
   reviewShowing = reviewPageSize;
+  updateTriageCount();
+  renderSummary();
+  renderDriftPills();
   renderReview();
+  renderDrift();
+  renderAudit();
+  renderPipeline();
 }
+
+function updateTriageCount() {
+  const el = document.getElementById('globalTriageCount');
+  const parts = [];
+  if (activeCountryFilter) parts.push(activeCountryFilter);
+  if (triageFilters.severity) parts.push(triageFilters.severity);
+  if (triageFilters.confidence) parts.push('conf: ' + triageFilters.confidence);
+  if (triageFilters.changeType) parts.push(triageFilters.changeType);
+  if (triageFilters.status) parts.push(triageFilters.status);
+  el.textContent = parts.length ? parts.join(' · ') : 'All data';
+}
+
 function applyTriageToItems(items) {
   let r = items;
   if (triageFilters.severity) r = r.filter(i => (i.severity||'').toLowerCase() === triageFilters.severity);
@@ -3562,7 +3765,6 @@ function applyTriageToItems(items) {
       return true;
     });
   }
-  if (triageFilters.country) r = r.filter(i => i.country === triageFilters.country);
   if (triageFilters.changeType) r = r.filter(i => i.change_type === triageFilters.changeType);
   if (triageFilters.status) r = r.filter(i => i.status === triageFilters.status);
   return r;
@@ -3600,12 +3802,7 @@ const startTab = (location.hash || '#summary').slice(1);
 if (['summary','review','drift','audit','pipeline','sources'].includes(startTab)) goTab(startTab);
 
 function toggleMgr() {
-  const s = document.getElementById('mgrStrip');
-  const lbl = document.getElementById('mgrToggleLabel');
-  const ic = document.getElementById('mgrToggleIcon');
-  s.classList.toggle('collapsed');
-  if (s.classList.contains('collapsed')) { lbl.textContent = 'Expand'; ic.innerHTML = '<polyline points="6 9 12 15 18 9"/>'; }
-  else { lbl.textContent = 'Collapse'; ic.innerHTML = '<polyline points="18 15 12 9 6 15"/>'; }
+  // Manager strip removed — summary tab replaces it
 }
 
 function metricClick(action) {
@@ -3711,7 +3908,12 @@ async function retryJob(id, event) {
   }
 }
 
-function openSync() { document.getElementById('syncModal').classList.add('open'); }
+function openSync() {
+  document.getElementById('syncModal').classList.add('open');
+  const search = document.getElementById('syncCountrySearch');
+  search.value = '';
+  filterSyncCountries();
+}
 function closeSync() { document.getElementById('syncModal').classList.remove('open'); }
 
 function toggleSort() {
@@ -4228,6 +4430,130 @@ document.getElementById('globalSearch').addEventListener('input', e => {
     if (best[1] > 0) goTab(best[0]);
   }
 });
+
+// ═══════════════════════════════════════════════════
+//  ADD SOURCE MODAL
+// ═══════════════════════════════════════════════════
+let _addSrcCountries = [];
+let _addSrcAuthorities = [];
+const _addSrcSectionKeys = Object.keys(SECTION_LABELS);
+let _addSrcSelectedSections = new Set();
+
+async function openAddSourceModal() {
+  document.getElementById('addSourceModal').style.display = 'flex';
+  document.getElementById('addSrcError').style.display = 'none';
+
+  // Load countries if not cached
+  if (!_addSrcCountries.length) {
+    _addSrcCountries = await fetch('/api/sources/countries').then(r => r.json());
+  }
+  const sel = document.getElementById('addSrcCountry');
+  sel.innerHTML = '<option value="">Select a country…</option>' +
+    _addSrcCountries.map(c => `<option value="${c.id}" data-name="${escHtml(c.name)}">${escHtml(c.name)}</option>`).join('');
+
+  document.getElementById('addSrcAuthority').innerHTML = '<option value="">Select a country first…</option>';
+  document.getElementById('addSrcAuthority').disabled = true;
+
+  // Render section checkboxes
+  _addSrcSelectedSections.clear();
+  const sectionsEl = document.getElementById('addSrcSections');
+  sectionsEl.innerHTML = _addSrcSectionKeys.map(k =>
+    `<label style="display:inline-flex; align-items:center; gap:5px; padding:4px 10px; background:var(--paper-2); border:1px solid var(--paper-line); border-radius:var(--r-s); font-family:var(--font-mono); font-size:11px; font-weight:600; color:var(--ink-2); cursor:pointer; transition:all 0.12s; user-select:none;" onmouseenter="this.style.borderColor='var(--paper-line-2)'" onmouseleave="this.style.borderColor=this.querySelector('input').checked?'var(--purple-line)':'var(--paper-line)'">
+      <input type="checkbox" value="${k}" onchange="toggleAddSrcSection(this)" style="accent-color:var(--purple); width:13px; height:13px;" />
+      ${sectionLabel(k)}
+    </label>`
+  ).join('');
+
+  // Reset form
+  document.getElementById('addSrcName').value = '';
+  document.getElementById('addSrcUrl').value = '';
+  document.getElementById('addSrcType').value = 'html';
+  document.getElementById('addSrcFreq').value = 'monthly';
+  document.getElementById('addSrcStrategy').value = 'html_readability';
+  document.getElementById('addSrcLang').value = 'en';
+  document.getElementById('addSrcNotes').value = '';
+}
+
+function closeAddSourceModal() {
+  document.getElementById('addSourceModal').style.display = 'none';
+}
+
+async function onAddSrcCountryChange() {
+  const countryId = document.getElementById('addSrcCountry').value;
+  const authSel = document.getElementById('addSrcAuthority');
+  if (!countryId) {
+    authSel.innerHTML = '<option value="">Select a country first…</option>';
+    authSel.disabled = true;
+    return;
+  }
+  const auths = await fetch('/api/sources/authorities?country_id=' + encodeURIComponent(countryId)).then(r => r.json());
+  _addSrcAuthorities = auths;
+  authSel.disabled = false;
+  authSel.innerHTML = '<option value="">Select an authority…</option>' +
+    auths.map(a => `<option value="${a.id}">${escHtml(a.name)} (${escHtml(a.authority_type || 'gov')})</option>`).join('');
+}
+
+function toggleAddSrcSection(cb) {
+  if (cb.checked) {
+    _addSrcSelectedSections.add(cb.value);
+    cb.parentElement.style.background = 'var(--purple-soft)';
+    cb.parentElement.style.borderColor = 'var(--purple-line)';
+    cb.parentElement.style.color = 'var(--purple-2)';
+  } else {
+    _addSrcSelectedSections.delete(cb.value);
+    cb.parentElement.style.background = 'var(--paper-2)';
+    cb.parentElement.style.borderColor = 'var(--paper-line)';
+    cb.parentElement.style.color = 'var(--ink-2)';
+  }
+}
+
+async function submitAddSource() {
+  const errEl = document.getElementById('addSrcError');
+  errEl.style.display = 'none';
+
+  const authorityId = document.getElementById('addSrcAuthority').value;
+  const url = document.getElementById('addSrcUrl').value.trim();
+
+  if (!authorityId) { errEl.textContent = 'Please select a country and authority.'; errEl.style.display = ''; return; }
+  if (!url) { errEl.textContent = 'URL is required.'; errEl.style.display = ''; return; }
+
+  const btn = document.getElementById('addSrcSubmit');
+  btn.disabled = true;
+  btn.textContent = 'Creating…';
+
+  try {
+    const res = await fetch('/api/sources/endpoints', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        authority_id: authorityId,
+        name: document.getElementById('addSrcName').value.trim(),
+        url: url,
+        source_type: document.getElementById('addSrcType').value,
+        crawl_frequency: document.getElementById('addSrcFreq').value,
+        extraction_strategy: document.getElementById('addSrcStrategy').value,
+        content_language: document.getElementById('addSrcLang').value,
+        sections_covered: Array.from(_addSrcSelectedSections),
+        notes: document.getElementById('addSrcNotes').value.trim(),
+      }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error || 'Failed to create endpoint');
+    }
+
+    closeAddSourceModal();
+    toast('Source endpoint created');
+    loadSourcesTab();
+  } catch (e) {
+    errEl.textContent = e.message;
+    errEl.style.display = '';
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Create endpoint';
+  }
+}
 
 // ═══════════════════════════════════════════════════
 //  SOURCES TAB

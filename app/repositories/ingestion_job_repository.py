@@ -99,7 +99,7 @@ class IngestionJobRepository:
         conn.commit()
         conn.close()
 
-    def list_recent_jobs(self, limit=25):
+    def list_recent_jobs(self, limit=200):
         conn = self.connect()
         c = conn.cursor()
         c.execute("""
