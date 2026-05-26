@@ -370,6 +370,55 @@ class TrustedSourceEndpointRepository:
             "parsers": parsers,
         }
 
+    def create_endpoint(self, data: dict) -> dict:
+        import uuid
+        from datetime import datetime
+
+        conn = self.db.connect()
+        c = conn.cursor()
+        endpoint_id = data.get("id") or f"ep-{uuid.uuid4().hex[:12]}"
+        now = datetime.now().isoformat()
+
+        c.execute("""
+            INSERT INTO source_endpoints
+            (id, authority_id, name, url, source_type, content_language,
+             sections_covered, authority_category, extraction_strategy,
+             parser_key, crawl_frequency, change_detection_strategy,
+             requires_authentication, is_javascript_heavy,
+             supports_incremental_diffs, is_human_curated, status,
+             owner_team, owner_user_id, reviewer_group,
+             escalation_required, supports_replay, notes, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            endpoint_id,
+            data["authority_id"],
+            data.get("name", ""),
+            data["url"],
+            data.get("source_type", "html"),
+            data.get("content_language", "en"),
+            json.dumps(data.get("sections_covered", [])),
+            data.get("authority_category", ""),
+            data.get("extraction_strategy", "html_readability"),
+            data.get("parser_key", "html_readability_v1"),
+            data.get("crawl_frequency", "monthly"),
+            data.get("change_detection_strategy", "semantic"),
+            1 if data.get("requires_authentication") else 0,
+            1 if data.get("is_javascript_heavy") else 0,
+            1 if data.get("supports_incremental_diffs", True) else 0,
+            1 if data.get("is_human_curated", True) else 0,
+            data.get("status", "active"),
+            data.get("owner_team", ""),
+            data.get("owner_user_id", ""),
+            data.get("reviewer_group", ""),
+            1 if data.get("escalation_required") else 0,
+            1 if data.get("supports_replay", True) else 0,
+            data.get("notes", ""),
+            now, now,
+        ))
+        conn.commit()
+        conn.close()
+        return {"id": endpoint_id, "created_at": now}
+
     def update_crawl_timestamp(self, endpoint_id: str, success: bool):
         conn = self.db.connect()
         c = conn.cursor()

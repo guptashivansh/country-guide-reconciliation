@@ -25,3 +25,6 @@ class SourceRegistryService:
 
     def list_classifications(self, limit=50):
         return self.source_endpoint_repository.list_classifications(limit)
+
+    def create_endpoint(self, data):
+        return self.source_endpoint_repository.create_endpoint(data)

@@ -22,7 +22,7 @@ FLAGS = {
     "Georgia": "🇬🇪", "Germany": "🇩🇪", "Ghana": "🇬🇭",
     "Greece": "🇬🇷", "Guatemala": "🇬🇹", "Hong Kong": "🇭🇰",
     "Hungary": "🇭🇺", "India": "🇮🇳", "Indonesia": "🇮🇩",
-    "Israel": "🇮🇱", "Jamaica": "🇯🇲", "Japan": "🇯🇵",
+    "Ireland": "🇮🇪", "Israel": "🇮🇱", "Jamaica": "🇯🇲", "Japan": "🇯🇵",
     "Jordan": "🇯🇴", "Kenya": "🇰🇪", "Kuwait": "🇰🇼",
     "Lebanon": "🇱🇧", "Lithuania": "🇱🇹", "Luxembourg": "🇱🇺",
     "Madagascar": "🇲🇬", "Malawi": "🇲🇼", "Malaysia": "🇲🇾",
@@ -42,13 +42,46 @@ FLAGS = {
 }
 
 SECTION_GROUPS = [
-    {"id": "leave",        "label": "Leave & Time Off",       "sections": ["annual_leave", "sick_leave", "maternity_leave", "public_holidays"]},
-    {"id": "hours",        "label": "Working Hours",           "sections": ["working_hours", "overtime", "probation"]},
-    {"id": "compensation", "label": "Compensation",            "sections": ["minimum_wage", "income_tax", "payroll_tax", "withholding_tax"]},
-    {"id": "benefits",     "label": "Benefits & Social Security", "sections": ["health_insurance", "social_security", "pension", "employee_benefits"]},
-    {"id": "employment",   "label": "Employment Terms",        "sections": ["termination_notice", "employer_obligations", "industrial_relations"]},
-    {"id": "immigration",  "label": "Immigration",             "sections": ["work_permit", "work_visa", "expatriate_employment"]},
-    {"id": "safety",       "label": "Workplace Safety",        "sections": ["workplace_safety", "osh_obligations"]},
+    {"id": "leave",        "label": "Leave & Time Off",       "sections": [
+        "annual_leave", "sick_leave", "maternity_leave", "paternity_leave",
+        "parental_leave", "adoption_leave", "childcare_leave",
+        "compassionate_leave", "bereavement_leave", "public_holidays",
+        "casual_leave", "personal_leave", "study_leave", "care_leave",
+        "other_leaves", "leave_carry_forward",
+    ]},
+    {"id": "hours",        "label": "Working Hours",           "sections": [
+        "working_hours", "overtime", "probation",
+        "notice_period_probation", "training_hours",
+    ]},
+    {"id": "compensation", "label": "Compensation",            "sections": [
+        "minimum_wage", "payout_currency", "income_tax",
+        "employer_cost", "additional_employer_costs",
+        "annual_bonus", "thirteenth_month_pay", "festival_bonus",
+        "holiday_bonus", "holiday_pay", "holiday_pay_allowance", "vacation_premium",
+        "overtime_pay", "end_of_service_benefit", "severance_accrual",
+        "seniority_bonus", "profit_sharing", "long_service_pay",
+        "payroll_tax", "withholding_tax", "vat",
+    ]},
+    {"id": "benefits",     "label": "Benefits & Social Security", "sections": [
+        "health_insurance", "public_health_insurance", "private_health_insurance",
+        "social_security", "pension", "mandatory_pension",
+        "life_insurance", "severance_fund", "employee_benefits",
+    ]},
+    {"id": "employment",   "label": "Employment Terms",        "sections": [
+        "termination_notice", "termination_scenarios", "severance_payable",
+        "redundancy_allowance", "employer_obligations", "industrial_relations",
+        "contract_durations",
+    ]},
+    {"id": "onboarding",   "label": "Onboarding & Dates",      "sections": [
+        "onboarding_time", "onboarding_health_insurance", "device_shipment",
+        "additional_onboarding_requirement", "pay_date", "expenses_cutoff", "onboarding_cutoff",
+    ]},
+    {"id": "immigration",  "label": "Immigration",             "sections": [
+        "work_permit", "work_visa", "expatriate_employment",
+    ]},
+    {"id": "safety",       "label": "Workplace Safety",        "sections": [
+        "workplace_safety", "osh_obligations", "health_and_safety",
+    ]},
 ]
 
 
@@ -103,7 +136,7 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
         if not rows:
             abort(404)
 
-        rules_by_section = {r["section"]: {"section": r["section"], "value": r["value"], "last_updated": _fmt_date(r["last_updated"])} for r in rows}
+        rules_by_section = {r["section"]: {"section": r["section"], "value": r["value"], "last_updated": _fmt_date(r["last_updated"])} for r in rows if (r["value"] or "").strip()}
         last_updated = _fmt_date(max(r["last_updated"] for r in rows))
 
         groups = []
@@ -182,7 +215,7 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
 
     @routes.route("/api/ingestion-jobs")
     def get_ingestion_jobs():
-        return jsonify(ingestion_job_service.list_recent_jobs())
+        return jsonify(ingestion_job_service.list_recent_jobs(limit=500))
 
     @routes.route("/api/retry-job/<int:job_id>", methods=["POST"])
     def retry_job(job_id):
@@ -433,15 +466,15 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
             flag=FLAGS.get(country, "🌐"),
         )
 
-    EMPLOYEE_SECTIONS = {"leave", "hours", "compensation", "benefits"}
-    CLIENT_SECTIONS = {"leave", "hours", "compensation", "benefits", "employment", "immigration"}
-    OPS_SECTIONS = {"leave", "hours", "compensation", "benefits", "employment", "immigration", "safety"}
+    EMPLOYEE_SECTIONS = {"leave", "hours", "compensation", "benefits", "onboarding"}
+    CLIENT_SECTIONS = {"leave", "hours", "compensation", "benefits", "employment", "immigration", "onboarding"}
+    OPS_SECTIONS = {"leave", "hours", "compensation", "benefits", "employment", "immigration", "safety", "onboarding"}
 
     def _build_guide_context(country, allowed_group_ids):
         rows = review_service.get_country_sections(country)
         if not rows:
             return None
-        rules_by_section = {r["section"]: {"section": r["section"], "value": r["value"], "last_updated": _fmt_date(r["last_updated"])} for r in rows}
+        rules_by_section = {r["section"]: {"section": r["section"], "value": r["value"], "last_updated": _fmt_date(r["last_updated"])} for r in rows if (r["value"] or "").strip()}
         last_updated = _fmt_date(max(r["last_updated"] for r in rows))
         groups = []
         for g in SECTION_GROUPS:
@@ -486,7 +519,7 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
             group_rules = []
             for s in g["sections"]:
                 r = rules_by_section.get(s)
-                if r:
+                if r and (r["value"] or "").strip():
                     group_rules.append({
                         "id": s,
                         "label": s.replace("_", " ").title(),
@@ -671,6 +704,14 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
             "notes": ep.notes,
             "status": ep.status,
         } for ep in eps])
+
+    @routes.route("/api/sources/endpoints", methods=["POST"])
+    def source_create_endpoint():
+        data = request.get_json(silent=True) or {}
+        if not data.get("authority_id") or not data.get("url"):
+            return jsonify({"error": "authority_id and url are required"}), 400
+        result = source_registry_service.create_endpoint(data)
+        return jsonify(result), 201
 
     @routes.route("/api/sources/verify", methods=["POST"])
     def source_verify_url():
