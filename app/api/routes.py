@@ -267,12 +267,12 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
         confidences = [float(i["confidence"]) for i in pending if i.get("confidence") is not None]
         avg_conf = round(sum(confidences) / len(confidences) * 100) if confidences else None
 
-        jobs = ingestion_job_service.list_recent_jobs(limit=50)
+        jobs = ingestion_job_service.list_recent_jobs(limit=500)
         crawl_failures = len([j for j in jobs if j.get("state") == "failed"])
-        last_ok_ts = next(
+        last_ok_ts = max(
             (j.get("reconciled_at") for j in jobs
              if j.get("state") == "reconciled" and j.get("reconciled_at")),
-            None,
+            default=None,
         )
 
         registry = source_registry_service.get_registry_stats()

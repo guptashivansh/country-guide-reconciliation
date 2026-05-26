@@ -406,12 +406,15 @@ class CountryGuideRepository:
             SELECT id, country, section, old_value, new_value, severity, confidence, source_url, source_paragraph,
                    created_at, source_snapshot_id, status, reviewed_at, reviewer_comment, reviewer_assignee,
                    reviewer_rationale, effective_date, materiality_level, change_type
-            FROM review_queue WHERE status IN ('pending', 'escalated')
+            FROM review_queue
+            WHERE status IN ('pending', 'escalated')
+              AND country != ''
+              AND source_url NOT LIKE ?
             ORDER BY
                 CASE status WHEN 'escalated' THEN 0 ELSE 1 END,
                 CASE severity WHEN 'critical' THEN 1 WHEN 'major' THEN 2 ELSE 3 END,
                 confidence DESC
-        """)
+        """, ('seed://%',))
         rows = c.fetchall()
         conn.close()
         return [{
@@ -523,8 +526,17 @@ class CountryGuideRepository:
         return exists
 
     def enqueue_review_item(self, country, section, old_value, new_value, severity, confidence, source_url, source_paragraph, source_hash, source_snapshot_id, effective_date=None, materiality_level=None, change_type=None):
+        if not country or not country.strip():
+            return
         conn = self.connect()
         c = conn.cursor()
+        c.execute("""
+            SELECT id FROM review_queue
+            WHERE country=? AND section=? AND new_value=? AND status IN ('pending', 'escalated')
+        """, (country, section, new_value))
+        if c.fetchone() is not None:
+            conn.close()
+            return
         c.execute('''
             INSERT INTO review_queue
             (country, section, old_value, new_value, severity, confidence, source_url, source_paragraph,
