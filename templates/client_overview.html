@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-mode="light">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 <style>
-/* ── Atlas design tokens (matches employee.html) ── */
+/* ── Abdul Kalam AI design tokens (matches employee.html) ── */
 :root {
   --paper:        #FFFFFF;
   --paper-2:      #F6F7F9;
@@ -48,6 +48,20 @@
   --gutter: 28px;
 }
 
+[data-mode="dark"] {
+  --paper:#0B0D11; --paper-2:#131620; --paper-3:#1B1F2A; --paper-line:#262B38;
+  --ink:#F5F6F8; --ink-2:#D8DBE2; --ink-3:#9097A4; --ink-4:#5A6273;
+  --accent:#FF6A33; --accent-2:#FF8C5C; --accent-soft:rgba(255,106,51,.12); --accent-line:rgba(255,106,51,.36);
+  --purple:#9B85FF; --purple-2:#B5A5FF; --purple-soft:rgba(155,133,255,.14); --purple-line:rgba(155,133,255,.36);
+  --ok:#5BBE92; --ok-soft:rgba(91,190,146,.10);
+  --warn:#E0A04A; --warn-soft:rgba(224,160,74,.10);
+  --danger:#E87874; --danger-soft:rgba(232,120,116,.10);
+  --info:#6EB0F7; --info-soft:rgba(110,176,247,.10);
+  --shadow-1:0 1px 0 rgba(0,0,0,.4),0 1px 2px rgba(0,0,0,.4);
+  --shadow-2:0 2px 6px rgba(0,0,0,.4),0 14px 32px -18px rgba(0,0,0,.6);
+  --shadow-3:0 8px 24px -8px rgba(0,0,0,.6),0 28px 60px -28px rgba(0,0,0,.7);
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body {
   background: var(--paper);
@@ -75,7 +89,7 @@ input, textarea, select { font: inherit; color: inherit; }
 /* ── App bar ── */
 .appbar {
   position: sticky; top: 0; z-index: 100;
-  background: rgba(255,255,255,0.86);
+  background: color-mix(in srgb, var(--paper) 92%, transparent);
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
   border-bottom: 1px solid var(--paper-line);
@@ -351,7 +365,17 @@ input, textarea, select { font: inherit; color: inherit; }
 .dtable .num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
 .dtable .right { text-align: right; }
 
-/* ── Ask Atlas ── */
+/* ── Ask Abdul Kalam AI ── */
+[data-mode="dark"] .ask-atlas { background: linear-gradient(135deg, rgba(155,133,255,.10) 0%, rgba(155,133,255,.06) 100%); }
+[data-mode="dark"] .ask-atlas-bar input { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.10); }
+[data-mode="dark"] .ask-suggestion { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.10); color: var(--purple-2); }
+[data-mode="dark"] .ask-suggestion:hover { background: rgba(255,255,255,0.10); }
+[data-mode="dark"] .map-section { background: linear-gradient(180deg, var(--paper-2) 0%, var(--paper) 100%); }
+[data-mode="dark"] .world { background: var(--paper-2); }
+[data-mode="dark"] .world-dot.avail { background: var(--paper-3); border-color: var(--ink-4); color: var(--ink); }
+[data-mode="dark"] .ov-snapshot { background: linear-gradient(135deg, #1B2336 0%, #0B0D11 100%); }
+[data-mode="dark"] .compare-row-bar { background: var(--paper-3); }
+
 .ask-atlas {
   background: linear-gradient(135deg, var(--purple-soft) 0%, #F4EFFF 100%);
   border: 1px solid var(--purple-line);
@@ -391,6 +415,25 @@ input, textarea, select { font: inherit; color: inherit; }
   outline: none;
 }
 .ask-atlas-bar input::placeholder { color: var(--ink-4); }
+.ask-reply {
+  margin-top: 14px; padding: 18px 20px;
+  background: var(--paper); border: 1px solid var(--purple-line);
+  border-left: 3px solid var(--purple); border-radius: var(--radius-m);
+  font-size: 13.5px; line-height: 1.7; color: var(--ink-2);
+  position: relative; z-index: 1;
+  animation: ask-fade .22s ease both;
+}
+@keyframes ask-fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.ask-reply p { margin-bottom: 10px; }
+.ask-reply p:last-child { margin-bottom: 0; }
+.ask-reply strong { color: var(--ink); font-weight: 700; }
+.ask-reply em { font-style: italic; }
+.ask-reply code { font-family: var(--font-mono); font-size: 12px; background: var(--paper-2); border: 1px solid var(--paper-line); border-radius: 4px; padding: 1px 5px; }
+.ask-reply ul, .ask-reply ol { margin: 8px 0 10px 20px; }
+.ask-reply li { margin-bottom: 4px; }
+.ask-reply h3 { font-size: 14px; font-weight: 700; color: var(--ink); margin: 12px 0 6px; }
+.ask-reply h3:first-child { margin-top: 0; }
+
 .ask-suggestions {
   display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px;
   position: relative; z-index: 1;
@@ -777,6 +820,170 @@ input, textarea, select { font: inherit; color: inherit; }
   color: var(--ink-3); font-size: 13px;
   font-family: var(--font-mono);
 }
+
+/* ── Bell icon button (matches ops) ── */
+.iconbtn {
+  position: relative;
+  width: 36px; height: 36px;
+  background: var(--paper);
+  border: 1px solid var(--paper-line);
+  border-radius: var(--radius-m);
+  display: grid; place-items: center;
+  color: var(--ink-2);
+  transition: background 0.15s, border-color 0.15s, transform 0.08s;
+}
+.iconbtn:hover { background: var(--paper-2); border-color: var(--ink-4); }
+.iconbtn:active { transform: scale(0.96); }
+.iconbtn svg { width: 16px; height: 16px; }
+.iconbtn .badge-dot {
+  position: absolute; top: -4px; right: -4px;
+  min-width: 18px; height: 18px; padding: 0 5px;
+  background: var(--danger); color: white;
+  font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+  border-radius: 999px;
+  border: 2px solid var(--paper);
+  display: grid; place-items: center;
+}
+
+/* ── Notification panel (matches ops) ── */
+.notif-wrap { position: relative; }
+.notif-panel {
+  position: absolute; top: calc(100% + 8px); right: 0;
+  width: 400px;
+  background: var(--paper);
+  border: 1px solid var(--paper-line);
+  border-radius: var(--radius-l);
+  box-shadow: var(--shadow-3);
+  z-index: 200;
+  animation: notif-in .2s cubic-bezier(0.34, 1.32, 0.64, 1);
+  overflow: hidden;
+}
+@keyframes notif-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+.notif-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 18px 12px;
+  border-bottom: 1px solid var(--paper-line);
+}
+.notif-header h3 { font-size: 15px; font-weight: 800; letter-spacing: -0.3px; }
+.notif-header .notif-count {
+  font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+  color: var(--danger); background: var(--danger-soft);
+  border: 1px solid currentColor;
+  padding: 2px 8px; border-radius: 999px;
+}
+.notif-tabs {
+  display: flex; border-bottom: 1px solid var(--paper-line);
+  background: var(--paper-2);
+}
+.notif-tab {
+  flex: 1; padding: 9px 8px;
+  font-size: 12px; font-weight: 600; text-align: center;
+  color: var(--ink-3);
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s;
+}
+.notif-tab:hover { color: var(--ink-2); }
+.notif-tab.active { color: var(--ink); border-bottom-color: var(--purple); background: var(--paper); }
+.notif-tab .ct {
+  font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+  background: var(--paper-3); color: var(--ink-2);
+  padding: 1px 5px; border-radius: 999px;
+  margin-left: 4px;
+}
+.notif-tab.active .ct { background: var(--purple-soft); color: var(--purple-2); }
+.notif-body { max-height: 380px; overflow-y: auto; }
+.notif-item {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--paper-line);
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.notif-item:last-child { border-bottom: none; }
+.notif-item:hover { background: var(--paper-2); }
+.notif-item .notif-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  margin-top: 6px; flex-shrink: 0;
+}
+.notif-item .notif-dot.crit { background: var(--danger); box-shadow: 0 0 0 3px rgba(200,48,45,0.15); }
+.notif-item .notif-dot.warn { background: var(--warn); }
+.notif-item .notif-dot.info { background: var(--info, #1E5FB6); }
+.notif-item .notif-dot.ok   { background: var(--ok); }
+.notif-item .notif-content { flex: 1; min-width: 0; }
+.notif-item .notif-title {
+  font-size: 13px; font-weight: 600; color: var(--ink);
+  line-height: 1.35; margin-bottom: 2px;
+}
+.notif-item .notif-title .flag { font-size: 13px; margin-right: 4px; }
+.notif-item .notif-desc {
+  font-size: 12px; color: var(--ink-3); line-height: 1.4;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.notif-item .notif-time {
+  font-family: var(--font-mono); font-size: 10.5px; color: var(--ink-4);
+  white-space: nowrap; margin-top: 4px;
+}
+.notif-empty {
+  padding: 32px 18px; text-align: center;
+  color: var(--ink-3); font-size: 13px;
+}
+.notif-footer {
+  padding: 10px 18px;
+  border-top: 1px solid var(--paper-line);
+  text-align: center;
+}
+.notif-footer a {
+  font-size: 12.5px; font-weight: 600; color: var(--purple-2); cursor: pointer;
+}
+.notif-footer a:hover { color: var(--purple); text-decoration: underline; }
+.notif-backdrop {
+  position: fixed; inset: 0; z-index: 199;
+}
+
+/* ── Browse-all card grid ── */
+.browse-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px;
+}
+@media (max-width: 640px) { .browse-grid { grid-template-columns: 1fr; } }
+.browse-card {
+  background: var(--paper);
+  border: 1px solid var(--paper-line);
+  border-radius: var(--radius-l);
+  padding: 20px 22px;
+  display: flex; flex-direction: column; gap: 12px;
+  box-shadow: var(--shadow-1);
+  transition: all .18s;
+  cursor: pointer;
+  position: relative;
+}
+.browse-card:hover {
+  border-color: var(--accent-line);
+  box-shadow: var(--shadow-2);
+  transform: translateY(-2px);
+}
+.browse-card-active { border-left: 3px solid var(--accent); }
+.browse-card-head { display: flex; align-items: center; gap: 12px; }
+.browse-card-flag {
+  width: 46px; height: 46px; border-radius: var(--radius-m);
+  background: var(--paper-2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px; flex-shrink: 0;
+}
+.browse-card-name { font-size: 16px; font-weight: 800; letter-spacing: -0.3px; }
+.browse-card-region { font-family: var(--font-mono); font-size: 10.5px; color: var(--ink-3); letter-spacing: 0.06em; margin-top: 2px; }
+.browse-card-stats {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 0 16px;
+}
+.browse-card-stat { padding: 5px 0; }
+.browse-card-stat-l { font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 2px; }
+.browse-card-stat-v { font-family: var(--font-mono); font-weight: 700; color: var(--ink); font-size: 14px; }
+.browse-card-foot {
+  display: flex; align-items: center; justify-content: space-between;
+  padding-top: 10px; border-top: 1px solid var(--paper-line); gap: 10px;
+}
 </style>
 </head>
 <body>
@@ -793,7 +1000,14 @@ input, textarea, select { font: inherit; color: inherit; }
 <script type="text/babel" data-presets="react">
 const { useState, useEffect } = React;
 
-const COMPANY = "Lumen Robotics";
+const COMPANY = "Acme Corp";
+
+function IconMoon() {
+  return (<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M12 7.5A5.5 5.5 0 016.5 2a5.5 5.5 0 100 11A5.5 5.5 0 0112 7.5z" fill="currentColor"/></svg>);
+}
+function IconSun() {
+  return (<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="3" fill="currentColor"/><path d="M7 1v1.5M7 11.5V13M1 7h1.5M11.5 7H13M2.93 2.93l1.06 1.06M10.01 10.01l1.06 1.06M2.93 11.07l1.06-1.06M10.01 3.99l1.06-1.06" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>);
+}
 
 /* ACTIVE — countries the client currently has employees in. */
 const ACTIVE_COUNTRIES = [
@@ -805,16 +1019,30 @@ const ACTIVE_COUNTRIES = [
     changes: 3, alerts: "warn",
     mapX: 70.5, mapY: 51,
   },
+  {
+    id: "de", name: "Germany", flag: "🇩🇪", region: "Europe",
+    headcount: 8, openReqs: 2, monthlyUsd: 198400,
+    avgTenure: "1.4 yrs", loadPct: 23.4,
+    deltaHc: "+2 QoQ", deltaCost: "+6.1%",
+    changes: 2, alerts: "info",
+    mapX: 51, mapY: 33,
+  },
+  {
+    id: "ph", name: "Philippines", flag: "🇵🇭", region: "Southeast Asia",
+    headcount: 12, openReqs: 3, monthlyUsd: 124800,
+    avgTenure: "1.8 yrs", loadPct: 13.2,
+    deltaHc: "+4 QoQ", deltaCost: "+8.3%",
+    changes: 0, alerts: "ok",
+    mapX: 84, mapY: 55,
+  },
 ];
 
 /* AVAILABLE — countries the client can hire in via Skuad, but doesn't yet. */
 const AVAILABLE_COUNTRIES = [
   { id:"my", name:"Malaysia",      flag:"🇲🇾", region:"Southeast Asia",  seniorEngUsd: 39000,  loadPct: 16.4, leadDays: 5,  changes: 1, talent: "Strong",    note: "English-fluent · tech hub",       mapX: 77,   mapY: 60, recommended: true },
-  { id:"ph", name:"Philippines",   flag:"🇵🇭", region:"Southeast Asia",  seniorEngUsd: 36000,  loadPct: 13.2, leadDays: 4,  changes: 0, talent: "Deep",      note: "English-native · BPO heritage",   mapX: 84,   mapY: 55, recommended: true },
   { id:"vn", name:"Vietnam",       flag:"🇻🇳", region:"Southeast Asia",  seniorEngUsd: 32000,  loadPct: 21.5, leadDays: 7,  changes: 1, talent: "Growing",   note: "Fastest-growing tech talent pool",mapX: 79.5, mapY: 56, recommended: true },
   { id:"mx", name:"Mexico",        flag:"🇲🇽", region:"Latin America",   seniorEngUsd: 55900,  loadPct: 33.1, leadDays: 6,  changes: 1, talent: "Strong",    note: "US time zones · nearshore",       mapX: 19.5, mapY: 49, recommended: true },
   { id:"pl", name:"Poland",        flag:"🇵🇱", region:"Europe",          seniorEngUsd: 68000,  loadPct: 22.6, leadDays: 8,  changes: 0, talent: "Strong",    note: "EU coverage · strong engineering",mapX: 53,   mapY: 32, recommended: true },
-  { id:"de", name:"Germany",       flag:"🇩🇪", region:"Europe",          seniorEngUsd: 103700, loadPct: 23.4, leadDays: 9,  changes: 2, talent: "Strong",    note: "EU/EEA strategic hire",           mapX: 51,   mapY: 33, recommended: true },
   { id:"sg", name:"Singapore",     flag:"🇸🇬", region:"Southeast Asia",  seniorEngUsd: 92000,  loadPct: 17.0, leadDays: 5,  changes: 0, talent: "Premium",   note: "Regional HQ · APAC hub",          mapX: 78.2, mapY: 63 },
   { id:"id", name:"Indonesia",     flag:"🇮🇩", region:"Southeast Asia",  seniorEngUsd: 27000,  loadPct: 19.8, leadDays: 8,  changes: 1, talent: "Growing",   note: "Massive market access",           mapX: 80.5, mapY: 67 },
   { id:"th", name:"Thailand",      flag:"🇹🇭", region:"Southeast Asia",  seniorEngUsd: 34000,  loadPct: 18.4, leadDays: 7,  changes: 0, talent: "Moderate",  note: "Stable · creative talent",        mapX: 78,   mapY: 57 },
@@ -839,60 +1067,63 @@ const TOTAL_AVAILABLE = AVAILABLE_COUNTRIES.length;
 const TOTAL_HEAD = ACTIVE_COUNTRIES.reduce((s, c) => s + c.headcount, 0);
 const TOTAL_OPEN = ACTIVE_COUNTRIES.reduce((s, c) => s + c.openReqs, 0);
 const TOTAL_CHANGES = ACTIVE_COUNTRIES.reduce((s, c) => s + c.changes, 0);
-const SKUAD_COUNTRY_COUNT = 1 + TOTAL_AVAILABLE;
+const SKUAD_COUNTRY_COUNT = ACTIVE_COUNTRIES.length + TOTAL_AVAILABLE;
 
-/* Route into the existing Atlas employee guide where the country exists in the DB.
+/* Route into the existing Abdul Kalam AI employee guide where the country exists in the DB.
    Countries not yet in the DB will 404 — same shape as the design's stub pages. */
 const countryHref = (c) => `/employee/${encodeURIComponent(c.name)}`;
 
 /* Compliance feed — India focused */
 const FEED = [
-  { date: "Nov 22",  flag: "🇮🇳", country: "India",   text: "Code on Wages — base salary definition changes",        impact: "All 23 employees", severity: "danger" },
-  { date: "Nov 18",  flag: "🇮🇳", country: "India",   text: "Karnataka professional-tax slab revision",              impact: "8 employees",      severity: "warn" },
-  { date: "Nov 09",  flag: "🇮🇳", country: "India",   text: "EPF wage-ceiling raise to ₹21,000/month proposed",      impact: "12 employees · pending", severity: "info" },
-  { date: "Nov 02",  flag: "🇮🇳", country: "India",   text: "Maharashtra revised minimum wages",                     impact: "0 employees · above floor", severity: "info" },
+  { date: "Nov 22",  flag: "🇮🇳", country: "India",       text: "Code on Wages — base salary definition changes",            impact: "All 23 employees",       severity: "danger" },
+  { date: "Nov 20",  flag: "🇩🇪", country: "Germany",     text: "Minimum wage increase to €12.82/hr effective Jan 2026",     impact: "8 employees",            severity: "warn" },
+  { date: "Nov 18",  flag: "🇮🇳", country: "India",       text: "Karnataka professional-tax slab revision",                  impact: "8 employees",            severity: "warn" },
+  { date: "Nov 14",  flag: "🇵🇭", country: "Philippines", text: "13th month pay calculation guidance updated",               impact: "12 employees",           severity: "info" },
+  { date: "Nov 09",  flag: "🇮🇳", country: "India",       text: "EPF wage-ceiling raise to ₹21,000/month proposed",          impact: "12 employees · pending", severity: "info" },
+  { date: "Nov 05",  flag: "🇩🇪", country: "Germany",     text: "Revised social security contribution ceilings for 2026",    impact: "8 employees",            severity: "info" },
 ];
 
 const HIRING = [
-  { flag:"🇮🇳", country:"India",      role:"Senior ML Engineer · L5",     cost:"₹38 L / yr",     state:"ready",   kind:"req",       eta:"Hire-ready" },
-  { flag:"🇮🇳", country:"India",      role:"Engineering Manager · M5",    cost:"₹52 L / yr",     state:"ready",   kind:"req",       eta:"Hire-ready" },
-  { flag:"🇮🇳", country:"India",      role:"Staff Software Engineer · L6",cost:"₹62 L / yr",     state:"ready",   kind:"req",       eta:"Hire-ready" },
-  { flag:"🇮🇳", country:"India",      role:"Senior Product Designer",     cost:"₹32 L / yr",     state:"ready",   kind:"req",       eta:"Hire-ready" },
-  { flag:"🇲🇾", country:"Malaysia",   role:"Try: Senior SWE in Kuala Lumpur", cost:"~$39K /yr",  state:"explore", kind:"expansion", eta:"5-day setup" },
-  { flag:"🇵🇭", country:"Philippines",role:"Try: Customer Success Lead",  cost:"~$42K /yr",      state:"explore", kind:"expansion", eta:"4-day setup" },
-  { flag:"🇲🇽", country:"Mexico",     role:"Try: Sr Engineer (US time zones)",cost:"~$56K /yr",  state:"explore", kind:"expansion", eta:"6-day setup" },
+  { flag:"🇮🇳", country:"India",       role:"Senior ML Engineer · L5",      cost:"₹38 L / yr",   state:"ready",   kind:"req",       eta:"Hire-ready" },
+  { flag:"🇮🇳", country:"India",       role:"Engineering Manager · M5",     cost:"₹52 L / yr",   state:"ready",   kind:"req",       eta:"Hire-ready" },
+  { flag:"🇩🇪", country:"Germany",     role:"Senior Backend Engineer · L5", cost:"€78K / yr",    state:"ready",   kind:"req",       eta:"Hire-ready" },
+  { flag:"🇵🇭", country:"Philippines", role:"Customer Success Lead",        cost:"₱1.85M / yr",  state:"ready",   kind:"req",       eta:"Hire-ready" },
+  { flag:"🇮🇳", country:"India",       role:"Staff Software Engineer · L6", cost:"₹62 L / yr",   state:"ready",   kind:"req",       eta:"Hire-ready" },
+  { flag:"🇵🇭", country:"Philippines", role:"QA Automation Engineer",       cost:"₱1.2M / yr",   state:"ready",   kind:"req",       eta:"Hire-ready" },
+  { flag:"🇲🇾", country:"Malaysia",    role:"Try: Senior SWE in KL",        cost:"~$39K /yr",    state:"explore", kind:"expansion", eta:"5-day setup" },
+  { flag:"🇲🇽", country:"Mexico",      role:"Try: Sr Engineer (US tz)",     cost:"~$56K /yr",    state:"explore", kind:"expansion", eta:"6-day setup" },
 ];
 
 const ROLE_COMPARE = {
   "Senior Software Engineer": [
     { ctry: "Vietnam",       flag: "🇻🇳", base: 26000, load:  6000, curr: "VND 660M base + 22%",  active: false },
-    { ctry: "Philippines",   flag: "🇵🇭", base: 32000, load:  4000, curr: "PHP 1.85M base + 13%", active: false },
+    { ctry: "Philippines",   flag: "🇵🇭", base: 32000, load:  4000, curr: "PHP 1.85M base + 13%", active: true  },
     { ctry: "India",         flag: "🇮🇳", base: 33000, load:  6000, curr: "₹27.4L base + 17%",    active: true  },
     { ctry: "Malaysia",      flag: "🇲🇾", base: 34000, load:  5000, curr: "MYR 175K base + 16%",  active: false },
     { ctry: "Mexico",        flag: "🇲🇽", base: 42000, load: 13900, curr: "MXN 720K base + 33%",  active: false },
     { ctry: "Poland",        flag: "🇵🇱", base: 55000, load: 13000, curr: "PLN 270K base + 23%",  active: false },
     { ctry: "United Kingdom",flag: "🇬🇧", base: 78000, load: 17000, curr: "£62K base + 22%",      active: false },
-    { ctry: "Germany",       flag: "🇩🇪", base: 84000, load: 19700, curr: "€78K base + 23%",      active: false },
+    { ctry: "Germany",       flag: "🇩🇪", base: 84000, load: 19700, curr: "€78K base + 23%",      active: true  },
     { ctry: "United States", flag: "🇺🇸", base:142000, load: 37200, curr: "$142K base + 26%",     active: false },
   ],
   "Engineering Manager": [
     { ctry: "Vietnam",       flag: "🇻🇳", base: 42000, load:  9000, curr: "VND 1.07B base + 22%",  active: false },
-    { ctry: "Philippines",   flag: "🇵🇭", base: 52000, load:  6800, curr: "PHP 3M base + 13%",     active: false },
+    { ctry: "Philippines",   flag: "🇵🇭", base: 52000, load:  6800, curr: "PHP 3M base + 13%",     active: true  },
     { ctry: "India",         flag: "🇮🇳", base: 50000, load:  8800, curr: "₹41.6L base + 17%",     active: true  },
     { ctry: "Malaysia",      flag: "🇲🇾", base: 58000, load:  9500, curr: "MYR 300K base + 16%",   active: false },
     { ctry: "Mexico",        flag: "🇲🇽", base: 68000, load: 22500, curr: "MXN 1.17M base + 33%",  active: false },
     { ctry: "United Kingdom",flag: "🇬🇧", base:118000, load: 25700, curr: "£94K base + 22%",       active: false },
-    { ctry: "Germany",       flag: "🇩🇪", base:124000, load: 29000, curr: "€115K base + 23%",      active: false },
+    { ctry: "Germany",       flag: "🇩🇪", base:124000, load: 29000, curr: "€115K base + 23%",      active: true  },
     { ctry: "United States", flag: "🇺🇸", base:198000, load: 51900, curr: "$198K base + 26%",      active: false },
   ],
   "Product Designer": [
     { ctry: "Vietnam",       flag: "🇻🇳", base: 22000, load:  4800, curr: "VND 560M base + 22%",  active: false },
-    { ctry: "Philippines",   flag: "🇵🇭", base: 26000, load:  3400, curr: "PHP 1.5M base + 13%",  active: false },
+    { ctry: "Philippines",   flag: "🇵🇭", base: 26000, load:  3400, curr: "PHP 1.5M base + 13%",  active: true  },
     { ctry: "India",         flag: "🇮🇳", base: 28000, load:  4900, curr: "₹23.3L base + 17%",    active: true  },
     { ctry: "Malaysia",      flag: "🇲🇾", base: 30000, load:  4900, curr: "MYR 155K base + 16%",  active: false },
     { ctry: "Mexico",        flag: "🇲🇽", base: 38000, load: 12600, curr: "MXN 654K base + 33%",  active: false },
     { ctry: "United Kingdom",flag: "🇬🇧", base: 68000, load: 14800, curr: "£54K base + 22%",      active: false },
-    { ctry: "Germany",       flag: "🇩🇪", base: 72000, load: 16800, curr: "€67K base + 23%",      active: false },
+    { ctry: "Germany",       flag: "🇩🇪", base: 72000, load: 16800, curr: "€67K base + 23%",      active: true  },
     { ctry: "United States", flag: "🇺🇸", base:124000, load: 32500, curr: "$124K base + 26%",     active: false },
   ],
 };
@@ -942,30 +1173,111 @@ function WorldMapBg() {
   );
 }
 
-function AppBar() {
+function IconBell() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+      <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+    </svg>
+  );
+}
+
+const SEV_DOT = { danger: "crit", warn: "warn", info: "info" };
+const NOTIF_TABS = [
+  { key: "all", label: "All" },
+  { key: "critical", label: "Critical" },
+  { key: "updates", label: "Updates" },
+];
+
+function NotifPanel({ onClose }) {
+  const [tab, setTab] = useState("all");
+
+  const items = FEED.map(f => ({
+    type: f.severity === "danger" ? "critical" : "updates",
+    dot: SEV_DOT[f.severity] || "info",
+    title: `${f.flag} ${f.country} · ${f.text}`,
+    desc: f.impact,
+    time: f.date,
+  }));
+
+  const filtered = tab === "all" ? items : items.filter(n => n.type === tab);
+  const counts = {
+    all: items.length,
+    critical: items.filter(n => n.type === "critical").length,
+    updates: items.filter(n => n.type === "updates").length,
+  };
+
+  return (
+    <>
+      <div className="notif-backdrop" onClick={onClose} />
+      <div className="notif-panel">
+        <div className="notif-header">
+          <h3>Notifications</h3>
+          <span className="notif-count">{items.length}</span>
+        </div>
+        <div className="notif-tabs">
+          {NOTIF_TABS.map(t => (
+            <button key={t.key} className={`notif-tab${tab === t.key ? " active" : ""}`} onClick={() => setTab(t.key)}>
+              {t.label} <span className="ct">{counts[t.key]}</span>
+            </button>
+          ))}
+        </div>
+        <div className="notif-body">
+          {filtered.length === 0 ? (
+            <div className="notif-empty">No notifications right now</div>
+          ) : filtered.map((n, i) => (
+            <div key={i} className="notif-item">
+              <div className={`notif-dot ${n.dot}`} />
+              <div className="notif-content">
+                <div className="notif-title">{n.title}</div>
+                <div className="notif-desc">{n.desc}</div>
+                {n.time && <div className="notif-time">{n.time}</div>}
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="notif-footer">
+          <a onClick={onClose}>View all compliance changes →</a>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function AppBar({ theme, setTheme }) {
+  const [notifOpen, setNotifOpen] = useState(false);
+
   return (
     <header className="appbar">
       <div className="appbar-row1">
         <div className="appbar-brand">
-          <div className="appbar-logo">S</div>
-          <span className="appbar-name">Skuad</span>
+          <a href="/" style={{display:"flex",alignItems:"center",gap:10,textDecoration:"none",color:"inherit"}}>
+            <div className="appbar-logo">A</div>
+            <span className="appbar-name">Abdul Kalam AI</span>
+          </a>
           <span className="appbar-divider" />
-          <span className="appbar-product">WORKFORCE</span>
+          <span className="appbar-product">CLIENT PORTAL</span>
         </div>
         <div className="appbar-crumb">
-          <span>Workforce</span>
+          <a href="/">Hub</a>
           <span className="appbar-crumb-sep">/</span>
-          <span>Overview</span>
+          <span>Client Overview</span>
         </div>
         <div className="appbar-spacer" />
         <div className="appbar-actions">
           <button className="appbar-btn"><I.search /> Search<span style={{marginLeft:6,padding:"1px 5px",border:"1px solid var(--paper-line)",borderRadius:4,fontFamily:"var(--font-mono)",fontSize:10,color:"var(--ink-4)"}}>⌘K</span></button>
-          <button className="appbar-icon-btn"><I.bell /><span className="dot" /></button>
-          <div className="appbar-tenant">
-            <div className="appbar-tenant-mark">LR</div>
-            <span className="appbar-tenant-name">{COMPANY}</span>
-            <span className="appbar-tenant-caret"><I.caret /></span>
+          <div className="notif-wrap">
+            <button className="iconbtn" onClick={() => setNotifOpen(v => !v)} title="Notifications">
+              <IconBell />
+              <span className="badge-dot">{FEED.length}</span>
+            </button>
+            {notifOpen && <NotifPanel onClose={() => setNotifOpen(false)} />}
           </div>
+          <button className="appbar-btn" onClick={() => setTheme(t => t === "light" ? "dark" : "light")} aria-label="Toggle theme">
+            {theme === "dark" ? <IconSun /> : <IconMoon />}
+            {theme === "dark" ? "Light" : "Dark"}
+          </button>
+          <a href="/" className="appbar-btn">⌂ Hub</a>
           <div className="appbar-avatar">EM</div>
         </div>
       </div>
@@ -980,13 +1292,13 @@ function Greet() {
         <div className="eyebrow" style={{marginBottom:10, display:"inline-flex", alignItems:"center", gap:8}}>
           <span className="dot-status dot-ok" /> Good morning, Emily — your workforce is in sync
         </div>
-        <h1>{TOTAL_HEAD} people in <span className="mark">India</span>. {SKUAD_COUNTRY_COUNT - 1} more countries ready when you are.</h1>
+        <h1>{TOTAL_HEAD} people across <span className="mark">{ACTIVE_COUNTRIES.length} countries</span>. {TOTAL_AVAILABLE} more ready when you are.</h1>
         <div className="sub">
-          Your team at <strong>{COMPANY}</strong> is fully in <strong>India</strong> today. Atlas tracks {TOTAL_CHANGES} compliance changes on your existing contracts — and gives you hire-ready cost &amp; compliance for every other country we cover, so you can plan your next move in minutes, not months.
+          Your team at <strong>{COMPANY}</strong> spans <strong>India</strong>, <strong>Germany</strong>, and the <strong>Philippines</strong>. Abdul Kalam AI tracks {TOTAL_CHANGES} compliance changes across your active contracts — and gives you hire-ready cost &amp; compliance for every other country we cover, so you can plan your next move in minutes, not months.
         </div>
         <div className="ov-greet-pills">
           <span className="ov-greet-pill"><span className="dot-status dot-ok" />Payroll on track · Nov 24</span>
-          <span className="ov-greet-pill"><span className="dot-status dot-warn" />{TOTAL_CHANGES} India compliance items</span>
+          <span className="ov-greet-pill"><span className="dot-status dot-warn" />{TOTAL_CHANGES} compliance items across {ACTIVE_COUNTRIES.length} countries</span>
           <span className="ov-greet-pill"><span className="dot-status dot-neutral" /><span className="num">{TOTAL_OPEN}</span> open reqs</span>
           <span className="ov-greet-pill"><span className="dot-status dot-info" />{TOTAL_AVAILABLE} countries to explore</span>
         </div>
@@ -999,12 +1311,12 @@ function Greet() {
             <div className="ov-snap-l">Headcount</div>
           </div>
           <div>
-            <div className="ov-snap-v">1<span className="u">/ {SKUAD_COUNTRY_COUNT}</span></div>
+            <div className="ov-snap-v">{ACTIVE_COUNTRIES.length}<span className="u">/ {SKUAD_COUNTRY_COUNT}</span></div>
             <div className="ov-snap-l">Active countries</div>
           </div>
           <div>
             <div className="ov-snap-v">{TOTAL_OPEN}<span className="u">open</span></div>
-            <div className="ov-snap-l">Reqs in India</div>
+            <div className="ov-snap-l">Open reqs</div>
           </div>
           <div>
             <div className="ov-snap-v">{TOTAL_AVAILABLE}<span className="u">available</span></div>
@@ -1012,12 +1324,14 @@ function Greet() {
           </div>
         </div>
         <div className="ov-snap-flags">
-          <span className="ov-snap-flag" style={{background:"rgba(255,72,0,0.18)",borderColor:"rgba(255,72,0,0.4)"}}>🇮🇳 <strong>{TOTAL_HEAD}</strong></span>
-          {RECOMMENDED.slice(0,5).map(c => (<span key={c.id} className="ov-snap-flag">{c.flag} <span style={{opacity:0.55}}>—</span></span>))}
-          <span className="ov-snap-flag" style={{opacity:0.65}}>+{TOTAL_AVAILABLE - 5}</span>
+          {ACTIVE_COUNTRIES.map(c => (
+            <span key={c.id} className="ov-snap-flag" style={{background:"rgba(255,72,0,0.18)",borderColor:"rgba(255,72,0,0.4)"}}>{c.flag} <strong>{c.headcount}</strong></span>
+          ))}
+          {RECOMMENDED.slice(0,3).map(c => (<span key={c.id} className="ov-snap-flag">{c.flag} <span style={{opacity:0.55}}>—</span></span>))}
+          <span className="ov-snap-flag" style={{opacity:0.65}}>+{TOTAL_AVAILABLE - 3}</span>
         </div>
         <div className="ov-snap-foot">
-          <span>Atlas Compliance · sweep 03:14 UTC</span>
+          <span>Abdul Kalam AI Compliance · sweep 03:14 UTC</span>
           <span style={{color:"#5BBE92"}}>● in sync</span>
         </div>
       </aside>
@@ -1031,25 +1345,78 @@ function KPIStrip() {
       <div className="kpi">
         <div className="kpi-head"><span className="kpi-label">Headcount</span><span className="tag tag-ok">+3 QoQ</span></div>
         <div className="kpi-value">{TOTAL_HEAD}</div>
-        <div className="kpi-foot"><span className="kpi-delta kpi-delta-up">▲ 15%</span> vs last quarter · all in India</div>
+        <div className="kpi-foot"><span className="kpi-delta kpi-delta-up">▲ 15%</span> vs last quarter · across {ACTIVE_COUNTRIES.length} countries</div>
       </div>
       <div className="kpi">
         <div className="kpi-head"><span className="kpi-label">Active countries</span><span className="tag tag-neutral">{SKUAD_COUNTRY_COUNT - 1} more available</span></div>
-        <div className="kpi-value">1<span className="kpi-unit">/ {SKUAD_COUNTRY_COUNT}</span></div>
-        <div className="kpi-foot">India today · {SKUAD_COUNTRY_COUNT - 1} expansion-ready via Skuad</div>
+        <div className="kpi-value">{ACTIVE_COUNTRIES.length}<span className="kpi-unit">/ {SKUAD_COUNTRY_COUNT}</span></div>
+        <div className="kpi-foot">India, Germany, Philippines · {TOTAL_AVAILABLE} expansion-ready</div>
       </div>
       <div className="kpi">
         <div className="kpi-head"><span className="kpi-label">Countries covered</span><span className="tag tag-info">Via Skuad</span></div>
         <div className="kpi-value">{SKUAD_COUNTRY_COUNT}</div>
-        <div className="kpi-foot">1 active · {TOTAL_AVAILABLE} available for expansion</div>
+        <div className="kpi-foot">{ACTIVE_COUNTRIES.length} active · {TOTAL_AVAILABLE} available for expansion</div>
       </div>
       <div className="kpi">
-        <div className="kpi-head"><span className="kpi-label">Compliance items</span><span className="tag tag-danger">3 to action</span></div>
-        <div className="kpi-value">{TOTAL_CHANGES}<span className="kpi-unit">/ 4</span></div>
-        <div className="kpi-foot">changes touching your India contracts</div>
+        <div className="kpi-head"><span className="kpi-label">Compliance items</span><span className="tag tag-warn">{TOTAL_CHANGES} to review</span></div>
+        <div className="kpi-value">{TOTAL_CHANGES}</div>
+        <div className="kpi-foot">changes touching your active contracts</div>
       </div>
     </div>
   );
+}
+
+function FormatReply({ text }) {
+  const inlineFormat = (line) => {
+    const parts = [];
+    const re = /(\*\*(.+?)\*\*|`(.+?)`|_(.+?)_)/g;
+    let last = 0, m, key = 0;
+    while ((m = re.exec(line)) !== null) {
+      if (m.index > last) parts.push(line.slice(last, m.index));
+      if (m[2]) parts.push(<strong key={key++}>{m[2]}</strong>);
+      else if (m[3]) parts.push(<code key={key++}>{m[3]}</code>);
+      else if (m[4]) parts.push(<em key={key++}>{m[4]}</em>);
+      last = re.lastIndex;
+    }
+    if (last < line.length) parts.push(line.slice(last));
+    return parts;
+  };
+
+  const lines = text.split("\n");
+  const blocks = [];
+  let i = 0;
+  while (i < lines.length) {
+    const line = lines[i];
+    if (/^#{1,3}\s/.test(line)) {
+      blocks.push(<h3 key={i}>{inlineFormat(line.replace(/^#{1,3}\s+/, ""))}</h3>);
+      i++;
+    } else if (/^\d+[.)]\s/.test(line)) {
+      const items = [];
+      while (i < lines.length && /^\d+[.)]\s/.test(lines[i])) {
+        items.push(<li key={i}>{inlineFormat(lines[i].replace(/^\d+[.)]\s+/, ""))}</li>);
+        i++;
+      }
+      blocks.push(<ol key={"ol"+i}>{items}</ol>);
+    } else if (/^[-*]\s/.test(line)) {
+      const items = [];
+      while (i < lines.length && /^[-*]\s/.test(lines[i])) {
+        items.push(<li key={i}>{inlineFormat(lines[i].replace(/^[-*]\s+/, ""))}</li>);
+        i++;
+      }
+      blocks.push(<ul key={"ul"+i}>{items}</ul>);
+    } else if (line.trim() === "") {
+      i++;
+    } else {
+      const para = [];
+      while (i < lines.length && lines[i].trim() !== "" && !/^[-*#]\s/.test(lines[i]) && !/^\d+[.)]\s/.test(lines[i])) {
+        if (para.length > 0) para.push(" ");
+        para.push(...inlineFormat(lines[i]));
+        i++;
+      }
+      blocks.push(<p key={"p"+i}>{para}</p>);
+    }
+  }
+  return <>{blocks}</>;
 }
 
 function AskAtlas() {
@@ -1077,7 +1444,7 @@ function AskAtlas() {
       const data = await res.json();
       setReply(data.reply || data.error || "No response");
     } catch (e) {
-      setReply("Failed to reach Atlas. Is the server running?");
+      setReply("Failed to reach Abdul Kalam AI. Is the server running?");
     }
     setLoading(false);
   };
@@ -1085,16 +1452,16 @@ function AskAtlas() {
     <section className="ask-atlas">
       <div className="ask-atlas-header">
         <div className="ask-atlas-mark"><I.sparkle /></div>
-        <div className="ask-atlas-title">Ask Atlas</div>
+        <div className="ask-atlas-title">Ask Abdul Kalam AI</div>
         <div className="ask-atlas-sub">Workforce intelligence across {SKUAD_COUNTRY_COUNT} countries</div>
       </div>
       <div className="ask-atlas-bar">
-        <input value={query} onChange={e=>setQuery(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")ask();}} placeholder="Ask anything about your India workforce, costs, compliance, or expansion plans…" />
+        <input value={query} onChange={e=>setQuery(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")ask();}} placeholder="Ask anything about your workforce, costs, compliance, or expansion plans…" />
         <button className="btn btn-primary" disabled={loading} onClick={()=>ask()}>{loading ? "Thinking…" : <><I.sparkle /> Ask</>}</button>
       </div>
       {reply && (
-        <div style={{marginTop:14,padding:"14px 16px",background:"rgba(255,255,255,0.85)",border:"1px solid var(--purple-line)",borderRadius:"var(--radius-m)",fontSize:13,lineHeight:1.6,color:"var(--ink-2)",whiteSpace:"pre-wrap",position:"relative",zIndex:1}}>
-          {reply}
+        <div className="ask-reply">
+          <FormatReply text={reply} />
         </div>
       )}
       <div className="ask-suggestions">
@@ -1201,7 +1568,7 @@ function CountryGrid() {
         <div>
           <div className="eyebrow">Workforce by country</div>
           <h2>Where your team is — and where it could go next</h2>
-          <div className="sub">Your active country, plus six expansion-ready picks. Click any card to open its cost, compliance, and hire details.</div>
+          <div className="sub">Your {ACTIVE_COUNTRIES.length} active countries, plus expansion-ready picks. Click any card to open its cost, compliance, and hire details.</div>
         </div>
       </div>
       <div className="ctry-grid">
@@ -1215,8 +1582,12 @@ function CountryGrid() {
 function BrowseAll() {
   const [query, setQuery] = useState("");
   const [region, setRegion] = useState("All");
-  const regions = ["All", ...Array.from(new Set(AVAILABLE_COUNTRIES.map(c => c.region)))];
-  const filtered = AVAILABLE_COUNTRIES.filter(c => {
+  const ALL_COUNTRIES = [
+    ...ACTIVE_COUNTRIES.map(c => ({ ...c, _active: true, seniorEngUsd: c.monthlyUsd * 12 / c.headcount, talent: "—", note: "", leadDays: 0 })),
+    ...AVAILABLE_COUNTRIES,
+  ];
+  const regions = ["All", ...Array.from(new Set(ALL_COUNTRIES.map(c => c.region)))];
+  const filtered = ALL_COUNTRIES.filter(c => {
     if (region !== "All" && c.region !== region) return false;
     if (query && !c.name.toLowerCase().includes(query.toLowerCase()) && !c.region.toLowerCase().includes(query.toLowerCase())) return false;
     return true;
@@ -1228,14 +1599,14 @@ function BrowseAll() {
         <div>
           <div className="eyebrow">Browse all countries</div>
           <h2>Every country we can run payroll in</h2>
-          <div className="sub">Filter by region, jump to any country's full guide. Skuad handles the entity, contracts, and statutory filings end-to-end.</div>
+          <div className="sub">Filter by region, click any card to open its full guide. Skuad handles the entity, contracts, and statutory filings end-to-end.</div>
         </div>
         <div className="section-head-actions">
-          <span className="text-mono-sm text-muted">{filtered.length} of {TOTAL_AVAILABLE}</span>
+          <span className="text-mono-sm text-muted">{filtered.length} of {SKUAD_COUNTRY_COUNT}</span>
         </div>
       </div>
 
-      <div style={{display:"flex",gap:10,marginBottom:12,flexWrap:"wrap",alignItems:"center"}}>
+      <div style={{display:"flex",gap:10,marginBottom:16,flexWrap:"wrap",alignItems:"center"}}>
         <div style={{display:"flex",alignItems:"center",gap:6,background:"var(--paper)",border:"1px solid var(--paper-line)",borderRadius:"var(--radius-s)",padding:"4px 10px",minWidth:240,flex:"0 1 280px"}}>
           <I.search />
           <input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search by country or region…" style={{border:"none",background:"none",outline:"none",fontSize:13,flex:1,padding:"4px 0"}} />
@@ -1247,39 +1618,86 @@ function BrowseAll() {
         </div>
       </div>
 
-      <div className="card" style={{padding:0,overflow:"hidden"}}>
-        <table className="dtable">
-          <thead>
-            <tr>
-              <th>Country</th>
-              <th>Region</th>
-              <th className="right">Sr SWE / yr</th>
-              <th className="right">Employer load</th>
-              <th className="right">Time-to-hire</th>
-              <th>Talent</th>
-              <th>Notes</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map(c => (
-              <tr key={c.id} style={{cursor:"pointer"}} onClick={()=>{ window.location.href = countryHref(c); }}>
-                <td><span style={{display:"inline-flex",alignItems:"center",gap:8,fontWeight:600}}><span style={{fontSize:18}}>{c.flag}</span>{c.name}</span></td>
-                <td className="text-muted">{c.region}</td>
-                <td className="right num">{usd(c.seniorEngUsd, {short:true})}</td>
-                <td className="right num">{c.loadPct}%</td>
-                <td className="right num">{c.leadDays} days</td>
-                <td><span className="tag tag-neutral">{c.talent}</span></td>
-                <td className="text-muted text-sm">{c.note}</td>
-                <td><a className="ctry-link" style={{whiteSpace:"nowrap"}} href={countryHref(c)}>Explore <I.arrow /></a></td>
-              </tr>
-            ))}
-            {filtered.length === 0 && (
-              <tr><td colSpan="8" style={{padding:"30px",textAlign:"center",color:"var(--ink-3)",fontSize:13}}>No countries match your filter.</td></tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+      {filtered.length === 0 ? (
+        <div style={{padding:48,textAlign:"center",color:"var(--ink-3)",fontFamily:"var(--font-mono)",fontSize:13}}>No countries match your filter.</div>
+      ) : (
+        <div className="browse-grid">
+          {filtered.map(c => {
+            const isActive = !!c._active;
+            return (
+              <a key={c.id} href={countryHref(c)} className={`browse-card${isActive ? " browse-card-active" : ""}`}>
+                {isActive && (
+                  <div style={{position:"absolute",top:14,right:14}}>
+                    <span className="tag tag-accent" style={{background:"var(--accent)",color:"#fff"}}>Active</span>
+                  </div>
+                )}
+                <div className="browse-card-head">
+                  <div className="browse-card-flag">{c.flag}</div>
+                  <div>
+                    <div className="browse-card-name">{c.name}</div>
+                    <div className="browse-card-region">{c.region}</div>
+                  </div>
+                </div>
+                <div className="browse-card-stats">
+                  {isActive ? (
+                    <>
+                      <div className="browse-card-stat">
+                        <div className="browse-card-stat-l">Headcount</div>
+                        <div className="browse-card-stat-v">{c.headcount}</div>
+                      </div>
+                      <div className="browse-card-stat">
+                        <div className="browse-card-stat-l">Open reqs</div>
+                        <div className="browse-card-stat-v">{c.openReqs}</div>
+                      </div>
+                      <div className="browse-card-stat">
+                        <div className="browse-card-stat-l">Employer load</div>
+                        <div className="browse-card-stat-v">{c.loadPct}%</div>
+                      </div>
+                      <div className="browse-card-stat">
+                        <div className="browse-card-stat-l">Avg tenure</div>
+                        <div className="browse-card-stat-v">{c.avgTenure}</div>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="browse-card-stat">
+                        <div className="browse-card-stat-l">Sr SWE cost</div>
+                        <div className="browse-card-stat-v">{usd(c.seniorEngUsd, {short:true})} <span style={{fontSize:11,color:"var(--ink-3)",fontWeight:400}}>/ yr</span></div>
+                      </div>
+                      <div className="browse-card-stat">
+                        <div className="browse-card-stat-l">Employer load</div>
+                        <div className="browse-card-stat-v">{c.loadPct}%</div>
+                      </div>
+                      <div className="browse-card-stat">
+                        <div className="browse-card-stat-l">Time-to-hire</div>
+                        <div className="browse-card-stat-v">{c.leadDays} days</div>
+                      </div>
+                      <div className="browse-card-stat">
+                        <div className="browse-card-stat-l">Talent</div>
+                        <div className="browse-card-stat-v" style={{fontSize:13,fontFamily:"var(--font-ui)",fontWeight:600}}>{c.talent}</div>
+                      </div>
+                    </>
+                  )}
+                </div>
+                <div className="browse-card-foot">
+                  <div className="ctry-status-tags">
+                    {isActive ? (
+                      c.changes > 0
+                        ? <span className="tag tag-warn"><span className="dot-status dot-warn" /> {c.changes} compliance change{c.changes>1?"s":""}</span>
+                        : <span className="tag tag-ok"><span className="dot-status dot-ok" /> Up to date</span>
+                    ) : (
+                      c.changes > 0
+                        ? <span className="tag tag-info"><span className="dot-status dot-info" /> {c.changes} rule update{c.changes>1?"s":""}</span>
+                        : <span className="tag tag-ok"><span className="dot-status dot-ok" /> Up-to-date guide</span>
+                    )}
+                  </div>
+                  <span className="ctry-link">{isActive ? "Open" : "Explore"} <I.arrow /></span>
+                </div>
+              </a>
+            );
+          })}
+        </div>
+      )}
     </section>
   );
 }
@@ -1290,7 +1708,7 @@ function MapSection() {
       <div className="map-head">
         <div>
           <div className="eyebrow">Global footprint</div>
-          <h3>1 active · {TOTAL_AVAILABLE} ready</h3>
+          <h3>{ACTIVE_COUNTRIES.length} active · {TOTAL_AVAILABLE} ready</h3>
           <div className="sub">Orange = where your team is. Grey = countries you can hire in via Skuad.</div>
         </div>
         <div className="row">
@@ -1312,18 +1730,20 @@ function MapSection() {
           ))}
         </div>
         <div className="map-legend">
-          <div className="map-legend-row" style={{borderColor:"var(--accent-line)",background:"var(--accent-soft)"}}>
-            <div className="map-legend-flag"><span className="emoji">🇮🇳</span> India</div>
-            <div className="map-legend-count">{TOTAL_HEAD}</div>
-            <div className="map-legend-bar"><div className="map-legend-bar-fill" style={{width:"100%"}} /></div>
-          </div>
+          {ACTIVE_COUNTRIES.map(c => (
+            <a key={c.id} href={countryHref(c)} className="map-legend-row" style={{borderColor:"var(--accent-line)",background:"var(--accent-soft)",textDecoration:"none",color:"inherit"}}>
+              <div className="map-legend-flag"><span className="emoji">{c.flag}</span> {c.name}</div>
+              <div className="map-legend-count">{c.headcount}</div>
+              <div className="map-legend-bar"><div className="map-legend-bar-fill" style={{width:`${Math.round(c.headcount/TOTAL_HEAD*100)}%`}} /></div>
+            </a>
+          ))}
           <div style={{padding:"10px 12px",color:"var(--ink-3)",fontSize:12,fontFamily:"var(--font-mono)",letterSpacing:0.4,textTransform:"uppercase"}}>Available {TOTAL_AVAILABLE}</div>
           {RECOMMENDED.map(c => (
-            <div key={c.id} className="map-legend-row">
+            <a key={c.id} href={countryHref(c)} className="map-legend-row" style={{textDecoration:"none",color:"inherit"}}>
               <div className="map-legend-flag"><span className="emoji">{c.flag}</span> {c.name}</div>
               <div className="map-legend-count" style={{color:"var(--ink-3)",fontSize:11}}>{c.leadDays}d</div>
               <div className="map-legend-bar"><div className="map-legend-bar-fill" style={{width:"0%",background:"#A2A8B5"}} /></div>
-            </div>
+            </a>
           ))}
           <a href="#browse-all" style={{display:"block",textAlign:"center",padding:"10px",fontSize:12,fontWeight:600,color:"var(--purple)"}}>See all {TOTAL_AVAILABLE} →</a>
         </div>
@@ -1527,7 +1947,7 @@ function AggregateCost() {
     <section className="agg-section">
       <div className="section-head">
         <div>
-          <div className="eyebrow">This month's payroll · India</div>
+          <div className="eyebrow">This month's payroll · {ACTIVE_COUNTRIES.length} countries</div>
           <h2>November 2025</h2>
           <div className="sub">Settling Nov 24. All amounts in USD at today's FX. Adds new countries automatically as you start hiring there.</div>
         </div>
@@ -1582,9 +2002,16 @@ function AggregateCost() {
 }
 
 function App() {
+  const [theme, setTheme] = useState(() => localStorage.getItem("atlas:theme") || "light");
+
+  useEffect(() => {
+    localStorage.setItem("atlas:theme", theme);
+    document.documentElement.setAttribute("data-mode", theme);
+  }, [theme]);
+
   return (
     <>
-      <AppBar />
+      <AppBar theme={theme} setTheme={setTheme} />
       <main className="shell">
         <Greet />
         <KPIStrip />
@@ -1596,7 +2023,7 @@ function App() {
         <div id="browse-all" style={{paddingTop:8}}><BrowseAll /></div>
         <footer style={{display:"flex",justifyContent:"space-between",alignItems:"center",paddingTop:24,borderTop:"1px solid var(--paper-line)",fontFamily:"var(--font-mono)",fontSize:11,color:"var(--ink-4)",flexWrap:"wrap",gap:8}}>
           <span>Skuad Workforce · {COMPANY}</span>
-          <span>Atlas Compliance · sweep Nov 22, 2025 · not legal advice</span>
+          <span>Abdul Kalam AI Compliance · sweep Nov 22, 2025 · not legal advice</span>
         </footer>
       </main>
     </>

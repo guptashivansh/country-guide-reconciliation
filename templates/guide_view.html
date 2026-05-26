@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Abdul Kalam AI · {{ country }} Employment Guide</title>
+<title>{{ country }} · {{ view_label }} Guide</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -11,22 +11,38 @@
 :root {
   --paper: #FFFFFF; --paper-2: #F6F7F9; --paper-3: #ECEEF2; --paper-line: #E2E5EB;
   --ink: #0E1014; --ink-2: #2E323B; --ink-3: #6B7180; --ink-4: #A2A8B5;
+  {% if view == 'employee' %}
+  --accent: #1E8A5F; --accent-2: #177A52; --accent-soft: #DCF1E6; --accent-line: #A8DFC2;
+  {% elif view == 'client' %}
+  --accent: #6F4FF2; --accent-2: #5B3FE0; --accent-soft: #ECE7FF; --accent-line: #C6B8FF;
+  {% else %}
   --accent: #FF4800; --accent-2: #E03E00; --accent-soft: #FFE7DC; --accent-line: #FFBFA0;
+  {% endif %}
   --purple: #6F4FF2; --purple-2: #5B3FE0; --purple-soft: #ECE7FF; --purple-line: #C6B8FF;
   --ok: #1E8A5F; --ok-soft: #DCF1E6;
+  --warn: #C9740F; --warn-soft: #FFEFD6;
+  --danger: #C8302D; --danger-soft: #FBDFDC;
   --font-ui: "Plus Jakarta Sans", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
   --radius-s: 6px; --radius-m: 10px; --radius-l: 16px;
   --shadow-1: 0 1px 0 rgba(14,16,20,0.04), 0 1px 2px rgba(14,16,20,0.05);
   --shadow-2: 0 2px 6px rgba(14,16,20,0.06), 0 14px 32px -18px rgba(14,16,20,0.18);
-  --maxw: 1200px; --gutter: 40px;
+  --maxw: {{ '1000px' if view == 'employee' else '1200px' }}; --gutter: 40px;
 }
 [data-mode="dark"] {
   --paper:#0B0D11; --paper-2:#131620; --paper-3:#1B1F2A; --paper-line:#262B38;
   --ink:#F5F6F8; --ink-2:#D8DBE2; --ink-3:#9097A4; --ink-4:#5A6273;
+  {% if view == 'employee' %}
+  --accent:#5BBE92; --accent-2:#7AD1A9; --accent-soft:rgba(91,190,146,.12); --accent-line:rgba(91,190,146,.36);
+  {% elif view == 'client' %}
+  --accent:#9B85FF; --accent-2:#B5A5FF; --accent-soft:rgba(155,133,255,.14); --accent-line:rgba(155,133,255,.36);
+  {% else %}
   --accent:#FF6A33; --accent-2:#FF8C5C; --accent-soft:rgba(255,106,51,.12); --accent-line:rgba(255,106,51,.36);
+  {% endif %}
   --purple:#9B85FF; --purple-2:#B5A5FF; --purple-soft:rgba(155,133,255,.14); --purple-line:rgba(155,133,255,.36);
   --ok:#5BBE92; --ok-soft:rgba(91,190,146,.10);
+  --warn:#E0A04A; --warn-soft:rgba(224,160,74,.10);
+  --danger:#E87874; --danger-soft:rgba(232,120,116,.10);
   --shadow-1:0 1px 0 rgba(0,0,0,.4),0 1px 2px rgba(0,0,0,.4);
   --shadow-2:0 2px 6px rgba(0,0,0,.4),0 14px 32px -18px rgba(0,0,0,.6);
 }
@@ -37,7 +53,6 @@ a{color:inherit;text-decoration:none} button{font:inherit;color:inherit;cursor:p
 .eyebrow{font-family:var(--font-mono);font-size:10.5px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
 ::-webkit-scrollbar{width:10px} ::-webkit-scrollbar-thumb{background:var(--paper-line);border-radius:999px;border:2px solid var(--paper)} ::-webkit-scrollbar-thumb:hover{background:var(--ink-4)}
 
-/* AppBar */
 .appbar{position:sticky;top:0;z-index:100;height:56px;display:flex;align-items:center;padding:0 40px;gap:14px;background:rgba(255,255,255,0.88);backdrop-filter:blur(16px) saturate(160%);-webkit-backdrop-filter:blur(16px) saturate(160%);border-bottom:1px solid var(--paper-line)}
 [data-mode="dark"] .appbar{background:rgba(11,13,17,0.88)}
 .appbar-logo{width:28px;height:28px;background:var(--accent);border-radius:var(--radius-s);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0}
@@ -45,13 +60,12 @@ a{color:inherit;text-decoration:none} button{font:inherit;color:inherit;cursor:p
 .appbar-sep{color:var(--paper-line);font-size:18px;font-weight:200}
 .appbar-subtitle{font-family:var(--font-mono);font-size:11px;color:var(--ink-4)}
 .appbar-spacer{flex:1}
+.appbar-badge{font-family:var(--font-mono);font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border-radius:20px;background:var(--accent-soft);border:1px solid var(--accent-line);color:var(--accent)}
 .appbar-theme{height:32px;padding:0 12px;border:1px solid var(--paper-line);border-radius:var(--radius-s);background:var(--paper);font-size:12px;color:var(--ink-3);display:flex;align-items:center;gap:6px;transition:all .15s}
 .appbar-theme:hover{color:var(--ink);background:var(--paper-3)}
 
-/* Shell */
 .shell{max-width:var(--maxw);margin:0 auto;padding:0 var(--gutter) 80px}
 
-/* Hero */
 .country-hero{display:grid;grid-template-columns:1fr auto;gap:28px;align-items:end;padding:48px 0 32px}
 @media(max-width:768px){.country-hero{grid-template-columns:1fr;gap:16px}}
 .hero-left{display:flex;align-items:flex-start;gap:20px}
@@ -61,7 +75,7 @@ a{color:inherit;text-decoration:none} button{font:inherit;color:inherit;cursor:p
 .hero-meta{font-family:var(--font-mono);font-size:11px;color:var(--ink-3);margin-top:6px;letter-spacing:.04em}
 .hero-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
 .hero-tag{font-family:var(--font-mono);font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border-radius:20px;background:var(--accent-soft);border:1px solid var(--accent-line);color:var(--accent-2)}
-[data-mode="dark"] .hero-tag{background:var(--accent-soft);border-color:var(--accent-line);color:var(--accent)}
+[data-mode="dark"] .hero-tag{color:var(--accent)}
 .hero-actions{display:flex;gap:8px;flex-shrink:0;align-self:end}
 .hero-btn{height:36px;padding:0 16px;border-radius:var(--radius-m);font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:6px;transition:all .15s;white-space:nowrap}
 .hero-btn-secondary{background:var(--paper-2);border:1px solid var(--paper-line);color:var(--ink-2)}
@@ -69,8 +83,7 @@ a{color:inherit;text-decoration:none} button{font:inherit;color:inherit;cursor:p
 .hero-btn-primary{background:var(--purple);border:1px solid var(--purple);color:#fff}
 .hero-btn-primary:hover{background:var(--purple-2);border-color:var(--purple-2)}
 
-/* Stats strip */
-.stats-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:1px solid var(--paper-line);border-bottom:1px solid var(--paper-line);margin-bottom:40px}
+.stats-strip{display:grid;grid-template-columns:repeat({{ 3 if view == 'employee' else 4 }},1fr);gap:0;border-top:1px solid var(--paper-line);border-bottom:1px solid var(--paper-line);margin-bottom:40px}
 @media(max-width:640px){.stats-strip{grid-template-columns:repeat(2,1fr)}.stat-item:nth-child(n+3){border-top:1px solid var(--paper-line)}}
 .stat-item{padding:18px 20px;border-left:1px solid var(--paper-line)}
 .stat-item:first-child{border-left:0;padding-left:0}
@@ -78,11 +91,9 @@ a{color:inherit;text-decoration:none} button{font:inherit;color:inherit;cursor:p
 .stat-val{font-size:28px;font-weight:800;letter-spacing:-.03em;line-height:1;color:var(--ink);margin-top:6px}
 .stat-unit{font-family:var(--font-mono);font-size:11px;color:var(--ink-3);margin-top:4px}
 
-/* Guide layout */
 .guide-layout{display:grid;grid-template-columns:220px 1fr;gap:56px;padding-top:8px}
 @media(max-width:960px){.guide-layout{grid-template-columns:1fr}.guide-toc{display:none}}
 
-/* TOC */
 .guide-toc{position:sticky;top:80px;align-self:start;display:grid;gap:2px;padding-right:8px}
 .guide-toc-label{font-family:var(--font-mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);padding:4px 12px 10px}
 .toc-item{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 12px;border-radius:8px;font-size:13.5px;color:var(--ink-3);transition:all .15s;position:relative;cursor:pointer}
@@ -92,19 +103,22 @@ a{color:inherit;text-decoration:none} button{font:inherit;color:inherit;cursor:p
 .toc-item.active::before{background:var(--accent)}
 .toc-count{font-family:var(--font-mono);font-size:10.5px;color:var(--ink-4)}
 
-/* Guide sections */
 .guide-body{min-width:0}
 .guide-section{padding-bottom:48px;scroll-margin-top:80px}
 .guide-section-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--paper-line)}
 .guide-section-head h2{font-size:28px;font-weight:700;letter-spacing:-.025em;line-height:1}
 .sec-meta{font-family:var(--font-mono);font-size:11px;color:var(--ink-3)}
 
-/* Rule rows */
+.section-callout{margin-bottom:24px;padding:14px 18px;border-radius:var(--radius-m);font-size:13px;display:flex;align-items:flex-start;gap:10px;line-height:1.5}
+.section-callout strong{font-weight:700}
+.callout-warn{background:var(--warn-soft);border:1px solid var(--warn);color:var(--warn)}
+.callout-danger{background:var(--danger-soft);border:1px solid var(--danger);color:var(--danger)}
+.callout-info{background:var(--purple-soft);border:1px solid var(--purple-line);color:var(--purple)}
+
 .rule{padding:18px 0;border-bottom:1px dashed var(--paper-line);display:grid;grid-template-columns:160px 1fr;gap:24px;align-items:start}
 .rule:last-child{border-bottom:0}
 @media(max-width:640px){.rule{grid-template-columns:1fr;gap:6px}}
 .rule-label{font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);padding-top:4px}
-.rule-content{min-width:0}
 .rule-body{font-size:15px;line-height:1.65;color:var(--ink)}
 .rule-body ul,.rule-body ol{margin:6px 0 6px 20px;padding:0}
 .rule-body li{margin:2px 0}
@@ -118,40 +132,10 @@ a{color:inherit;text-decoration:none} button{font:inherit;color:inherit;cursor:p
 .rule-body table{border-collapse:collapse;margin:8px 0;font-size:14px}
 .rule-body th,.rule-body td{border:1px solid var(--paper-line);padding:6px 10px;text-align:left}
 .rule-body th{background:var(--paper-2);font-weight:600}
-.rule-editable{cursor:pointer;border-radius:6px;padding:4px 8px;margin:-4px -8px;transition:background .15s}
-.rule-editable:hover{background:var(--paper-2)}
-.rule-editor{width:100%;min-height:100px;padding:12px 14px;border:1px solid var(--purple-line);border-radius:8px;background:var(--paper);color:var(--ink);font-family:var(--font-ui);font-size:14px;line-height:1.65;resize:vertical;outline:none}
-.rule-editor:focus{border-color:var(--purple);box-shadow:0 0 0 3px var(--purple-soft)}
-.rule-edit-toolbar{display:flex;align-items:center;gap:8px;margin-top:8px}
-.rule-edit-save{height:30px;padding:0 16px;border-radius:7px;background:var(--purple);color:#fff;font-size:12px;font-weight:600;border:1px solid var(--purple);transition:all .15s;cursor:pointer}
-.rule-edit-save:hover{background:var(--purple-2)}
-.rule-edit-save:disabled{opacity:.5;cursor:default}
-.rule-edit-cancel{height:30px;padding:0 14px;border-radius:7px;background:var(--paper-2);color:var(--ink-3);font-size:12px;font-weight:500;border:1px solid var(--paper-line);transition:all .15s;cursor:pointer}
-.rule-edit-cancel:hover{color:var(--ink);border-color:var(--ink-4)}
-.rule-edit-status{font-family:var(--font-mono);font-size:11px;color:var(--ok)}
-
-/* Success toast */
-.edit-toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(80px);z-index:100;display:flex;align-items:center;gap:14px;padding:14px 22px;background:var(--paper);border:1px solid var(--ok);border-radius:var(--radius-m);box-shadow:var(--shadow-2);opacity:0;transition:all .35s cubic-bezier(.4,0,.2,1);pointer-events:none;white-space:nowrap}
-.edit-toast.visible{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
-.edit-toast-icon{width:24px;height:24px;border-radius:50%;background:var(--ok-soft);color:var(--ok);display:grid;place-items:center;font-size:14px;flex-shrink:0}
-.edit-toast-text{font-size:14px;font-weight:600;color:var(--ink)}
-.edit-toast-cta{font-size:12px;font-weight:600;padding:6px 14px;border-radius:7px;background:var(--purple);color:#fff;border:1px solid var(--purple);transition:all .15s;cursor:pointer;text-decoration:none}
-.edit-toast-cta:hover{background:var(--purple-2);border-color:var(--purple-2)}
-.edit-toast-dismiss{font-size:18px;color:var(--ink-4);cursor:pointer;padding:0 2px;line-height:1;transition:color .15s}
-.edit-toast-dismiss:hover{color:var(--ink)}
-
-/* Formatting toolbar */
-.rule-fmt-bar{display:flex;align-items:center;gap:2px;margin-bottom:6px}
-.fmt-btn{width:30px;height:28px;display:inline-grid;place-items:center;border-radius:6px;font-size:13px;color:var(--ink-3);border:1px solid transparent;background:transparent;transition:all .12s;cursor:pointer}
-.fmt-btn:hover{background:var(--paper-2);color:var(--ink);border-color:var(--paper-line)}
-.fmt-btn:active{background:var(--paper-3)}
-.fmt-sep{width:1px;height:18px;background:var(--paper-line);margin:0 4px}
 .rule-updated{font-family:var(--font-mono);font-size:10px;color:var(--ink-4);margin-top:6px}
 
-/* Empty section */
 .empty-section{padding:24px;background:var(--paper-2);border:1px dashed var(--paper-line);border-radius:var(--radius-m);font-family:var(--font-mono);font-size:12px;color:var(--ink-4)}
 
-/* Internal Notes */
 .notes-container{background:var(--paper-2);border:1px solid var(--paper-line);border-radius:var(--radius-m);overflow:hidden}
 .notes-editor{width:100%;min-height:160px;padding:16px 18px;border:0;background:transparent;color:var(--ink);font-family:var(--font-ui);font-size:14px;line-height:1.65;resize:vertical;outline:none}
 .notes-editor::placeholder{color:var(--ink-4)}
@@ -162,7 +146,6 @@ a{color:inherit;text-decoration:none} button{font:inherit;color:inherit;cursor:p
 .notes-saved-msg{font-family:var(--font-mono);font-size:11px;color:var(--ok);opacity:0;transition:opacity .3s}
 .notes-saved-msg.visible{opacity:1}
 
-/* Footer */
 .guide-footer{margin-top:28px;padding:22px 0;border-top:1px solid var(--paper-line);font-family:var(--font-mono);font-size:11px;color:var(--ink-4);display:flex;justify-content:space-between;gap:18px}
 </style>
 </head>
@@ -176,45 +159,41 @@ a{color:inherit;text-decoration:none} button{font:inherit;color:inherit;cursor:p
   <span class="appbar-sep">/</span>
   <span class="appbar-subtitle">{{ country }} Guide</span>
   <div class="appbar-spacer"></div>
+  <span class="appbar-badge">{{ view_label }} View</span>
   <button class="appbar-theme" id="themeBtn" onclick="toggleTheme()">
     <span id="themeIcon">&#9790;</span>
     <span id="themeLabel">Dark</span>
   </button>
 </header>
 
-<div class="edit-toast" id="editToast">
-  <span class="edit-toast-icon">&#10003;</span>
-  <span class="edit-toast-text" id="editToastText">Rule updated successfully</span>
-  <a class="edit-toast-cta" href="/ops?country={{ country }}#audit">Audit trail &rarr;</a>
-  <span class="edit-toast-dismiss" onclick="dismissToast()">&times;</span>
-</div>
-
 <main class="shell">
-  <!-- Hero -->
   <div class="country-hero">
     <div class="hero-left">
       <div class="hero-flag">{{ flag }}</div>
       <div class="hero-info">
         <h1 class="hero-name">{{ country }}</h1>
-        <div class="hero-meta">Employment Guide &middot; {{ rule_count }} rules &middot; Last updated {{ last_updated }}</div>
+        <div class="hero-meta">{{ view_label }} Employment Guide &middot; {{ rule_count }} rules &middot; Last updated {{ last_updated }}</div>
+        {% if view != 'employee' %}
         <div class="hero-tags">
           {% for group in groups %}
           <span class="hero-tag">{{ group.label }}</span>
           {% endfor %}
         </div>
+        {% endif %}
       </div>
     </div>
     <div class="hero-actions">
       <a href="/guide" class="hero-btn hero-btn-secondary">&larr; All countries</a>
+      {% if view == 'ops' %}
       <a href="/ops?country={{ country }}#audit" class="hero-btn hero-btn-secondary">Audit trail &rarr;</a>
-      <a href="/employee/{{ country }}" class="hero-btn hero-btn-primary">Employee view &rarr;</a>
+      <a href="/guide/{{ country }}" class="hero-btn hero-btn-primary">Admin view &rarr;</a>
+      {% endif %}
     </div>
   </div>
 
-  <!-- Stats strip -->
   <div class="stats-strip">
     <div class="stat-item">
-      <div class="stat-label">Total Rules</div>
+      <div class="stat-label">Rules</div>
       <div class="stat-val">{{ rule_count }}</div>
     </div>
     <div class="stat-item">
@@ -225,15 +204,15 @@ a{color:inherit;text-decoration:none} button{font:inherit;color:inherit;cursor:p
       <div class="stat-label">Last Updated</div>
       <div class="stat-unit" style="margin-top:10px;font-size:14px;font-weight:600;color:var(--ink)">{{ last_updated }}</div>
     </div>
+    {% if view != 'employee' %}
     <div class="stat-item">
       <div class="stat-label">Status</div>
       <div class="stat-unit" style="margin-top:10px;font-size:13px;font-weight:600;color:var(--ok)">&#9679; Up to date</div>
     </div>
+    {% endif %}
   </div>
 
-  <!-- Guide body -->
   <div class="guide-layout">
-    <!-- TOC sidebar -->
     <aside class="guide-toc" aria-label="Sections">
       <div class="guide-toc-label">Sections</div>
       {% for group in groups %}
@@ -242,12 +221,13 @@ a{color:inherit;text-decoration:none} button{font:inherit;color:inherit;cursor:p
         <span class="toc-count">{{ group.rules|length }}</span>
       </a>
       {% endfor %}
+      {% if view == 'ops' %}
       <a class="toc-item" data-section="internal-notes" onclick="jumpTo('internal-notes', this)">
         <span>Internal Notes</span>
       </a>
+      {% endif %}
     </aside>
 
-    <!-- Content -->
     <div class="guide-body">
       {% for group in groups %}
       <section class="guide-section" id="{{ group.id }}">
@@ -255,32 +235,28 @@ a{color:inherit;text-decoration:none} button{font:inherit;color:inherit;cursor:p
           <h2>{{ group.label }}</h2>
           <div class="sec-meta">{{ group.rules|length }} rule{{ 's' if group.rules|length != 1 }}</div>
         </div>
+        {% if group.id == 'employment' and view == 'client' %}
+        <div class="section-callout callout-warn">
+          <strong>Important:</strong> This section covers termination notice, employer obligations, and industrial relations. Review carefully before any employment action.
+        </div>
+        {% endif %}
+        {% if group.id == 'employment' and view == 'ops' %}
+        <div class="section-callout callout-danger">
+          <strong>Ops:</strong> Review termination notice periods, severance obligations, and employer requirements before processing any exit. Consult legal for complex cases.
+        </div>
+        {% endif %}
+        {% if group.id == 'safety' and view == 'ops' %}
+        <div class="section-callout callout-warn">
+          <strong>Note:</strong> Workplace safety and OSH obligations vary by industry. Verify sector-specific requirements with local counsel.
+        </div>
+        {% endif %}
         {% for rule in group.rules %}
-        <div class="rule" data-section="{{ rule.section }}">
+        <div class="rule">
           <div class="rule-label">{{ rule.section | replace('_', ' ') }}</div>
-          <div class="rule-content">
-            <div class="rule-body rule-editable" onclick="startEdit(this)" title="Click to edit" data-raw="{{ rule.value }}">{{ rule.value }}</div>
-            <div class="rule-edit-area" style="display:none">
-              <div class="rule-fmt-bar">
-                <button class="fmt-btn" onclick="fmtWrap(this,'**')" title="Bold"><strong>B</strong></button>
-                <button class="fmt-btn" onclick="fmtWrap(this,'*')" title="Italic"><em>I</em></button>
-                <button class="fmt-btn" onclick="fmtWrap(this,'`')" title="Code" style="font-family:var(--font-mono);font-size:12px">&lt;/&gt;</button>
-                <span class="fmt-sep"></span>
-                <button class="fmt-btn" onclick="fmtLine(this,'- ')" title="Bullet list" style="font-size:16px">&#8226;</button>
-                <button class="fmt-btn" onclick="fmtLine(this,'1. ')" title="Numbered list" style="font-size:12px;font-weight:700">1.</button>
-                <span class="fmt-sep"></span>
-                <button class="fmt-btn" onclick="fmtLine(this,'## ')" title="Heading" style="font-size:12px;font-weight:800">H</button>
-                <button class="fmt-btn" onclick="fmtLine(this,'> ')" title="Quote" style="font-size:15px">&rdquo;</button>
-              </div>
-              <textarea class="rule-editor"></textarea>
-              <div class="rule-edit-toolbar">
-                <button class="rule-edit-save" onclick="saveEdit(this)">Save</button>
-                <button class="rule-edit-cancel" onclick="cancelEdit(this)">Cancel</button>
-                <span class="rule-edit-status"></span>
-              </div>
-            </div>
-            <div class="rule-updated">Updated {{ rule.last_updated }}</div>
-          </div>
+          <div class="rule-body" data-raw="{{ rule.value }}">{{ rule.value }}</div>
+          {% if view == 'ops' %}
+          <div class="rule-updated">Updated {{ rule.last_updated }}</div>
+          {% endif %}
         </div>
         {% else %}
         <div class="empty-section">No data available for this section yet.</div>
@@ -288,7 +264,7 @@ a{color:inherit;text-decoration:none} button{font:inherit;color:inherit;cursor:p
       </section>
       {% endfor %}
 
-      <!-- Internal Notes -->
+      {% if view == 'ops' %}
       <section class="guide-section" id="internal-notes">
         <div class="guide-section-head">
           <h2>Internal Notes</h2>
@@ -296,18 +272,22 @@ a{color:inherit;text-decoration:none} button{font:inherit;color:inherit;cursor:p
             <span id="notes-status">{% if notes.updated_at %}Last saved {{ notes.updated_at }}{% else %}No notes yet{% endif %}</span>
           </div>
         </div>
+        <div class="section-callout callout-info">
+          <strong>Internal only.</strong> These notes are visible to ops staff only and are not shared with employees or clients.
+        </div>
         <div class="notes-container">
-          <textarea id="notesEditor" class="notes-editor" placeholder="Add internal notes about {{ country }}…">{{ notes.content }}</textarea>
+          <textarea id="notesEditor" class="notes-editor" placeholder="Add internal notes about {{ country }} — severance possibilities, notice negotiation strategies, termination risks…">{{ notes.content }}</textarea>
           <div class="notes-toolbar">
             <button class="notes-save-btn" id="notesSaveBtn" onclick="saveNotes()">Save notes</button>
             <span class="notes-saved-msg" id="notesSavedMsg"></span>
           </div>
         </div>
       </section>
+      {% endif %}
 
       <div class="guide-footer">
-        <span>Abdul Kalam AI Compliance &middot; last sweep {{ last_updated }}</span>
-        <span>Not legal advice. Verify before policy decisions.</span>
+        <span>Abdul Kalam AI Compliance &middot; {{ view_label }} view &middot; last sweep {{ last_updated }}</span>
+        <span>{% if view == 'ops' %}Internal use only. Not legal advice.{% else %}Not legal advice. Verify before policy decisions.{% endif %}</span>
       </div>
     </div>
   </div>
@@ -329,24 +309,19 @@ function applyTheme(mode) {
   document.getElementById('themeLabel').textContent = mode === 'dark' ? 'Light' : 'Dark';
 }
 
-// Prevent IntersectionObserver from overriding active class during/after a manual click
-var _manualClick = false;
-var _manualClickTimer;
-
+var _manualClick = false, _manualClickTimer;
 function jumpTo(id, el) {
   var target = document.getElementById(id);
   if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
   document.querySelectorAll('.toc-item').forEach(function(t) { t.classList.remove('active'); });
   if (el) el.classList.add('active');
-  // Lock out the observer for 800 ms so smooth-scroll doesn't overwrite the active class
   _manualClick = true;
   clearTimeout(_manualClickTimer);
   _manualClickTimer = setTimeout(function() { _manualClick = false; }, 800);
 }
 
-// Intersection observer for active TOC highlighting
 var observer = new IntersectionObserver(function(entries) {
-  if (_manualClick) return; // user just clicked — keep the manually-set active class
+  if (_manualClick) return;
   entries.forEach(function(entry) {
     if (entry.isIntersecting) {
       var id = entry.target.id;
@@ -356,14 +331,10 @@ var observer = new IntersectionObserver(function(entries) {
     }
   });
 }, { rootMargin: '-100px 0px -55% 0px', threshold: [0, 0.2] });
-
-document.querySelectorAll('.guide-section').forEach(function(sec) {
-  observer.observe(sec);
-});
+document.querySelectorAll('.guide-section').forEach(function(sec) { observer.observe(sec); });
 
 function renderMarkdown(text) {
   var html = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  // tables: detect lines with | separators
   html = html.replace(/((?:^|\n)\|.+\|(?:\n\|.+\|)+)/g, function(block) {
     var rows = block.trim().split('\n');
     var out = '<table>';
@@ -375,30 +346,23 @@ function renderMarkdown(text) {
     }
     return out + '</table>';
   });
-  // blockquotes
   html = html.replace(/(^|\n)&gt; (.+)/g, '$1<blockquote>$2</blockquote>');
-  // bold & italic
   html = html.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
   html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
   html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
   html = html.replace(/__(.+?)__/g, '<strong>$1</strong>');
-  // inline code
   html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-  // headings
   html = html.replace(/(^|\n)### (.+)/g, '$1<strong style="font-size:14px">$2</strong>');
   html = html.replace(/(^|\n)## (.+)/g, '$1<strong style="font-size:15px">$2</strong>');
   html = html.replace(/(^|\n)# (.+)/g, '$1<strong style="font-size:16px">$2</strong>');
-  // unordered lists: collect consecutive lines starting with - or *
   html = html.replace(/((?:^|\n)(?:- |\* ).+(?:\n(?:- |\* ).+)*)/g, function(block) {
     var items = block.trim().split('\n').map(function(l){return '<li>'+l.replace(/^[-*] /,'')+'</li>';}).join('');
     return '\n<ul>'+items+'</ul>';
   });
-  // ordered lists
   html = html.replace(/((?:^|\n)\d+\. .+(?:\n\d+\. .+)*)/g, function(block) {
     var items = block.trim().split('\n').map(function(l){return '<li>'+l.replace(/^\d+\. /,'')+'</li>';}).join('');
     return '\n<ol>'+items+'</ol>';
   });
-  // paragraphs: split on double newline
   var parts = html.split(/\n{2,}/);
   html = parts.map(function(p) {
     p = p.trim();
@@ -408,119 +372,11 @@ function renderMarkdown(text) {
   }).join('');
   return html;
 }
-
 document.querySelectorAll('.rule-body[data-raw]').forEach(function(el) {
   el.innerHTML = renderMarkdown(el.getAttribute('data-raw'));
 });
 
-var _toastTimer;
-function showToast(msg) {
-  var toast = document.getElementById('editToast');
-  document.getElementById('editToastText').textContent = msg;
-  toast.classList.add('visible');
-  clearTimeout(_toastTimer);
-  _toastTimer = setTimeout(function() { toast.classList.remove('visible'); }, 6000);
-}
-function dismissToast() {
-  clearTimeout(_toastTimer);
-  document.getElementById('editToast').classList.remove('visible');
-}
-
-function fmtWrap(btn, marker) {
-  var editor = btn.closest('.rule-edit-area').querySelector('.rule-editor');
-  var start = editor.selectionStart;
-  var end = editor.selectionEnd;
-  var text = editor.value;
-  var selected = text.slice(start, end);
-  if (selected) {
-    editor.value = text.slice(0, start) + marker + selected + marker + text.slice(end);
-    editor.selectionStart = start + marker.length;
-    editor.selectionEnd = end + marker.length;
-  } else {
-    editor.value = text.slice(0, start) + marker + marker + text.slice(end);
-    editor.selectionStart = editor.selectionEnd = start + marker.length;
-  }
-  editor.focus();
-}
-
-function fmtLine(btn, prefix) {
-  var editor = btn.closest('.rule-edit-area').querySelector('.rule-editor');
-  var start = editor.selectionStart;
-  var text = editor.value;
-  var lineStart = text.lastIndexOf('\n', start - 1) + 1;
-  var before = text.slice(0, lineStart);
-  var after = text.slice(lineStart);
-  editor.value = before + prefix + after;
-  editor.selectionStart = editor.selectionEnd = start + prefix.length;
-  editor.focus();
-}
-
-function startEdit(el) {
-  var rule = el.closest('.rule');
-  var editArea = rule.querySelector('.rule-edit-area');
-  var editor = rule.querySelector('.rule-editor');
-  editor.value = el.getAttribute('data-raw') || el.textContent;
-  el.style.display = 'none';
-  editArea.style.display = 'block';
-  editor.focus();
-  editor.style.height = 'auto';
-  editor.style.height = Math.max(100, editor.scrollHeight + 4) + 'px';
-}
-
-function cancelEdit(btn) {
-  var rule = btn.closest('.rule');
-  rule.querySelector('.rule-body').style.display = '';
-  rule.querySelector('.rule-edit-area').style.display = 'none';
-}
-
-function saveEdit(btn) {
-  var rule = btn.closest('.rule');
-  var section = rule.dataset.section;
-  var editor = rule.querySelector('.rule-editor');
-  var body = rule.querySelector('.rule-body');
-  var status = rule.querySelector('.rule-edit-status');
-  var saveBtn = rule.querySelector('.rule-edit-save');
-  var cancelBtn = rule.querySelector('.rule-edit-cancel');
-  var newValue = editor.value.trim();
-  if (!newValue) return;
-
-  saveBtn.disabled = true;
-  cancelBtn.disabled = true;
-  saveBtn.textContent = 'Saving…';
-  status.textContent = '';
-
-  fetch('/api/guide/{{ country }}/' + section, {
-    method: 'PUT',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({value: newValue})
-  })
-  .then(function(r) { return r.json(); })
-  .then(function(data) {
-    saveBtn.disabled = false;
-    cancelBtn.disabled = false;
-    saveBtn.textContent = 'Save';
-    if (data.success) {
-      body.setAttribute('data-raw', newValue);
-      body.innerHTML = renderMarkdown(newValue);
-      body.style.display = '';
-      rule.querySelector('.rule-edit-area').style.display = 'none';
-      if (data.updated_at) {
-        rule.querySelector('.rule-updated').textContent = 'Updated ' + data.updated_at;
-      }
-      var label = section.replace(/_/g, ' ');
-      showToast('"' + label + '" updated successfully');
-    } else {
-      status.textContent = data.message || 'Save failed';
-    }
-  })
-  .catch(function() {
-    saveBtn.disabled = false;
-    cancelBtn.disabled = false;
-    saveBtn.textContent = 'Save';
-    status.textContent = 'Save failed';
-  });
-}
-
+{% if view == 'ops' %}
 function saveNotes() {
   var btn = document.getElementById('notesSaveBtn');
   var msg = document.getElementById('notesSavedMsg');
@@ -556,6 +412,7 @@ function saveNotes() {
     msg.classList.add('visible');
   });
 }
+{% endif %}
 </script>
 </body>
 </html>

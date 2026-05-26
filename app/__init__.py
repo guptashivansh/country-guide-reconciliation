@@ -18,7 +18,7 @@ from app.services.provenance_service import ProvenanceService
 from app.services.temporal_rule_service import TemporalRuleService
 from app.drift.detector import DriftDetector
 from app.drift.repository import DriftRepository
-from app.utils.config import database_path, extraction_chunk_size, groq_api_keys, load_env_file, official_sources_json_url, slack_webhook_url, sync_cron_schedule, parser_version
+from app.utils.config import database_path, extraction_chunk_size, groq_api_keys, load_env_file, official_sources_json_url, slack_webhook_url, sync_cron_schedule, parser_version  # noqa: E501
 from app.utils.db import Database
 from app.utils.logging_config import configure_logging
 
@@ -32,8 +32,7 @@ def build_services(db_path=None):
     country_guide_repository = CountryGuideRepository(db)
     source_snapshot_repository = SourceSnapshotRepository(db)
     ingestion_job_repository = IngestionJobRepository(db)
-    source_endpoint_repository = TrustedSourceEndpointRepository(json_url=official_sources_json_url())
-    source_endpoint_repository.list_active_source_endpoints()
+    source_endpoint_repository = TrustedSourceEndpointRepository(db, json_url=official_sources_json_url())
 
     provenance_repository = ProvenanceRepository(db)
     provenance_service = ProvenanceService(provenance_repository, parser_version=parser_version())
@@ -45,6 +44,7 @@ def build_services(db_path=None):
         "country_guide_repository": country_guide_repository,
         "source_snapshot_repository": source_snapshot_repository,
         "ingestion_job_repository": ingestion_job_repository,
+        "source_endpoint_repository": source_endpoint_repository,
         "provenance_repository": provenance_repository,
         "provenance_service": provenance_service,
         "temporal_rule_service": temporal_rule_service,
@@ -68,6 +68,7 @@ def create_app(db_path=None):
     services["source_snapshot_repository"].initialize_schema()
     services["ingestion_job_repository"].initialize_schema()
     services["provenance_repository"].initialize_schema()
+    services["source_endpoint_repository"].initialize_schema()
     flask_app = Flask(__name__, template_folder="../templates")
     flask_app.config["services"] = services
     flask_app.register_blueprint(create_api_blueprint(

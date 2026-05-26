@@ -4,7 +4,7 @@
     {
       "name": "flask-app",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["app.py"],
+      "runtimeArgs": ["/Users/shivanshgupta/Desktop/country-guide-reconciliation/run_preview.py"],
       "cwd": "/Users/shivanshgupta/Desktop/country-guide-reconciliation",
       "port": 8080
     },

@@ -8,13 +8,29 @@ class IngestionJobService:
     def __init__(self, ingestion_job_repository):
         self.ingestion_job_repository = ingestion_job_repository
 
-    def create_job(self, source_url):
-        job_id = self.ingestion_job_repository.create_job(source_url)
+    def create_job(self, source_url, country=None):
+        job_id = self.ingestion_job_repository.create_job(source_url, country=country)
         logger.info(
             "Ingestion job queued",
-            extra={"stage": "queued", "source_url": source_url, "ingestion_job_id": job_id},
+            extra={"stage": "queued", "source_url": source_url, "ingestion_job_id": job_id, "country": country},
         )
         return job_id
+
+    def get_job(self, job_id):
+        return self.ingestion_job_repository.get_job(job_id)
+
+    def retry_job(self, job_id):
+        original = self.ingestion_job_repository.get_job(job_id)
+        if not original:
+            return None
+        new_id = self.ingestion_job_repository.create_job(
+            original["source_url"], country=original.get("country"),
+        )
+        logger.info(
+            "Ingestion job retried",
+            extra={"stage": "queued", "original_job_id": job_id, "new_job_id": new_id, "source_url": original["source_url"]},
+        )
+        return {"job_id": new_id, "source_url": original["source_url"], "country": original.get("country")}
 
     def mark_fetched(self, job_id):
         self.ingestion_job_repository.transition_job(job_id, "fetched")

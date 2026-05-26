@@ -132,12 +132,12 @@ def _post_region_alert(webhook_url, region, owner, region_stats, timestamp, trig
         {
             "type": "button",
             "text": "Review Queue",
-            "url": f"{base}/api/review-queue",
+            "url": f"{base}/ops#review",
         },
         {
             "type": "button",
             "text": "Open Dashboard",
-            "url": f"{base}/compliance/dashboard",
+            "url": f"{base}/ops",
         },
     ]
 

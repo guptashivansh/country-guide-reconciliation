@@ -242,17 +242,16 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
             None,
         )
 
-        all_endpoints = source_registry_service.list_trusted_source_endpoints()
-        country_count = len({e.country for e in all_endpoints if e.country})
+        registry = source_registry_service.get_registry_stats()
 
         return jsonify({
-            "sources_monitored": len(all_endpoints),
+            "sources_monitored": registry["endpoints"],
             "pending_reviews": len(pending),
             "critical_changes": len(critical),
             "avg_confidence": avg_conf,
             "crawl_failures": crawl_failures,
             "last_successful_sync": last_ok_ts,
-            "trusted_source_count": country_count,
+            "trusted_source_count": registry["countries"],
         })
 
     @routes.route("/api/sync", methods=["POST"])
@@ -434,6 +433,48 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
             flag=FLAGS.get(country, "🌐"),
         )
 
+    EMPLOYEE_SECTIONS = {"leave", "hours", "compensation", "benefits"}
+    CLIENT_SECTIONS = {"leave", "hours", "compensation", "benefits", "employment", "immigration"}
+    OPS_SECTIONS = {"leave", "hours", "compensation", "benefits", "employment", "immigration", "safety"}
+
+    def _build_guide_context(country, allowed_group_ids):
+        rows = review_service.get_country_sections(country)
+        if not rows:
+            return None
+        rules_by_section = {r["section"]: {"section": r["section"], "value": r["value"], "last_updated": _fmt_date(r["last_updated"])} for r in rows}
+        last_updated = _fmt_date(max(r["last_updated"] for r in rows))
+        groups = []
+        for g in SECTION_GROUPS:
+            if g["id"] not in allowed_group_ids:
+                continue
+            group_rules = [rules_by_section[s] for s in g["sections"] if s in rules_by_section]
+            if group_rules:
+                groups.append({"id": g["id"], "label": g["label"], "rules": group_rules})
+        return {
+            "country": country,
+            "flag": FLAGS.get(country, "🌐"),
+            "rule_count": sum(len(g["rules"]) for g in groups),
+            "last_updated": last_updated,
+            "groups": groups,
+        }
+
+    VIEW_CONFIG = {
+        "employee": {"sections": EMPLOYEE_SECTIONS, "label": "Employee"},
+        "client":   {"sections": CLIENT_SECTIONS,   "label": "Client"},
+        "ops":      {"sections": OPS_SECTIONS,       "label": "Ops"},
+    }
+
+    @routes.route("/guide/<view>/<country>")
+    def guide_view(view, country):
+        cfg = VIEW_CONFIG.get(view)
+        if not cfg:
+            abort(404)
+        ctx = _build_guide_context(country, cfg["sections"])
+        if not ctx:
+            abort(404)
+        notes = review_service.get_country_notes(country) if view == "ops" else {"content": "", "updated_at": None}
+        return render_template("guide_view.html", view=view, view_label=cfg["label"], notes=notes, **ctx)
+
     @routes.route("/api/employee/guide/<country>")
     def api_employee_guide(country):
         rows = review_service.get_country_sections(country)
@@ -591,5 +632,78 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
     @routes.route("/compliance/settings")
     def compliance_settings():
         return render_template("compliance_base.html", nav_active="settings")
+
+    @routes.route("/api/sources/stats")
+    def source_registry_stats():
+        return jsonify(source_registry_service.get_registry_stats())
+
+    @routes.route("/api/sources/countries")
+    def source_registry_countries():
+        return jsonify(source_registry_service.list_countries())
+
+    @routes.route("/api/sources/authorities")
+    def source_registry_authorities():
+        country_id = request.args.get("country_id")
+        return jsonify(source_registry_service.list_authorities(country_id))
+
+    @routes.route("/api/sources/endpoints")
+    def source_registry_endpoints():
+        country = request.args.get("country")
+        if country:
+            eps = source_registry_service.list_endpoints_for_country(country)
+        else:
+            eps = source_registry_service.list_trusted_source_endpoints()
+        return jsonify([{
+            "endpoint_id": ep.endpoint_id,
+            "country": ep.country,
+            "iso_code": ep.iso_code,
+            "authority": ep.authority,
+            "authority_type": ep.authority_type,
+            "url": ep.url,
+            "authority_url": ep.authority_url,
+            "sections": list(ep.sections),
+            "source_type": ep.source_type,
+            "extraction_strategy": ep.extraction_strategy,
+            "crawl_frequency": ep.crawl_frequency,
+            "escalation_required": ep.escalation_required,
+            "supports_replay": ep.supports_replay,
+            "owner_team": ep.owner_team,
+            "notes": ep.notes,
+            "status": ep.status,
+        } for ep in eps])
+
+    @routes.route("/api/sources/verify", methods=["POST"])
+    def source_verify_url():
+        data = request.get_json(silent=True) or {}
+        url = (data.get("url") or "").strip()
+        if not url:
+            return jsonify({"error": "url is required"}), 400
+        return jsonify(source_registry_service.verify_url(url))
+
+    @routes.route("/api/sources/classify", methods=["POST"])
+    def source_classify_url():
+        data = request.get_json(silent=True) or {}
+        url = (data.get("url") or "").strip()
+        classification = (data.get("classification") or "").strip()
+        if not url or classification not in ("official", "unofficial_trusted", "not_official"):
+            return jsonify({"error": "url and valid classification required"}), 400
+        result = source_registry_service.classify_url(
+            url, classification,
+            notes=data.get("notes", ""),
+            classified_by=data.get("classified_by", ""),
+            matched_authority=data.get("matched_authority", ""),
+            matched_country=data.get("matched_country", ""),
+        )
+        return jsonify(result)
+
+    @routes.route("/api/sources/classifications")
+    def source_classifications():
+        return jsonify(source_registry_service.list_classifications())
+
+    @routes.route("/api/sources/pdfs")
+    def source_pdf_uploads():
+        jobs = ingestion_job_service.list_recent_jobs(limit=100)
+        pdfs = [j for j in jobs if (j.get("source_url") or "").startswith("pdf://")]
+        return jsonify(pdfs)
 
     return routes
