@@ -27,6 +27,7 @@ graph TD
         IJS[IngestionJobService]
         ES[GroqExtractionService]
         RCS[ReconciliationService]
+        LRE[LLMReconciliationEngine]
         PS[ProvenanceService]
         TRS[TemporalRuleService]
         DD[DriftDetector]
@@ -35,11 +36,14 @@ graph TD
         SLACK[SlackService]
     end
 
+    subgraph "LLM Layer"
+        GP[GroqProvider]
+    end
+
     subgraph "Pipeline Components — Stateless"
         CC[ContentChunker]
         ERP[EmploymentRuleParser]
         ERA[EmploymentRuleAggregator]
-        SRE[SemanticReconciliationEngine]
     end
 
     subgraph "API Layer"
@@ -55,7 +59,8 @@ graph TD
     ES --> ERP
     ES --> ERA
     RCS --> CGR
-    RCS --> SRE
+    RCS --> LRE
+    LRE --> GP
     PS --> PR
     TRS --> CGR
     DD --> DR
@@ -108,6 +113,7 @@ Repositories own all SQL operations. No service or API handler writes SQL direct
 | `GroqExtractionService` | No database writes; reads only | Manages LLM API calls, key rotation, chunk processing, confidence aggregation |
 | `ReconciliationService` | Writes via `CountryGuideRepository.enqueue_review_item()` | Applies semantic diff engine, suppresses duplicates, creates review queue items |
 | `ProvenanceService` | Writes via `ProvenanceRepository.write()` and `set_current()` | Constructs and records provenance chains for approval, bulk-approval, and seed operations |
+| `LLMReconciliationEngine` | No database writes; reads only | Classifies materiality level and change type for a detected change via an injected `LLMProvider` (Groq); retries on malformed response or transient failure; raises after exhausting attempts so the caller can fail open |
 | `TemporalRuleService` | No writes | Point-in-time rule queries and version timeline construction |
 | `DriftDetector` | No writes | Evaluates drift rules, deduplicates findings, aggregates reports |
 | `SyncService` | Coordinates across all pipeline services | Top-level orchestrator; does not hold database state; fault-isolates per-source failures |
@@ -125,7 +131,6 @@ These components are pure functions with no database access. They can be safely 
 | `ContentChunker` | Raw text string | List of `{chunk_index, chunk_count, text}` | Ensures LLM context budget compliance |
 | `EmploymentRuleParser` | LLM JSON response string, allowed sections | List of validated `EmploymentRule` objects | Drops invalid extractions before they enter the governance pipeline |
 | `EmploymentRuleAggregator` | List of `EmploymentRule` objects from all chunks | Deduplicated list (highest confidence per section) | Resolves conflicting extractions from the same source |
-| `SemanticReconciliationEngine` | Old rule value, new rule value | `SemanticReconciliationResult` | Deterministic change classification with documented reasoning |
 
 ---
 
@@ -142,7 +147,7 @@ services = {
     "trusted_source_endpoint_repository": TrustedSourceEndpointRepository(source_registry_url),
     "review_service": ReviewService(country_guide_repository, provenance_service),
     "extraction_service": GroqExtractionService(api_keys, parser, chunker, aggregator),
-    "reconciliation_service": ReconciliationService(country_guide_repository, semantic_engine),
+    "reconciliation_service": ReconciliationService(country_guide_repository, reconciliation_engine=LLMReconciliationEngine(GroqProvider(api_keys))),
     "provenance_service": ProvenanceService(provenance_repository, parser_version),
     "temporal_rule_service": TemporalRuleService(country_guide_repository),
     "drift_detector": DriftDetector(drift_repository),

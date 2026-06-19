@@ -45,7 +45,7 @@ The system defines three trust zones with explicit boundary enforcement:
 │  AI PROCESSING ZONE: Extraction & Classification                   │
 │                                                                     │
 │  LLM extraction (Groq LLaMA 3.3 70B, temperature=0.1)             │
-│  Deterministic semantic classification (regex engine)              │
+│  LLM change classification (Groq LLaMA 3.3 70B, temperature=0.0)   │
 │  • AI output is NEVER published directly                           │
 │  • Every AI output carries a confidence score                      │
 │  • Classification decisions have documented reasoning              │
@@ -98,7 +98,7 @@ The system defines three trust zones with explicit boundary enforcement:
                                │  EmploymentRule[] with confidence scores
                     ┌──────────▼──────────────────────────────────────────┐
                     │          RECONCILIATION LAYER                       │
-                    │  Semantic Diff Engine (deterministic regex)         │
+                    │  LLM Change Classifier (Groq, temperature=0.0)      │
                     │  Change Type Classification · Materiality Scoring   │
                     │  Duplicate Suppression · Null-change Filtering      │
                     └──────────┬──────────────────────────────────────────┘
@@ -132,7 +132,7 @@ flowchart LR
     E --> F[Groq LLM — temperature=0.1]
     F --> G[Pydantic Validator]
     G --> H[Confidence Aggregator]
-    H --> I[Semantic Diff Engine]
+    H --> I[LLM Change Classifier]
     I --> J{Semantic Change?}
     J -- No change detected --> K[Suppress — no queue item]
     J -- Change detected --> L[review_queue — status=pending]
@@ -149,21 +149,27 @@ flowchart LR
 
 ## Architectural Decisions & Rationale
 
-### Decision 1: Deterministic Semantic Engine (No LLM for Reconciliation)
+### Decision 1: LLM-Based Change Classification (Superseded Regex Engine)
 
-**What the decision is:** Change classification uses a compiled regex pattern library with documented rules, not an LLM.
+**What the decision is:** Change classification calls the LLM (Groq LLaMA 3.3 70B, temperature=0.0) with a fixed rubric and a closed label set, rather than a hand-written regex pattern library. `LLMReconciliationEngine` (`app/reconciliation/llm_reconciliation_service.py`) replaced `SemanticReconciliationEngine` (removed).
 
-**Why this matters for governance:** An LLM classifying the same (old, new) pair might return `NUMERIC_THRESHOLD_CHANGE` on one invocation and `NON_MATERIAL_FORMATTING` on another. This non-determinism is unacceptable in a compliance context: the decision to escalate a critical change versus surface it as informational must be reproducible and explainable to a reviewer or auditor. The regex engine's classification is deterministic, the reasoning is documented, and the pattern library is inspectable.
+**Why the regex engine was replaced:** The pattern library only recognized English compliance keywords (`must`, `shall`, `eligible`, `minimum wage`...) compiled in advance. Any change phrased outside that vocabulary — including any non-English source, or simply unanticipated wording — fell through to a generic low-priority classification regardless of actual materiality. A fixed vocabulary cannot keep pace with new compliance domains or new source languages without a code change and a deploy. The LLM-based classifier generalizes the same way the extraction layer already does.
 
-**Acknowledged limitation:** The regex engine is less flexible than LLM classification. A change type outside the defined pattern vocabulary falls through to `NON_MATERIAL_FORMATTING`. This is a deliberate conservative failure mode — it surfaces the change for human review rather than attempting to classify it with a model that could return an incorrect classification. Reviewers see the before/after diff regardless of the classification.
+**How non-determinism is managed, not eliminated:** Classification is not perfectly reproducible the way regex matching was — this is a real tradeoff, not a solved problem. It is mitigated, not removed: `temperature=0.0` minimizes (but does not guarantee zero) run-to-run variance; the prompt encodes the same materiality rubric the regex engine used (high-impact domains, eligibility/visa escalation, requirement-removal asymmetry) so classification stays anchored to a documented standard rather than free-form judgment; every classification's `reasoning` is logged at call time for traceability; and — as before — the classification is advisory. It never gates whether a change reaches the review queue, only how it's prioritized within it. A misclassification is a prioritization error a human reviewer can catch from the before/after diff, not a publication error.
+
+**Acknowledged limitation:** An LLM call can fail to return valid JSON, time out, or hit a rate limit. `LLMReconciliationEngine` retries internally; if classification still fails, `ReconciliationService` logs a warning and enqueues the review item without a materiality/change-type label rather than dropping it — the same fail-open behavior the regex engine used for unmatched patterns. Every detected change still reaches a reviewer.
+
+**Cost and latency tradeoff:** This adds one Groq call per detected change, on top of the existing extraction calls — both classification and extraction now depend on Groq availability and quota, where reconciliation previously had zero LLM dependency. This is a deliberate tradeoff being made explicitly, not a side effect: the previous "no LLM in reconciliation" design existed in part *because* of this cost/availability concern, and the team chose generalization over that isolation.
 
 ---
 
-### Decision 2: LLM Scoped to Extraction Only
+### Decision 2: LLM Scoped to Extraction and Classification Only
 
-**What the decision is:** The LLM (Groq LLaMA 3.3 70B) processes only the ingestion-to-extraction stage. It is not used for reconciliation, classification, approval decisions, or any operation that modifies published data.
+**What the decision is:** The LLM (Groq LLaMA 3.3 70B) is used for two pipeline stages: extracting structured rules from source text, and classifying the materiality/type of a detected change (see Decision 1). It is not used for approval decisions or any operation that writes to `country_guide` directly.
 
-**Why this matters for governance:** Containing the LLM to the extraction stage means AI uncertainty is bounded. Confidence scores quantify extraction reliability, human reviewers evaluate that uncertainty, and the governance gate ensures LLM output never directly modifies authoritative data. If the LLM is deprecated, rate-limited, or replaced, it affects only the extraction layer; all historical provenance, version history, and audit records remain valid.
+**Why this matters for governance:** Both LLM call sites sit strictly upstream of the governance gate. Confidence scores quantify extraction reliability; classification reasoning is logged for every reconciliation call; human reviewers evaluate both before anything is approved. The governance gate ensures LLM output — extracted or classified — never directly modifies authoritative data. If Groq is deprecated, rate-limited, or replaced, it affects extraction and classification only; all historical provenance, version history, and audit records remain valid.
+
+**Widened blast radius, acknowledged:** Decision 1 previously argued for keeping reconciliation LLM-free specifically to bound this risk to one stage. That argument no longer holds: a full Groq outage or rate-limit exhaustion now degrades two pipeline stages instead of one. Both stages fail open (extraction failure halts that source's sync cycle; classification failure enqueues the change unclassified) rather than failing closed, so an outage produces missing or unprioritized review items, not silent data loss or incorrect publication.
 
 ---
 
@@ -231,7 +237,8 @@ Failures that produce data, but data of degraded quality, requiring heightened h
 |---------|-----------|--------|----------|
 | Government website restructured | Confidence scores drop significantly | Extractions propose incorrect rules | Low-confidence items are flagged; reviewers examine source paragraph against source URL |
 | LLM extracts a hallucinated rule | Confidence score < 0.7; source paragraph doesn't support value | Incorrect change proposed in review queue | Human reviewer rejects; audit log records rejection; next sync re-extracts |
-| Regex pattern misclassifies change type | Wrong change type or materiality assigned | Change may be under-prioritized | Human reviewer sees before/after diff regardless; classification guides but does not gate review |
+| LLM misclassifies change type or materiality | Wrong change type or materiality assigned | Change may be under-prioritized | Human reviewer sees before/after diff regardless; classification guides but does not gate review |
+| LLM classification call fails (rate limit, malformed JSON, outage) | Exception after retry exhaustion in `LLMReconciliationEngine` | Review item enqueued with no materiality/change_type label | `ReconciliationService` catches the failure and enqueues unclassified rather than dropping the change |
 
 ### Category 3: Unacceptable Failures (Data Integrity)
 
@@ -253,7 +260,7 @@ Scalability decisions are made with governance as the primary constraint. Perfor
 |-----------|-----------------|------------|
 | Source coverage | 87 countries × N sources per country | Source registry is additive; no code changes required |
 | Sync throughput | Sequential per source endpoint | Worker pool with per-country distributed locking; requires external scheduler |
-| LLM throughput | N-key rotation (one key per Groq account) | Add keys to `GROQ_API_KEY` comma-separated; rotation is automatic |
+| LLM throughput | N-key rotation (one key per Groq account), shared quota pool across extraction and classification | Add keys to `GROQ_API_KEYS` comma-separated; rotation is automatic. Classification now competes with extraction for the same quota — see Decision 2 |
 | Database concurrency | SQLite (single-writer) | PostgreSQL adapter in `db.py`; `set DATABASE_URL` activates it |
 | Audit record volume | ~1 record per review action | Append-only; archive partitions for historical records beyond N years |
 | Temporal query performance | `(country, section, effective_date)` composite index | Adequate for 87 countries × 7 sections × N versions; no optimization needed at current scale |

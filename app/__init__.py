@@ -6,6 +6,8 @@ from app.extraction.groq_extraction_service import GroqExtractionService
 from app.ingestion.html_ingestion_service import HtmlIngestionService
 from app.ingestion.ingestion_job_service import IngestionJobService
 from app.ingestion.source_snapshot_service import SourceSnapshotService
+from app.llm.groq_provider import GroqProvider
+from app.reconciliation.llm_reconciliation_service import LLMReconciliationEngine
 from app.reconciliation.reconciliation_service import ReconciliationService
 from app.repositories.country_guide_repository import CountryGuideRepository
 from app.repositories.ingestion_job_repository import IngestionJobRepository
@@ -58,7 +60,10 @@ def build_services(db_path=None):
             groq_api_keys(),
             chunker=ContentChunker(max_chunk_size=extraction_chunk_size()),
         ),
-        "reconciliation_service": ReconciliationService(country_guide_repository),
+        "reconciliation_service": ReconciliationService(
+            country_guide_repository,
+            reconciliation_engine=LLMReconciliationEngine(GroqProvider(groq_api_keys())),
+        ),
     }
 
 

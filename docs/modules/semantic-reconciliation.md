@@ -10,140 +10,77 @@ The semantic reconciliation engine classifies every detected difference into a c
 2. **Gates bulk approve eligibility** — Only items below the CRITICAL threshold can be bulk-approved
 3. **Provides documented reasoning** — Every classification has a `reasoning` field recording why the engine classified it as it did, enabling auditors to evaluate the classification
 
-The engine's critical design property is determinism. The same (old, new) pair always produces the same classification. Reproducibility is not a convenience — it is a governance requirement.
+The engine's classification step is advisory: it never decides whether a detected difference reaches the review queue. A failed or low-confidence classification still produces a review item — it just arrives unlabeled, at the bottom of the triage order, rather than being dropped.
 
 ---
 
-## Why the Engine Does Not Use an LLM
+## LLM-Based Classification
 
-This decision is worth stating explicitly, because it may appear counterintuitive in a system that already uses an LLM for extraction.
+`LLMReconciliationEngine` (`app/reconciliation/llm_reconciliation_service.py`) classifies every detected change by calling an LLM (Groq LLaMA 3.3 70B, `temperature=0.0`) against a fixed rubric and a closed label set, rather than matching the text against a hand-written regex pattern library. This replaced the previous `SemanticReconciliationEngine`, which is no longer part of the codebase.
 
-**LLMs are non-deterministic at temperature > 0.** Even at temperature=0.1, LLMs can produce different classifications for identical inputs across separate invocations. A compliance reviewer who sees "CRITICAL" for a change on Tuesday and "INFORMATIONAL" for the same change on Wednesday when re-processed has no basis for trusting the classification. An auditor who asks "why was this change classified as HIGH rather than CRITICAL?" cannot receive a reproducible, inspectable answer if the classification came from an LLM.
+**Why the regex engine was replaced.** The pattern library only recognized English compliance keywords ("minimum wage," "visa," "must," "shall," and similar fixed vocabulary). Any change phrased outside that vocabulary — non-English source text, a synonym the pattern library didn't enumerate, or a sentence structure the numeric/eligibility/requirement patterns didn't anticipate — fell through to `NON_MATERIAL_FORMATTING` regardless of its actual materiality. A rule change in a high-impact domain phrased in unfamiliar wording was indistinguishable, to the regex engine, from a punctuation fix. An LLM classifying against the same rubric generalizes across phrasing the pattern library could not enumerate in advance.
 
-**Regex classification reasoning is auditable.** The `reasoning` field records the exact pattern match that produced the classification: "Numeric value '21000' changed to '23500' in high-impact domain 'minimum wage'." An auditor can verify this against the source text and the pattern library. LLM reasoning is opaque by comparison.
+**How non-determinism is managed, not eliminated.** `temperature=0.0` minimizes — but does not guarantee zero — run-to-run variance. The prompt encodes the same materiality rubric the regex engine used (high-impact domains, eligibility/visa changes escalate to CRITICAL or HIGH, requirement removal is treated more severely than requirement addition), so the classification target is the same even though the mechanism changed. Every classification's `reasoning` is logged and stored with the review queue item, so an auditor can inspect why a given label was produced — even though, unlike a regex match, that reasoning is the model's own account rather than a literal pattern trace. Classification is advisory: it labels severity for triage, it does not gate whether a change reaches the review queue, and it does not decide approval.
 
-**Regex classification is instantaneous.** Sub-millisecond classification means the reconciliation layer adds no meaningful latency to the sync pipeline. LLM classification would add seconds per change detection, multiplied across every source endpoint on every sync.
-
-**The LLM is already upstream.** The extraction layer uses AI generalization to handle diverse HTML formats. By the time content reaches reconciliation, it is structured rule text — not raw HTML. Structured text comparison is exactly where deterministic pattern matching outperforms probabilistic inference.
+**Failure mode is fail-open, not fail-closed.** An LLM call can fail to return valid JSON, return a value outside the enum, time out, or hit a rate limit. `LLMReconciliationEngine` retries internally (`max_attempts`, default 2) on both malformed responses and provider exceptions. If classification still fails after exhausting attempts, it raises, and `ReconciliationService.reconcile_extracted_rules()` catches that exception, logs a warning, and enqueues the review item without a `materiality_level` or `change_type` label rather than dropping it. A model outage degrades triage ordering; it never suppresses a detected change.
 
 ---
 
-## Classification Cascade
+## Classification Contract
 
-The engine applies pattern categories in priority order (highest materiality potential first). The first matching category determines the change type:
+The engine sends a prompt built from the old and new `CanonicalComplianceRule` and requires the response to be a JSON object matching this schema exactly:
 
-```
-1. Numeric threshold detection     → NUMERIC_THRESHOLD_CHANGE
-   ↓ (if no numeric change)
-2. Eligibility scope detection     → ELIGIBILITY_CHANGE
-   ↓ (if no eligibility change)
-3. Requirement language detection  → REQUIREMENT_ADDED or REQUIREMENT_REMOVED
-   ↓ (if no requirement change)
-4. Timeline/deadline detection     → TIMELINE_CHANGE
-   ↓ (if none of the above)
-5. Fallback                        → NON_MATERIAL_FORMATTING
+```python
+class SemanticReconciliationResult(BaseModel):
+    semantic_change_detected: bool
+    materiality_level: MaterialityLevel   # CRITICAL | HIGH | MODERATE | LOW | INFORMATIONAL
+    change_type: ChangeType               # see change types below
+    human_readable_summary: str
+    reasoning: list[str]
 ```
 
-**Conservative fallback design:** If a change does not match any specific pattern, it falls through to `NON_MATERIAL_FORMATTING` with INFORMATIONAL materiality. This means the change still enters the review queue — it is not suppressed — but it is presented at the lowest priority. A reviewer who disagrees with the classification sees the before/after diff regardless and can escalate if they believe the change warrants higher priority.
+`change_type` is one of: `NUMERIC_THRESHOLD_CHANGE`, `ELIGIBILITY_CHANGE`, `REQUIREMENT_ADDED`, `REQUIREMENT_REMOVED`, `TIMELINE_CHANGE`, `NON_MATERIAL_FORMATTING`.
 
-There is no category for "suppress entirely." Every detected semantic difference between an extracted rule and the published rule creates a review item.
+A response that fails JSON parsing, or that fails Pydantic validation (e.g. an invalid enum value like `"EXTREME"` for `materiality_level`), is treated identically to a provider exception: it consumes a retry attempt rather than being silently coerced or accepted.
 
 ---
 
-## Pattern Library
+## Materiality Rubric
 
-### NUMERIC_PATTERN
+The prompt encodes the same severity framework the regex engine enforced, now applied by the model rather than a pattern match:
 
-Extracts numeric values with units and comparators from rule text.
+| Signal | Materiality Level |
+|--------|-------------------|
+| Affects visa, work permit, or immigration eligibility; or a mandatory requirement was removed | CRITICAL |
+| Affects minimum wage, tax, social security, pension, termination, dismissal, or overtime; or a numeric threshold moved by 25% or more; or the population of workers covered by the rule changed | HIGH |
+| A numeric threshold, deadline, or timeline changed, but the rule is not in a high-impact domain | MODERATE |
+| Wording changed and a requirement was added, but no numeric, eligibility, or timeline signal was found | LOW |
+| No material compliance change — punctuation, capitalization, spacing, or non-substantive rewording only | INFORMATIONAL |
 
-```
-Matches: "15 days", "≥ 3 months", "INR 21,000/month", "2.5%", "12 weeks", "30 calendar days"
-Captures: numeric value, unit, optional comparator
-```
+### Why requirement removal is treated as CRITICAL
 
-**Classification logic:** All numeric values are extracted from the old and new text and compared. If the sets differ, the change type is `NUMERIC_THRESHOLD_CHANGE`. If the change involves a high-impact domain (see HIGH_IMPACT_PATTERN), materiality escalates to CRITICAL or HIGH.
-
-### ELIGIBILITY_PATTERN
-
-Detects changes to the population of workers to whom a rule applies.
-
-```
-Keywords: "eligible", "applies to", "citizens", "residents", "employees",
-          "workers", "contractors", "covered under", "subject to"
-```
-
-**Classification logic:** Eligibility keywords present in the new text but absent from the old (or vice versa) indicate that the rule's scope has changed — a different set of workers is now covered. These changes are HIGH materiality regardless of domain, because an organization may be applying the rule to the wrong population.
-
-### REQUIREMENT_PATTERN
-
-Detects changes to mandatory obligation language.
-
-```
-Keywords: "must", "shall", "required", "mandatory", "obligated", "compulsory"
-```
-
-**Classification logic:** New mandatory language appearing in the new text is `REQUIREMENT_ADDED` (MODERATE materiality). Mandatory language disappearing from the text is `REQUIREMENT_REMOVED` (CRITICAL materiality). The asymmetry is deliberate: removing a requirement carries higher risk than adding one, because the organization may be relying on an obligation that no longer exists.
-
-### HIGH_IMPACT_PATTERN
-
-Identifies regulated domains where numeric changes carry elevated risk.
-
-```
-Keywords: "minimum wage", "tax", "pension", "termination", "severance",
-          "social security", "health insurance", "work permit", "visa"
-```
-
-**Role in materiality escalation:** This pattern does not produce a change type independently. It is applied as a modifier during materiality assessment. A numeric change in a high-impact domain is CRITICAL; the same numeric change in a low-impact domain may be HIGH or MODERATE.
-
-### TIMELINE_CONTEXT_PATTERN
-
-Detects changes to deadlines, notice periods, and effective dates.
-
-```
-Keywords: "deadline", "notice", "effective", "within", "before", "after",
-          "grace period", "expiry", "by the end of"
-```
-
----
-
-## Materiality Framework
-
-| Change Type | High-Impact Domain | Materiality Level |
-|------------|-------------------|------------------|
-| NUMERIC_THRESHOLD_CHANGE | minimum wage, tax, social security | CRITICAL |
-| NUMERIC_THRESHOLD_CHANGE | leave days, notice period, working hours | HIGH |
-| NUMERIC_THRESHOLD_CHANGE | other domains | MODERATE |
-| REQUIREMENT_REMOVED | any | CRITICAL |
-| ELIGIBILITY_CHANGE | any | HIGH |
-| REQUIREMENT_ADDED | any | MODERATE |
-| TIMELINE_CHANGE | any | MODERATE |
-| NON_MATERIAL_FORMATTING | any | INFORMATIONAL |
-
-### Why REQUIREMENT_REMOVED is CRITICAL
-
-Removing a mandatory obligation from a rule text means the organization was previously subject to that requirement. If the requirement is legitimately removed (the law changed), publication is straightforward. But if the requirement was removed from the source due to a website restructuring or extraction error, and the organization stops applying it based on this change, the compliance gap is direct and immediate. The CRITICAL classification ensures this change is individually reviewed.
+Removing a mandatory obligation from a rule text means the organization was previously subject to that requirement. If the requirement is legitimately removed (the law changed), publication is straightforward. But if the requirement was removed from the source due to a website restructuring or extraction error, and the organization stops applying it based on this change, the compliance gap is direct and immediate. The CRITICAL classification ensures this change is individually reviewed — `bulk_approve_non_critical()` cannot approve it without a human looking at it directly.
 
 ---
 
 ## Reconciliation Result Object
 
 ```python
-@dataclass
-class SemanticReconciliationResult:
+class SemanticReconciliationResult(BaseModel):
     semantic_change_detected: bool
-    materiality_level: str     # "CRITICAL" | "HIGH" | "MODERATE" | "LOW" | "INFORMATIONAL"
-    change_type: str           # See classification cascade above
-    human_readable_summary: str  # E.g., "Minimum wage increased from INR 21,000 to INR 23,500"
-    reasoning: str             # E.g., "Numeric value 21000 changed to 23500 in high-impact domain 'minimum wage'"
+    materiality_level: MaterialityLevel
+    change_type: ChangeType
+    human_readable_summary: str   # e.g., "Minimum wage increased from INR 21,000 to INR 23,500"
+    reasoning: list[str]          # e.g., ["Numeric value changed from 21000 to 23500 in a minimum-wage context."]
 ```
 
-The `reasoning` field is stored with the review queue item. Reviewers can examine it to understand why the engine classified the change as it did. This is a governance transparency feature: the classification is not a black box.
+The `reasoning` field is stored with the review queue item. Reviewers can examine it to understand why the engine classified the change as it did. This is a governance transparency feature: the classification is not presented as a black box, even though — unlike the old regex engine — the reasoning text is the model's stated rationale rather than a deterministic pattern-match trace.
 
 ---
 
 ## Duplicate Suppression
 
-The reconciliation service applies a duplicate suppression check before creating a review queue item. If a pending review item already exists for the same (country, section, new_value) triple, no new item is created. This prevents the review queue from accumulating identical items from repeated syncs on unchanged sources.
+The reconciliation service applies a duplicate suppression check before creating a review queue item. If a pending review item already exists for the same (country, section, new_value) triple, no new item is created. This prevents the review queue from accumulating identical items from repeated syncs on unchanged sources. This logic is unchanged by the move to LLM classification — it runs in `ReconciliationService`, independent of which engine produced the materiality label.
 
 **Behavior when a new extraction differs from both the pending item and the published rule:** A new review item is created, and the previous pending item is superseded. The system does not accumulate competing proposals for the same section.
 
@@ -154,19 +91,21 @@ The reconciliation service applies a duplicate suppression check before creating
 ```
 ReconciliationService receives: (old_value, new_value, country, section, source_url, snapshot_id)
     ↓
-SemanticReconciliationEngine.reconcile(old_rule, new_rule)
+LLMReconciliationEngine.reconcile(old_rule, new_rule)
     ↓
-Pattern matching cascade (numeric → eligibility → requirement → timeline → formatting)
+Prompt built from old/new CanonicalComplianceRule, sent to GroqProvider.complete()
     ↓
+JSON response parsed and validated against SemanticReconciliationResult
+    ↓ (on malformed response or provider exception: retry, up to max_attempts)
 SemanticReconciliationResult {
     semantic_change_detected: true,
     materiality_level: "CRITICAL",
     change_type: "NUMERIC_THRESHOLD_CHANGE",
     human_readable_summary: "Minimum wage increased from INR 21,000 to INR 23,500",
-    reasoning: "Numeric value 21000 changed to 23500 in high-impact domain 'minimum wage'"
+    reasoning: ["Numeric value changed from 21000 to 23500 in a minimum-wage context."]
 }
-    ↓
-review_queue INSERT (materiality_level, change_type, reasoning stored)
+    ↓ (on failure after exhausting attempts: caught by ReconciliationService, logged, enqueued unlabeled)
+review_queue INSERT (materiality_level, change_type, reasoning stored when classification succeeded)
 ```
 
 ---
@@ -176,10 +115,10 @@ review_queue INSERT (materiality_level, change_type, reasoning stored)
 | Control | Implementation |
 |---------|---------------|
 | Critical changes require individual review | `bulk_approve_non_critical()` filters on `severity != 'critical'` at repository level |
-| Classification reasoning is preserved | `reasoning` field stored with every review queue item |
-| Classification is reproducible | Same (old, new) pair always produces same result from deterministic engine |
-| Fallback never suppresses a change | `NON_MATERIAL_FORMATTING` still enters review queue with INFORMATIONAL priority |
+| Classification reasoning is preserved | `reasoning` field logged and stored with every successfully classified review queue item |
+| Classification failure cannot suppress a change | `ReconciliationService` catches classification exceptions and enqueues the item unlabeled rather than dropping it |
 | Reviewer sees diff regardless of classification | Before/after values are always displayed; classification is advisory, not filtering |
+| LLM responses are schema-validated before use | `SemanticReconciliationResult.model_validate()` rejects malformed JSON and invalid enum values, triggering a retry rather than accepting bad data |
 
 ---
 
@@ -187,8 +126,10 @@ review_queue INSERT (materiality_level, change_type, reasoning stored)
 
 | Component | File | Responsibility |
 |-----------|------|----------------|
-| `SemanticReconciliationEngine` | `app/reconciliation/semantic_reconciliation_service.py` (391 lines) | Pattern matching, classification, materiality scoring, reasoning generation |
-| `ReconciliationService` | `app/reconciliation/reconciliation_service.py` (166 lines) | Orchestrates comparison, duplicate suppression, review queue insertion |
+| `LLMReconciliationEngine` | `app/reconciliation/llm_reconciliation_service.py` (97 lines) | Builds the classification prompt, calls the injected `LLMProvider`, parses and validates the response, retries on failure |
+| `GroqProvider` | `app/llm/groq_provider.py` (45 lines) | `LLMProvider` implementation backed by the Groq SDK; rotates across configured API keys on rate limit |
+| `LLMProvider` | `app/llm/provider.py` | `Protocol` defining the `complete(prompt: str) -> str` contract; the reconciliation engine depends on this interface, not on Groq directly |
+| `ReconciliationService` | `app/reconciliation/reconciliation_service.py` (165 lines) | Orchestrates comparison, duplicate suppression, review queue insertion, fail-open handling of classification errors |
 | `MaterialityLevel` | `app/reconciliation/schemas.py` | Enum: CRITICAL, HIGH, MODERATE, LOW, INFORMATIONAL |
 | `ChangeType` | `app/reconciliation/schemas.py` | Enum: 6 change types |
 | `SemanticReconciliationResult` | `app/reconciliation/schemas.py` | Pydantic result model |
@@ -199,8 +140,8 @@ review_queue INSERT (materiality_level, change_type, reasoning stored)
 
 | Risk | Mitigation |
 |------|-----------|
-| Regex misclassifies a CRITICAL change as INFORMATIONAL | Reviewer sees the before/after diff regardless; INFORMATIONAL items are still surfaced in the review queue, not suppressed |
-| Pattern doesn't cover a novel change type | Falls through to NON_MATERIAL_FORMATTING; human reviewer evaluates; classification can be appealed by escalating the item |
-| Numeric extraction matches a non-numeric context (e.g., a phone number) | Pattern requires contextual unit tokens (days, months, %, INR, etc.) to qualify as a threshold change; bare numerics do not match |
-| High-impact domain pattern matches a benign context | High-impact keywords require proximity to numeric changes; keyword match alone does not escalate materiality |
-| Classification produces incorrect human_readable_summary | Summary is informational; the canonical evidence is always the source paragraph; summary errors do not affect governance decisions |
+| LLM misclassifies a CRITICAL change as INFORMATIONAL | Reviewer sees the before/after diff regardless; INFORMATIONAL items are still surfaced in the review queue, not suppressed |
+| LLM call fails (timeout, rate limit, malformed JSON) after exhausting retries | `ReconciliationService` catches the exception and enqueues the item unclassified rather than dropping it; nothing is silently lost |
+| LLM returns an invalid enum value (e.g. a materiality level outside the closed set) | Pydantic validation rejects the response before it reaches the review queue; the attempt is retried instead of accepted |
+| Classification produces an incorrect `human_readable_summary` | Summary is informational; the canonical evidence is always the source paragraph; summary errors do not affect governance decisions |
+| Increased dependency on Groq availability/quota | Extraction and classification now share one rate-limited resource; `GroqProvider` rotates across configured keys, and a classification failure degrades to "enqueue unlabeled" rather than blocking the sync — see [Architectural Decisions](../architecture/overview.md#architectural-decisions-rationale) for the tradeoff this introduces |
