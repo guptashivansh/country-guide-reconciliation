@@ -45,7 +45,7 @@ The system defines three trust zones with explicit boundary enforcement:
 │  AI PROCESSING ZONE: Extraction & Classification                   │
 │                                                                     │
 │  LLM extraction (Groq LLaMA 3.3 70B, temperature=0.1)             │
-│  LLM change classification (Groq LLaMA 3.3 70B, temperature=0.0)   │
+│  LLM change classification (Claude claude-sonnet-4-6, temperature=0.0) │
 │  • AI output is NEVER published directly                           │
 │  • Every AI output carries a confidence score                      │
 │  • Classification decisions have documented reasoning              │
@@ -98,7 +98,7 @@ The system defines three trust zones with explicit boundary enforcement:
                                │  EmploymentRule[] with confidence scores
                     ┌──────────▼──────────────────────────────────────────┐
                     │          RECONCILIATION LAYER                       │
-                    │  LLM Change Classifier (Groq, temperature=0.0)      │
+                    │  LLM Change Classifier (Claude, temperature=0.0)    │
                     │  Change Type Classification · Materiality Scoring   │
                     │  Duplicate Suppression · Null-change Filtering      │
                     └──────────┬──────────────────────────────────────────┘
@@ -151,7 +151,7 @@ flowchart LR
 
 ### Decision 1: LLM-Based Change Classification (Superseded Regex Engine)
 
-**What the decision is:** Change classification calls the LLM (Groq LLaMA 3.3 70B, temperature=0.0) with a fixed rubric and a closed label set, rather than a hand-written regex pattern library. `LLMReconciliationEngine` (`app/reconciliation/llm_reconciliation_service.py`) replaced `SemanticReconciliationEngine` (removed).
+**What the decision is:** Change classification calls an LLM (Claude, `claude-sonnet-4-6`, temperature=0.0) with a fixed rubric and a closed label set, rather than a hand-written regex pattern library. `LLMReconciliationEngine` (`app/reconciliation/llm_reconciliation_service.py`) replaced `SemanticReconciliationEngine` (removed). Extraction continues to run on Groq LLaMA 3.3 70B, unchanged — see Decision 2 for why classification runs on a different vendor than extraction.
 
 **Why the regex engine was replaced:** The pattern library only recognized English compliance keywords (`must`, `shall`, `eligible`, `minimum wage`...) compiled in advance. Any change phrased outside that vocabulary — including any non-English source, or simply unanticipated wording — fell through to a generic low-priority classification regardless of actual materiality. A fixed vocabulary cannot keep pace with new compliance domains or new source languages without a code change and a deploy. The LLM-based classifier generalizes the same way the extraction layer already does.
 
@@ -159,17 +159,19 @@ flowchart LR
 
 **Acknowledged limitation:** An LLM call can fail to return valid JSON, time out, or hit a rate limit. `LLMReconciliationEngine` retries internally; if classification still fails, `ReconciliationService` logs a warning and enqueues the review item without a materiality/change-type label rather than dropping it — the same fail-open behavior the regex engine used for unmatched patterns. Every detected change still reaches a reviewer.
 
-**Cost and latency tradeoff:** This adds one Groq call per detected change, on top of the existing extraction calls — both classification and extraction now depend on Groq availability and quota, where reconciliation previously had zero LLM dependency. This is a deliberate tradeoff being made explicitly, not a side effect: the previous "no LLM in reconciliation" design existed in part *because* of this cost/availability concern, and the team chose generalization over that isolation.
+**Cost and latency tradeoff:** This adds one Claude call per detected change, on top of the existing Groq extraction calls. Reconciliation previously had zero LLM dependency; it now depends on Anthropic availability and quota — a dependency that is deliberately separate from the Groq dependency extraction already carries (see Decision 2). The previous "no LLM in reconciliation" design existed in part *because* of this cost/availability concern; the team chose generalization over that isolation, but scoped the new dependency to a different vendor rather than doubling up on Groq.
 
 ---
 
-### Decision 2: LLM Scoped to Extraction and Classification Only
+### Decision 2: LLM Scoped to Extraction and Classification Only — Split Across Two Vendors
 
-**What the decision is:** The LLM (Groq LLaMA 3.3 70B) is used for two pipeline stages: extracting structured rules from source text, and classifying the materiality/type of a detected change (see Decision 1). It is not used for approval decisions or any operation that writes to `country_guide` directly.
+**What the decision is:** Two LLMs are used across the pipeline, one per stage, on two different vendors: Groq (LLaMA 3.3 70B) extracts structured rules from source text; Claude (`claude-sonnet-4-6`) classifies the materiality/type of a detected change (see Decision 1). Neither is used for approval decisions or any operation that writes to `country_guide` directly.
 
-**Why this matters for governance:** Both LLM call sites sit strictly upstream of the governance gate. Confidence scores quantify extraction reliability; classification reasoning is logged for every reconciliation call; human reviewers evaluate both before anything is approved. The governance gate ensures LLM output — extracted or classified — never directly modifies authoritative data. If Groq is deprecated, rate-limited, or replaced, it affects extraction and classification only; all historical provenance, version history, and audit records remain valid.
+**Why two vendors, not one:** An earlier iteration of this design used Groq for both stages, which concentrated availability risk: a single Groq outage or quota exhaustion degraded extraction and classification simultaneously — the same Groq dependency the team had originally kept out of reconciliation entirely (see Decision 1's discussion of the cost/availability tradeoff). Splitting the two stages across vendors restores an analogous isolation, now at the vendor level instead of the pipeline-stage level: a Groq outage degrades extraction only (classification on already-extracted rules is unaffected), and an Anthropic outage degrades classification only (extraction keeps running; changes still reach the review queue, just unlabeled).
 
-**Widened blast radius, acknowledged:** Decision 1 previously argued for keeping reconciliation LLM-free specifically to bound this risk to one stage. That argument no longer holds: a full Groq outage or rate-limit exhaustion now degrades two pipeline stages instead of one. Both stages fail open (extraction failure halts that source's sync cycle; classification failure enqueues the change unclassified) rather than failing closed, so an outage produces missing or unprioritized review items, not silent data loss or incorrect publication.
+**Why this matters for governance:** Both LLM call sites sit strictly upstream of the governance gate, regardless of vendor. Confidence scores quantify extraction reliability; classification reasoning is logged for every reconciliation call; human reviewers evaluate both before anything is approved. The governance gate ensures LLM output — extracted or classified — never directly modifies authoritative data. If either vendor is deprecated, rate-limited, or replaced, it affects exactly one pipeline stage; all historical provenance, version history, and audit records remain valid regardless.
+
+**Residual blast radius, acknowledged:** Splitting vendors bounds simultaneous-outage risk but does not eliminate either dependency individually. Both stages still fail open rather than fail closed (extraction failure halts that source's sync cycle; classification failure enqueues the change unclassified), so a single-vendor outage produces missing or unprioritized review items, not silent data loss or incorrect publication.
 
 ---
 
@@ -227,6 +229,8 @@ Failures that do not corrupt data and will resolve on the next sync cycle:
 | Source website 5xx / timeout | HTTP response code | No new snapshot; previous published rule unchanged | Automatic retry (max 2); job marked `failed` with reason; next sync re-attempts |
 | Groq API rate limit | 429 response | Extraction paused for current key | Automatic key rotation to next configured key; transparent retry |
 | Groq API outage | Connection error / all keys exhausted | Extraction fails for affected sources | Job marked `failed`; source snapshot preserved; extraction retried on next sync |
+| Anthropic API rate limit | 429 response | Classification paused for current key | Automatic key rotation to next configured key; transparent retry |
+| Anthropic API outage | Connection error / all keys exhausted | Classification fails for the current change | `LLMReconciliationEngine` raises after exhausting retries; `ReconciliationService` enqueues the item unclassified rather than dropping it |
 | Scheduler process restart | Process death | In-progress sync cancelled | Next scheduled run starts fresh; idempotent design means no data corruption |
 
 ### Category 2: Quality Degradation (Detectable)
@@ -260,7 +264,7 @@ Scalability decisions are made with governance as the primary constraint. Perfor
 |-----------|-----------------|------------|
 | Source coverage | 87 countries × N sources per country | Source registry is additive; no code changes required |
 | Sync throughput | Sequential per source endpoint | Worker pool with per-country distributed locking; requires external scheduler |
-| LLM throughput | N-key rotation (one key per Groq account), shared quota pool across extraction and classification | Add keys to `GROQ_API_KEYS` comma-separated; rotation is automatic. Classification now competes with extraction for the same quota — see Decision 2 |
+| LLM throughput | N-key rotation per vendor — `GroqProvider` rotates Groq keys for extraction, `ClaudeProvider` rotates Anthropic keys for classification; the two quota pools are independent | Add keys to `GROQ_API_KEYS` or `ANTHROPIC_API_KEYS` (comma-separated) for either pool; rotation is automatic and per-vendor — see Decision 2 |
 | Database concurrency | SQLite (single-writer) | PostgreSQL adapter in `db.py`; `set DATABASE_URL` activates it |
 | Audit record volume | ~1 record per review action | Append-only; archive partitions for historical records beyond N years |
 | Temporal query performance | `(country, section, effective_date)` composite index | Adequate for 87 countries × 7 sections × N versions; no optimization needed at current scale |
@@ -272,6 +276,7 @@ Scalability decisions are made with governance as the primary constraint. Perfor
 | Threat | Control |
 |--------|---------|
 | Groq API key exposure | Environment variables only; multi-key rotation reduces per-key blast radius |
+| Anthropic API key exposure | Environment variables only; multi-key rotation reduces per-key blast radius |
 | SQL injection via user input | All database queries use parameterized statements throughout the repository layer |
 | Prompt injection via government source content | BeautifulSoup strips executable tags before text enters the LLM context; LLM is instruction-prompted to extract only |
 | Audit log tampering | Append-only table design; no UPDATE/DELETE methods in `ProvenanceRepository` or `audit_log` handlers |

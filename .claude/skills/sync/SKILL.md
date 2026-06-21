@@ -8,7 +8,7 @@ description: >
 
 # Compliance Sync Skill
 
-Runs the full crawl → extract → reconcile pipeline via `app.services.sync_service.run_sync()`. Each trusted government source endpoint is fetched, its HTML is normalized, employment rules are extracted via Groq LLM, and changes are reconciled against the current guide — queuing diffs for human review.
+Runs the full crawl → extract → reconcile pipeline via `app.services.sync_service.run_sync()`. Each trusted government source endpoint is fetched, its HTML is normalized, employment rules are extracted via Groq LLM, and changes are reconciled and classified via Claude — queuing diffs for human review.
 
 The database backend is determined by `DATABASE_URL` (PostgreSQL) or falls back to SQLite. All queries go through `app.utils.db.Database`.
 
@@ -20,14 +20,16 @@ The database backend is determined by `DATABASE_URL` (PostgreSQL) or falls back 
 python3 -c "
 import sys, os
 sys.path.insert(0, os.getcwd())
-from app.utils.config import load_env_file, groq_api_keys
+from app.utils.config import load_env_file, groq_api_keys, anthropic_api_keys
 load_env_file()
-keys = groq_api_keys()
-print(f'GROQ_API_KEY(s): {len(keys)} key(s) configured') if keys else print('ERROR: No GROQ_API_KEY set in .env')
+groq_keys = groq_api_keys()
+claude_keys = anthropic_api_keys()
+print(f'GROQ_API_KEY(s): {len(groq_keys)} key(s) configured') if groq_keys else print('ERROR: No GROQ_API_KEY set in .env')
+print(f'ANTHROPIC_API_KEY(s): {len(claude_keys)} key(s) configured') if claude_keys else print('ERROR: No ANTHROPIC_API_KEY set in .env')
 "
 ```
 
-If no Groq key is configured, tell the user to add `GROQ_API_KEY` to `.env` and stop.
+Extraction runs on Groq; reconciliation/classification runs on Claude. If either key is missing, tell the user to add it to `.env`. A missing Groq key blocks extraction entirely; a missing Anthropic key only degrades classification (changes still reach the review queue, unlabeled) — use judgment on whether to stop or proceed depending on which is missing.
 
 ### 2. Show current state and ask scope
 

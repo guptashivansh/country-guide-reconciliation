@@ -16,7 +16,7 @@ The engine's classification step is advisory: it never decides whether a detecte
 
 ## LLM-Based Classification
 
-`LLMReconciliationEngine` (`app/reconciliation/llm_reconciliation_service.py`) classifies every detected change by calling an LLM (Groq LLaMA 3.3 70B, `temperature=0.0`) against a fixed rubric and a closed label set, rather than matching the text against a hand-written regex pattern library. This replaced the previous `SemanticReconciliationEngine`, which is no longer part of the codebase.
+`LLMReconciliationEngine` (`app/reconciliation/llm_reconciliation_service.py`) classifies every detected change by calling an LLM (Claude, `claude-sonnet-4-6`, `temperature=0.0`) against a fixed rubric and a closed label set, rather than matching the text against a hand-written regex pattern library. This replaced the previous `SemanticReconciliationEngine`, which is no longer part of the codebase. Classification runs on Claude/Anthropic; extraction (upstream of reconciliation) runs on Groq — the two stages are deliberately on different vendors so neither outage takes down both stages at once (see [Architectural Decisions, Decision 2](../architecture/overview.md#decision-2-llm-scoped-to-extraction-and-classification-only--split-across-two-vendors)).
 
 **Why the regex engine was replaced.** The pattern library only recognized English compliance keywords ("minimum wage," "visa," "must," "shall," and similar fixed vocabulary). Any change phrased outside that vocabulary — non-English source text, a synonym the pattern library didn't enumerate, or a sentence structure the numeric/eligibility/requirement patterns didn't anticipate — fell through to `NON_MATERIAL_FORMATTING` regardless of its actual materiality. A rule change in a high-impact domain phrased in unfamiliar wording was indistinguishable, to the regex engine, from a punctuation fix. An LLM classifying against the same rubric generalizes across phrasing the pattern library could not enumerate in advance.
 
@@ -93,7 +93,7 @@ ReconciliationService receives: (old_value, new_value, country, section, source_
     ↓
 LLMReconciliationEngine.reconcile(old_rule, new_rule)
     ↓
-Prompt built from old/new CanonicalComplianceRule, sent to GroqProvider.complete()
+Prompt built from old/new CanonicalComplianceRule, sent to ClaudeProvider.complete()
     ↓
 JSON response parsed and validated against SemanticReconciliationResult
     ↓ (on malformed response or provider exception: retry, up to max_attempts)
@@ -127,8 +127,9 @@ review_queue INSERT (materiality_level, change_type, reasoning stored when class
 | Component | File | Responsibility |
 |-----------|------|----------------|
 | `LLMReconciliationEngine` | `app/reconciliation/llm_reconciliation_service.py` (97 lines) | Builds the classification prompt, calls the injected `LLMProvider`, parses and validates the response, retries on failure |
-| `GroqProvider` | `app/llm/groq_provider.py` (45 lines) | `LLMProvider` implementation backed by the Groq SDK; rotates across configured API keys on rate limit |
-| `LLMProvider` | `app/llm/provider.py` | `Protocol` defining the `complete(prompt: str) -> str` contract; the reconciliation engine depends on this interface, not on Groq directly |
+| `ClaudeProvider` | `app/llm/claude_provider.py` | `LLMProvider` implementation backed by the Anthropic SDK (`claude-sonnet-4-6`); rotates across configured API keys on rate limit |
+| `GroqProvider` | `app/llm/groq_provider.py` (45 lines) | `LLMProvider` implementation backed by the Groq SDK; used by `GroqExtractionService` for rule extraction, not by reconciliation |
+| `LLMProvider` | `app/llm/provider.py` | `Protocol` defining the `complete(prompt: str) -> str` contract; the reconciliation engine depends on this interface, not on any vendor SDK directly |
 | `ReconciliationService` | `app/reconciliation/reconciliation_service.py` (165 lines) | Orchestrates comparison, duplicate suppression, review queue insertion, fail-open handling of classification errors |
 | `MaterialityLevel` | `app/reconciliation/schemas.py` | Enum: CRITICAL, HIGH, MODERATE, LOW, INFORMATIONAL |
 | `ChangeType` | `app/reconciliation/schemas.py` | Enum: 6 change types |
@@ -144,4 +145,4 @@ review_queue INSERT (materiality_level, change_type, reasoning stored when class
 | LLM call fails (timeout, rate limit, malformed JSON) after exhausting retries | `ReconciliationService` catches the exception and enqueues the item unclassified rather than dropping it; nothing is silently lost |
 | LLM returns an invalid enum value (e.g. a materiality level outside the closed set) | Pydantic validation rejects the response before it reaches the review queue; the attempt is retried instead of accepted |
 | Classification produces an incorrect `human_readable_summary` | Summary is informational; the canonical evidence is always the source paragraph; summary errors do not affect governance decisions |
-| Increased dependency on Groq availability/quota | Extraction and classification now share one rate-limited resource; `GroqProvider` rotates across configured keys, and a classification failure degrades to "enqueue unlabeled" rather than blocking the sync — see [Architectural Decisions](../architecture/overview.md#architectural-decisions-rationale) for the tradeoff this introduces |
+| Increased dependency on LLM availability/quota | Extraction depends on Groq; classification depends on Anthropic — two independent rate-limited resources rather than one shared pool. Each provider (`GroqProvider`, `ClaudeProvider`) rotates across its own configured keys, and a classification failure degrades to "enqueue unlabeled" rather than blocking the sync — see [Architectural Decisions](../architecture/overview.md#architectural-decisions-rationale) for the tradeoff this introduces |

@@ -33,6 +33,19 @@ def groq_api_keys():
     return keys
 
 
+def anthropic_api_key():
+    return os.environ.get("ANTHROPIC_API_KEY")
+
+
+def anthropic_api_keys():
+    """Return list of Anthropic API keys. Reads ANTHROPIC_API_KEYS (comma-separated) with ANTHROPIC_API_KEY as fallback."""
+    multi = os.environ.get("ANTHROPIC_API_KEYS", "")
+    keys = [k.strip().strip("'").strip('"') for k in multi.split(",") if k.strip()]
+    if not keys and anthropic_api_key():
+        keys = [anthropic_api_key()]
+    return keys
+
+
 def extraction_chunk_size():
     return int(os.environ.get("EXTRACTION_CHUNK_SIZE", "6000"))
 
