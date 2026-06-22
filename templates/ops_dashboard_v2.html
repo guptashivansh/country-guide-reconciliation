@@ -1754,10 +1754,97 @@ input:focus, button:focus, select:focus, textarea:focus, [tabindex]:focus { outl
 /* ─────────────────────────────────────────────
    SOURCES TAB
    ───────────────────────────────────────────── */
-.sources-grid {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+.src-country-row {
+  display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+  border-bottom: 1px solid var(--paper-line); cursor: pointer; transition: background 0.12s;
 }
-@media (max-width: 1024px) { .sources-grid { grid-template-columns: 1fr; } }
+.src-country-row:hover { background: var(--paper-2); }
+.src-country-row:last-child { border-bottom: none; }
+.src-country-flag { font-size: 20px; line-height: 1; }
+.src-country-name { font-size: 14px; font-weight: 700; color: var(--ink); flex: 1; min-width: 0; }
+.src-country-meta { display: flex; gap: 12px; align-items: center; }
+.src-country-stat { font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); white-space: nowrap; }
+.src-country-chevron { color: var(--ink-4); transition: transform 0.2s; width: 16px; height: 16px; }
+.src-country-row.open .src-country-chevron { transform: rotate(90deg); }
+
+.src-eps-panel { display: none; background: var(--paper-2); border-bottom: 1px solid var(--paper-line); }
+.src-eps-panel.open { display: block; }
+.src-ep-card {
+  margin: 8px 16px; padding: 14px 16px;
+  background: var(--paper); border: 1px solid var(--paper-line);
+  border-radius: var(--r-m); display: flex; flex-direction: column; gap: 8px;
+}
+.src-ep-header { display: flex; align-items: center; gap: 10px; }
+.src-ep-name { font-size: 13px; font-weight: 700; color: var(--ink); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.src-ep-url { font-family: var(--font-mono); font-size: 11.5px; color: var(--info); word-break: break-all; }
+.src-ep-url a { color: var(--info); border-bottom: 1px solid rgba(47,91,183,0.25); }
+.src-ep-url a:hover { color: var(--info); border-bottom-color: var(--info); }
+.src-ep-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+.src-ep-tags .t {
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.04em;
+  padding: 2px 7px; border-radius: 4px;
+  background: var(--paper-2); border: 1px solid var(--paper-line); color: var(--ink-3);
+}
+.src-ep-tags .t.strategy { background: var(--purple-soft); border-color: var(--purple-line); color: var(--purple-2); }
+.src-ep-tags .t.freq { background: var(--info-soft); border-color: var(--info-line); color: var(--info); }
+.src-ep-tags .t.type { background: var(--warn-soft); border-color: var(--warn-line); color: var(--warn-2); }
+.src-ep-sections { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 2px; }
+.src-ep-sections .s { font-size: 10.5px; padding: 2px 7px; border-radius: 4px; background: var(--ok-soft); border: 1px solid var(--ok-line); color: var(--ok-2); }
+.src-ep-auth { font-size: 11.5px; color: var(--ink-3); }
+.src-ep-job { display: flex; align-items: center; gap: 8px; margin-top: 2px; font-size: 11.5px; color: var(--ink-3); }
+.src-ep-job .ts { font-family: var(--font-mono); font-size: 10.5px; color: var(--ink-4); }
+
+/* Source detail drawer */
+.src-drawer-scrim {
+  display: none; position: fixed; inset: 0; z-index: 200;
+  background: rgba(14,16,20,0.35); backdrop-filter: blur(4px);
+  animation: fadeIn 0.15s ease;
+}
+.src-drawer-scrim.open { display: block; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.src-drawer {
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 201;
+  width: 520px; max-width: 92vw;
+  background: var(--paper); border-left: 1px solid var(--paper-line);
+  box-shadow: -8px 0 40px rgba(14,16,20,0.12);
+  transform: translateX(100%); transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.src-drawer.open { transform: translateX(0); }
+
+.src-drawer-header {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 24px 24px 16px; border-bottom: 1px solid var(--paper-line);
+  flex-shrink: 0;
+}
+.src-drawer-header-info { flex: 1; min-width: 0; }
+.src-drawer-title { font-size: 17px; font-weight: 800; letter-spacing: -0.3px; line-height: 1.3; margin-bottom: 4px; }
+.src-drawer-subtitle { font-size: 13px; color: var(--ink-3); }
+.src-drawer-close {
+  width: 32px; height: 32px; border-radius: var(--r-s);
+  display: grid; place-items: center; flex-shrink: 0;
+  background: var(--paper-2); border: 1px solid var(--paper-line);
+  transition: background 0.15s;
+}
+.src-drawer-close:hover { background: var(--paper-3); }
+
+.src-drawer-body { flex: 1; overflow-y: auto; padding: 20px 24px 32px; }
+
+.src-drawer-field { margin-bottom: 18px; }
+.src-drawer-label {
+  font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-4);
+  margin-bottom: 5px;
+}
+.src-drawer-value { font-size: 13.5px; color: var(--ink); line-height: 1.5; }
+.src-drawer-value a { color: var(--info); border-bottom: 1px solid rgba(47,91,183,0.25); }
+.src-drawer-value a:hover { border-bottom-color: var(--info); }
+
+.src-drawer-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.src-drawer-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+.src-drawer-divider { height: 1px; background: var(--paper-line); margin: 20px 0; }
 
 /* ─────────────────────────────────────────────
    SYNC MODAL
@@ -2014,9 +2101,6 @@ input:focus, button:focus, select:focus, textarea:focus, [tabindex]:focus { outl
     <button class="tab" data-tab="audit" onclick="goTab('audit')">
       Audit log
     </button>
-    <button class="tab" data-tab="pipeline" onclick="goTab('pipeline')">
-      Pipeline <span class="ct" id="tabPipeCt">0</span>
-    </button>
     <button class="tab" data-tab="sources" onclick="goTab('sources')">
       Sources <span class="ct" id="tabSourcesCt">0</span>
     </button>
@@ -2102,7 +2186,7 @@ input:focus, button:focus, select:focus, textarea:focus, [tabindex]:focus { outl
             <span class="ct warn" id="sumFailCt">0</span>
           </div>
           <div class="card-body" id="sumFailList"></div>
-          <div class="card-foot"><a onclick="goTab('pipeline');">View pipeline &rarr;</a></div>
+          <div class="card-foot"><a onclick="goTab('sources');">View sources &rarr;</a></div>
         </div>
       </div>
     </div>
@@ -2215,108 +2299,93 @@ input:focus, button:focus, select:focus, textarea:focus, [tabindex]:focus { outl
     <div id="auditEmpty" class="empty-state" style="display:none;">No audit entries found.</div>
   </section>
 
-  <!-- ── Pipeline tab ── -->
-  <section class="tabpanel" data-tab="pipeline">
-    <div class="pipe-head">
-      <div>
-        <div class="eyebrow" style="color:var(--purple); margin-bottom:6px;">Ingestion pipeline</div>
-        <div class="title">Where the data comes from, and what broke</div>
-      </div>
-      <div class="right">
-        <button class="btn btn-ghost" onclick="loadPipeline()">Refresh</button>
-      </div>
-    </div>
-    <div class="pipe-summary" id="pipeSummary"></div>
-    <table class="pipe-table" id="pipeTable">
-      <thead>
-        <tr>
-          <th style="width:40px;"></th>
-          <th>Country</th>
-          <th>Status</th>
-          <th>Sources</th>
-          <th>Last activity</th>
-          <th style="text-align:right; width:140px;">Action</th>
-        </tr>
-      </thead>
-      <tbody id="pipeBody"></tbody>
-    </table>
-    <div class="pipe-legend">
-      <span class="seq">
-        <span class="stage done"></span><span>queued</span>
-        <span style="color:var(--ink-4); margin: 0 4px;">→</span>
-        <span class="stage done"></span><span>fetched</span>
-        <span style="color:var(--ink-4); margin: 0 4px;">→</span>
-        <span class="stage done"></span><span>normalized</span>
-        <span style="color:var(--ink-4); margin: 0 4px;">→</span>
-        <span class="stage done"></span><span>extracted</span>
-        <span style="color:var(--ink-4); margin: 0 4px;">→</span>
-        <span class="stage done"></span><span>reconciled</span>
-      </span>
-    </div>
-    <div id="pipeEmpty" class="empty-state" style="display:none;">No ingestion jobs found.</div>
-  </section>
-
   <!-- ── Sources tab ── -->
   <section class="tabpanel" data-tab="sources">
+    <!-- Header -->
     <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
       <div>
         <div class="eyebrow" style="color:var(--purple); margin-bottom:6px;">Source registry</div>
-        <div style="font-size:18px; font-weight:800; letter-spacing:-0.4px;">Manage source endpoints</div>
+        <div style="font-size:18px; font-weight:800; letter-spacing:-0.4px;">Monitored sources</div>
       </div>
       <div style="display:flex; gap:8px;">
         <button class="btn btn-primary" onclick="openAddSourceModal()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-          URL Source
+          Add Source
         </button>
         <a href="/compliance/intake/pdf" class="btn btn-primary" style="text-decoration:none;">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-          Intake PDF
+          Upload PDF
         </a>
       </div>
     </div>
 
-    <!-- Registry stats (metrics at top, consistent with other tabs) -->
-    <div id="registryStats" style="display:flex; gap:14px; flex-wrap:wrap; margin-bottom:24px;"></div>
+    <!-- Stats -->
+    <div id="registryStats" style="display:flex; gap:14px; flex-wrap:wrap; margin-bottom:20px;"></div>
 
-    <div class="sources-grid">
-      <!-- Left: URL Verifier -->
-      <div>
-        <div class="eyebrow" style="color:var(--purple); margin-bottom:10px;">URL verification</div>
-        <div style="font-size:18px; font-weight:800; letter-spacing:-0.4px; margin-bottom:16px;">Check &amp; classify source URLs</div>
-
-        <div style="display:flex; gap:8px; margin-bottom:18px;">
-          <div class="search-bar" style="flex:1;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-            <input id="verifyUrlInput" placeholder="Paste a URL to verify…" onkeydown="if(event.key==='Enter') verifyUrl()" />
-          </div>
-          <button class="btn btn-primary" onclick="verifyUrl()">Verify</button>
-        </div>
-
-        <!-- Verification result -->
-        <div id="verifyResult" style="display:none;">
-          <div id="verifyResultInner"></div>
-        </div>
-
-        <!-- Classification history -->
-        <div style="margin-top:28px;">
-          <div class="eyebrow" style="margin-bottom:12px;">Recent classifications</div>
-          <div id="classificationList"></div>
-          <div id="classEmpty" class="empty-state" style="display:none; padding:24px;">No URLs classified yet.</div>
-        </div>
+    <!-- Search + filters -->
+    <div style="display:flex; gap:8px; margin-bottom:16px;">
+      <div class="search-bar" style="flex:1;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="srcSearch" placeholder="Search countries, authorities, URLs…" oninput="renderUnifiedSources()" />
       </div>
+      <select id="srcHealthFilter" onchange="renderUnifiedSources()" style="height:36px; padding:0 10px; font-family:var(--font-ui); font-size:13px; border:1px solid var(--paper-line); border-radius:var(--r-m); background:var(--paper); color:var(--ink); outline:none; cursor:pointer;">
+        <option value="">All health</option>
+        <option value="healthy">Healthy</option>
+        <option value="failing">Failing</option>
+        <option value="not_synced">Not synced</option>
+      </select>
+      <select id="srcStrategyFilter" onchange="renderUnifiedSources()" style="height:36px; padding:0 10px; font-family:var(--font-ui); font-size:13px; border:1px solid var(--paper-line); border-radius:var(--r-m); background:var(--paper); color:var(--ink); outline:none; cursor:pointer;">
+        <option value="">All strategies</option>
+        <option value="html_readability">html_readability</option>
+        <option value="playwright">playwright</option>
+        <option value="ocr_pdf">ocr_pdf</option>
+        <option value="css_selector">css_selector</option>
+      </select>
+    </div>
 
-      <!-- Right: PDF uploads -->
-      <div>
-        <div class="eyebrow" style="color:var(--purple); margin-bottom:10px;">Compliance intake</div>
-        <div style="font-size:18px; font-weight:800; letter-spacing:-0.4px; margin-bottom:6px;">Uploaded PDFs</div>
-        <p style="font-size:13px; color:var(--ink-3); margin-bottom:16px;">Documents uploaded via <a href="/compliance/intake/pdf" style="color:var(--purple-2); font-weight:600;">compliance intake</a></p>
-        <div id="pdfList"></div>
-        <div id="pdfEmpty" class="empty-state" style="display:none; padding:24px;">No PDF uploads found.</div>
+    <!-- Unified country list -->
+    <div id="srcList" style="border:1px solid var(--paper-line); border-radius:var(--r-l); overflow:hidden; background:var(--paper);"></div>
+    <div id="srcEmpty" class="empty-state" style="display:none; padding:24px;">No sources match your filters.</div>
+
+    <!-- URL Verifier (inline tool) -->
+    <div style="margin-top:32px;">
+      <div class="eyebrow" style="color:var(--purple); margin-bottom:10px;">URL verification</div>
+      <div style="display:flex; gap:8px; margin-bottom:12px;">
+        <div class="search-bar" style="flex:1; max-width:520px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          <input id="verifyUrlInput" placeholder="Paste a URL to check if it's in the registry…" onkeydown="if(event.key==='Enter') verifyUrl()" />
+        </div>
+        <button class="btn btn-primary" onclick="verifyUrl()">Verify</button>
       </div>
+      <div id="verifyResult" style="display:none;"><div id="verifyResultInner"></div></div>
+      <div id="classificationList" style="max-width:720px;"></div>
+      <div id="classEmpty" class="empty-state" style="display:none; padding:24px;">No URLs classified yet.</div>
+    </div>
+
+    <!-- Hidden pipeline DOM for renderPipeline compatibility -->
+    <div style="display:none;">
+      <div id="pipeSummary"></div>
+      <table><tbody id="pipeBody"></tbody></table>
+      <div id="pipeEmpty"></div>
     </div>
 
   </section>
 
+</div>
+
+<!-- ── Source Detail Drawer ── -->
+<div class="src-drawer-scrim" id="srcDrawerScrim" onclick="closeSrcDrawer()"></div>
+<div class="src-drawer" id="srcDrawer">
+  <div class="src-drawer-header">
+    <div class="src-drawer-header-info">
+      <div class="src-drawer-title" id="srcDrawerTitle"></div>
+      <div class="src-drawer-subtitle" id="srcDrawerSubtitle"></div>
+    </div>
+    <button class="src-drawer-close" onclick="closeSrcDrawer()" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" width="16" height="16"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="src-drawer-body" id="srcDrawerBody"></div>
 </div>
 
 <!-- ─── Footer ─── -->
@@ -2743,7 +2812,7 @@ function renderSummary() {
     failListEl.innerHTML = '<div class="card-empty">No pipeline failures</div>';
   } else {
     failListEl.innerHTML = failItems.map(j => `
-      <div class="sum-action-item" onclick="goTab('pipeline');">
+      <div class="sum-action-item" onclick="goTab('sources');">
         <span class="sev-dot fail"></span>
         <div class="item-info">
           <div class="item-title">${flag(j.country)} ${escHtml(j.country)}</div>
@@ -2889,7 +2958,8 @@ function renderTabCounts() {
   const driftCount = DATA.drift.filter(d => d.drift_detected).length;
   document.getElementById('tabDriftCt').textContent = driftCount;
   const failedJobs = DATA.jobs.filter(j => j.state === 'failed').length;
-  document.getElementById('tabPipeCt').textContent = failedJobs || DATA.jobs.length;
+  const failCtEl = document.getElementById('tabSourcesCt');
+  if (failCtEl) failCtEl.textContent = DATA.jobs.length ? (failedJobs || DATA.jobs.length) : 0;
 }
 
 // ═══════════════════════════════════════════════════
@@ -3801,7 +3871,8 @@ function goTab(name) {
   history.replaceState(null, '', '#' + name);
 }
 const startTab = (location.hash || '#summary').slice(1);
-if (['summary','review','drift','audit','pipeline','sources'].includes(startTab)) goTab(startTab);
+if (startTab === 'pipeline') { goTab('sources'); }
+else if (['summary','review','drift','audit','sources'].includes(startTab)) goTab(startTab);
 
 function toggleMgr() {
   // Manager strip removed — summary tab replaces it
@@ -3825,7 +3896,7 @@ function metricClick(action) {
   } else if (action === 'drift') {
     goTab('drift');
   } else if (action === 'pipeline') {
-    goTab('pipeline');
+    goTab('sources');
   }
 }
 
@@ -4032,7 +4103,7 @@ document.addEventListener('keydown', e => {
   if (e.key === '2') goTab('review');
   if (e.key === '3') goTab('drift');
   if (e.key === '4') goTab('audit');
-  if (e.key === '5') goTab('pipeline');
+  if (e.key === '5') goTab('sources');
   if (e.key === 's' || e.key === 'S') openSync();
   if (e.key === 'Escape') { closeSync(); closeNotifPanel(); }
   const activeTab = document.querySelector('.tabpanel.active');
@@ -4303,7 +4374,7 @@ function buildNotifications() {
       title: m.crawl_failures + ' crawl failure' + (m.crawl_failures !== 1 ? 's' : ''),
       desc: 'Source endpoints unreachable or returning errors',
       time: m.last_successful_sync ? 'last sync ' + timeAgo(m.last_successful_sync) : '',
-      action: () => { goTab('pipeline'); closeNotifPanel(); }
+      action: () => { goTab('sources'); closeNotifPanel(); }
     });
   }
 
@@ -4315,7 +4386,7 @@ function buildNotifications() {
       title: failedJobs.length + ' pipeline job' + (failedJobs.length !== 1 ? 's' : '') + ' failed',
       desc: 'Ingestion pipeline errors need attention',
       time: '',
-      action: () => { goTab('pipeline'); closeNotifPanel(); }
+      action: () => { goTab('sources'); closeNotifPanel(); }
     });
   }
 
@@ -4561,37 +4632,135 @@ async function submitAddSource() {
 //  SOURCES TAB
 // ═══════════════════════════════════════════════════
 let _verifyResult = null;
+let _allEndpoints = [];
+let _allJobs = [];
+let _countryIndex = {};
 
 async function loadSourcesTab() {
-  const [statsRes, classRes, pdfRes] = await Promise.all([
+  const [statsRes, classRes, epsRes, countriesRes, jobsRes] = await Promise.all([
     fetch('/api/sources/stats').then(r => r.json()),
     fetch('/api/sources/classifications').then(r => r.json()),
-    fetch('/api/sources/pdfs').then(r => r.json()),
+    fetch('/api/sources/endpoints').then(r => r.json()),
+    fetch('/api/sources/countries').then(r => r.json()),
+    fetch('/api/ingestion-jobs').then(r => r.json()),
   ]);
 
-  // Registry stats bar
-  const statsEl = document.getElementById('registryStats');
-  statsEl.innerHTML = [
-    { l: 'Countries', v: statsRes.countries, cls: 'info' },
-    { l: 'Authorities', v: statsRes.authorities, cls: 'neut' },
-    { l: 'Endpoints', v: statsRes.endpoints, cls: 'ok' },
-    { l: 'Parsers', v: statsRes.parsers, cls: 'neut' },
-  ].map(s => `
-    <div class="metric ${s.cls}" style="flex:1; min-width:140px; cursor:default;">
-      <div class="strip"></div>
-      <div class="l">${s.l}</div>
-      <div class="v">${s.v}</div>
-    </div>
-  `).join('');
+  _allEndpoints = epsRes;
+  _allJobs = jobsRes;
+  _countryIndex = {};
+  countriesRes.forEach(c => { _countryIndex[c.name] = c; });
 
-  // Tab badge
+  const jobsByUrl = {};
+  jobsRes.forEach(j => { if (j.source_url && (!jobsByUrl[j.source_url] || j.id > jobsByUrl[j.source_url].id)) jobsByUrl[j.source_url] = j; });
+  _allEndpoints.forEach(ep => { ep._job = jobsByUrl[ep.url] || null; });
+
+  const healthyCt = _allEndpoints.filter(e => e._job && e._job.state === 'reconciled').length;
+  const failedCt = _allEndpoints.filter(e => e._job && e._job.state === 'failed').length;
+  const notSyncedCt = _allEndpoints.filter(e => !e._job).length;
+
+  document.getElementById('registryStats').innerHTML = [
+    { l: 'Countries', v: statsRes.countries, cls: 'info' },
+    { l: 'Endpoints', v: statsRes.endpoints, cls: 'neut' },
+    { l: 'Healthy', v: healthyCt, cls: 'ok' },
+    { l: 'Failing', v: failedCt, cls: failedCt ? 'crit' : 'ok' },
+    { l: 'Not synced', v: notSyncedCt, cls: 'neut' },
+  ].map(s => `<div class="metric ${s.cls}" style="flex:1; min-width:120px; cursor:default;"><div class="strip"></div><div class="l">${s.l}</div><div class="v">${s.v}</div></div>`).join('');
+
   document.getElementById('tabSourcesCt').textContent = statsRes.endpoints;
 
-  // Classifications list
+  renderUnifiedSources();
   renderClassifications(classRes);
+}
 
-  // PDF uploads list
-  renderPdfs(pdfRes);
+function renderUnifiedSources() {
+  const search = (document.getElementById('srcSearch')?.value || '').toLowerCase();
+  const stratFilter = document.getElementById('srcStrategyFilter')?.value || '';
+  const healthFilter = document.getElementById('srcHealthFilter')?.value || '';
+
+  const grouped = {};
+  _allEndpoints.forEach(ep => {
+    if (stratFilter && ep.extraction_strategy !== stratFilter) return;
+    if (healthFilter === 'healthy' && !(ep._job && ep._job.state === 'reconciled')) return;
+    if (healthFilter === 'failing' && !(ep._job && ep._job.state === 'failed')) return;
+    if (healthFilter === 'not_synced' && ep._job) return;
+    if (search) {
+      const hay = [ep.country, ep.authority, ep.name, ep.url, ep.endpoint_id, ...(ep.sections || []), ep.extraction_strategy, ep.owner_team].join(' ').toLowerCase();
+      if (!hay.includes(search)) return;
+    }
+    if (!grouped[ep.country]) grouped[ep.country] = [];
+    grouped[ep.country].push(ep);
+  });
+
+  _groupedByCountry = grouped;
+  const countries = Object.keys(grouped).sort();
+  const listEl = document.getElementById('srcList');
+  const emptyEl = document.getElementById('srcEmpty');
+
+  if (!countries.length) { listEl.innerHTML = ''; emptyEl.style.display = ''; return; }
+  emptyEl.style.display = 'none';
+
+  listEl.innerHTML = countries.map(country => {
+    const eps = grouped[country];
+    const flag = FLAGS[country] || '';
+    const okCt = eps.filter(e => e._job && e._job.state === 'reconciled').length;
+    const failCt = eps.filter(e => e._job && e._job.state === 'failed').length;
+    const pendCt = eps.length - okCt - failCt;
+    const healthCls = failCt ? 'crit' : okCt === eps.length ? 'ok' : 'warn';
+    const healthLabel = failCt ? `${failCt} failing` : okCt === eps.length ? 'All healthy' : `${pendCt} not synced`;
+
+    const latestTime = eps.reduce((t, e) => {
+      if (!e._job) return t;
+      const jt = e._job.failed_at || e._job.reconciled_at || e._job.queued_at || '';
+      return jt > t ? jt : t;
+    }, '');
+
+    return `
+      <div class="src-country-row" onclick="toggleSrcCountry(this)" data-country="${escHtml(country)}">
+        <span class="src-country-flag">${flag}</span>
+        <span class="src-country-name">${escHtml(country)}</span>
+        <div class="src-country-meta">
+          <span class="src-country-stat">${eps.length} endpoint${eps.length !== 1 ? 's' : ''}</span>
+          <span class="badge ${healthCls}" style="font-size:10px; padding:1px 7px;"><span class="d"></span> ${healthLabel}</span>
+          ${latestTime ? `<span class="src-country-stat">${timeAgo(latestTime)}</span>` : ''}
+          <svg class="src-country-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+      <div class="src-eps-panel" data-country="${escHtml(country)}">
+        ${eps.map((ep, idx) => {
+          const j = ep._job;
+          const jCls = !j ? 'neut' : j.state === 'reconciled' ? 'ok' : j.state === 'failed' ? 'crit' : 'warn';
+          const jLabel = !j ? 'Not synced' : j.state === 'reconciled' ? 'Healthy' : j.state === 'failed' ? 'Failed' : j.state;
+          const jTime = j ? (j.failed_at || j.reconciled_at || j.queued_at) : '';
+          return `
+          <div class="src-ep-card" style="cursor:pointer;" onclick="openSrcDrawer('${escHtml(country)}', ${idx})">
+            <div class="src-ep-header">
+              <span class="src-ep-name" title="${escHtml(ep.endpoint_id)}">${escHtml(ep.name || ep.authority)}</span>
+              <span class="badge ${jCls}" style="font-size:10px; padding:1px 7px;"><span class="d"></span> ${jLabel}</span>
+            </div>
+            ${ep.name ? `<div class="src-ep-auth">${escHtml(ep.authority)}</div>` : ''}
+            <div class="src-ep-url"><a href="${escHtml(ep.url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${escHtml(ep.url)}</a></div>
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+              <div class="src-ep-tags">
+                <span class="t strategy">${escHtml(ep.extraction_strategy)}</span>
+                <span class="t type">${escHtml(ep.source_type)}</span>
+                <span class="t freq">${escHtml(ep.crawl_frequency)}</span>
+                ${ep.owner_team ? `<span class="t">${escHtml(ep.owner_team)}</span>` : ''}
+              </div>
+              ${jTime ? `<span style="font-family:var(--font-mono); font-size:10.5px; color:var(--ink-4); white-space:nowrap;">${timeAgo(jTime)}</span>` : ''}
+            </div>
+            ${j && j.state === 'failed' ? `<div style="font-size:11.5px; color:var(--crit); margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${escHtml(j.failure_reason || '')}">${escHtml(j.failure_reason || 'Unknown error')}</div>` : ''}
+          </div>`;
+        }).join('')}
+      </div>`;
+  }).join('');
+}
+
+function toggleSrcCountry(row) {
+  const country = row.dataset.country;
+  const panel = document.querySelector(`.src-eps-panel[data-country="${country}"]`);
+  const isOpen = row.classList.contains('open');
+  row.classList.toggle('open', !isOpen);
+  panel.classList.toggle('open', !isOpen);
 }
 
 function renderClassifications(items) {
@@ -4632,6 +4801,7 @@ function renderPdfs(jobs) {
       const src = j.source_url || '';
       const title = src.includes('#') ? src.split('#').pop() : src.replace('pdf://', '');
       const ts = fmtTime(j.queued_at);
+      const addedBy = j.triggered_by || j.queued_by || '—';
       return `<div style="display:flex; align-items:center; gap:12px; padding:12px 16px; border-bottom:1px solid var(--paper-line); cursor:pointer;" onclick="window.location='/compliance/pipeline/${j.id}'">
         <div style="width:32px; height:32px; border-radius:var(--r-s); background:var(--crit-soft); display:grid; place-items:center; flex-shrink:0;">
           <svg viewBox="0 0 24 24" fill="none" stroke="var(--crit-2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
@@ -4640,6 +4810,7 @@ function renderPdfs(jobs) {
           <div style="font-size:13.5px; font-weight:600; color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escHtml(title)}</div>
           <div style="font-size:11.5px; color:var(--ink-3);">${j.country ? escHtml(j.country) + ' · ' : ''}Job #${j.id}</div>
         </div>
+        <span style="font-size:12px; color:var(--ink-3); max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${escHtml(addedBy)}">${escHtml(addedBy)}</span>
         <span class="badge ${stCls}"><span class="d"></span> ${j.state}</span>
         <span style="font-family:var(--font-mono); font-size:10.5px; color:var(--ink-4); white-space:nowrap;">${ts}</span>
       </div>`;
@@ -4747,10 +4918,152 @@ async function classifyVerified(classification) {
   document.getElementById('verifyResult').style.display = 'none';
   document.getElementById('verifyUrlInput').value = '';
   _verifyResult = null;
-  // Refresh classifications list
   const classRes = await fetch('/api/sources/classifications').then(r => r.json());
   renderClassifications(classRes);
 }
+
+// ═══════════════════════════════════════════════════
+//  SOURCE DRAWER
+// ═══════════════════════════════════════════════════
+let _groupedByCountry = {};
+
+function openSrcDrawer(country, idx) {
+  const eps = _groupedByCountry[country];
+  if (!eps || !eps[idx]) return;
+  const ep = eps[idx];
+  const flag = FLAGS[country] || '';
+
+  document.getElementById('srcDrawerTitle').textContent = ep.name || ep.authority;
+  document.getElementById('srcDrawerSubtitle').innerHTML = `${flag} ${escHtml(country)} · <span style="font-family:var(--font-mono);font-size:11px;">${escHtml(ep.endpoint_id)}</span>`;
+
+  const body = document.getElementById('srcDrawerBody');
+  body.innerHTML = `
+    <div class="src-drawer-field">
+      <div class="src-drawer-label">Authority</div>
+      <div class="src-drawer-value" style="font-weight:600;">${escHtml(ep.authority)}</div>
+      <div class="src-drawer-value" style="font-size:12px; color:var(--ink-3); margin-top:2px;">${escHtml(ep.authority_type.replace(/_/g, ' '))}</div>
+      ${ep.authority_url ? `<div class="src-drawer-value" style="margin-top:4px;"><a href="${escHtml(ep.authority_url)}" target="_blank" rel="noopener">${escHtml(ep.authority_url)}</a></div>` : ''}
+    </div>
+
+    <div class="src-drawer-field">
+      <div class="src-drawer-label">Source URL</div>
+      <div class="src-drawer-value"><a href="${escHtml(ep.url)}" target="_blank" rel="noopener">${escHtml(ep.url)}</a></div>
+    </div>
+
+    <div class="src-drawer-divider"></div>
+
+    <div class="src-drawer-row">
+      <div class="src-drawer-field">
+        <div class="src-drawer-label">Source type</div>
+        <div class="src-drawer-value">${escHtml(ep.source_type)}</div>
+      </div>
+      <div class="src-drawer-field">
+        <div class="src-drawer-label">Language</div>
+        <div class="src-drawer-value">${escHtml(ep.content_language || 'en')}</div>
+      </div>
+    </div>
+
+    <div class="src-drawer-row">
+      <div class="src-drawer-field">
+        <div class="src-drawer-label">Extraction strategy</div>
+        <div class="src-drawer-value"><span style="font-family:var(--font-mono);font-size:12px;padding:2px 8px;background:var(--purple-soft);border:1px solid var(--purple-line);border-radius:4px;color:var(--purple-2);">${escHtml(ep.extraction_strategy)}</span></div>
+      </div>
+      <div class="src-drawer-field">
+        <div class="src-drawer-label">Parser key</div>
+        <div class="src-drawer-value" style="font-family:var(--font-mono); font-size:12px;">${escHtml(ep.parser_key)}</div>
+      </div>
+    </div>
+
+    <div class="src-drawer-row">
+      <div class="src-drawer-field">
+        <div class="src-drawer-label">Crawl frequency</div>
+        <div class="src-drawer-value">${escHtml(ep.crawl_frequency)}</div>
+      </div>
+      <div class="src-drawer-field">
+        <div class="src-drawer-label">Change detection</div>
+        <div class="src-drawer-value">${escHtml(ep.change_detection_strategy || 'semantic')}</div>
+      </div>
+    </div>
+
+    <div class="src-drawer-row">
+      <div class="src-drawer-field">
+        <div class="src-drawer-label">Trust level</div>
+        <div class="src-drawer-value">${escHtml(ep.trust_level || 'official')}</div>
+      </div>
+      <div class="src-drawer-field">
+        <div class="src-drawer-label">Owner team</div>
+        <div class="src-drawer-value">${escHtml(ep.owner_team || '—')}</div>
+      </div>
+    </div>
+
+    <div class="src-drawer-divider"></div>
+
+    <div class="src-drawer-row">
+      <div class="src-drawer-field">
+        <div class="src-drawer-label">JavaScript heavy</div>
+        <div class="src-drawer-value">${ep.is_javascript_heavy ? '<span style="color:var(--warn);">Yes</span>' : 'No'}</div>
+      </div>
+      <div class="src-drawer-field">
+        <div class="src-drawer-label">Requires auth</div>
+        <div class="src-drawer-value">${ep.requires_authentication ? '<span style="color:var(--warn);">Yes</span>' : 'No'}</div>
+      </div>
+    </div>
+
+    <div class="src-drawer-row">
+      <div class="src-drawer-field">
+        <div class="src-drawer-label">Escalation required</div>
+        <div class="src-drawer-value">${ep.escalation_required ? '<span style="color:var(--crit);">Yes</span>' : 'No'}</div>
+      </div>
+      <div class="src-drawer-field">
+        <div class="src-drawer-label">Supports replay</div>
+        <div class="src-drawer-value">${ep.supports_replay ? '<span style="color:var(--ok);">Yes</span>' : 'No'}</div>
+      </div>
+    </div>
+
+    ${ep.sections && ep.sections.length ? `
+    <div class="src-drawer-divider"></div>
+    <div class="src-drawer-field">
+      <div class="src-drawer-label">Sections covered</div>
+      <div class="src-drawer-tags">
+        ${ep.sections.map(s => `<span style="font-size:11px;padding:3px 9px;border-radius:4px;background:var(--ok-soft);border:1px solid var(--ok-line);color:var(--ok-2);">${escHtml(s)}</span>`).join('')}
+      </div>
+    </div>` : ''}
+
+    ${ep.notes ? `
+    <div class="src-drawer-divider"></div>
+    <div class="src-drawer-field">
+      <div class="src-drawer-label">Notes</div>
+      <div class="src-drawer-value">${escHtml(ep.notes)}</div>
+    </div>` : ''}
+
+    ${ep._job ? `
+    <div class="src-drawer-divider"></div>
+    <div class="src-drawer-field">
+      <div class="src-drawer-label">Pipeline status</div>
+      <div class="src-drawer-value"><span class="badge ${ep._job.state === 'reconciled' ? 'ok' : ep._job.state === 'failed' ? 'crit' : 'warn'}" style="font-size:11px;padding:2px 8px;"><span class="d"></span> ${escHtml(ep._job.state)}</span></div>
+      ${ep._job.reconciled_at ? `<div class="src-drawer-value" style="font-size:12px;color:var(--ink-3);margin-top:4px;">Last reconciled: ${timeAgo(ep._job.reconciled_at)}</div>` : ''}
+      ${ep._job.failed_at ? `<div class="src-drawer-value" style="font-size:12px;color:var(--crit);margin-top:4px;">Failed: ${timeAgo(ep._job.failed_at)}</div>` : ''}
+      ${ep._job.failure_reason ? `<div class="src-drawer-value" style="font-size:12px;color:var(--crit);margin-top:2px;">${escHtml(ep._job.failure_reason)}</div>` : ''}
+    </div>` : `
+    <div class="src-drawer-divider"></div>
+    <div class="src-drawer-field">
+      <div class="src-drawer-label">Pipeline status</div>
+      <div class="src-drawer-value"><span class="badge neut" style="font-size:11px;padding:2px 8px;"><span class="d"></span> Not synced</span></div>
+    </div>`}
+  `;
+
+  document.getElementById('srcDrawerScrim').classList.add('open');
+  document.getElementById('srcDrawer').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeSrcDrawer() {
+  document.getElementById('srcDrawerScrim').classList.remove('open');
+  document.getElementById('srcDrawer').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSrcDrawer(); });
 
 // ═══════════════════════════════════════════════════
 //  INIT

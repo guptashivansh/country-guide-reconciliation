@@ -553,11 +553,11 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
 
     @routes.route("/compliance")
     def compliance_root():
-        return redirect(url_for("country_guide_routes.compliance_intake_select"))
+        return redirect("/ops#sources")
 
     @routes.route("/compliance/intake")
     def compliance_intake_select():
-        return render_template("compliance_intake_select.html", nav_active="intake", flags=_flags())
+        return redirect("/ops#sources")
 
     @routes.route("/intake/<country>")
     def compliance_intake_country(country):
@@ -574,7 +574,7 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
 
     @routes.route("/compliance/pipeline")
     def compliance_pipeline():
-        return render_template("compliance_pipeline.html", nav_active="intake")
+        return redirect("/ops#sources")
 
     @routes.route("/compliance/pipeline/<int:job_id>")
     def compliance_pipeline_job(job_id):
@@ -648,18 +648,25 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
             eps = source_registry_service.list_trusted_source_endpoints()
         return jsonify([{
             "endpoint_id": ep.endpoint_id,
+            "name": ep.name,
             "country": ep.country,
             "iso_code": ep.iso_code,
             "authority": ep.authority,
             "authority_type": ep.authority_type,
-            "url": ep.url,
             "authority_url": ep.authority_url,
+            "url": ep.url,
             "sections": list(ep.sections),
             "source_type": ep.source_type,
+            "content_language": ep.content_language,
             "extraction_strategy": ep.extraction_strategy,
+            "parser_key": ep.parser_key,
             "crawl_frequency": ep.crawl_frequency,
+            "change_detection_strategy": ep.change_detection_strategy,
+            "is_javascript_heavy": ep.is_javascript_heavy,
+            "requires_authentication": ep.requires_authentication,
             "escalation_required": ep.escalation_required,
             "supports_replay": ep.supports_replay,
+            "trust_level": ep.trust_level,
             "owner_team": ep.owner_team,
             "notes": ep.notes,
             "status": ep.status,
