@@ -2,7 +2,7 @@
   "metadata": {
     "version": "2.1.0",
     "schema": "normalized",
-    "last_updated": "2026-05-23T00:00:00Z",
+    "last_updated": "2026-06-22T00:00:00Z",
     "domains": [
       "labour_employment",
       "legislative",
@@ -2029,7 +2029,7 @@
       "country_id": "country_BH",
       "name": "Ministry of Labour and Social Development",
       "authority_type": "labor_ministry",
-      "website_url": "https://www.mlsd.gov.bh",
+      "website_url": "https://www.lmra.bh",
       "trust_level": "official",
       "precedence_rank": 1,
       "is_active": true,
@@ -2040,7 +2040,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "auth_BH_tax",
@@ -2173,7 +2173,7 @@
       "country_id": "country_BD",
       "name": "Department of Immigration and Passports",
       "authority_type": "immigration_authority",
-      "website_url": "https://www.dip.gov.bd",
+      "website_url": "https://dip.gov.bd",
       "trust_level": "official",
       "precedence_rank": 1,
       "is_active": true,
@@ -2184,7 +2184,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "auth_BD_legislative",
@@ -2443,7 +2443,7 @@
       "country_id": "country_BO",
       "name": "Dirección General de Migración (DIGEMIG)",
       "authority_type": "immigration_authority",
-      "website_url": "https://www.migracion.gob.bo",
+      "website_url": "https://migracion.gob.bo",
       "trust_level": "official",
       "precedence_rank": 1,
       "is_active": true,
@@ -2454,14 +2454,14 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "auth_BO_legislative",
       "country_id": "country_BO",
       "name": "Gaceta Oficial del Estado Plurinacional de Bolivia",
       "authority_type": "official_gazette",
-      "website_url": "https://gacetaoficialdebolivia.gob.bo",
+      "website_url": "https://www.gacetaoficialdebolivia.gob.bo",
       "trust_level": "official",
       "precedence_rank": 1,
       "is_active": true,
@@ -2472,7 +2472,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "auth_BA_labour",
@@ -2569,7 +2569,7 @@
       "country_id": "country_BW",
       "name": "Ministry of Labour and Home Affairs",
       "authority_type": "labor_ministry",
-      "website_url": "https://www.gov.bw/ministries/ministry-labour-and-home-affairs",
+      "website_url": "https://www.gov.bw",
       "trust_level": "official",
       "precedence_rank": 1,
       "is_active": true,
@@ -2580,7 +2580,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "auth_BW_tax",
@@ -2623,7 +2623,7 @@
       "country_id": "country_BW",
       "name": "Department of Immigration and Citizenship Services",
       "authority_type": "immigration_authority",
-      "website_url": "https://www.gov.bw/immigration",
+      "website_url": "https://www.gov.bw",
       "trust_level": "official",
       "precedence_rank": 1,
       "is_active": true,
@@ -2634,14 +2634,14 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "auth_BW_legislative",
       "country_id": "country_BW",
       "name": "Attorney General Chambers – Laws of Botswana",
       "authority_type": "official_gazette",
-      "website_url": "https://www.gov.bw/laws-botswana",
+      "website_url": "https://www.gov.bw",
       "trust_level": "official",
       "precedence_rank": 1,
       "is_active": true,
@@ -2652,7 +2652,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "auth_BR_labour",
@@ -8059,7 +8059,7 @@
       "country_id": "country_LK",
       "name": "Department of Labour Sri Lanka",
       "authority_type": "labor_ministry",
-      "website_url": "https://www.labourdept.gov.lk",
+      "website_url": "https://labourdept.gov.lk",
       "trust_level": "official",
       "precedence_rank": 1,
       "is_active": true,
@@ -8070,7 +8070,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "auth_LK_tax",
@@ -8095,7 +8095,7 @@
       "country_id": "country_LK",
       "name": "Employees Provident Fund (EPF) – Central Bank of Sri Lanka",
       "authority_type": "social_security",
-      "website_url": "https://www.cbsl.gov.lk/en/financial-system/employees-provident-fund-epf",
+      "website_url": "https://www.cbsl.gov.lk",
       "trust_level": "official",
       "precedence_rank": 1,
       "is_active": true,
@@ -8106,7 +8106,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "auth_LK_immigration",
@@ -10903,7 +10903,7 @@
       "id": "ep_AR_migraciones_work",
       "authority_id": "auth_AR_immigration",
       "name": "Argentina – Work Permits (DNM)",
-      "url": "https://www.argentina.gob.ar/interior/migraciones/permisosdetrabajo",
+      "url": "https://www.argentina.gob.ar/migraciones",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
@@ -10929,7 +10929,7 @@
       "escalation_required": true,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z",
+      "updated_at": "2026-06-22T00:00:00Z",
       "notes": "Residency and work authorisation portal; structure changes frequently."
     },
     {
@@ -10971,7 +10971,7 @@
       "id": "ep_AT_bmf_lohnsteuer",
       "authority_id": "auth_AT_tax",
       "name": "Austria – BMF Wage Tax (Lohnsteuer) Guide",
-      "url": "https://www.bmf.gv.at/en/topics/taxation/wage-tax.html",
+      "url": "https://www.bmf.gv.at/en/topics/taxation.html",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
@@ -10996,13 +10996,13 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_AT_ris_labour_law",
       "authority_id": "auth_AT_legislative",
       "name": "Austria – RIS Legislation Database",
-      "url": "https://www.ris.bka.gv.at/GeltendeFassung.wxe?Abfrage=Bundesnormen&Gesetzesnummer=10008891",
+      "url": "https://www.ris.bka.gv.at",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
@@ -11029,7 +11029,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z",
+      "updated_at": "2026-06-22T00:00:00Z",
       "notes": "Links to Arbeitszeitgesetz (Working Hours Act). RIS is the authoritative source for all Austrian law."
     },
     {
@@ -11266,7 +11266,7 @@
       "id": "ep_BH_mlsd_home",
       "authority_id": "auth_BH_labour",
       "name": "Bahrain – Ministry of Labour Home",
-      "url": "https://www.mlsd.gov.bh",
+      "url": "https://www.lmra.bh",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
@@ -11294,7 +11294,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_BH_sio_contributions",
@@ -11530,7 +11530,7 @@
       "id": "ep_BD_dip_work_visa",
       "authority_id": "auth_BD_immigration",
       "name": "Bangladesh – Work Visa (DIP)",
-      "url": "https://www.dip.gov.bd",
+      "url": "https://dip.gov.bd",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
@@ -11556,7 +11556,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_BD_dol_welfare",
@@ -11887,7 +11887,7 @@
       "id": "ep_BZ_labour_act",
       "authority_id": "auth_BZ_legislative",
       "name": "Belize – Labour Act (Chapter 297)",
-      "url": "https://www.belizelaw.org/web/lawadmin/index2.html",
+      "url": "https://www.belizelaw.org",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
@@ -11914,7 +11914,7 @@
       "escalation_required": true,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z",
+      "updated_at": "2026-06-22T00:00:00Z",
       "notes": "Hosted on belizelaw.org – check for redirect if unavailable."
     },
     {
@@ -12018,7 +12018,7 @@
       "id": "ep_BO_digemig_home",
       "authority_id": "auth_BO_immigration",
       "name": "Bolivia – DIGEMIG Work Visas",
-      "url": "https://www.migracion.gob.bo",
+      "url": "https://migracion.gob.bo",
       "source_type": "html",
       "content_language": "es",
       "sections_covered": [
@@ -12044,13 +12044,13 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_BO_gaceta_home",
       "authority_id": "auth_BO_legislative",
       "name": "Bolivia – Gaceta Oficial",
-      "url": "https://gacetaoficialdebolivia.gob.bo",
+      "url": "https://www.gacetaoficialdebolivia.gob.bo",
       "source_type": "html",
       "content_language": "es",
       "sections_covered": [
@@ -12076,7 +12076,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_BA_ita_home",
@@ -12243,7 +12243,7 @@
       "id": "ep_BW_labour_home",
       "authority_id": "auth_BW_labour",
       "name": "Botswana – Ministry of Labour",
-      "url": "https://www.gov.bw/ministries/ministry-labour-and-home-affairs",
+      "url": "https://www.gov.bw",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
@@ -12271,7 +12271,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_BW_burs_paye",
@@ -12309,7 +12309,7 @@
       "id": "ep_BW_immigration_permits",
       "authority_id": "auth_BW_immigration",
       "name": "Botswana – Work Permits",
-      "url": "https://www.gov.bw/immigration",
+      "url": "https://www.gov.bw",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
@@ -12335,13 +12335,13 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_BW_laws_botswana",
       "authority_id": "auth_BW_legislative",
       "name": "Botswana – Laws of Botswana (Employment Act)",
-      "url": "https://www.gov.bw/laws-botswana",
+      "url": "https://www.gov.bw",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
@@ -12368,7 +12368,7 @@
       "escalation_required": true,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_BW_bpopf_home",
@@ -12505,7 +12505,7 @@
       "id": "ep_BR_esocial",
       "authority_id": "auth_BR_tax",
       "name": "Brazil – eSocial Employer Portal",
-      "url": "https://esocial.fazenda.gov.br",
+      "url": "https://www.gov.br/esocial/pt-br",
       "source_type": "html",
       "content_language": "pt",
       "sections_covered": [
@@ -12531,7 +12531,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z",
+      "updated_at": "2026-06-22T00:00:00Z",
       "notes": "Unified digital platform for all labour, social security and tax reporting."
     },
     {
@@ -13396,12 +13396,12 @@
         "employee_benefits"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
-      "parser_key": "html_readability_v1",
+      "extraction_strategy": "playwright",
+      "parser_key": "playwright_spa_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -13414,7 +13414,7 @@
       "escalation_required": true,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_CG_dgid_home",
@@ -13427,12 +13427,12 @@
         "payroll_tax"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
-      "parser_key": "html_readability_v1",
+      "extraction_strategy": "playwright",
+      "parser_key": "playwright_spa_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -13445,7 +13445,7 @@
       "escalation_required": true,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_CG_travail_home",
@@ -13460,12 +13460,12 @@
         "termination_notice"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
-      "parser_key": "html_readability_v1",
+      "extraction_strategy": "playwright",
+      "parser_key": "playwright_spa_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -13478,7 +13478,7 @@
       "escalation_required": true,
       "supports_replay": false,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_CG_interieur_immigration",
@@ -13492,12 +13492,12 @@
         "work_permit_process"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
-      "parser_key": "html_readability_v1",
+      "extraction_strategy": "playwright",
+      "parser_key": "playwright_spa_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -13510,7 +13510,7 @@
       "escalation_required": true,
       "supports_replay": false,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_CG_gouv_portal",
@@ -13524,12 +13524,12 @@
         "termination_notice"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
-      "parser_key": "html_readability_v1",
+      "extraction_strategy": "playwright",
+      "parser_key": "playwright_spa_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -13542,7 +13542,7 @@
       "escalation_required": true,
       "supports_replay": false,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_CR_mtss_home",
@@ -14862,12 +14862,12 @@
         "maternity_leave"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
-      "parser_key": "html_readability_v1",
+      "extraction_strategy": "playwright",
+      "parser_key": "playwright_spa_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -14880,7 +14880,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_FR_impots_home",
@@ -14893,12 +14893,12 @@
         "payroll_tax"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
-      "parser_key": "html_readability_v1",
+      "extraction_strategy": "playwright",
+      "parser_key": "playwright_spa_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -14911,7 +14911,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_FR_urssaf_home",
@@ -14925,12 +14925,12 @@
         "employee_benefits"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
-      "parser_key": "html_readability_v1",
+      "extraction_strategy": "playwright",
+      "parser_key": "playwright_spa_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -14943,7 +14943,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_FR_anef_work_permits",
@@ -14957,12 +14957,12 @@
         "work_permit_process"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
-      "parser_key": "html_readability_v1",
+      "extraction_strategy": "playwright",
+      "parser_key": "playwright_spa_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -14975,7 +14975,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_FR_legifrance_code_travail",
@@ -14993,12 +14993,12 @@
         "maternity_leave"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
-      "parser_key": "html_readability_v1",
+      "extraction_strategy": "playwright",
+      "parser_key": "playwright_spa_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -15011,7 +15011,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_GE_moh_home",
@@ -16658,12 +16658,12 @@
         "maternity_leave"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
-      "parser_key": "html_readability_v1",
+      "extraction_strategy": "playwright",
+      "parser_key": "playwright_spa_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -16676,7 +16676,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_JP_nta_home",
@@ -16689,12 +16689,12 @@
         "payroll_tax"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
-      "parser_key": "html_readability_v1",
+      "extraction_strategy": "playwright",
+      "parser_key": "playwright_spa_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -16707,7 +16707,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_JP_nenkin_home",
@@ -16721,12 +16721,12 @@
         "employee_benefits"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
-      "parser_key": "html_readability_v1",
+      "extraction_strategy": "playwright",
+      "parser_key": "playwright_spa_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -16739,7 +16739,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_JP_isa_work_visa",
@@ -16753,12 +16753,12 @@
         "work_permit_process"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
-      "parser_key": "html_readability_v1",
+      "extraction_strategy": "playwright",
+      "parser_key": "playwright_spa_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -16771,7 +16771,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_JP_egov_labour_standards",
@@ -16787,12 +16787,12 @@
         "overtime"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
-      "parser_key": "html_readability_v1",
+      "extraction_strategy": "playwright",
+      "parser_key": "playwright_spa_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -16805,7 +16805,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_JO_mol_home",
@@ -22205,7 +22205,7 @@
       "id": "ep_LK_dept_labour_home",
       "authority_id": "auth_LK_labour",
       "name": "Sri Lanka – Department of Labour",
-      "url": "https://www.labourdept.gov.lk",
+      "url": "https://labourdept.gov.lk",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
@@ -22233,7 +22233,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_LK_ird_home",
@@ -22270,7 +22270,7 @@
       "id": "ep_LK_cbsl_epf",
       "authority_id": "auth_LK_social_security",
       "name": "Sri Lanka – EPF Provident Fund (CBSL)",
-      "url": "https://www.cbsl.gov.lk/en/financial-system/employees-provident-fund-epf",
+      "url": "https://www.cbsl.gov.lk",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
@@ -22296,7 +22296,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_LK_immigration_home",
