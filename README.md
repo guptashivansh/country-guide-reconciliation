@@ -88,7 +88,8 @@ Official sources are configured in a separate repo ([compliance-data](https://gi
 
 ### Prerequisites
 - Python 3.9+
-- Groq API key(s) — [console.groq.com](https://console.groq.com)
+- Groq API key(s) — [console.groq.com](https://console.groq.com) (extraction)
+- Anthropic API key(s) — [console.anthropic.com](https://console.anthropic.com) (change classification)
 - Notion integration token (for initial seed only)
 
 ### Install
@@ -102,7 +103,8 @@ pip install -r requirements.txt
 Create `.env` in the project root:
 
 ```env
-GROQ_API_KEYS=key1,key2           # comma-separated, no quotes around individual keys
+GROQ_API_KEYS=key1,key2           # comma-separated, no quotes around individual keys — used for extraction
+ANTHROPIC_API_KEYS=key1,key2      # comma-separated, no quotes around individual keys — used for change classification
 NOTION_TOKEN=secret_...
 NOTION_PAGE_ID=...                # root Skuad country guides Notion page ID
 COUNTRY_GUIDE_DB=country_guides.db
@@ -142,8 +144,9 @@ Open `http://localhost:8080`.
 | Decision | Rationale |
 |---|---|
 | SQLite | Zero-ops for a hackathon; the data model is simple and volumes are small |
-| Groq (LLaMA 3.3 70B) | Fast inference, generous free tier, strong at structured extraction |
-| Multi-key rotation | Rotates to the next key on `RateLimitError` — handles quota exhaustion gracefully |
+| Groq (LLaMA 3.3 70B) for extraction | Fast inference, generous free tier, strong at structured extraction |
+| Claude (claude-sonnet-4-6) for change classification | Different vendor than extraction, so a Groq outage or quota exhaustion doesn't also block classification, and vice versa |
+| Multi-key rotation | Rotates to the next key on `RateLimitError` — handles quota exhaustion gracefully, per vendor |
 | Notion import without LLM | Pipe-separated table structure is deterministic; no tokens wasted on baseline data |
 | Human-in-the-loop approval | LLM extraction is imperfect — every change requires explicit approval before going live |
 | Official sources as external JSON | Separate lifecycle from the app; update source URLs without redeploying |

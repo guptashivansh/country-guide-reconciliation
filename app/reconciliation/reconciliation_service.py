@@ -1,19 +1,18 @@
 import logging
 
 from app.models.workflow_results import FailureDetail, ReconciliationResult
-from app.reconciliation.semantic_reconciliation_service import SemanticReconciliationEngine
 
 
 logger = logging.getLogger(__name__)
 
 
 class ReconciliationService:
-    def __init__(self, country_guide_repository, semantic_engine=None):
+    def __init__(self, country_guide_repository, reconciliation_engine):
         self.country_guide_repository = country_guide_repository
-        self.semantic_engine = semantic_engine or SemanticReconciliationEngine()
+        self.reconciliation_engine = reconciliation_engine
 
     def reconcile_canonical_rules(self, old_rule, new_rule):
-        return self.semantic_engine.reconcile(old_rule, new_rule)
+        return self.reconciliation_engine.reconcile(old_rule, new_rule)
 
     def reconcile_extracted_rules(self, country, extracted_data, source_url, source_hash, source_snapshot_id):
         changes_found = 0
@@ -71,24 +70,25 @@ class ReconciliationService:
                 materiality_level = None
                 change_type = None
                 try:
-                    sem = self.semantic_engine.reconcile(
-                        {"section": section, "value": old_value},
-                        {"section": section, "value": new_value},
+                    sem = self.reconciliation_engine.reconcile(
+                        {"country": country, "section": section, "value": old_value},
+                        {"country": country, "section": section, "value": new_value},
                     )
                     materiality_level = sem.materiality_level
                     change_type = sem.change_type
                     logger.info(
-                        "Semantic classification complete",
+                        "LLM classification complete",
                         extra={
                             "stage": "reconciliation",
                             "section": section,
                             "materiality": materiality_level,
                             "change_type": change_type,
+                            "reasoning": sem.reasoning,
                         },
                     )
                 except Exception as e:
                     logger.warning(
-                        "Semantic classification failed — enqueuing without classification",
+                        "LLM classification failed — enqueuing without classification",
                         extra={"stage": "reconciliation", "section": section, "error": str(e)},
                     )
 

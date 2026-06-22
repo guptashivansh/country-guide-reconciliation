@@ -24,9 +24,9 @@ This system is built around four principles that govern every architectural deci
 
 ---
 
-**Deterministic classification over probabilistic judgment.** Change classification — determining whether a detected difference is a numeric threshold change, an eligibility scope modification, or a formatting artifact — uses a deterministic regex-based engine, not an LLM. The same (old, new) pair always produces the same classification. Auditors can reconstruct the reasoning. LLM classification would undermine that reproducibility.
+**Classification is advisory, never a gate.** Change classification — determining whether a detected difference is a numeric threshold change, an eligibility scope modification, or a formatting artifact — uses an LLM call (Claude `claude-sonnet-4-6`, temperature=0.0) against a fixed materiality rubric and a closed label set. Every classification's reasoning is logged for audit. Classification never decides whether a change reaches the review queue or skips human approval — it only labels severity for triage. If classification fails after retries, the change is still enqueued, unlabeled, so a model failure can never suppress a detected change.
 
-![Classification output: CRITICAL severity badge with section type label — produced deterministically, not by probabilistic AI judgment](assets/screenshots/gp_deterministic_classification.png){ loading=lazy }
+![Classification output: CRITICAL severity badge with section type label — produced by an LLM call against a fixed materiality rubric, logged with reasoning for audit](assets/screenshots/gp_deterministic_classification.png){ loading=lazy }
 
 ---
 
@@ -123,8 +123,8 @@ The governance pipeline is sequential by design. Each stage has a defined respon
 |-----------|-----------|---------------------|
 | Application Framework | Flask (Python) | Explicit, auditable request handling; no magic |
 | Database | SQLite (development) / PostgreSQL (production) | ACID transactions; append-only tables for audit data |
-| LLM Provider | Groq API (LLaMA 3.3 70B, temperature=0.1) | Near-deterministic extraction; fast inference for structured output |
-| Semantic Engine | Regex pattern library (deterministic) | Reproducible classification; full reasoning traceability |
+| LLM Provider (extraction) | Groq API (LLaMA 3.3 70B, temperature=0.1) | Near-deterministic extraction; fast inference for structured output |
+| Semantic Engine (classification) | Anthropic Claude API (claude-sonnet-4-6, temperature=0.0) | Rubric-constrained classification; reasoning logged for audit; advisory only, never gates the review queue; separate vendor from extraction bounds simultaneous-outage risk |
 | Alerting | Slack Webhooks (region-routed) | Direct notification to regional accountability owners |
 | Scheduler | APScheduler (in-process cron) | Configurable schedule with misfire recovery |
 
@@ -139,7 +139,7 @@ The governance pipeline is sequential by design. Each stage has a defined respon
 | [Service Architecture](architecture/services.md) | Engineering Teams | Service boundaries, dependency model, transaction ownership |
 | [Ingestion Layer](modules/ingestion.md) | Platform Engineers | Source reliability, snapshot integrity, failure isolation |
 | [LLM Extraction](modules/llm-extraction.md) | Engineers, Compliance Leads | AI trust boundaries, confidence model, extraction governance |
-| [Semantic Reconciliation](modules/semantic-reconciliation.md) | Compliance Leadership, Architects | Deterministic classification rationale, materiality framework |
+| [Semantic Reconciliation](modules/semantic-reconciliation.md) | Compliance Leadership, Architects | LLM classification rationale, materiality framework, fail-open behavior |
 | [Review & Governance Workflow](modules/review-workflow.md) | Compliance Analysts, Leads, Auditors | Governance protocol, reviewer accountability, publishing safety |
 | [Provenance & Audit Trail](modules/provenance.md) | Auditors, Legal, Compliance Leads | Chain of custody, audit readiness, historical reconstruction |
 | [Temporal Versioning](modules/temporal-versioning.md) | Legal, Auditors, Advisors | Point-in-time queries, version integrity, dispute evidence |

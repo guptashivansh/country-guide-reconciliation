@@ -6,6 +6,8 @@ from app.extraction.groq_extraction_service import GroqExtractionService
 from app.ingestion.html_ingestion_service import HtmlIngestionService
 from app.ingestion.ingestion_job_service import IngestionJobService
 from app.ingestion.source_snapshot_service import SourceSnapshotService
+from app.llm.claude_provider import ClaudeProvider
+from app.reconciliation.llm_reconciliation_service import LLMReconciliationEngine
 from app.reconciliation.reconciliation_service import ReconciliationService
 from app.repositories.country_guide_repository import CountryGuideRepository
 from app.repositories.ingestion_job_repository import IngestionJobRepository
@@ -18,7 +20,7 @@ from app.services.provenance_service import ProvenanceService
 from app.services.temporal_rule_service import TemporalRuleService
 from app.drift.detector import DriftDetector
 from app.drift.repository import DriftRepository
-from app.utils.config import database_path, extraction_chunk_size, groq_api_keys, load_env_file, official_sources_json_url, slack_webhook_url, sync_cron_schedule, parser_version  # noqa: E501
+from app.utils.config import anthropic_api_keys, database_path, extraction_chunk_size, groq_api_keys, load_env_file, official_sources_json_url, slack_webhook_url, sync_cron_schedule, parser_version  # noqa: E501
 from app.utils.db import Database
 from app.utils.logging_config import configure_logging
 
@@ -58,7 +60,10 @@ def build_services(db_path=None):
             groq_api_keys(),
             chunker=ContentChunker(max_chunk_size=extraction_chunk_size()),
         ),
-        "reconciliation_service": ReconciliationService(country_guide_repository),
+        "reconciliation_service": ReconciliationService(
+            country_guide_repository,
+            reconciliation_engine=LLMReconciliationEngine(ClaudeProvider(anthropic_api_keys())),
+        ),
     }
 
 
