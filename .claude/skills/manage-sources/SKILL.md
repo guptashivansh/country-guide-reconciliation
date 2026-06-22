@@ -1,11 +1,21 @@
 ---
 name: manage-sources
 description: >
-  List, inspect, add, update, fix, and remove official government source endpoints in
-  data/official-sources.json and sync changes to the live database.
-  Use when the user asks to: view sources, list endpoints, check which government sites are
-  monitored, see source coverage, add a new country or endpoint, fix a broken URL, remove a
-  stale source, update source metadata, or reseed/resync the source registry from the JSON file.
+  Official government source registry — look up, list, add, update, fix, and remove source
+  endpoints in data/official-sources.json and sync changes to the live database.
+
+  Trigger on ANY of these:
+  - Lookup queries: "What is the official website for employment law in Singapore?",
+    "Where can I find UAE work permit rules?", "Which authority handles tax in India?",
+    "Give me official sources for labour law in Australia", "What government site covers
+    social security in the Philippines?"
+  - Source management: view sources, list endpoints, check which government sites are monitored,
+    see source coverage, add a new country or endpoint, fix a broken URL, remove a stale source,
+    update source metadata, reseed/resync the source registry
+  - Country + domain compliance source questions for any of the 87 covered countries
+  - Questions about which government authority or portal covers a compliance matter
+  - Any question asking for an official government URL for employment, tax, immigration,
+    legislation, or workplace safety
 ---
 
 # Manage Sources — Agentic Skill
@@ -24,24 +34,60 @@ source_countries / source_authorities / source_endpoints / parser_registry   ←
 sync pipeline crawls endpoints → extraction → reconciliation → review queue
 ```
 
+## Domains covered
+
+| Domain Key | Covers |
+|---|---|
+| `labour_employment` | Employment law, minimum wage, termination, leave entitlements, disputes |
+| `legislative` | National Acts, statutes, official gazettes, legislation databases |
+| `tax_social_security` | Income tax, payroll, VAT/GST, pension, social insurance contributions |
+| `immigration_work_permits` | Work visas, work permits, residency, employer obligations |
+| `workplace_safety` | OSH legislation, regulators, incident reporting, codes of practice |
+
 ## Step 0 — Understand the request
 
 Classify the user's intent:
 
 | Intent | Action |
 |---|---|
-| **List / inspect** sources | Read the DB via the API or the JSON file |
+| **Look up** a source for a country + domain | Read the JSON → answer (Step 1a) |
+| **List / inspect** sources | Read the DB via the API or the JSON file (Step 1b) |
 | **Add** a country, authority, or endpoint | Edit the JSON, then reseed |
 | **Update** a URL, metadata, or sections | Edit the JSON, then reseed |
 | **Remove** an entry | Edit the JSON, then reseed |
 | **Fix** a broken URL | Edit the JSON, then reseed |
 | **Reseed** the DB from JSON | Run the reseed script only |
-| **Look up** what authority covers a domain for a country | Read the JSON |
 
 For any mutation: **always edit `data/official-sources.json` first, then reseed.** Never
 edit the database directly — the JSON is the source of truth.
 
-## Step 1 — Read current state
+## Step 1a — Answer a lookup query
+
+When the user asks "What is the official source for X in country Y?" or similar:
+
+1. Read `data/official-sources.json`
+2. Find the authority for that country + domain; present its **name**, **website_url**, and **notes**
+3. List the most relevant `source_endpoints` with their `url` and `sections_covered`
+4. Always include the direct URL — never paraphrase it away
+
+### Presentation rules
+
+- **Single country**: Bold the authority name, show URL on its own line, then list 1-3 relevant endpoints
+- **Multiple countries**: Present as a comparison table: Country | Authority | URL | Key Notes
+- **`escalation_required: true`**: Add a warning — "Verify this URL before use — this portal restructures without notice."
+- **`precedence_rank`**: When multiple authorities cover the same domain, show rank 1 first. Rank 2+ are secondary — mention but don't lead with them.
+- **`supports_replay: false`**: Flag — "Content may not be available online; check directly or contact the authority."
+- **Country not in database**: State clearly that it is not yet covered. Suggest the general government portal as a starting point. Do NOT fabricate URLs.
+
+### Example queries this handles
+
+- "What is the official website for employment law in Singapore?"
+- "Where can I find the UAE work permit rules for foreign employees?"
+- "What government site covers tax and social security for employers in the Philippines?"
+- "Give me the official sources for labour law and immigration in India and Australia"
+- "What authority handles work visas in New Zealand?"
+
+## Step 1b — Read current state (for list/inspect/management)
 
 For listing / inspecting, use the running API if the server is up:
 
