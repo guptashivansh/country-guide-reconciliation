@@ -70,5 +70,50 @@ def sync_cron_schedule():
     return os.environ.get("SYNC_CRON_SCHEDULE", "")
 
 
+def groq_model():
+    return os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile")
+
+
+def claude_model():
+    return os.environ.get("CLAUDE_MODEL", "claude-sonnet-4-6")
+
+
+def gemini_api_key():
+    return os.environ.get("GEMINI_API_KEY")
+
+
+def gemini_api_keys():
+    multi = os.environ.get("GEMINI_API_KEYS", "")
+    keys = [k.strip().strip("'").strip('"') for k in multi.split(",") if k.strip()]
+    if not keys and gemini_api_key():
+        keys = [gemini_api_key()]
+    return keys
+
+
+def gemini_model():
+    return os.environ.get("GEMINI_MODEL", "gemini-2.0-flash")
+
+
 def parser_version():
-    return os.environ.get("PARSER_VERSION", "groq/llama-3.3-70b-versatile/v1")
+    return os.environ.get("PARSER_VERSION", f"groq/{groq_model()}/v1")
+
+
+def ingestion_timeout():
+    return int(os.environ.get("INGESTION_TIMEOUT", "30"))
+
+
+def ingestion_max_retries():
+    return int(os.environ.get("INGESTION_MAX_RETRIES", "2"))
+
+
+def ingestion_strip_tags():
+    default = "script,style,nav,footer,header,aside"
+    return [t.strip() for t in os.environ.get("INGESTION_STRIP_TAGS", default).split(",")]
+
+
+def ingestion_min_line_length():
+    return int(os.environ.get("INGESTION_MIN_LINE_LENGTH", "30"))
+
+
+def ingestion_max_content_length():
+    return int(os.environ.get("INGESTION_MAX_CONTENT_LENGTH", "6000"))

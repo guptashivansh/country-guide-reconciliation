@@ -1,7 +1,7 @@
 from dataclasses import dataclass, asdict, field
 from typing import Optional, List
 
-SEVERITY_ORDER = {"CRITICAL": 3, "WARNING": 2, "INFO": 1, "NONE": 0}
+from app.drift.constants import SEVERITY_ORDER
 
 
 @dataclass

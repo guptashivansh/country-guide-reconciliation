@@ -17,6 +17,7 @@ from app.drift.report import (
     build_recommended_action,
     build_summary,
 )
+from app.drift.constants import SEVERITY_ORDER
 from app.drift.repository import DriftRepository
 from app.drift.rules import DEFAULT_CANONICAL_RULES, DEFAULT_PENDING_RULES
 
@@ -27,10 +28,17 @@ class DriftDetector:
         repository: DriftRepository,
         pending_rules=None,
         canonical_rules=None,
+        config_service=None,
     ):
         self.repository = repository
         self.pending_rules = pending_rules if pending_rules is not None else DEFAULT_PENDING_RULES
         self.canonical_rules = canonical_rules if canonical_rules is not None else DEFAULT_CANONICAL_RULES
+        self._config_service = config_service
+
+    def _get_thresholds(self):
+        if self._config_service:
+            return self._config_service.get_drift_thresholds()
+        return None
 
     # ── public API ─────────────────────────────────────────────────────────────
 
@@ -62,7 +70,7 @@ class DriftDetector:
         if not pending_items:
             return []
 
-        # Build canonical lookup by section
+        thresholds = self._get_thresholds()
         entries = {e["section"]: e for e in self.repository.get_canonical_entries(country)}
 
         records = []
@@ -70,7 +78,7 @@ class DriftDetector:
             section = item.get("section", "")
             current_entry = entries.get(section)
             for rule in self.pending_rules:
-                result = rule(section, current_entry, item, now)
+                result = rule(section, current_entry, item, now, thresholds=thresholds)
                 if result is not None:
                     records.append(result)
         return records
@@ -80,6 +88,7 @@ class DriftDetector:
         if not entries:
             return []
 
+        thresholds = self._get_thresholds()
         provenances = self.repository.get_all_provenances(country)
 
         records = []
@@ -87,15 +96,13 @@ class DriftDetector:
             section = entry["section"]
             prov = provenances.get(section)
             for rule in self.canonical_rules:
-                result = rule(section, entry, prov, now)
+                result = rule(section, entry, prov, now, thresholds=thresholds)
                 if result is not None:
                     records.append(result)
         return records
 
 
 # ── helpers ────────────────────────────────────────────────────────────────────
-
-_SEVERITY_RANK = {"CRITICAL": 3, "WARNING": 2, "INFO": 1}
 
 
 def _deduplicate(records: List[DriftRecord]) -> List[DriftRecord]:
@@ -104,6 +111,6 @@ def _deduplicate(records: List[DriftRecord]) -> List[DriftRecord]:
     for rec in records:
         key = (rec.section, rec.drift_type)
         existing = best.get(key)
-        if existing is None or _SEVERITY_RANK.get(rec.severity, 0) > _SEVERITY_RANK.get(existing.severity, 0):
+        if existing is None or SEVERITY_ORDER.get(rec.severity, 0) > SEVERITY_ORDER.get(existing.severity, 0):
             best[key] = rec
     return list(best.values())

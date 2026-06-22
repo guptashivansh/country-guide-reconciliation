@@ -2526,7 +2526,7 @@ input:focus, button:focus, select:focus, textarea:focus, [tabindex]:focus { outl
 // ═══════════════════════════════════════════════════
 //  CONSTANTS & STATE
 // ═══════════════════════════════════════════════════
-const FLAGS = {"Argentina":"🇦🇷","Australia":"🇦🇺","Austria":"🇦🇹","Azerbaijan":"🇦🇿","Bahrain":"🇧🇭","Bangladesh":"🇧🇩","Belgium":"🇧🇪","Belize":"🇧🇿","Bolivia":"🇧🇴","Bosnia And Herzegovina":"🇧🇦","Botswana":"🇧🇼","Brazil":"🇧🇷","Bulgaria":"🇧🇬","Cameroon":"🇨🇲","Canada":"🇨🇦","Chile":"🇨🇱","China":"🇨🇳","Colombia":"🇨🇴","Congo (Republic of Congo)":"🇨🇬","Costa Rica":"🇨🇷","Croatia":"🇭🇷","Cyprus":"🇨🇾","Czech Republic":"🇨🇿","Denmark":"🇩🇰","Dominican Republic":"🇩🇴","Egypt":"🇪🇬","Estonia":"🇪🇪","France":"🇫🇷","Georgia":"🇬🇪","Germany":"🇩🇪","Ghana":"🇬🇭","Greece":"🇬🇷","Guatemala":"🇬🇹","Hong Kong":"🇭🇰","Hungary":"🇭🇺","India":"🇮🇳","Indonesia":"🇮🇩","Israel":"🇮🇱","Italy":"🇮🇹","Jamaica":"🇯🇲","Japan":"🇯🇵","Jordan":"🇯🇴","Kenya":"🇰🇪","Kuwait":"🇰🇼","Lebanon":"🇱🇧","Lithuania":"🇱🇹","Luxembourg":"🇱🇺","Madagascar":"🇲🇬","Malawi":"🇲🇼","Malaysia":"🇲🇾","Malta":"🇲🇹","Mauritius":"🇲🇺","Mexico":"🇲🇽","Morocco":"🇲🇦","Nepal":"🇳🇵","Netherlands":"🇳🇱","New Zealand":"🇳🇿","Nicaragua":"🇳🇮","Nigeria":"🇳🇬","Norway":"🇳🇴","Oman":"🇴🇲","Pakistan":"🇵🇰","Panama":"🇵🇦","Paraguay":"🇵🇾","Peru":"🇵🇪","Philippines":"🇵🇭","Poland":"🇵🇱","Portugal":"🇵🇹","Puerto Rico":"🇵🇷","Qatar":"🇶🇦","Romania":"🇷🇴","Rwanda":"🇷🇼","Saudi Arabia":"🇸🇦","Serbia":"🇷🇸","Singapore":"🇸🇬","Slovakia":"🇸🇰","South Africa":"🇿🇦","South Korea":"🇰🇷","Spain":"🇪🇸","Sri Lanka":"🇱🇰","Switzerland":"🇨🇭","Taiwan":"🇹🇼","Thailand":"🇹🇭","Turkey":"🇹🇷","UAE":"🇦🇪","Uganda":"🇺🇬","Ukraine":"🇺🇦","United Kingdom":"🇬🇧","United States":"🇺🇸","Vietnam":"🇻🇳"};
+let FLAGS = {};
 const SECTION_LABELS = {annual_leave:"Annual Leave",sick_leave:"Sick Leave",maternity_leave:"Maternity Leave",public_holidays:"Public Holidays",working_hours:"Working Hours",overtime:"Overtime",probation:"Probation",minimum_wage:"Minimum Wage",income_tax:"Income Tax",payroll_tax:"Payroll Tax",withholding_tax:"Withholding Tax",health_insurance:"Health Insurance",social_security:"Social Security",pension:"Pension",employee_benefits:"Employee Benefits",termination_notice:"Termination Notice",employer_obligations:"Employer Obligations",industrial_relations:"Industrial Relations",work_permit:"Work Permit",work_visa:"Work Visa",expatriate_employment:"Expatriate Employment",workplace_safety:"Workplace Safety",osh_obligations:"OSH Obligations"};
 
 let DATA = { queue: [], audit: [], drift: [], jobs: [], metrics: {} };
@@ -2576,13 +2576,15 @@ function extractPath(url) {
 //  DATA LOADING
 // ═══════════════════════════════════════════════════
 async function loadAll() {
-  const [metrics, queue, audit, drift, jobs] = await Promise.all([
+  const [metrics, queue, audit, drift, jobs, flags] = await Promise.all([
     fetch('/api/metrics').then(r=>r.json()).catch(()=>({})),
     fetch('/api/queue').then(r=>r.json()).catch(()=>[]),
     fetch('/api/audit').then(r=>r.json()).catch(()=>[]),
     fetch('/api/drift').then(r=>r.json()).catch(()=>[]),
     fetch('/api/ingestion-jobs').then(r=>r.json()).catch(()=>[]),
+    fetch('/api/flags').then(r=>r.json()).catch(()=>({})),
   ]);
+  FLAGS = flags;
   DATA = { metrics, queue, audit, drift, jobs };
   renderAll();
 }

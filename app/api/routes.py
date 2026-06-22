@@ -4,85 +4,11 @@ from datetime import datetime
 from flask import Blueprint, abort, jsonify, redirect, render_template, request, url_for
 from app.services.sync_service import run_sync, run_single_job
 from app.services.slack_service import send_sync_alert
-from app.utils.config import slack_webhook_url
+from app.utils.config import groq_model, slack_webhook_url
+from app.utils.flags import build_flags_map, country_flag
 
 
 logger = logging.getLogger(__name__)
-
-FLAGS = {
-    "Argentina": "🇦🇷", "Australia": "🇦🇺", "Austria": "🇦🇹",
-    "Azerbaijan": "🇦🇿", "Bahrain": "🇧🇭", "Bangladesh": "🇧🇩",
-    "Belgium": "🇧🇪", "Belize": "🇧🇿", "Bolivia": "🇧🇴",
-    "Bosnia And Herzegovina": "🇧🇦", "Botswana": "🇧🇼", "Brazil": "🇧🇷",
-    "Bulgaria": "🇧🇬", "Cameroon": "🇨🇲", "Chile": "🇨🇱",
-    "China": "🇨🇳", "Colombia": "🇨🇴", "Congo (Republic of Congo)": "🇨🇬",
-    "Costa Rica": "🇨🇷", "Croatia": "🇭🇷", "Cyprus": "🇨🇾",
-    "Czech Republic": "🇨🇿", "Denmark": "🇩🇰", "Dominican Republic": "🇩🇴",
-    "Egypt": "🇪🇬", "Estonia": "🇪🇪", "France": "🇫🇷",
-    "Georgia": "🇬🇪", "Germany": "🇩🇪", "Ghana": "🇬🇭",
-    "Greece": "🇬🇷", "Guatemala": "🇬🇹", "Hong Kong": "🇭🇰",
-    "Hungary": "🇭🇺", "India": "🇮🇳", "Indonesia": "🇮🇩",
-    "Ireland": "🇮🇪", "Israel": "🇮🇱", "Jamaica": "🇯🇲", "Japan": "🇯🇵",
-    "Jordan": "🇯🇴", "Kenya": "🇰🇪", "Kuwait": "🇰🇼",
-    "Lebanon": "🇱🇧", "Lithuania": "🇱🇹", "Luxembourg": "🇱🇺",
-    "Madagascar": "🇲🇬", "Malawi": "🇲🇼", "Malaysia": "🇲🇾",
-    "Malta": "🇲🇹", "Mauritius": "🇲🇺", "Mexico": "🇲🇽",
-    "Morocco": "🇲🇦", "Nepal": "🇳🇵", "Netherlands": "🇳🇱",
-    "New Zealand": "🇳🇿", "Nicaragua": "🇳🇮", "Nigeria": "🇳🇬",
-    "Norway": "🇳🇴", "Oman": "🇴🇲", "Pakistan": "🇵🇰",
-    "Panama": "🇵🇦", "Paraguay": "🇵🇾", "Peru": "🇵🇪",
-    "Philippines": "🇵🇭", "Poland": "🇵🇱", "Portugal": "🇵🇹",
-    "Puerto Rico": "🇵🇷", "Qatar": "🇶🇦", "Romania": "🇷🇴",
-    "Rwanda": "🇷🇼", "Saudi Arabia": "🇸🇦", "Serbia": "🇷🇸",
-    "Singapore": "🇸🇬", "Slovakia": "🇸🇰", "South Africa": "🇿🇦",
-    "South Korea": "🇰🇷", "Spain": "🇪🇸", "Sri Lanka": "🇱🇰",
-    "Switzerland": "🇨🇭", "Taiwan": "🇹🇼", "Thailand": "🇹🇭",
-    "Turkey": "🇹🇷", "UAE": "🇦🇪", "Uganda": "🇺🇬",
-    "Ukraine": "🇺🇦", "United Kingdom": "🇬🇧", "Vietnam": "🇻🇳",
-}
-
-SECTION_GROUPS = [
-    {"id": "leave",        "label": "Leave & Time Off",       "sections": [
-        "annual_leave", "sick_leave", "maternity_leave", "paternity_leave",
-        "parental_leave", "adoption_leave", "childcare_leave",
-        "compassionate_leave", "bereavement_leave", "public_holidays",
-        "casual_leave", "personal_leave", "study_leave", "care_leave",
-        "other_leaves", "leave_carry_forward",
-    ]},
-    {"id": "hours",        "label": "Working Hours",           "sections": [
-        "working_hours", "overtime", "probation",
-        "notice_period_probation", "training_hours",
-    ]},
-    {"id": "compensation", "label": "Compensation",            "sections": [
-        "minimum_wage", "payout_currency", "income_tax",
-        "employer_cost", "additional_employer_costs",
-        "annual_bonus", "thirteenth_month_pay", "festival_bonus",
-        "holiday_bonus", "holiday_pay", "holiday_pay_allowance", "vacation_premium",
-        "overtime_pay", "end_of_service_benefit", "severance_accrual",
-        "seniority_bonus", "profit_sharing", "long_service_pay",
-        "payroll_tax", "withholding_tax", "vat",
-    ]},
-    {"id": "benefits",     "label": "Benefits & Social Security", "sections": [
-        "health_insurance", "public_health_insurance", "private_health_insurance",
-        "social_security", "pension", "mandatory_pension",
-        "life_insurance", "severance_fund", "employee_benefits",
-    ]},
-    {"id": "employment",   "label": "Employment Terms",        "sections": [
-        "termination_notice", "termination_scenarios", "severance_payable",
-        "redundancy_allowance", "employer_obligations", "industrial_relations",
-        "contract_durations",
-    ]},
-    {"id": "onboarding",   "label": "Onboarding & Dates",      "sections": [
-        "onboarding_time", "onboarding_health_insurance", "device_shipment",
-        "additional_onboarding_requirement", "pay_date", "expenses_cutoff", "onboarding_cutoff",
-    ]},
-    {"id": "immigration",  "label": "Immigration",             "sections": [
-        "work_permit", "work_visa", "expatriate_employment",
-    ]},
-    {"id": "safety",       "label": "Workplace Safety",        "sections": [
-        "workplace_safety", "osh_obligations", "health_and_safety",
-    ]},
-]
 
 
 def _fmt_date(iso):
@@ -102,13 +28,31 @@ def _review_payload():
     }
 
 
-def create_api_blueprint(review_service, source_registry_service, ingestion_service, source_snapshot_service, ingestion_job_service, extraction_service, reconciliation_service, provenance_service=None, temporal_rule_service=None, drift_detector=None):
+def create_api_blueprint(review_service, source_registry_service, ingestion_service, source_snapshot_service, ingestion_job_service, extraction_service, reconciliation_service, provenance_service=None, temporal_rule_service=None, drift_detector=None, config_service=None):
     routes = Blueprint("country_guide_routes", __name__)
+
+    def _flags():
+        if config_service:
+            return build_flags_map(config_service.get_country_iso_codes())
+        return {}
+
+    def _flag(country_name):
+        return _flags().get(country_name, country_flag(country_name))
+
+    def _section_groups():
+        if config_service:
+            return config_service.get_section_groups()
+        return []
+
+    def _sections_for_view(view_name):
+        if config_service:
+            return config_service.get_sections_for_view(view_name)
+        return set()
 
     @routes.route("/")
     def home():
         countries = [
-            {"name": r["country"], "flag": FLAGS.get(r["country"], "🌐")}
+            {"name": r["country"], "flag": _flag(r["country"])}
             for r in review_service.list_countries_summary()
         ]
         return render_template("home.html", countries=countries)
@@ -124,7 +68,7 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
     @routes.route("/guide")
     def guide_list():
         countries = [
-            {"name": r["country"], "flag": FLAGS.get(r["country"], "🌐"),
+            {"name": r["country"], "flag": _flag(r["country"]),
              "rule_count": r["rule_count"], "last_updated": _fmt_date(r["last_updated"])}
             for r in review_service.list_countries_summary()
         ]
@@ -140,7 +84,7 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
         last_updated = _fmt_date(max(r["last_updated"] for r in rows))
 
         groups = []
-        for g in SECTION_GROUPS:
+        for g in _section_groups():
             group_rules = [rules_by_section[s] for s in g["sections"] if s in rules_by_section]
             if group_rules:
                 groups.append({"id": g["id"], "label": g["label"], "rules": group_rules})
@@ -150,7 +94,7 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
         return render_template(
             "guide_country.html",
             country=country,
-            flag=FLAGS.get(country, "🌐"),
+            flag=_flag(country),
             rule_count=len(rows),
             last_updated=last_updated,
             groups=groups,
@@ -463,12 +407,8 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
         return render_template(
             "employee.html",
             country=country,
-            flag=FLAGS.get(country, "🌐"),
+            flag=_flag(country),
         )
-
-    EMPLOYEE_SECTIONS = {"leave", "hours", "compensation", "benefits", "onboarding"}
-    CLIENT_SECTIONS = {"leave", "hours", "compensation", "benefits", "employment", "immigration", "onboarding"}
-    OPS_SECTIONS = {"leave", "hours", "compensation", "benefits", "employment", "immigration", "safety", "onboarding"}
 
     def _build_guide_context(country, allowed_group_ids):
         rows = review_service.get_country_sections(country)
@@ -477,7 +417,7 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
         rules_by_section = {r["section"]: {"section": r["section"], "value": r["value"], "last_updated": _fmt_date(r["last_updated"])} for r in rows if (r["value"] or "").strip()}
         last_updated = _fmt_date(max(r["last_updated"] for r in rows))
         groups = []
-        for g in SECTION_GROUPS:
+        for g in _section_groups():
             if g["id"] not in allowed_group_ids:
                 continue
             group_rules = [rules_by_section[s] for s in g["sections"] if s in rules_by_section]
@@ -485,28 +425,25 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
                 groups.append({"id": g["id"], "label": g["label"], "rules": group_rules})
         return {
             "country": country,
-            "flag": FLAGS.get(country, "🌐"),
+            "flag": _flag(country),
             "rule_count": sum(len(g["rules"]) for g in groups),
             "last_updated": last_updated,
             "groups": groups,
         }
 
-    VIEW_CONFIG = {
-        "employee": {"sections": EMPLOYEE_SECTIONS, "label": "Employee"},
-        "client":   {"sections": CLIENT_SECTIONS,   "label": "Client"},
-        "ops":      {"sections": OPS_SECTIONS,       "label": "Ops"},
-    }
+    _VIEW_LABELS = {"employee": "Employee", "client": "Client", "ops": "Ops"}
 
     @routes.route("/guide/<view>/<country>")
     def guide_view(view, country):
-        cfg = VIEW_CONFIG.get(view)
-        if not cfg:
+        view_label = _VIEW_LABELS.get(view)
+        if not view_label:
             abort(404)
-        ctx = _build_guide_context(country, cfg["sections"])
+        allowed = _sections_for_view(view)
+        ctx = _build_guide_context(country, allowed)
         if not ctx:
             abort(404)
         notes = review_service.get_country_notes(country) if view == "ops" else {"content": "", "updated_at": None}
-        return render_template("guide_view.html", view=view, view_label=cfg["label"], notes=notes, **ctx)
+        return render_template("guide_view.html", view=view, view_label=view_label, notes=notes, **ctx)
 
     @routes.route("/api/employee/guide/<country>")
     def api_employee_guide(country):
@@ -515,7 +452,7 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
             return jsonify({"error": "Country not found"}), 404
         rules_by_section = {r["section"]: r for r in rows}
         groups = []
-        for g in SECTION_GROUPS:
+        for g in _section_groups():
             group_rules = []
             for s in g["sections"]:
                 r = rules_by_section.get(s)
@@ -530,7 +467,7 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
                 groups.append({"id": g["id"], "label": g["label"], "rules": group_rules})
         return jsonify({
             "country": country,
-            "flag": FLAGS.get(country, "🌐"),
+            "flag": _flag(country),
             "last_updated": _fmt_date(max(r["last_updated"] for r in rows)),
             "rule_count": len(rows),
             "groups": groups,
@@ -550,7 +487,7 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
                 return jsonify({"error": "GROQ_API_KEY is not set. Get a free key at console.groq.com then run: export GROQ_API_KEY=your_key"}), 501
             client = Groq(api_key=keys[0])
             chat = client.chat.completions.create(
-                model="llama-3.3-70b-versatile",
+                model=groq_model(),
                 max_tokens=512,
                 messages=[{"role": "user", "content": prompt}],
             )
@@ -597,19 +534,19 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
 
     @routes.route("/compliance/intake")
     def compliance_intake_select():
-        return render_template("compliance_intake_select.html", nav_active="intake", flags=FLAGS)
+        return render_template("compliance_intake_select.html", nav_active="intake", flags=_flags())
 
     @routes.route("/intake/<country>")
     def compliance_intake_country(country):
-        return render_template("compliance_intake.html", nav_active="intake", flags=FLAGS, country=country, flag=FLAGS.get(country, "🌐"))
+        return render_template("compliance_intake.html", nav_active="intake", flags=_flags(), country=country, flag=_flag(country))
 
     @routes.route("/compliance/intake/pdf")
     def compliance_intake_pdf():
         return render_template(
             "compliance_intake_pdf.html",
             nav_active="intake",
-            flags=FLAGS,
-            sections=[{"id": g["id"], "label": g["label"], "sections": g["sections"]} for g in SECTION_GROUPS],
+            flags=_flags(),
+            sections=[{"id": g["id"], "label": g["label"], "sections": g["sections"]} for g in _section_groups()],
         )
 
     @routes.route("/compliance/pipeline")
@@ -746,5 +683,176 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
         jobs = ingestion_job_service.list_recent_jobs(limit=100)
         pdfs = [j for j in jobs if (j.get("source_url") or "").startswith("pdf://")]
         return jsonify(pdfs)
+
+    @routes.route("/api/flags")
+    def api_flags():
+        return jsonify(_flags())
+
+    # ── Configuration CRUD API ────────────────────────────────────────────────
+
+    @routes.route("/api/config/sections")
+    def config_sections():
+        if not config_service:
+            return jsonify({"error": "config service not available"}), 503
+        return jsonify(config_service.get_section_groups())
+
+    @routes.route("/api/config/sections", methods=["POST"])
+    def config_create_section():
+        if not config_service:
+            return jsonify({"error": "config service not available"}), 503
+        data = request.get_json(silent=True) or {}
+        section_id = (data.get("id") or "").strip()
+        display_name = (data.get("display_name") or "").strip()
+        group_id = (data.get("group_id") or "").strip()
+        if not section_id or not display_name or not group_id:
+            return jsonify({"error": "id, display_name, and group_id are required"}), 400
+        config_service.create_section(section_id, display_name, group_id,
+                                      sort_order=data.get("sort_order", 0),
+                                      changed_by=data.get("changed_by", "api"))
+        return jsonify({"success": True, "id": section_id}), 201
+
+    @routes.route("/api/config/sections/<section_id>", methods=["PUT"])
+    def config_update_section(section_id):
+        if not config_service:
+            return jsonify({"error": "config service not available"}), 503
+        data = request.get_json(silent=True) or {}
+        result = config_service.update_section(
+            section_id,
+            changed_by=data.get("changed_by", "api"),
+            display_name=data.get("display_name"),
+            group_id=data.get("group_id"),
+            sort_order=data.get("sort_order"),
+            is_active=data.get("is_active"),
+        )
+        if not result:
+            return jsonify({"error": "section not found"}), 404
+        return jsonify({"success": True})
+
+    @routes.route("/api/config/section-groups", methods=["POST"])
+    def config_create_section_group():
+        if not config_service:
+            return jsonify({"error": "config service not available"}), 503
+        data = request.get_json(silent=True) or {}
+        group_id = (data.get("id") or "").strip()
+        label = (data.get("label") or "").strip()
+        if not group_id or not label:
+            return jsonify({"error": "id and label are required"}), 400
+        config_service.create_section_group(group_id, label,
+                                            sort_order=data.get("sort_order", 0),
+                                            changed_by=data.get("changed_by", "api"))
+        return jsonify({"success": True, "id": group_id}), 201
+
+    @routes.route("/api/config/section-groups/<group_id>", methods=["PUT"])
+    def config_update_section_group(group_id):
+        if not config_service:
+            return jsonify({"error": "config service not available"}), 503
+        data = request.get_json(silent=True) or {}
+        result = config_service.update_section_group(
+            group_id,
+            changed_by=data.get("changed_by", "api"),
+            label=data.get("label"),
+            sort_order=data.get("sort_order"),
+            is_active=data.get("is_active"),
+        )
+        if not result:
+            return jsonify({"error": "section group not found"}), 404
+        return jsonify({"success": True})
+
+    @routes.route("/api/config/view-roles/<view_name>", methods=["GET"])
+    def config_get_view_roles(view_name):
+        if not config_service:
+            return jsonify({"error": "config service not available"}), 503
+        groups = config_service.get_sections_for_view(view_name)
+        return jsonify({"view_name": view_name, "group_ids": sorted(groups)})
+
+    @routes.route("/api/config/view-roles/<view_name>", methods=["PUT"])
+    def config_set_view_roles(view_name):
+        if not config_service:
+            return jsonify({"error": "config service not available"}), 503
+        data = request.get_json(silent=True) or {}
+        group_ids = data.get("group_ids", [])
+        if not isinstance(group_ids, list):
+            return jsonify({"error": "group_ids must be a list"}), 400
+        config_service.set_view_role_sections(view_name, group_ids, changed_by=data.get("changed_by", "api"))
+        return jsonify({"success": True})
+
+    @routes.route("/api/config/rubrics")
+    def config_list_rubrics():
+        if not config_service:
+            return jsonify({"error": "config service not available"}), 503
+        return jsonify(config_service.list_classification_rubrics())
+
+    @routes.route("/api/config/rubrics/<country>", methods=["GET"])
+    def config_get_rubric(country):
+        if not config_service:
+            return jsonify({"error": "config service not available"}), 503
+        rubric = config_service.get_classification_rubric(country=country)
+        return jsonify({"country": country, "rubric_text": rubric})
+
+    @routes.route("/api/config/rubrics", methods=["PUT"])
+    def config_set_global_rubric():
+        if not config_service:
+            return jsonify({"error": "config service not available"}), 503
+        data = request.get_json(silent=True) or {}
+        rubric_text = (data.get("rubric_text") or "").strip()
+        if not rubric_text:
+            return jsonify({"error": "rubric_text is required"}), 400
+        config_service.set_classification_rubric(rubric_text, country=None, changed_by=data.get("changed_by", "api"))
+        return jsonify({"success": True})
+
+    @routes.route("/api/config/rubrics/<country>", methods=["PUT"])
+    def config_set_country_rubric(country):
+        if not config_service:
+            return jsonify({"error": "config service not available"}), 503
+        data = request.get_json(silent=True) or {}
+        rubric_text = (data.get("rubric_text") or "").strip()
+        if not rubric_text:
+            return jsonify({"error": "rubric_text is required"}), 400
+        config_service.set_classification_rubric(rubric_text, country=country, changed_by=data.get("changed_by", "api"))
+        return jsonify({"success": True})
+
+    @routes.route("/api/config/rubrics/<country>", methods=["DELETE"])
+    def config_delete_country_rubric(country):
+        if not config_service:
+            return jsonify({"error": "config service not available"}), 503
+        data = request.get_json(silent=True) or {}
+        config_service.delete_classification_rubric(country, changed_by=data.get("changed_by", "api"))
+        return jsonify({"success": True})
+
+    @routes.route("/api/config/<namespace>/<key>", methods=["GET"])
+    def config_get_entry(namespace, key):
+        if not config_service:
+            return jsonify({"error": "config service not available"}), 503
+        value = config_service.get_config(namespace, key)
+        if value is None:
+            return jsonify({"error": "config entry not found"}), 404
+        return jsonify({"namespace": namespace, "key": key, "value": value})
+
+    @routes.route("/api/config/<namespace>/<key>", methods=["PUT"])
+    def config_set_entry(namespace, key):
+        if not config_service:
+            return jsonify({"error": "config service not available"}), 503
+        data = request.get_json(silent=True) or {}
+        if "value" not in data:
+            return jsonify({"error": "value is required"}), 400
+        config_service.set_config(namespace, key, data["value"],
+                                  changed_by=data.get("changed_by", "api"),
+                                  reason=data.get("reason"))
+        return jsonify({"success": True})
+
+    @routes.route("/api/config/<namespace>", methods=["GET"])
+    def config_get_namespace(namespace):
+        if not config_service:
+            return jsonify({"error": "config service not available"}), 503
+        return jsonify(config_service.get_namespace(namespace))
+
+    @routes.route("/api/config/audit")
+    def config_audit_log():
+        if not config_service:
+            return jsonify({"error": "config service not available"}), 503
+        namespace = request.args.get("namespace")
+        key = request.args.get("key")
+        limit = int(request.args.get("limit", 50))
+        return jsonify(config_service.get_config_audit_log(namespace, key, limit))
 
     return routes

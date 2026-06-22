@@ -13,11 +13,12 @@ logger = logging.getLogger(__name__)
 
 
 class GroqExtractionService:
-    def __init__(self, api_keys, parser=None, chunker=None, aggregator=None, max_attempts=2):
+    def __init__(self, api_keys, parser=None, chunker=None, aggregator=None, max_attempts=2, model=None):
         if isinstance(api_keys, str):
             api_keys = [api_keys] if api_keys else []
         self._clients = [Groq(api_key=k) for k in api_keys if k]
         self._current = 0
+        self.model = model or "llama-3.3-70b-versatile"
         self.parser = parser or EmploymentRuleParser()
         self.chunker = chunker or ContentChunker()
         self.aggregator = aggregator or EmploymentRuleAggregator()
@@ -223,7 +224,7 @@ Content:
         for attempt in range(len(self._clients)):
             try:
                 response = self.client.chat.completions.create(
-                    model="llama-3.3-70b-versatile",
+                    model=self.model,
                     messages=[{"role": "user", "content": prompt}],
                     temperature=0.1,
                 )

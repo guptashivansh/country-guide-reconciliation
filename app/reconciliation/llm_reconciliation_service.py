@@ -26,9 +26,17 @@ non-substantive rewording only
 class LLMReconciliationEngine:
     """Classifies the materiality and type of a compliance rule change via an LLM call."""
 
-    def __init__(self, provider, max_attempts=2):
+    _DEFAULT_GUIDANCE = _CLASSIFICATION_GUIDANCE
+
+    def __init__(self, provider, max_attempts=2, config_service=None):
         self.provider = provider
         self.max_attempts = max_attempts
+        self._config_service = config_service
+
+    def _get_rubric(self, country=None):
+        if self._config_service:
+            return self._config_service.get_classification_rubric(country=country)
+        return self._DEFAULT_GUIDANCE
 
     def reconcile(self, old_rule, new_rule) -> SemanticReconciliationResult:
         old = self._coerce_rule(old_rule)
@@ -67,6 +75,7 @@ class LLMReconciliationEngine:
     def _build_prompt(self, old: CanonicalComplianceRule, new: CanonicalComplianceRule) -> str:
         country = old.country or new.country or "an unspecified jurisdiction"
         section = old.section or new.section or "unspecified"
+        rubric = self._get_rubric(country)
         return f"""
 You are a compliance analyst reviewing a proposed change to an employment rule for {country}.
 
@@ -88,7 +97,7 @@ REQUIREMENT_REMOVED, TIMELINE_CHANGE, NON_MATERIAL_FORMATTING
 - reasoning: an array of short strings explaining the classification
 
 Classification guidance:
-{_CLASSIFICATION_GUIDANCE}
+{rubric}
 
 Return ONLY valid JSON. No explanation. No markdown. No backticks.
 """.strip()

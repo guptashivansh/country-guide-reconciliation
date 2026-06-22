@@ -41,6 +41,15 @@ def _sev(item_severity: Optional[str]) -> str:
     return (item_severity or "minor").lower()
 
 
+def _threshold(thresholds, key, default):
+    if not thresholds:
+        return default
+    val = thresholds.get(key, default)
+    if isinstance(val, dict):
+        return val.get("value", default)
+    return val
+
+
 # ── Rule 1: pending change ──────────────────────────────────────────────────
 
 def pending_change_rule(
@@ -48,6 +57,7 @@ def pending_change_rule(
     current_entry: Optional[dict],
     pending_item: dict,
     now: datetime,
+    thresholds: Optional[dict] = None,
 ) -> Optional[DriftRecord]:
     """
     A pending review_queue item means the published guide may be out of date.
@@ -56,15 +66,18 @@ def pending_change_rule(
     if pending_item.get("status") != "pending":
         return None
 
+    pdc = _threshold(thresholds, "pending_days_critical", PENDING_DAYS_CRITICAL)
+    pdw = _threshold(thresholds, "pending_days_warning", PENDING_DAYS_WARNING)
+
     item_sev = _sev(pending_item.get("severity"))
     days = _days_since(pending_item.get("created_at"), now)
 
     if item_sev == "critical":
         severity = "CRITICAL"
     elif item_sev == "major":
-        severity = "CRITICAL" if (days or 0) >= PENDING_DAYS_CRITICAL else "WARNING"
+        severity = "CRITICAL" if (days or 0) >= pdc else "WARNING"
     else:
-        severity = "WARNING" if (days or 0) >= PENDING_DAYS_WARNING else "INFO"
+        severity = "WARNING" if (days or 0) >= pdw else "INFO"
 
     days_label = f"{days}d" if days is not None else "unknown"
     return DriftRecord(
@@ -96,6 +109,7 @@ def escalated_item_rule(
     current_entry: Optional[dict],
     pending_item: dict,
     now: datetime,
+    thresholds: Optional[dict] = None,
 ) -> Optional[DriftRecord]:
     """
     An escalated item that has been sitting too long signals a review bottleneck.
@@ -103,8 +117,9 @@ def escalated_item_rule(
     if pending_item.get("status") != "escalated":
         return None
 
+    edc = _threshold(thresholds, "escalated_days_critical", ESCALATED_DAYS_CRITICAL)
     days = _days_since(pending_item.get("created_at"), now)
-    severity = "CRITICAL" if (days or 0) >= ESCALATED_DAYS_CRITICAL else "WARNING"
+    severity = "CRITICAL" if (days or 0) >= edc else "WARNING"
 
     days_label = f"{days}d" if days is not None else "unknown"
     return DriftRecord(
@@ -129,6 +144,7 @@ def missing_section_rule(
     current_entry: Optional[dict],
     pending_item: dict,
     now: datetime,
+    thresholds: Optional[dict] = None,
 ) -> Optional[DriftRecord]:
     """
     A section exists in the review queue but has no entry in the live guide.
@@ -174,11 +190,16 @@ def stale_verification_rule(
     current_entry: dict,
     provenance: Optional[dict],
     now: datetime,
+    thresholds: Optional[dict] = None,
 ) -> Optional[DriftRecord]:
     """
     A rule that hasn't been re-verified against a live official source
     for a long time may be drifting from current regulation.
     """
+    sdc = _threshold(thresholds, "stale_days_critical", STALE_DAYS_CRITICAL)
+    sdw = _threshold(thresholds, "stale_days_warning", STALE_DAYS_WARNING)
+    sdi = _threshold(thresholds, "stale_days_info", STALE_DAYS_INFO)
+
     reference_ts = None
     if provenance:
         reference_ts = provenance.get("reviewed_at")
@@ -189,11 +210,11 @@ def stale_verification_rule(
     if days is None:
         return None
 
-    if days >= STALE_DAYS_CRITICAL:
+    if days >= sdc:
         severity = "CRITICAL"
-    elif days >= STALE_DAYS_WARNING:
+    elif days >= sdw:
         severity = "WARNING"
-    elif days >= STALE_DAYS_INFO:
+    elif days >= sdi:
         severity = "INFO"
     else:
         return None
@@ -220,6 +241,7 @@ def no_provenance_rule(
     current_entry: dict,
     provenance: Optional[dict],
     now: datetime,
+    thresholds: Optional[dict] = None,
 ) -> Optional[DriftRecord]:
     """
     A rule with no provenance record cannot be traced to a source.

@@ -3445,12 +3445,13 @@
   }
 
   // ── SYNC MODAL ──
-  const COUNTRIES = ['India','Australia','Singapore','South Africa','UAE','New Zealand','Philippines','Pakistan'];
-  const FLAGS = {India:'🇮🇳',Australia:'🇦🇺',Singapore:'🇸🇬','South Africa':'🇿🇦',UAE:'🇦🇪','New Zealand':'🇳🇿',Philippines:'🇵🇭',Pakistan:'🇵🇰'};
+  let FLAGS = {};
+  fetch('/api/flags').then(r=>r.json()).then(f => { FLAGS = f; }).catch(()=>{});
 
   function openSyncModal() {
     const grid = document.getElementById('countryGrid');
-    grid.innerHTML = COUNTRIES.map(c => `
+    const countries = Object.keys(FLAGS).sort();
+    grid.innerHTML = countries.map(c => `
       <div class="country-chip selected" id="chip-${c}" onclick="toggleChip('${c}')">
         <span>${FLAGS[c] || ''}</span> ${c}
       </div>
