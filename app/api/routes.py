@@ -518,7 +518,7 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
         except ImportError:
             return jsonify({"error": "groq SDK not installed. Run: pip install groq"}), 501
         except Exception as exc:
-            logger.exception("Ask Abdul Kalam AI error")
+            logger.exception("Ask Regulift error")
             return jsonify({"error": str(exc)}), 500
 
     @routes.route("/api/drift/<country>")

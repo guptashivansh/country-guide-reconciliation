@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Abdul Kalam AI · Compliance Intelligence</title>
+<title>Regulift · Compliance Intelligence</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -1942,8 +1942,8 @@ input:focus, button:focus, select:focus, textarea:focus, [tabindex]:focus { outl
 <!-- ─── App bar ─── -->
 <header class="appbar">
   <a href="/" class="brand" style="text-decoration:none;color:inherit">
-    <div class="brand-mark">A</div>
-    <span class="brand-name">Abdul Kalam AI</span>
+    <div class="brand-mark">R</div>
+    <span class="brand-name">Regulift</span>
     <span class="brand-slash">/</span>
     <span class="brand-tag">Compliance Intelligence</span>
   </a>
@@ -2322,7 +2322,7 @@ input:focus, button:focus, select:focus, textarea:focus, [tabindex]:focus { outl
 <!-- ─── Footer ─── -->
 <footer class="foot">
   <div class="left">
-    <span class="live"><span class="d"></span><span id="footerLabel">Abdul Kalam AI Compliance</span></span>
+    <span class="live"><span class="d"></span><span id="footerLabel">Regulift Compliance</span></span>
     <span>·</span><span>v0.7</span><span>·</span><span>not legal advice</span>
   </div>
   <div class="right">
@@ -3617,7 +3617,7 @@ async function runSync() {
 // ═══════════════════════════════════════════════════
 function renderFooter() {
   const m = DATA.metrics;
-  document.getElementById('footerLabel').textContent = `Abdul Kalam AI Compliance · ${m.trusted_source_count || 0} countries monitored`;
+  document.getElementById('footerLabel').textContent = `Regulift Compliance · ${m.trusted_source_count || 0} countries monitored`;
 }
 
 // ═══════════════════════════════════════════════════
@@ -3625,7 +3625,7 @@ function renderFooter() {
 // ═══════════════════════════════════════════════════
 async function doAction(action, id, extra) {
   try {
-    const payload = Object.assign({ notes: '', assignee: 'Abdul Kalam AI Compliance' }, extra || {});
+    const payload = Object.assign({ notes: '', assignee: 'Regulift Compliance' }, extra || {});
     const res = await fetch(`/api/${action}/${id}`, {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
@@ -3780,7 +3780,7 @@ async function bulkApproveSelected() {
       const res = await fetch('/api/approve/' + id, {
         method: 'POST',
         headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({ notes: 'Bulk approval from ops dashboard', assignee: 'Abdul Kalam AI Compliance' })
+        body: JSON.stringify({ notes: 'Bulk approval from ops dashboard', assignee: 'Regulift Compliance' })
       });
       const data = await res.json();
       if (data.success) approved++;
@@ -3941,7 +3941,7 @@ async function bulkMarkReviewed() {
   let count = 0;
   for (const id of selectedIds) {
     try {
-      const res = await fetch('/api/approve/' + id, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ notes:'Marked as reviewed', assignee:'Abdul Kalam AI Compliance' }) });
+      const res = await fetch('/api/approve/' + id, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ notes:'Marked as reviewed', assignee:'Regulift Compliance' }) });
       const data = await res.json();
       if (data.success) count++;
     } catch {}
@@ -3957,7 +3957,7 @@ async function bulkEscalate() {
   let count = 0;
   for (const id of selectedIds) {
     try {
-      const res = await fetch('/api/escalate/' + id, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ notes:'Bulk escalation', assignee:'Abdul Kalam AI Compliance' }) });
+      const res = await fetch('/api/escalate/' + id, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ notes:'Bulk escalation', assignee:'Regulift Compliance' }) });
       const data = await res.json();
       if (data.success) count++;
     } catch {}
@@ -3973,7 +3973,7 @@ async function bulkReject() {
   let count = 0;
   for (const id of selectedIds) {
     try {
-      const res = await fetch('/api/reject/' + id, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ notes:'Bulk rejection', assignee:'Abdul Kalam AI Compliance' }) });
+      const res = await fetch('/api/reject/' + id, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ notes:'Bulk rejection', assignee:'Regulift Compliance' }) });
       const data = await res.json();
       if (data.success) count++;
     } catch {}
