@@ -1,4 +1,5 @@
 import logging
+import time
 from datetime import datetime
 
 from flask import Blueprint, abort, jsonify, redirect, render_template, request, url_for
@@ -6,6 +7,22 @@ from app.services.sync_service import run_sync, run_single_job
 from app.services.slack_service import send_sync_alert
 from app.utils.config import groq_model, slack_webhook_url
 from app.utils.flags import build_flags_map, country_flag
+
+_drift_cache = {"data": None, "expires": 0}
+_DRIFT_CACHE_TTL = 60
+
+
+def warm_drift_cache(drift_detector):
+    import threading
+
+    def _warm():
+        import time as _t
+        reports = drift_detector.detect_all()
+        result = [r.to_dict() for r in reports]
+        _drift_cache["data"] = result
+        _drift_cache["expires"] = _t.monotonic() + _DRIFT_CACHE_TTL
+
+    threading.Thread(target=_warm, daemon=True).start()
 
 
 logger = logging.getLogger(__name__)
@@ -392,8 +409,14 @@ def create_api_blueprint(review_service, source_registry_service, ingestion_serv
     def get_drift_all():
         if not drift_detector:
             return jsonify({"error": "drift detector not configured"}), 503
+        now = time.monotonic()
+        if _drift_cache["data"] is not None and now < _drift_cache["expires"]:
+            return jsonify(_drift_cache["data"])
         reports = drift_detector.detect_all()
-        return jsonify([r.to_dict() for r in reports])
+        result = [r.to_dict() for r in reports]
+        _drift_cache["data"] = result
+        _drift_cache["expires"] = now + _DRIFT_CACHE_TTL
+        return jsonify(result)
 
     @routes.route("/client")
     def client_overview():

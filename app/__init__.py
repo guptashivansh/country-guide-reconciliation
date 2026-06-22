@@ -1,6 +1,6 @@
 from flask import Flask
 
-from app.api.routes import create_api_blueprint
+from app.api.routes import create_api_blueprint, warm_drift_cache
 from app.extraction.content_chunker import ContentChunker
 from app.extraction.groq_extraction_service import GroqExtractionService
 from app.ingestion.html_ingestion_service import HtmlIngestionService
@@ -117,5 +117,7 @@ def create_app(db_path=None):
     if cron:
         from app.services.scheduler_service import start_scheduler
         start_scheduler(flask_app, services, cron, slack_webhook_url())
+
+    warm_drift_cache(services["drift_detector"])
 
     return flask_app
