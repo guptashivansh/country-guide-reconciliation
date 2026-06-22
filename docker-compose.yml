@@ -6,10 +6,10 @@ services:
     env_file:
       - .env
     environment:
-      - DATABASE_URL=${DATABASE_URL:-}
-      - COUNTRY_GUIDE_DB=/app/data/country_guides.db
-    volumes:
-      - app-data:/app/data
+      - DATABASE_URL=postgresql://regulift:${POSTGRES_PASSWORD:-regulift}@db:5432/country_guides
+    depends_on:
+      db:
+        condition: service_started
     restart: unless-stopped
 
   db:
@@ -26,4 +26,3 @@ services:
 
 volumes:
   pgdata:
-  app-data:

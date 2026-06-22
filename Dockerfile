@@ -11,7 +11,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-ENV COUNTRY_GUIDE_DB=/app/data/country_guides.db
 ENV PYTHONUNBUFFERED=1
 
 EXPOSE 8080
