@@ -1,0 +1,12 @@
+.git
+.claude
+.playwright-mcp
+__pycache__
+*.pyc
+*.db
+.env
+site/
+tests/
+docs/
+examples/
+*.skill

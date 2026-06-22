@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 <style>
-/* ── Abdul Kalam AI design tokens (matches employee.html) ── */
+/* ── Regulift design tokens (matches employee.html) ── */
 :root {
   --paper:        #FFFFFF;
   --paper-2:      #F6F7F9;
@@ -365,7 +365,7 @@ input, textarea, select { font: inherit; color: inherit; }
 .dtable .num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
 .dtable .right { text-align: right; }
 
-/* ── Ask Abdul Kalam AI ── */
+/* ── Ask Regulift ── */
 [data-mode="dark"] .ask-atlas { background: linear-gradient(135deg, rgba(155,133,255,.10) 0%, rgba(155,133,255,.06) 100%); }
 [data-mode="dark"] .ask-atlas-bar input { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.10); }
 [data-mode="dark"] .ask-suggestion { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.10); color: var(--purple-2); }
@@ -1069,7 +1069,7 @@ const TOTAL_OPEN = ACTIVE_COUNTRIES.reduce((s, c) => s + c.openReqs, 0);
 const TOTAL_CHANGES = ACTIVE_COUNTRIES.reduce((s, c) => s + c.changes, 0);
 const SKUAD_COUNTRY_COUNT = ACTIVE_COUNTRIES.length + TOTAL_AVAILABLE;
 
-/* Route into the existing Abdul Kalam AI employee guide where the country exists in the DB.
+/* Route into the existing Regulift employee guide where the country exists in the DB.
    Countries not yet in the DB will 404 — same shape as the design's stub pages. */
 const countryHref = (c) => `/employee/${encodeURIComponent(c.name)}`;
 
@@ -1252,8 +1252,8 @@ function AppBar({ theme, setTheme }) {
       <div className="appbar-row1">
         <div className="appbar-brand">
           <a href="/" style={{display:"flex",alignItems:"center",gap:10,textDecoration:"none",color:"inherit"}}>
-            <div className="appbar-logo">A</div>
-            <span className="appbar-name">Abdul Kalam AI</span>
+            <div className="appbar-logo">R</div>
+            <span className="appbar-name">Regulift</span>
           </a>
           <span className="appbar-divider" />
           <span className="appbar-product">CLIENT PORTAL</span>
@@ -1294,7 +1294,7 @@ function Greet() {
         </div>
         <h1>{TOTAL_HEAD} people across <span className="mark">{ACTIVE_COUNTRIES.length} countries</span>. {TOTAL_AVAILABLE} more ready when you are.</h1>
         <div className="sub">
-          Your team at <strong>{COMPANY}</strong> spans <strong>India</strong>, <strong>Germany</strong>, and the <strong>Philippines</strong>. Abdul Kalam AI tracks {TOTAL_CHANGES} compliance changes across your active contracts — and gives you hire-ready cost &amp; compliance for every other country we cover, so you can plan your next move in minutes, not months.
+          Your team at <strong>{COMPANY}</strong> spans <strong>India</strong>, <strong>Germany</strong>, and the <strong>Philippines</strong>. Regulift tracks {TOTAL_CHANGES} compliance changes across your active contracts — and gives you hire-ready cost &amp; compliance for every other country we cover, so you can plan your next move in minutes, not months.
         </div>
         <div className="ov-greet-pills">
           <span className="ov-greet-pill"><span className="dot-status dot-ok" />Payroll on track · Nov 24</span>
@@ -1331,7 +1331,7 @@ function Greet() {
           <span className="ov-snap-flag" style={{opacity:0.65}}>+{TOTAL_AVAILABLE - 3}</span>
         </div>
         <div className="ov-snap-foot">
-          <span>Abdul Kalam AI Compliance · sweep 03:14 UTC</span>
+          <span>Regulift Compliance · sweep 03:14 UTC</span>
           <span style={{color:"#5BBE92"}}>● in sync</span>
         </div>
       </aside>
@@ -1444,7 +1444,7 @@ function AskAtlas() {
       const data = await res.json();
       setReply(data.reply || data.error || "No response");
     } catch (e) {
-      setReply("Failed to reach Abdul Kalam AI. Is the server running?");
+      setReply("Failed to reach Regulift. Is the server running?");
     }
     setLoading(false);
   };
@@ -1452,7 +1452,7 @@ function AskAtlas() {
     <section className="ask-atlas">
       <div className="ask-atlas-header">
         <div className="ask-atlas-mark"><I.sparkle /></div>
-        <div className="ask-atlas-title">Ask Abdul Kalam AI</div>
+        <div className="ask-atlas-title">Ask Regulift</div>
         <div className="ask-atlas-sub">Workforce intelligence across {SKUAD_COUNTRY_COUNT} countries</div>
       </div>
       <div className="ask-atlas-bar">
@@ -2023,7 +2023,7 @@ function App() {
         <div id="browse-all" style={{paddingTop:8}}><BrowseAll /></div>
         <footer style={{display:"flex",justifyContent:"space-between",alignItems:"center",paddingTop:24,borderTop:"1px solid var(--paper-line)",fontFamily:"var(--font-mono)",fontSize:11,color:"var(--ink-4)",flexWrap:"wrap",gap:8}}>
           <span>Skuad Workforce · {COMPANY}</span>
-          <span>Abdul Kalam AI Compliance · sweep Nov 22, 2025 · not legal advice</span>
+          <span>Regulift Compliance · sweep Nov 22, 2025 · not legal advice</span>
         </footer>
       </main>
     </>
