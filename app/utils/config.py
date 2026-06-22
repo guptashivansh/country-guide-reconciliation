@@ -51,10 +51,7 @@ def extraction_chunk_size():
 
 
 def official_sources_json_url():
-    return os.environ.get(
-        "OFFICIAL_SOURCES_JSON_URL",
-        "https://raw.githubusercontent.com/guptashivansh/compliance-data/main/data/official-sources.json",
-    )
+    return os.environ.get("OFFICIAL_SOURCES_JSON_URL", "")
 
 
 def slack_webhook_url():

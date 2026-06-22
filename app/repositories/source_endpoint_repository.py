@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import urllib.request
 
 from app.models.source_endpoint import SourceEndpoint
@@ -9,20 +10,27 @@ from app.utils.db import Database
 
 logger = logging.getLogger(__name__)
 
+_DEFAULT_LOCAL_JSON = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+    "data", "official-sources.json",
+)
+
 
 class TrustedSourceEndpointRepository:
     """DB-backed registry of official government source endpoints.
 
     On first call to initialize_schema(), creates the four registry tables
     (source_countries, source_authorities, source_endpoints, parser_registry).
-    If the tables are empty, seeds them from the remote JSON.
+    If the tables are empty, seeds them from a local JSON file (preferred)
+    or a remote URL as fallback.
     """
 
-    def __init__(self, db, json_url: str = ""):
+    def __init__(self, db, json_url: str = "", json_path: str = ""):
         if isinstance(db, str):
             db = Database(db)
         self.db = db
         self.json_url = json_url
+        self.json_path = json_path or _DEFAULT_LOCAL_JSON
 
     def initialize_schema(self):
         conn = self.db.connect()
@@ -129,9 +137,13 @@ class TrustedSourceEndpointRepository:
         conn.commit()
 
         c.execute("SELECT COUNT(*) FROM source_countries")
-        if c.fetchone()[0] == 0 and self.json_url:
-            logger.info("Source registry tables empty — seeding from remote JSON")
-            self._seed_from_url(conn, self.json_url)
+        if c.fetchone()[0] == 0:
+            if self.json_path and os.path.isfile(self.json_path):
+                logger.info("Source registry tables empty — seeding from local JSON: %s", self.json_path)
+                self._seed_from_file(conn, self.json_path)
+            elif self.json_url:
+                logger.info("Source registry tables empty — seeding from remote JSON: %s", self.json_url)
+                self._seed_from_url(conn, self.json_url)
 
         conn.close()
 
@@ -139,6 +151,22 @@ class TrustedSourceEndpointRepository:
         conn = self.db.connect()
         self._seed_from_url(conn, url or self.json_url)
         conn.close()
+
+    def reseed_from_file(self, path: str = ""):
+        """Clear all registry tables and re-import from a local JSON file."""
+        path = path or self.json_path
+        conn = self.db.connect()
+        c = conn.cursor()
+        for table in ("source_endpoints", "source_authorities", "source_countries", "parser_registry"):
+            c.execute(f"DELETE FROM {table}")
+        conn.commit()
+        self._seed_from_file(conn, path)
+        conn.close()
+
+    def _seed_from_file(self, conn, path: str):
+        with open(path, "r") as f:
+            data = json.load(f)
+        self._seed_from_dict(conn, data)
 
     def _seed_from_url(self, conn, url: str):
         data = self._fetch_json(url)
