@@ -63,6 +63,15 @@ class DriftDetector:
         countries = self.repository.list_countries()
         return [self.detect(c, now) for c in countries]
 
+    def get_coverage(self) -> dict:
+        core = []
+        if self._config_service:
+            core = self._config_service.get_core_sections()
+        if not core:
+            return {"core_sections": [], "countries": {}}
+        scores = self.repository.get_coverage_scores(core)
+        return {"core_sections": core, "countries": scores}
+
     # ── internal ───────────────────────────────────────────────────────────────
 
     def _run_pending_rules(self, country: str, now: datetime) -> List[DriftRecord]:

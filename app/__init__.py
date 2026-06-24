@@ -1,14 +1,15 @@
 from flask import Flask
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 from app.api.routes import create_api_blueprint, warm_drift_cache
 from app.extraction.content_chunker import ContentChunker
 from app.extraction.groq_extraction_service import GroqExtractionService
 from app.ingestion.html_ingestion_service import HtmlIngestionService
+from app.ingestion.pdf_ingestion_service import PdfIngestionService
 from app.ingestion.ingestion_job_service import IngestionJobService
 from app.ingestion.source_snapshot_service import SourceSnapshotService
-from app.llm.claude_provider import ClaudeProvider
-from app.llm.gemini_provider import GeminiProvider
-from app.llm.groq_provider import GroqProvider
+from app.llm import create_reconciliation_provider
 from app.reconciliation.llm_reconciliation_service import LLMReconciliationEngine
 from app.reconciliation.reconciliation_service import ReconciliationService
 from app.repositories.country_guide_repository import CountryGuideRepository
@@ -33,7 +34,7 @@ def build_services(db_path=None):
     load_env_file()
     configure_logging()
 
-    db = Database(db_path or database_path())
+    db = Database(db_path)
 
     country_guide_repository = CountryGuideRepository(db)
     source_snapshot_repository = SourceSnapshotRepository(db)
@@ -50,12 +51,18 @@ def build_services(db_path=None):
 
     drift_detector = DriftDetector(drift_repository, config_service=config_service)
 
-    if anthropic_api_keys():
-        reconciliation_provider = ClaudeProvider(anthropic_api_keys(), model=claude_model())
-    elif gemini_api_keys():
-        reconciliation_provider = GeminiProvider(gemini_api_keys(), model=gemini_model())
-    else:
-        reconciliation_provider = GroqProvider(groq_api_keys(), model=groq_model())
+    reconciliation_provider = create_reconciliation_provider(
+        api_keys_by_name={
+            "anthropic": anthropic_api_keys(),
+            "gemini": gemini_api_keys(),
+            "groq": groq_api_keys(),
+        },
+        models_by_name={
+            "anthropic": claude_model(),
+            "gemini": gemini_model(),
+            "groq": groq_model(),
+        },
+    )
     reconciliation_engine = LLMReconciliationEngine(
         reconciliation_provider,
         config_service=config_service,
@@ -75,6 +82,7 @@ def build_services(db_path=None):
         "review_service": ReviewService(country_guide_repository, provenance_service=provenance_service),
         "source_registry_service": SourceRegistryService(source_endpoint_repository),
         "ingestion_service": HtmlIngestionService(),
+        "pdf_ingestion_service": PdfIngestionService(),
         "source_snapshot_service": SourceSnapshotService(source_snapshot_repository),
         "ingestion_job_service": IngestionJobService(ingestion_job_repository),
         "extraction_service": GroqExtractionService(
@@ -97,8 +105,16 @@ def create_app(db_path=None):
     services["provenance_repository"].initialize_schema()
     services["source_endpoint_repository"].initialize_schema()
     services["config_repository"].initialize_schema()
-    flask_app = Flask(__name__, template_folder="../templates")
+    flask_app = Flask(__name__, template_folder="../templates", static_folder="../static")
     flask_app.config["services"] = services
+
+    limiter = Limiter(
+        get_remote_address,
+        app=flask_app,
+        default_limits=["200 per minute"],
+        storage_uri="memory://",
+    )
+
     flask_app.register_blueprint(create_api_blueprint(
         review_service=services["review_service"],
         source_registry_service=services["source_registry_service"],
@@ -111,6 +127,8 @@ def create_app(db_path=None):
         temporal_rule_service=services["temporal_rule_service"],
         drift_detector=services["drift_detector"],
         config_service=services["config_service"],
+        pdf_ingestion_service=services["pdf_ingestion_service"],
+        limiter=limiter,
     ))
 
     cron = sync_cron_schedule()

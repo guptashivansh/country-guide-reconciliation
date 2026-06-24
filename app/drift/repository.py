@@ -3,7 +3,7 @@ Read-only DB queries that feed the drift detector.
 All methods return plain dicts / lists of dicts — no ORM objects.
 """
 
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from app.utils.db import Database
 
@@ -97,6 +97,68 @@ class DriftRepository:
                 (country, section),
             ).fetchone()
             return dict(row) if row else None
+
+    def get_coverage_scores(self, core_sections: List[str]) -> Dict[str, dict]:
+        """Compute coverage scores for all countries against core sections.
+
+        Returns {country: {total, covered, missing, pct, has_provenance, sections}}.
+        """
+        if not core_sections:
+            return {}
+        with self._connect() as conn:
+            guide_countries = {r["country"] for r in conn.execute(
+                "SELECT DISTINCT country FROM country_guide"
+            ).fetchall()}
+            try:
+                registry_countries = {r["name"] for r in conn.execute(
+                    "SELECT name FROM source_countries WHERE is_active = 1"
+                ).fetchall()}
+            except Exception:
+                registry_countries = set()
+            countries = sorted(guide_countries | registry_countries)
+
+            placeholders = ",".join("?" * len(core_sections))
+            rows = conn.execute(
+                f"SELECT country, section FROM country_guide WHERE section IN ({placeholders})",
+                core_sections,
+            ).fetchall()
+            published = {}
+            for r in rows:
+                published.setdefault(r["country"], set()).add(r["section"])
+
+            has_prov = {}
+            try:
+                prov_rows = conn.execute(
+                    f"""SELECT rp.country, rp.section
+                        FROM rule_provenance rp
+                        JOIN country_guide cg ON cg.country = rp.country
+                            AND cg.section = rp.section
+                        WHERE rp.section IN ({placeholders})""",
+                    core_sections,
+                ).fetchall()
+                for r in prov_rows:
+                    has_prov.setdefault(r["country"], set()).add(r["section"])
+            except Exception:
+                pass
+
+            total = len(core_sections)
+            core_set = set(core_sections)
+            result = {}
+            for country in countries:
+                pub = published.get(country, set())
+                prov = has_prov.get(country, set())
+                covered = pub & core_set
+                verified = covered & prov
+                missing = sorted(core_set - covered)
+                result[country] = {
+                    "total": total,
+                    "covered": len(covered),
+                    "verified": len(verified),
+                    "missing": missing,
+                    "pct": round(len(covered) / total * 100) if total else 0,
+                    "verified_pct": round(len(verified) / total * 100) if total else 0,
+                }
+            return result
 
     def get_all_provenances(self, country: str) -> dict:
         """Returns {section: provenance_dict} for all sections of a country."""

@@ -103,14 +103,6 @@ def ingestion_max_retries():
     return int(os.environ.get("INGESTION_MAX_RETRIES", "2"))
 
 
-def ingestion_strip_tags():
-    default = "script,style,nav,footer,header,aside"
-    return [t.strip() for t in os.environ.get("INGESTION_STRIP_TAGS", default).split(",")]
-
-
-def ingestion_min_line_length():
-    return int(os.environ.get("INGESTION_MIN_LINE_LENGTH", "30"))
-
 
 def ingestion_max_content_length():
     return int(os.environ.get("INGESTION_MAX_CONTENT_LENGTH", "6000"))

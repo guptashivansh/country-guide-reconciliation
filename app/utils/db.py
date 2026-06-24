@@ -1,15 +1,12 @@
 """
-Dual-backend database layer: SQLite (default) or PostgreSQL.
+Dual-backend database layer: PostgreSQL (default) or SQLite.
 
-Set the DATABASE_URL environment variable to a PostgreSQL connection string
-(e.g. ``postgresql://user:pass@localhost/country_guides``) to use Postgres.
-When DATABASE_URL is absent or doesn't start with ``postgres``, the system
-falls back to SQLite using the file path from COUNTRY_GUIDE_DB (or
-``country_guides.db``).
+PostgreSQL is the default backend. Set DATABASE_URL to a connection string
+(e.g. ``postgresql://user:pass@localhost/country_guides``), or leave it unset
+to use ``postgresql://localhost/country_guides``.
 
-Install ``psycopg2-binary`` (or ``psycopg2``) to enable the Postgres backend::
-
-    pip install psycopg2-binary
+To use SQLite instead, set ``DATABASE_BACKEND=sqlite`` (uses COUNTRY_GUIDE_DB
+or ``country_guides.db``).
 """
 
 import os
@@ -23,8 +20,38 @@ import sqlite3
 
 def _adapt_sql(sql):
     """Convert SQLite-flavored SQL to PostgreSQL-compatible SQL."""
-    # Parameter placeholder: ? -> %s
-    sql = sql.replace("?", "%s")
+    # Phase 1: Replace ? placeholders only outside string literals.
+    # Handles SQL-standard '' escape sequences within strings.
+    out = []
+    i = 0
+    while i < len(sql):
+        ch = sql[i]
+        if ch == "'":
+            # Start of string literal — copy until closing quote
+            out.append(ch)
+            i += 1
+            while i < len(sql):
+                ch = sql[i]
+                out.append(ch)
+                i += 1
+                if ch == "'":
+                    # Check for escaped quote ''
+                    if i < len(sql) and sql[i] == "'":
+                        out.append(sql[i])
+                        i += 1
+                    else:
+                        break
+        elif ch == "?":
+            out.append("%s")
+            i += 1
+        else:
+            out.append(ch)
+            i += 1
+    sql = "".join(out)
+
+    # Phase 2: Keyword transformations.
+    # These patterns target SQL keywords which won't appear inside string
+    # literals in practice, so simple regex replacement is safe here.
 
     # Auto-increment primary key
     sql = re.sub(
@@ -140,15 +167,17 @@ class Database:
     """
 
     def __init__(self, db_path=None):
+        backend = os.environ.get("DATABASE_BACKEND", "").lower()
         url = os.environ.get("DATABASE_URL", "")
-        if url.startswith(("postgresql://", "postgres://")):
-            self.dialect = "postgres"
-            self._dsn = url
-            self._db_path = None
-        else:
+
+        if db_path or backend == "sqlite":
             self.dialect = "sqlite"
             self._dsn = None
-            self._db_path = db_path or "country_guides.db"
+            self._db_path = db_path or os.environ.get("COUNTRY_GUIDE_DB", "country_guides.db")
+        else:
+            self.dialect = "postgres"
+            self._dsn = url if url.startswith(("postgresql://", "postgres://")) else "postgresql://localhost/country_guides"
+            self._db_path = None
 
     # Backward compat: some code still reads .db_path
     @property

@@ -9,6 +9,7 @@ class SourceEndpoint:
     authority: str
     url: str
     sections: tuple[str, ...]
+    name: str = ""
     endpoint_id: str = ""
     authority_id: str = ""
     country_id: str = ""

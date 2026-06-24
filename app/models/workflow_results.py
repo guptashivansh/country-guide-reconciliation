@@ -10,6 +10,8 @@ FailureType = Literal[
     "network_error",
     "reconciliation_error",
     "configuration_error",
+    "pdf_error",
+    "crawl_error",
     "unknown_error",
 ]
 

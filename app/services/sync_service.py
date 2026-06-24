@@ -3,7 +3,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def run_single_job(services, job_id, source_url, country, sections=None):
+def run_single_job(services, job_id, source_url, country, sections=None, fetch_only=False, engine=None):
     ingestion_service = services["ingestion_service"]
     source_snapshot_service = services["source_snapshot_service"]
     ingestion_job_service = services["ingestion_job_service"]
@@ -11,7 +11,7 @@ def run_single_job(services, job_id, source_url, country, sections=None):
     reconciliation_service = services["reconciliation_service"]
 
     try:
-        ingestion_result = ingestion_service.fetch_clean_text(source_url)
+        ingestion_result = ingestion_service.fetch_clean_text(source_url, engine=engine)
 
         if not ingestion_result.succeeded:
             failure_reason = ingestion_result.failure.reason if ingestion_result.failure else "source fetch failed"
@@ -25,6 +25,9 @@ def run_single_job(services, job_id, source_url, country, sections=None):
             content_hash=ingestion_result.content_hash,
         )
         ingestion_job_service.mark_normalized(job_id, snapshot_id)
+
+        if fetch_only:
+            return {"success": True, "changes_queued": 0, "snapshot_id": snapshot_id}
 
         extraction_result = extraction_service.extract_employment_rules(
             content=ingestion_result.raw_text,
@@ -65,7 +68,7 @@ def run_single_job(services, job_id, source_url, country, sections=None):
         return {"success": False, "failure_reason": str(e)}
 
 
-def run_sync(services, countries=None):
+def run_sync(services, countries=None, fetch_only=False, engine=None):
     """
     Run the full sync pipeline for all (or a subset of) country endpoints.
 
@@ -97,6 +100,7 @@ def run_sync(services, countries=None):
         result = run_single_job(
             services, job_id, source_endpoint.url,
             source_endpoint.country, source_endpoint.sections,
+            fetch_only=fetch_only, engine=engine,
         )
 
         if result["success"]:
