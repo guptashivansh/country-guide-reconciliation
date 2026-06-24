@@ -138,4 +138,59 @@ def create_app(db_path=None):
 
     warm_drift_cache(services["drift_detector"])
 
+    _auto_seed_if_empty(services)
+
     return flask_app
+
+
+def _auto_seed_if_empty(services):
+    """Run Notion import in background on first boot when country_guide is empty."""
+    import threading
+
+    repo = services["country_guide_repository"]
+    if repo.list_countries_summary():
+        return
+
+    def _seed():
+        import logging
+        from app.ingestion.notion_ingestion_service import NotionIngestionService
+        from app.services.provenance_service import ProvenanceService
+        from app.utils.config import parser_version
+        import re
+
+        logger = logging.getLogger(__name__)
+        logger.info("Auto-seeding country_guide from Notion (background)...")
+
+        NOTION_PAGE_ID = "7ed6a2f53972448db2cb107a8d20b661"
+        NOTION_SOURCE_URL = "https://skuad.notion.site/Skuad-Country-Product-Guides-7ed6a2f53972448db2cb107a8d20b661"
+        COUNTRY_ALIASES = {"united arab emirates": "UAE"}
+
+        try:
+            from notion_import import FIELD_TO_SECTION, _parse_sections, _canonical_country
+
+            notion_service = NotionIngestionService(page_id=NOTION_PAGE_ID)
+            country_texts = notion_service.fetch_all_employment_guides()
+
+            provenance_service = ProvenanceService(
+                services["provenance_repository"],
+                parser_version=parser_version(),
+            )
+
+            total = 0
+            for raw_country, content in country_texts.items():
+                country = _canonical_country(raw_country)
+                sections = _parse_sections(content)
+                for section, value in sections.items():
+                    repo.upsert_guide_entry(
+                        country=country, section=section,
+                        value=value, source_url=NOTION_SOURCE_URL,
+                    )
+                    provenance_service.record_seed(country, section, value, NOTION_SOURCE_URL)
+                    total += 1
+                logger.info("Seeded %s (%d sections)", country, len(sections))
+
+            logger.info("Auto-seed complete: %d rules across %d countries", total, len(country_texts))
+        except Exception:
+            logger.exception("Auto-seed from Notion failed")
+
+    threading.Thread(target=_seed, daemon=True).start()
