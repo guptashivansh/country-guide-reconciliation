@@ -2,6 +2,7 @@
 <html lang="en" data-mode="light">
 <head>
 <meta charset="UTF-8">
+<link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{% block title %}Compliance Intelligence{% endblock %} · Regulift</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -249,15 +250,20 @@ input,textarea,select{font:inherit;color:inherit} ::selection{background:var(--a
   <!-- Row 2: Nav tabs -->
   {% block appbar_tabs %}
   <div class="appbar-row2">
-    <a href="/compliance/dashboard" class="appbar-tab {% if nav_active == 'dashboard' %}active{% endif %}">Dashboard</a>
-    <a href="/guide"                class="appbar-tab {% if nav_active == 'guides' %}active{% endif %}">Country Guides</a>
-    <a href="/compliance/review"    class="appbar-tab {% if nav_active == 'review' %}active{% endif %}">
-      Review Queue
+    <a href="/ops#summary"  class="appbar-tab {% if nav_active == 'summary' %}active{% endif %}">Summary</a>
+    <a href="/ops#review"   class="appbar-tab {% if nav_active == 'review' %}active{% endif %}">
+      Review queue
       <span class="appbar-tab-badge" id="navQueueBadge" style="display:none"></span>
     </a>
-    <a href="/ops#sources"           class="appbar-tab {% if nav_active == 'intake' %}active{% endif %}">Sources</a>
-    <a href="/compliance/audit"     class="appbar-tab {% if nav_active == 'audit' %}active{% endif %}">Audit Trail</a>
-    <a href="/compliance/settings"  class="appbar-tab {% if nav_active == 'settings' %}active{% endif %}">Settings</a>
+    <a href="/ops#drift"    class="appbar-tab {% if nav_active == 'drift' %}active{% endif %}">
+      Drift map
+      <span class="appbar-tab-badge" id="navDriftBadge" style="display:none"></span>
+    </a>
+    <a href="/ops#audit"    class="appbar-tab {% if nav_active == 'audit' %}active{% endif %}">Audit log</a>
+    <a href="/ops#sources"  class="appbar-tab {% if nav_active == 'sources' %}active{% endif %}">
+      Sources
+      <span class="appbar-tab-badge" id="navSourcesBadge" style="display:none"></span>
+    </a>
   </div>
   {% endblock %}
 </header>
@@ -321,6 +327,10 @@ input,textarea,select{font:inherit;color:inherit} ::selection{background:var(--a
       var pending = data.pending_reviews || 0;
       var badge = document.getElementById('navQueueBadge');
       if (badge && pending > 0) { badge.textContent = pending; badge.style.display = ''; }
+      var driftBadge = document.getElementById('navDriftBadge');
+      if (driftBadge && data.drift_count > 0) { driftBadge.textContent = data.drift_count; driftBadge.style.display = ''; }
+      var srcBadge = document.getElementById('navSourcesBadge');
+      if (srcBadge && data.total_endpoints > 0) { srcBadge.textContent = data.total_endpoints; srcBadge.style.display = ''; }
       var dot = document.getElementById('statusDot');
       var lbl = document.getElementById('statusSyncLabel');
       if (data.crawl_failures > 0) {

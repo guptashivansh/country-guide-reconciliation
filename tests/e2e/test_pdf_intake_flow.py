@@ -15,16 +15,38 @@ import pytest
 from tests.e2e.conftest import TEST_COUNTRY
 
 
-# 4-byte stub PDF. The backend only reads form fields (jurisdiction, publisher,
-# doc_title, authority, effective_date, file_hash) — it never opens the file.
-# The browser still computes SHA-256 over these bytes via SubtleCrypto.
-_STUB_PDF_BYTES = b"%PDF-1.4\n%\xe2\xe3\xcf\xd3\n1 0 obj<</Type/Catalog>>endobj\ntrailer<<>>\n%%EOF\n"
+def _make_stub_pdf_bytes():
+    """Build a minimal valid PDF with text content that pdfplumber can parse."""
+    stream = b"BT /F1 12 Tf 72 720 Td (Stub regulation content for e2e testing.) Tj ET"
+    objects = []
+    offsets = []
+
+    def _obj(num, data):
+        offsets.append(len(b"".join(objects)))
+        objects.append(f"{num} 0 obj\n".encode() + data + b"\nendobj\n")
+
+    _obj(1, b"<< /Type /Catalog /Pages 2 0 R >>")
+    _obj(2, b"<< /Type /Pages /Kids [3 0 R] /Count 1 >>")
+    _obj(3, b"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] "
+            b"/Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>")
+    _obj(4, f"<< /Length {len(stream)} >>\nstream\n".encode() + stream + b"\nendstream")
+    _obj(5, b"<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>")
+
+    header = b"%PDF-1.4\n"
+    body = b"".join(objects)
+    xref_offset = len(header) + len(body)
+    xref = f"xref\n0 {len(offsets) + 1}\n0000000000 65535 f \n"
+    for off in offsets:
+        xref += f"{off + len(header):010d} 00000 n \n"
+    trailer = (f"trailer\n<< /Size {len(offsets) + 1} /Root 1 0 R >>\n"
+               f"startxref\n{xref_offset}\n%%EOF\n")
+    return header + body + xref.encode() + trailer.encode()
 
 
 @pytest.fixture
 def stub_pdf(tmp_path: Path) -> Path:
     p = tmp_path / "stub_regulation.pdf"
-    p.write_bytes(_STUB_PDF_BYTES)
+    p.write_bytes(_make_stub_pdf_bytes())
     return p
 
 
@@ -120,12 +142,8 @@ def test_pdf_intake_wizard_creates_job_and_pipeline_renders(
 
 
 @pytest.mark.smoke
-def test_pdf_intake_api_rejects_no_op_call_creates_job(seeded_app, browser_context):
-    """Direct POST to /api/intake/pdf with minimal fields should still create a job.
-
-    Documents the backend boundary contract: jurisdiction is the only field
-    that ends up on the row, but the endpoint never refuses a submission.
-    """
+def test_pdf_intake_api_rejects_missing_file(seeded_app, browser_context):
+    """POST to /api/intake/pdf without a file attachment returns 400."""
     base_url = seeded_app["base_url"]
     page = browser_context.new_page()
 
@@ -140,7 +158,6 @@ def test_pdf_intake_api_rejects_no_op_call_creates_job(seeded_app, browser_conte
             "file_hash": "deadbeef" * 8,
         },
     )
-    assert resp.status == 200, f"POST failed: {resp.status} {resp.text()}"
+    assert resp.status == 400
     body = resp.json()
-    assert body.get("success") is True
-    assert isinstance(body.get("job_id"), int)
+    assert body.get("success") is False

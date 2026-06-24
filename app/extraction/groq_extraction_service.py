@@ -1,7 +1,7 @@
 import logging
 
 from groq import Groq
-from groq import RateLimitError
+from groq import AuthenticationError, RateLimitError
 
 from app.extraction.content_chunker import ContentChunker
 from app.extraction.employment_rule_parser import EmploymentRuleParser
@@ -131,8 +131,7 @@ class GroqExtractionService:
 
     def _extract_chunk(self, content, source_url, country, sections, chunk_index, chunk_count):
         sections_str = ", ".join(sections)
-        prompt = f"""
-You are a legal compliance analyst for an Employer of Record (EOR) company.
+        prompt = f"""You are a legal compliance analyst for an Employer of Record (EOR) company.
 
 Analyze the following content from {source_url} and extract employment rules for {country}.
 
@@ -141,14 +140,17 @@ This is chunk {chunk_index + 1} of {chunk_count} from the source.
 Extract values ONLY for these sections if found: {sections_str}
 
 Return a JSON array. Each item must have exactly these fields:
-- section: one of the sections listed above
-- value: the extracted rule as a clear, concise string
-- confidence: float between 0 and 1 (how confident you are this is accurate)
-- severity: "critical", "major", or "minor" (how important this rule is for compliance)
-- source_paragraph: the exact sentence or phrase from the content that supports this value
+- section: one of the section names listed above (use the exact snake_case name)
+- value: the extracted rule as a clear, concise string (e.g. "12 days per year", "30 days notice required")
+- confidence: float between 0.0 and 1.0
+- severity: "critical" (visa/permit/termination rules), "major" (wage/tax/leave rules), or "minor" (procedural/administrative)
+- source_paragraph: the exact sentence from the content that supports this value
 
-If a section is not mentioned in the content, do not include it.
-Return ONLY valid JSON. No explanation. No markdown. No backticks.
+Rules:
+- Only include sections where you find a specific, concrete value — not vague references.
+- Do NOT include entries like "No specific value mentioned" or "Not explicitly stated".
+- If a section is not covered in the content, omit it entirely.
+- Return ONLY the JSON array. No explanation, no markdown fences, no backticks.
 
 Content:
 {content}
@@ -229,9 +231,9 @@ Content:
                     temperature=0.1,
                 )
                 return response.choices[0].message.content.strip()
-            except RateLimitError:
+            except (RateLimitError, AuthenticationError) as exc:
                 logger.warning(
-                    "Groq quota exceeded on key %d, rotating to next key", self._current
+                    "Groq key %d failed (%s), rotating to next key", self._current, type(exc).__name__
                 )
                 self._rotate_key()
-        raise RateLimitError("All Groq API keys have exceeded their quota")
+        raise RateLimitError("All Groq API keys have been exhausted")

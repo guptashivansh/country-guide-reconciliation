@@ -26,5 +26,29 @@ class SourceRegistryService:
     def list_classifications(self, limit=50):
         return self.source_endpoint_repository.list_classifications(limit)
 
+    def create_country(self, data):
+        return self.source_endpoint_repository.create_country(data)
+
+    def update_country(self, country_id, data):
+        return self.source_endpoint_repository.update_country(country_id, data)
+
+    def delete_country(self, country_id):
+        return self.source_endpoint_repository.delete_country(country_id)
+
+    def create_authority(self, data):
+        return self.source_endpoint_repository.create_authority(data)
+
+    def update_authority(self, authority_id, data):
+        return self.source_endpoint_repository.update_authority(authority_id, data)
+
+    def delete_authority(self, authority_id):
+        return self.source_endpoint_repository.delete_authority(authority_id)
+
     def create_endpoint(self, data):
         return self.source_endpoint_repository.create_endpoint(data)
+
+    def update_endpoint(self, endpoint_id, data):
+        return self.source_endpoint_repository.update_endpoint(endpoint_id, data)
+
+    def delete_endpoint(self, endpoint_id):
+        return self.source_endpoint_repository.delete_endpoint(endpoint_id)

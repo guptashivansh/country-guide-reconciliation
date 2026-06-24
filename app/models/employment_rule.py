@@ -29,7 +29,15 @@ class EmploymentRule(BaseModel):
     @field_validator("severity")
     @classmethod
     def normalize_severity(cls, value):
+        _ALIASES = {
+            "high": "critical", "severe": "critical", "urgent": "critical",
+            "medium": "major", "moderate": "major", "significant": "major",
+            "important": "major",
+            "low": "minor", "minimal": "minor", "negligible": "minor",
+            "informational": "minor", "info": "minor",
+        }
         severity = value.strip().lower()
+        severity = _ALIASES.get(severity, severity)
         if severity not in {"critical", "major", "minor"}:
             raise ValueError(f"unsupported severity: {value}")
         return severity

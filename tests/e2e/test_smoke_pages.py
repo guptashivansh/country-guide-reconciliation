@@ -78,7 +78,7 @@ def test_page_smoke(browser_context, seeded_app, path, expected_status):
 
 @pytest.mark.smoke
 def test_compliance_root_redirects(seeded_app, browser_context):
-    """/compliance should 302 to /compliance/intake."""
+    """/compliance should 302 to /ops#sources."""
     page = browser_context.new_page()
     resp = page.request.get(
         f"{seeded_app['base_url']}/compliance",
@@ -86,6 +86,6 @@ def test_compliance_root_redirects(seeded_app, browser_context):
     )
     assert resp.status == 302, f"/compliance returned {resp.status}, expected 302"
     location = resp.headers.get("location", "")
-    assert location.endswith("/compliance/intake"), (
-        f"/compliance redirected to {location!r}, expected …/compliance/intake"
+    assert location.endswith("/ops#sources"), (
+        f"/compliance redirected to {location!r}, expected …/ops#sources"
     )

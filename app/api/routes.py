@@ -1,888 +1,116 @@
-import logging
-import time
-from datetime import datetime
+"""Coordinator module — assembles all sub-blueprints into the parent API blueprint.
 
-from flask import Blueprint, abort, jsonify, redirect, render_template, request, url_for
-from app.services.sync_service import run_sync, run_single_job
-from app.services.slack_service import send_sync_alert
-from app.utils.config import groq_model, slack_webhook_url
-from app.utils.flags import build_flags_map, country_flag
+The public interface (``create_api_blueprint`` and ``warm_drift_cache``) is
+unchanged so that ``app/__init__.py`` continues to work without modifications.
+"""
+
+import atexit
+import time
+from concurrent.futures import ThreadPoolExecutor
+
+from flask import Blueprint
+
+from app.api.routes_config import create_config_blueprint
+from app.api.routes_dashboard import create_dashboard_blueprint
+from app.api.routes_drift import create_drift_blueprint
+from app.api.routes_guide import create_guide_blueprint
+from app.api.routes_pipeline import create_pipeline_blueprint
+from app.api.routes_provenance import create_provenance_blueprint
+from app.api.routes_review import create_review_blueprint
+from app.api.routes_sources import create_sources_blueprint
+
+# ── Shared thread pool (used by warm_drift_cache and routes_pipeline) ─────────
+
+_executor = ThreadPoolExecutor(max_workers=4, thread_name_prefix="pipeline")
+atexit.register(lambda: _executor.shutdown(wait=False))
+
+# ── Shared drift cache (used by routes_drift and warm_drift_cache) ────────────
 
 _drift_cache = {"data": None, "expires": 0}
 _DRIFT_CACHE_TTL = 60
 
 
 def warm_drift_cache(drift_detector):
-    import threading
+    """Pre-warm the drift cache in a background thread."""
 
     def _warm():
-        import time as _t
         reports = drift_detector.detect_all()
         result = [r.to_dict() for r in reports]
         _drift_cache["data"] = result
-        _drift_cache["expires"] = _t.monotonic() + _DRIFT_CACHE_TTL
-
-    threading.Thread(target=_warm, daemon=True).start()
-
-
-logger = logging.getLogger(__name__)
-
-
-def _fmt_date(iso):
-    try:
-        return datetime.fromisoformat(iso).strftime("%b %d, %Y")
-    except Exception:
-        return iso or "—"
-
-
-def _review_payload():
-    data = request.get_json(silent=True) or {}
-    return {
-        "comment": data.get("notes", data.get("comment", "")),
-        "assignee": data.get("assignee", ""),
-        "rationale": data.get("rationale", ""),
-        "effective_date": data.get("effective_date"),
-    }
-
-
-def create_api_blueprint(review_service, source_registry_service, ingestion_service, source_snapshot_service, ingestion_job_service, extraction_service, reconciliation_service, provenance_service=None, temporal_rule_service=None, drift_detector=None, config_service=None):
-    routes = Blueprint("country_guide_routes", __name__)
-
-    def _flags():
-        if config_service:
-            return build_flags_map(config_service.get_country_iso_codes())
-        return {}
-
-    def _flag(country_name):
-        return _flags().get(country_name, country_flag(country_name))
-
-    def _section_groups():
-        if config_service:
-            return config_service.get_section_groups()
-        return []
-
-    def _sections_for_view(view_name):
-        if config_service:
-            return config_service.get_sections_for_view(view_name)
-        return set()
-
-    @routes.route("/")
-    def home():
-        countries = [
-            {"name": r["country"], "flag": _flag(r["country"])}
-            for r in review_service.list_countries_summary()
-        ]
-        return render_template("home.html", countries=countries)
-
-    @routes.route("/ops")
-    def index():
-        return render_template("ops_dashboard_v2.html")
-
-    @routes.route("/ops-legacy")
-    def ops_legacy():
-        return render_template("index.html")
-
-    @routes.route("/guide")
-    def guide_list():
-        countries = [
-            {"name": r["country"], "flag": _flag(r["country"]),
-             "rule_count": r["rule_count"], "last_updated": _fmt_date(r["last_updated"])}
-            for r in review_service.list_countries_summary()
-        ]
-        return render_template("guide_list.html", countries=countries, nav_active="guides")
-
-    @routes.route("/guide/<country>")
-    def guide_country(country):
-        rows = review_service.get_country_sections(country)
-        if not rows:
-            abort(404)
-
-        rules_by_section = {r["section"]: {"section": r["section"], "value": r["value"], "last_updated": _fmt_date(r["last_updated"])} for r in rows if (r["value"] or "").strip()}
-        last_updated = _fmt_date(max(r["last_updated"] for r in rows))
-
-        groups = []
-        for g in _section_groups():
-            group_rules = [rules_by_section[s] for s in g["sections"] if s in rules_by_section]
-            if group_rules:
-                groups.append({"id": g["id"], "label": g["label"], "rules": group_rules})
-
-        notes = review_service.get_country_notes(country)
-
-        return render_template(
-            "guide_country.html",
-            country=country,
-            flag=_flag(country),
-            rule_count=len(rows),
-            last_updated=last_updated,
-            groups=groups,
-            notes=notes,
-            nav_active="guides",
-        )
-
-    @routes.route("/api/notes/<country>", methods=["GET"])
-    def get_country_notes(country):
-        notes = review_service.get_country_notes(country)
-        return jsonify(notes)
-
-    @routes.route("/api/notes/<country>", methods=["PUT"])
-    def save_country_notes(country):
-        data = request.get_json(silent=True) or {}
-        content = data.get("content", "")
-        result = review_service.save_country_notes(country, content)
-        return jsonify({"success": True, **result})
-
-    @routes.route("/api/guide/<country>/<section>", methods=["PUT"])
-    def edit_rule(country, section):
-        data = request.get_json(silent=True) or {}
-        new_value = data.get("value", "").strip()
-        if not new_value:
-            return jsonify({"success": False, "message": "value is required"}), 400
-        result = review_service.manual_edit_rule(country, section, new_value)
-        if result is None:
-            return jsonify({"success": True, "message": "No change"})
-        return jsonify({"success": True, **result})
-
-    @routes.route("/api/guide")
-    def get_guide():
-        return jsonify(review_service.list_country_guide_entries())
-
-    @routes.route("/api/queue")
-    def get_queue():
-        return jsonify(review_service.list_pending_review_items())
-
-    @routes.route("/api/audit")
-    def get_audit():
-        entries = review_service.list_audit_entries()
-        country_filter = request.args.get("country")
-        since_filter = request.args.get("since")
-        if country_filter:
-            entries = [e for e in entries if e.get("country") == country_filter]
-        if since_filter:
-            try:
-                since_dt = datetime.fromisoformat(since_filter)
-                entries = [e for e in entries if e.get("timestamp") and datetime.fromisoformat(e["timestamp"]) > since_dt]
-            except ValueError:
-                pass
-        if request.args.get("dedupe") == "1":
-            seen = {}
-            deduped = []
-            for e in entries:
-                key = (e.get("country"), e.get("section"))
-                if key not in seen:
-                    seen[key] = True
-                    deduped.append(e)
-            entries = deduped
-        return jsonify(entries)
-
-    @routes.route("/api/ingestion-jobs")
-    def get_ingestion_jobs():
-        return jsonify(ingestion_job_service.list_recent_jobs(limit=500))
-
-    @routes.route("/api/retry-job/<int:job_id>", methods=["POST"])
-    def retry_job(job_id):
-        retry_result = ingestion_job_service.retry_job(job_id)
-        if not retry_result:
-            return jsonify({"success": False, "message": "Job not found"}), 404
-
-        new_job_id = retry_result["job_id"]
-        source_url = retry_result["source_url"]
-        country = retry_result.get("country") or ""
-
-        endpoint = None
-        for ep in source_registry_service.list_trusted_source_endpoints():
-            if ep.url == source_url:
-                endpoint = ep
-                break
-
-        services = {
-            "ingestion_service": ingestion_service,
-            "source_snapshot_service": source_snapshot_service,
-            "ingestion_job_service": ingestion_job_service,
-            "extraction_service": extraction_service,
-            "reconciliation_service": reconciliation_service,
-        }
-        pipeline_result = run_single_job(
-            services, new_job_id, source_url,
-            country=endpoint.country if endpoint else country,
-            sections=endpoint.sections if endpoint else None,
-        )
-
-        if pipeline_result["success"]:
-            changes = pipeline_result.get("changes_queued", 0)
-            return jsonify({
-                "success": True,
-                "job_id": new_job_id,
-                "message": f"Job #{job_id} retried as #{new_job_id} — {changes} change(s) queued",
-            })
-        return jsonify({
-            "success": True,
-            "job_id": new_job_id,
-            "message": f"Job #{job_id} retried as #{new_job_id} — pipeline failed: {pipeline_result.get('failure_reason', 'unknown')}",
-        })
-
-    @routes.route("/api/metrics")
-    def get_metrics():
-        queue = review_service.list_pending_review_items()
-        pending = [i for i in queue if i.get("status") == "pending"]
-        critical = [i for i in pending if (i.get("severity") or "").lower() == "critical"]
-        confidences = [float(i["confidence"]) for i in pending if i.get("confidence") is not None]
-        avg_conf = round(sum(confidences) / len(confidences) * 100) if confidences else None
-
-        jobs = ingestion_job_service.list_recent_jobs(limit=500)
-        crawl_failures = len([j for j in jobs if j.get("state") == "failed"])
-        last_ok_ts = max(
-            (j.get("reconciled_at") for j in jobs
-             if j.get("state") == "reconciled" and j.get("reconciled_at")),
-            default=None,
-        )
-
-        registry = source_registry_service.get_registry_stats()
-
-        return jsonify({
-            "sources_monitored": registry["endpoints"],
-            "pending_reviews": len(pending),
-            "critical_changes": len(critical),
-            "avg_confidence": avg_conf,
-            "crawl_failures": crawl_failures,
-            "last_successful_sync": last_ok_ts,
-            "trusted_source_count": registry["countries"],
-        })
-
-    @routes.route("/api/sync", methods=["POST"])
-    def sync():
-        body = request.get_json(silent=True) or {}
-        selected_countries = list(body.get("countries") or [])
-
-        services = {
-            "source_registry_service": source_registry_service,
-            "ingestion_service": ingestion_service,
-            "source_snapshot_service": source_snapshot_service,
-            "ingestion_job_service": ingestion_job_service,
-            "extraction_service": extraction_service,
-            "reconciliation_service": reconciliation_service,
-        }
-        result = run_sync(services, countries=selected_countries or None)
-        send_sync_alert(slack_webhook_url(), result, triggered_by="manual")
-
-        total_changes = result["total_changes"]
-        return jsonify({
-            "success": True,
-            "changes_queued": total_changes,
-            "endpoints_processed": result["endpoints_processed"],
-            "failures": result["failures"],
-            "message": f"{total_changes} change(s) queued for review" if total_changes > 0 else "No changes detected"
-        })
-
-    @routes.route("/api/bulk-approve", methods=["POST"])
-    def bulk_approve():
-        body = request.get_json(silent=True) or {}
-        country = body.get("country", "").strip()
-        if not country:
-            return jsonify({"success": False, "message": "country is required"}), 400
-
-        result = review_service.bulk_approve_non_critical(
-            country,
-            comment=body.get("comment", "Bulk approval: non-critical pending items"),
-            rationale=body.get("rationale", "Bulk approved — non-critical"),
-            effective_date=body.get("effective_date"),
-        )
-        approved = result["approved"]
-        if approved == 0:
-            return jsonify({"success": True, "approved": 0, "message": f"No eligible non-critical items for {country}"})
-        return jsonify({
-            "success": True,
-            "approved": approved,
-            "effective_date": body.get("effective_date"),
-            "message": f"{approved} non-critical change{'s' if approved != 1 else ''} approved for {country}",
-        })
-
-    @routes.route("/api/approve/<int:item_id>", methods=["POST"])
-    def approve(item_id):
-        payload = _review_payload()
-        result = review_service.approve_review_item(
-            item_id,
-            payload["comment"],
-            payload["assignee"],
-            payload["rationale"],
-            payload["effective_date"],
-        )
-        if not result:
-            return jsonify({"success": False, "message": "Pending item not found"}), 404
-
-        return jsonify({
-            "success": True,
-            "status": result["status"],
-            "reviewed_at": result["reviewed_at"],
-            "effective_date": result.get("effective_date"),
-            "version_number": result.get("version_number"),
-            "approval_reference": result.get("approval_reference"),
-            "message": f"'{result['section']}' approved and published to live guide"
-        })
-
-    @routes.route("/api/reject/<int:item_id>", methods=["POST"])
-    def reject(item_id):
-        payload = _review_payload()
-        result = review_service.reject_review_item(
-            item_id,
-            payload["comment"],
-            payload["assignee"],
-            payload["rationale"],
-        )
-        if not result:
-            return jsonify({"success": False, "message": "Pending item not found"}), 404
-
-        return jsonify({
-            "success": True,
-            "status": result["status"],
-            "reviewed_at": result["reviewed_at"],
-            "message": f"'{result['section']}' rejected - current guide value retained"
-        })
-
-    @routes.route("/api/assign/<int:item_id>", methods=["POST"])
-    def assign(item_id):
-        payload = _review_payload()
-        result = review_service.assign_review_item(
-            item_id,
-            payload["comment"],
-            payload["assignee"],
-        )
-        if not result:
-            return jsonify({"success": False, "message": "Pending item not found"}), 404
-
-        return jsonify({
-            "success": True,
-            "status": result["status"],
-            "reviewed_at": result["reviewed_at"],
-            "message": f"'{result['section']}' assignment saved"
-        })
-
-    @routes.route("/api/escalate/<int:item_id>", methods=["POST"])
-    def escalate(item_id):
-        payload = _review_payload()
-        result = review_service.escalate_review_item(
-            item_id,
-            payload["comment"],
-            payload["assignee"],
-            payload["rationale"],
-        )
-        if not result:
-            return jsonify({"success": False, "message": "Pending item not found"}), 404
-
-        return jsonify({
-            "success": True,
-            "status": result["status"],
-            "reviewed_at": result["reviewed_at"],
-            "message": f"'{result['section']}' escalated for compliance review"
-        })
-
-    @routes.route("/api/provenance/<country>")
-    def get_provenance_all(country):
-        if not provenance_service:
-            return jsonify({"error": "provenance service not configured"}), 503
-        rows = review_service.get_country_sections(country)
-        if not rows:
-            return jsonify({"error": f"No data for {country}"}), 404
-        chains = []
-        for r in rows:
-            chain = provenance_service.get_chain(country, r["section"])
-            if chain:
-                chains.append(chain)
-        return jsonify({"country": country, "chains": chains})
-
-    @routes.route("/api/provenance/<country>/<section>")
-    def get_provenance(country, section):
-        if not provenance_service:
-            return jsonify({"error": "provenance service not configured"}), 503
-        chain = provenance_service.get_chain(country, section)
-        if not chain:
-            return jsonify({"error": f"No provenance found for {country}/{section}"}), 404
-        return jsonify(chain)
-
-    @routes.route("/api/provenance/<country>/<section>/history")
-    def get_provenance_history(country, section):
-        if not provenance_service:
-            return jsonify({"error": "provenance service not configured"}), 503
-        history = provenance_service.get_history(country, section)
-        return jsonify({"country": country, "section": section, "history": history})
-
-    @routes.route("/api/drift")
-    def get_drift_all():
-        if not drift_detector:
-            return jsonify({"error": "drift detector not configured"}), 503
-        now = time.monotonic()
-        if _drift_cache["data"] is not None and now < _drift_cache["expires"]:
-            return jsonify(_drift_cache["data"])
-        reports = drift_detector.detect_all()
-        result = [r.to_dict() for r in reports]
-        _drift_cache["data"] = result
-        _drift_cache["expires"] = now + _DRIFT_CACHE_TTL
-        return jsonify(result)
-
-    @routes.route("/client")
-    def client_overview():
-        return render_template("client_overview.html")
-
-    @routes.route("/employee/<country>")
-    def employee_country(country):
-        rows = review_service.get_country_sections(country)
-        if not rows:
-            abort(404)
-        return render_template(
-            "employee.html",
-            country=country,
-            flag=_flag(country),
-        )
-
-    def _build_guide_context(country, allowed_group_ids):
-        rows = review_service.get_country_sections(country)
-        if not rows:
-            return None
-        rules_by_section = {r["section"]: {"section": r["section"], "value": r["value"], "last_updated": _fmt_date(r["last_updated"])} for r in rows if (r["value"] or "").strip()}
-        last_updated = _fmt_date(max(r["last_updated"] for r in rows))
-        groups = []
-        for g in _section_groups():
-            if g["id"] not in allowed_group_ids:
-                continue
-            group_rules = [rules_by_section[s] for s in g["sections"] if s in rules_by_section]
-            if group_rules:
-                groups.append({"id": g["id"], "label": g["label"], "rules": group_rules})
-        return {
-            "country": country,
-            "flag": _flag(country),
-            "rule_count": sum(len(g["rules"]) for g in groups),
-            "last_updated": last_updated,
-            "groups": groups,
-        }
-
-    _VIEW_LABELS = {"employee": "Employee", "client": "Client", "ops": "Ops"}
-
-    @routes.route("/guide/<view>/<country>")
-    def guide_view(view, country):
-        view_label = _VIEW_LABELS.get(view)
-        if not view_label:
-            abort(404)
-        allowed = _sections_for_view(view)
-        ctx = _build_guide_context(country, allowed)
-        if not ctx:
-            abort(404)
-        notes = review_service.get_country_notes(country) if view == "ops" else {"content": "", "updated_at": None}
-        return render_template("guide_view.html", view=view, view_label=view_label, notes=notes, **ctx)
-
-    @routes.route("/api/employee/guide/<country>")
-    def api_employee_guide(country):
-        rows = review_service.get_country_sections(country)
-        if not rows:
-            return jsonify({"error": "Country not found"}), 404
-        rules_by_section = {r["section"]: r for r in rows}
-        groups = []
-        for g in _section_groups():
-            group_rules = []
-            for s in g["sections"]:
-                r = rules_by_section.get(s)
-                if r and (r["value"] or "").strip():
-                    group_rules.append({
-                        "id": s,
-                        "label": s.replace("_", " ").title(),
-                        "value": r["value"],
-                        "last_updated": _fmt_date(r["last_updated"]),
-                    })
-            if group_rules:
-                groups.append({"id": g["id"], "label": g["label"], "rules": group_rules})
-        return jsonify({
-            "country": country,
-            "flag": _flag(country),
-            "last_updated": _fmt_date(max(r["last_updated"] for r in rows)),
-            "rule_count": len(rows),
-            "groups": groups,
-        })
-
-    @routes.route("/api/employee/ask", methods=["POST"])
-    def api_employee_ask():
-        data = request.get_json(silent=True) or {}
-        prompt = data.get("prompt", "").strip()
-        if not prompt:
-            return jsonify({"error": "No prompt provided"}), 400
-        try:
-            from groq import Groq
-            from app.utils.config import groq_api_keys
-            keys = groq_api_keys()
-            if not keys:
-                return jsonify({"error": "GROQ_API_KEY is not set. Get a free key at console.groq.com then run: export GROQ_API_KEY=your_key"}), 501
-            client = Groq(api_key=keys[0])
-            chat = client.chat.completions.create(
-                model=groq_model(),
-                max_tokens=512,
-                messages=[{"role": "user", "content": prompt}],
-            )
-            return jsonify({"reply": chat.choices[0].message.content})
-        except ImportError:
-            return jsonify({"error": "groq SDK not installed. Run: pip install groq"}), 501
-        except Exception as exc:
-            logger.exception("Ask Regulift error")
-            return jsonify({"error": str(exc)}), 500
-
-    @routes.route("/api/drift/<country>")
-    def get_drift_country(country):
-        if not drift_detector:
-            return jsonify({"error": "drift detector not configured"}), 503
-        report = drift_detector.detect(country)
-        return jsonify(report.to_dict())
-
-    @routes.route("/api/guide/<country>/<section>/history")
-    def get_rule_version_history(country, section):
-        if not temporal_rule_service:
-            return jsonify({"error": "temporal rule service not configured"}), 503
-        return jsonify(temporal_rule_service.build_timeline(country, section))
-
-    @routes.route("/api/guide/<country>/<section>/at")
-    def get_rule_at_date(country, section):
-        if not temporal_rule_service:
-            return jsonify({"error": "temporal rule service not configured"}), 503
-        as_of_date = request.args.get("date") or request.args.get("as_of")
-        if not as_of_date:
-            return jsonify({"error": "date query parameter is required"}), 400
-        try:
-            rule = temporal_rule_service.get_rule_at_date(country, section, as_of_date)
-        except ValueError as exc:
-            return jsonify({"error": str(exc)}), 400
-        if not rule:
-            return jsonify({"error": f"No rule found for {country}/{section} at {as_of_date}"}), 404
-        return jsonify({"country": country, "section": section, "as_of_date": as_of_date, "rule": rule})
-
-    # ── Compliance Intelligence surfaces ──
-
-    @routes.route("/compliance")
-    def compliance_root():
-        return redirect("/ops#sources")
-
-    @routes.route("/compliance/intake")
-    def compliance_intake_select():
-        return redirect("/ops#sources")
-
-    @routes.route("/intake/<country>")
-    def compliance_intake_country(country):
-        return render_template("compliance_intake.html", nav_active="intake", flags=_flags(), country=country, flag=_flag(country))
-
-    @routes.route("/compliance/intake/pdf")
-    def compliance_intake_pdf():
-        return render_template(
-            "compliance_intake_pdf.html",
-            nav_active="intake",
-            flags=_flags(),
-            sections=[{"id": g["id"], "label": g["label"], "sections": g["sections"]} for g in _section_groups()],
-        )
-
-    @routes.route("/compliance/pipeline")
-    def compliance_pipeline():
-        return redirect("/ops#sources")
-
-    @routes.route("/compliance/pipeline/<int:job_id>")
-    def compliance_pipeline_job(job_id):
-        return render_template("compliance_pipeline.html", nav_active="intake", focus_job=job_id)
-
-    @routes.route("/api/intake/pdf", methods=["POST"])
-    def api_intake_pdf():
-        jurisdiction = request.form.get("jurisdiction", "").strip()
-        publisher = request.form.get("publisher", "").strip()
-        doc_title = request.form.get("doc_title", "").strip()
-        authority = request.form.get("authority", "").strip()
-        effective_date = request.form.get("effective_date", "").strip()
-        file_hash = request.form.get("file_hash", "").strip()
-
-        source_url = f"pdf://{file_hash[:12] if file_hash else 'upload'}#{doc_title or 'untitled'}"
-        job_id = ingestion_job_service.create_job(source_url, country=jurisdiction or None)
-
-        logger.info(
-            "PDF intake registered",
-            extra={
-                "stage": "pdf_intake",
-                "ingestion_job_id": job_id,
-                "jurisdiction": jurisdiction,
-                "publisher": publisher,
-                "authority": authority,
-                "effective_date": effective_date,
-            },
-        )
-
-        return jsonify({
-            "success": True,
-            "job_id": job_id,
-            "message": f"Document registered as job #{job_id}",
-        })
-
-    @routes.route("/compliance/dashboard")
-    def compliance_dashboard():
-        return render_template("compliance_base.html", nav_active="dashboard")
-
-    @routes.route("/compliance/review")
-    def compliance_review():
-        return render_template("compliance_base.html", nav_active="review")
-
-    @routes.route("/compliance/audit")
-    def compliance_audit():
-        return render_template("compliance_base.html", nav_active="audit")
-
-    @routes.route("/compliance/settings")
-    def compliance_settings():
-        return render_template("compliance_base.html", nav_active="settings")
-
-    @routes.route("/api/sources/stats")
-    def source_registry_stats():
-        return jsonify(source_registry_service.get_registry_stats())
-
-    @routes.route("/api/sources/countries")
-    def source_registry_countries():
-        return jsonify(source_registry_service.list_countries())
-
-    @routes.route("/api/sources/authorities")
-    def source_registry_authorities():
-        country_id = request.args.get("country_id")
-        return jsonify(source_registry_service.list_authorities(country_id))
-
-    @routes.route("/api/sources/endpoints")
-    def source_registry_endpoints():
-        country = request.args.get("country")
-        if country:
-            eps = source_registry_service.list_endpoints_for_country(country)
-        else:
-            eps = source_registry_service.list_trusted_source_endpoints()
-        return jsonify([{
-            "endpoint_id": ep.endpoint_id,
-            "name": ep.name,
-            "country": ep.country,
-            "iso_code": ep.iso_code,
-            "authority": ep.authority,
-            "authority_type": ep.authority_type,
-            "authority_url": ep.authority_url,
-            "url": ep.url,
-            "sections": list(ep.sections),
-            "source_type": ep.source_type,
-            "content_language": ep.content_language,
-            "extraction_strategy": ep.extraction_strategy,
-            "parser_key": ep.parser_key,
-            "crawl_frequency": ep.crawl_frequency,
-            "change_detection_strategy": ep.change_detection_strategy,
-            "is_javascript_heavy": ep.is_javascript_heavy,
-            "requires_authentication": ep.requires_authentication,
-            "escalation_required": ep.escalation_required,
-            "supports_replay": ep.supports_replay,
-            "trust_level": ep.trust_level,
-            "owner_team": ep.owner_team,
-            "notes": ep.notes,
-            "status": ep.status,
-        } for ep in eps])
-
-    @routes.route("/api/sources/endpoints", methods=["POST"])
-    def source_create_endpoint():
-        data = request.get_json(silent=True) or {}
-        if not data.get("authority_id") or not data.get("url"):
-            return jsonify({"error": "authority_id and url are required"}), 400
-        result = source_registry_service.create_endpoint(data)
-        return jsonify(result), 201
-
-    @routes.route("/api/sources/verify", methods=["POST"])
-    def source_verify_url():
-        data = request.get_json(silent=True) or {}
-        url = (data.get("url") or "").strip()
-        if not url:
-            return jsonify({"error": "url is required"}), 400
-        return jsonify(source_registry_service.verify_url(url))
-
-    @routes.route("/api/sources/classify", methods=["POST"])
-    def source_classify_url():
-        data = request.get_json(silent=True) or {}
-        url = (data.get("url") or "").strip()
-        classification = (data.get("classification") or "").strip()
-        if not url or classification not in ("official", "unofficial_trusted", "not_official"):
-            return jsonify({"error": "url and valid classification required"}), 400
-        result = source_registry_service.classify_url(
-            url, classification,
-            notes=data.get("notes", ""),
-            classified_by=data.get("classified_by", ""),
-            matched_authority=data.get("matched_authority", ""),
-            matched_country=data.get("matched_country", ""),
-        )
-        return jsonify(result)
-
-    @routes.route("/api/sources/classifications")
-    def source_classifications():
-        return jsonify(source_registry_service.list_classifications())
-
-    @routes.route("/api/sources/pdfs")
-    def source_pdf_uploads():
-        jobs = ingestion_job_service.list_recent_jobs(limit=100)
-        pdfs = [j for j in jobs if (j.get("source_url") or "").startswith("pdf://")]
-        return jsonify(pdfs)
-
-    @routes.route("/api/flags")
-    def api_flags():
-        return jsonify(_flags())
-
-    # ── Configuration CRUD API ────────────────────────────────────────────────
-
-    @routes.route("/api/config/sections")
-    def config_sections():
-        if not config_service:
-            return jsonify({"error": "config service not available"}), 503
-        return jsonify(config_service.get_section_groups())
-
-    @routes.route("/api/config/sections", methods=["POST"])
-    def config_create_section():
-        if not config_service:
-            return jsonify({"error": "config service not available"}), 503
-        data = request.get_json(silent=True) or {}
-        section_id = (data.get("id") or "").strip()
-        display_name = (data.get("display_name") or "").strip()
-        group_id = (data.get("group_id") or "").strip()
-        if not section_id or not display_name or not group_id:
-            return jsonify({"error": "id, display_name, and group_id are required"}), 400
-        config_service.create_section(section_id, display_name, group_id,
-                                      sort_order=data.get("sort_order", 0),
-                                      changed_by=data.get("changed_by", "api"))
-        return jsonify({"success": True, "id": section_id}), 201
-
-    @routes.route("/api/config/sections/<section_id>", methods=["PUT"])
-    def config_update_section(section_id):
-        if not config_service:
-            return jsonify({"error": "config service not available"}), 503
-        data = request.get_json(silent=True) or {}
-        result = config_service.update_section(
-            section_id,
-            changed_by=data.get("changed_by", "api"),
-            display_name=data.get("display_name"),
-            group_id=data.get("group_id"),
-            sort_order=data.get("sort_order"),
-            is_active=data.get("is_active"),
-        )
-        if not result:
-            return jsonify({"error": "section not found"}), 404
-        return jsonify({"success": True})
-
-    @routes.route("/api/config/section-groups", methods=["POST"])
-    def config_create_section_group():
-        if not config_service:
-            return jsonify({"error": "config service not available"}), 503
-        data = request.get_json(silent=True) or {}
-        group_id = (data.get("id") or "").strip()
-        label = (data.get("label") or "").strip()
-        if not group_id or not label:
-            return jsonify({"error": "id and label are required"}), 400
-        config_service.create_section_group(group_id, label,
-                                            sort_order=data.get("sort_order", 0),
-                                            changed_by=data.get("changed_by", "api"))
-        return jsonify({"success": True, "id": group_id}), 201
-
-    @routes.route("/api/config/section-groups/<group_id>", methods=["PUT"])
-    def config_update_section_group(group_id):
-        if not config_service:
-            return jsonify({"error": "config service not available"}), 503
-        data = request.get_json(silent=True) or {}
-        result = config_service.update_section_group(
-            group_id,
-            changed_by=data.get("changed_by", "api"),
-            label=data.get("label"),
-            sort_order=data.get("sort_order"),
-            is_active=data.get("is_active"),
-        )
-        if not result:
-            return jsonify({"error": "section group not found"}), 404
-        return jsonify({"success": True})
-
-    @routes.route("/api/config/view-roles/<view_name>", methods=["GET"])
-    def config_get_view_roles(view_name):
-        if not config_service:
-            return jsonify({"error": "config service not available"}), 503
-        groups = config_service.get_sections_for_view(view_name)
-        return jsonify({"view_name": view_name, "group_ids": sorted(groups)})
-
-    @routes.route("/api/config/view-roles/<view_name>", methods=["PUT"])
-    def config_set_view_roles(view_name):
-        if not config_service:
-            return jsonify({"error": "config service not available"}), 503
-        data = request.get_json(silent=True) or {}
-        group_ids = data.get("group_ids", [])
-        if not isinstance(group_ids, list):
-            return jsonify({"error": "group_ids must be a list"}), 400
-        config_service.set_view_role_sections(view_name, group_ids, changed_by=data.get("changed_by", "api"))
-        return jsonify({"success": True})
-
-    @routes.route("/api/config/rubrics")
-    def config_list_rubrics():
-        if not config_service:
-            return jsonify({"error": "config service not available"}), 503
-        return jsonify(config_service.list_classification_rubrics())
-
-    @routes.route("/api/config/rubrics/<country>", methods=["GET"])
-    def config_get_rubric(country):
-        if not config_service:
-            return jsonify({"error": "config service not available"}), 503
-        rubric = config_service.get_classification_rubric(country=country)
-        return jsonify({"country": country, "rubric_text": rubric})
-
-    @routes.route("/api/config/rubrics", methods=["PUT"])
-    def config_set_global_rubric():
-        if not config_service:
-            return jsonify({"error": "config service not available"}), 503
-        data = request.get_json(silent=True) or {}
-        rubric_text = (data.get("rubric_text") or "").strip()
-        if not rubric_text:
-            return jsonify({"error": "rubric_text is required"}), 400
-        config_service.set_classification_rubric(rubric_text, country=None, changed_by=data.get("changed_by", "api"))
-        return jsonify({"success": True})
-
-    @routes.route("/api/config/rubrics/<country>", methods=["PUT"])
-    def config_set_country_rubric(country):
-        if not config_service:
-            return jsonify({"error": "config service not available"}), 503
-        data = request.get_json(silent=True) or {}
-        rubric_text = (data.get("rubric_text") or "").strip()
-        if not rubric_text:
-            return jsonify({"error": "rubric_text is required"}), 400
-        config_service.set_classification_rubric(rubric_text, country=country, changed_by=data.get("changed_by", "api"))
-        return jsonify({"success": True})
-
-    @routes.route("/api/config/rubrics/<country>", methods=["DELETE"])
-    def config_delete_country_rubric(country):
-        if not config_service:
-            return jsonify({"error": "config service not available"}), 503
-        data = request.get_json(silent=True) or {}
-        config_service.delete_classification_rubric(country, changed_by=data.get("changed_by", "api"))
-        return jsonify({"success": True})
-
-    @routes.route("/api/config/<namespace>/<key>", methods=["GET"])
-    def config_get_entry(namespace, key):
-        if not config_service:
-            return jsonify({"error": "config service not available"}), 503
-        value = config_service.get_config(namespace, key)
-        if value is None:
-            return jsonify({"error": "config entry not found"}), 404
-        return jsonify({"namespace": namespace, "key": key, "value": value})
-
-    @routes.route("/api/config/<namespace>/<key>", methods=["PUT"])
-    def config_set_entry(namespace, key):
-        if not config_service:
-            return jsonify({"error": "config service not available"}), 503
-        data = request.get_json(silent=True) or {}
-        if "value" not in data:
-            return jsonify({"error": "value is required"}), 400
-        config_service.set_config(namespace, key, data["value"],
-                                  changed_by=data.get("changed_by", "api"),
-                                  reason=data.get("reason"))
-        return jsonify({"success": True})
-
-    @routes.route("/api/config/<namespace>", methods=["GET"])
-    def config_get_namespace(namespace):
-        if not config_service:
-            return jsonify({"error": "config service not available"}), 503
-        return jsonify(config_service.get_namespace(namespace))
-
-    @routes.route("/api/config/audit")
-    def config_audit_log():
-        if not config_service:
-            return jsonify({"error": "config service not available"}), 503
-        namespace = request.args.get("namespace")
-        key = request.args.get("key")
-        limit = int(request.args.get("limit", 50))
-        return jsonify(config_service.get_config_audit_log(namespace, key, limit))
-
-    return routes
+        _drift_cache["expires"] = time.monotonic() + _DRIFT_CACHE_TTL
+
+    _executor.submit(_warm)
+
+
+# ── Blueprint assembly ────────────────────────────────────────────────────────
+
+def create_api_blueprint(
+    review_service,
+    source_registry_service,
+    ingestion_service,
+    source_snapshot_service,
+    ingestion_job_service,
+    extraction_service,
+    reconciliation_service,
+    provenance_service=None,
+    temporal_rule_service=None,
+    drift_detector=None,
+    config_service=None,
+    pdf_ingestion_service=None,
+    limiter=None,
+):
+    parent = Blueprint("country_guide_routes", __name__)
+
+    parent.register_blueprint(create_dashboard_blueprint(
+        review_service=review_service,
+        config_service=config_service,
+    ))
+
+    parent.register_blueprint(create_review_blueprint(
+        review_service=review_service,
+        limiter=limiter,
+    ))
+
+    parent.register_blueprint(create_guide_blueprint(
+        review_service=review_service,
+        temporal_rule_service=temporal_rule_service,
+        config_service=config_service,
+        limiter=limiter,
+    ))
+
+    parent.register_blueprint(create_drift_blueprint(
+        drift_detector=drift_detector,
+        drift_cache=_drift_cache,
+        drift_cache_ttl=_DRIFT_CACHE_TTL,
+        config_service=config_service,
+    ))
+
+    parent.register_blueprint(create_sources_blueprint(
+        source_registry_service=source_registry_service,
+        ingestion_job_service=ingestion_job_service,
+        config_service=config_service,
+    ))
+
+    parent.register_blueprint(create_pipeline_blueprint(
+        review_service=review_service,
+        source_registry_service=source_registry_service,
+        ingestion_service=ingestion_service,
+        source_snapshot_service=source_snapshot_service,
+        ingestion_job_service=ingestion_job_service,
+        extraction_service=extraction_service,
+        reconciliation_service=reconciliation_service,
+        pdf_ingestion_service=pdf_ingestion_service,
+        executor=_executor,
+        limiter=limiter,
+    ))
+
+    parent.register_blueprint(create_config_blueprint(
+        config_service=config_service,
+    ))
+
+    parent.register_blueprint(create_provenance_blueprint(
+        review_service=review_service,
+        provenance_service=provenance_service,
+    ))
+
+    return parent

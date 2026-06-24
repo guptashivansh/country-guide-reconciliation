@@ -3,7 +3,7 @@
   "configurations": [
     {
       "name": "flask-app",
-      "runtimeExecutable": "/Users/shivanshgupta/Library/Python/3.9/bin/flask",
+      "runtimeExecutable": "/Users/shivanshgupta/Desktop/country-guide-reconciliation/.venv/bin/flask",
       "runtimeArgs": ["run", "--host=0.0.0.0", "--port=8080"],
       "cwd": "/Users/shivanshgupta/Desktop/country-guide-reconciliation",
       "port": 8080,

@@ -71,6 +71,15 @@ signal was found
 - INFORMATIONAL: no material compliance change — punctuation, capitalization, spacing, or \
 non-substantive rewording only"""
 
+_DEFAULT_CORE_SECTIONS = [
+    "annual_leave", "sick_leave", "maternity_leave", "paternity_leave",
+    "working_hours", "overtime", "probation",
+    "minimum_wage", "income_tax", "employer_cost",
+    "social_security", "public_health_insurance",
+    "termination_notice", "severance_payable",
+    "onboarding_time",
+]
+
 _DEFAULT_DRIFT_THRESHOLDS = {
     "pending_days_critical": 14,
     "pending_days_warning": 7,
@@ -173,6 +182,14 @@ class ConfigRepository:
         """)
         c.execute("CREATE INDEX IF NOT EXISTS idx_rubrics_country ON classification_rubrics(country)")
 
+        c.execute("""
+            CREATE TABLE IF NOT EXISTS core_sections (
+                section_id TEXT PRIMARY KEY,
+                added_by TEXT NOT NULL DEFAULT 'system',
+                added_at TEXT NOT NULL
+            )
+        """)
+
         for table, col, default in [
             ("config_entries", "is_active", "1"),
             ("section_groups", "is_active", "1"),
@@ -189,6 +206,16 @@ class ConfigRepository:
         row = c.execute("SELECT COUNT(*) FROM section_groups").fetchone()
         if row[0] == 0:
             self._seed_defaults(conn)
+
+        row = c.execute("SELECT COUNT(*) FROM core_sections").fetchone()
+        if row[0] == 0:
+            now = _now_iso()
+            for sid in _DEFAULT_CORE_SECTIONS:
+                c.execute(
+                    "INSERT OR IGNORE INTO core_sections (section_id, added_by, added_at) VALUES (?, 'system', ?)",
+                    (sid, now),
+                )
+            conn.commit()
 
     def _migrate_drift_keys(self, conn):
         c = conn.cursor()
@@ -243,8 +270,14 @@ class ConfigRepository:
                 ("drift", key, json.dumps(val), vtype, f"Drift threshold: {key}", now, now),
             )
 
+        for sid in _DEFAULT_CORE_SECTIONS:
+            c.execute(
+                "INSERT OR IGNORE INTO core_sections (section_id, added_by, added_at) VALUES (?, 'system', ?)",
+                (sid, now),
+            )
+
         conn.commit()
-        logger.info("Seeded default configuration (sections, rubrics, drift thresholds)")
+        logger.info("Seeded default configuration (sections, rubrics, drift thresholds, core sections)")
 
     # ── generic config CRUD ────────────────────────────────────────────────────
 
@@ -494,6 +527,61 @@ class ConfigRepository:
         )
         conn.commit()
         return True
+
+    # ── core sections (coverage definition) ──────────────────────────────────
+
+    def get_core_sections(self):
+        conn = self.db.connect()
+        rows = conn.execute("SELECT section_id FROM core_sections ORDER BY section_id").fetchall()
+        return [r[0] for r in rows]
+
+    def set_core_sections(self, section_ids, changed_by="system"):
+        conn = self.db.connect()
+        now = _now_iso()
+        old = self.get_core_sections()
+        c = conn.cursor()
+        c.execute("DELETE FROM core_sections")
+        for sid in section_ids:
+            c.execute(
+                "INSERT INTO core_sections (section_id, added_by, added_at) VALUES (?, ?, ?)",
+                (sid, changed_by, now),
+            )
+        c.execute(
+            "INSERT INTO config_audit_log (namespace, key, old_value, new_value, changed_by, change_reason, changed_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            ("coverage", "core_sections", json.dumps(old), json.dumps(list(section_ids)), changed_by, "core sections updated", now),
+        )
+        conn.commit()
+
+    # ── cache version (cross-worker invalidation) ───────────────────────────
+
+    def get_cache_version(self):
+        conn = self.db.connect()
+        row = conn.execute(
+            "SELECT value FROM config_entries WHERE namespace = ? AND key = ?",
+            ("_system", "cache_version"),
+        ).fetchone()
+        return int(row[0]) if row else 0
+
+    def bump_cache_version(self):
+        conn = self.db.connect()
+        row = conn.execute(
+            "SELECT value FROM config_entries WHERE namespace = ? AND key = ?",
+            ("_system", "cache_version"),
+        ).fetchone()
+        new_version = (int(row[0]) + 1) if row else 1
+        now = _now_iso()
+        if row:
+            conn.execute(
+                "UPDATE config_entries SET value = ?, updated_at = ? WHERE namespace = ? AND key = ?",
+                (str(new_version), now, "_system", "cache_version"),
+            )
+        else:
+            conn.execute(
+                "INSERT INTO config_entries (namespace, key, value, value_type, updated_by, updated_at, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                ("_system", "cache_version", str(new_version), "int", "system", now, now),
+            )
+        conn.commit()
+        return new_version
 
     # ── audit log ──────────────────────────────────────────────────────────────
 

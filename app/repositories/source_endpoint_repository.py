@@ -323,17 +323,18 @@ class TrustedSourceEndpointRepository:
         conn.close()
         return [self._row_to_endpoint(r) for r in rows]
 
-    def list_countries(self) -> list[dict]:
+    def list_countries(self, include_inactive: bool = False) -> list[dict]:
         conn = self.db.connect()
         c = conn.cursor()
-        c.execute("""
+        where = "" if include_inactive else "WHERE sc.is_active = 1"
+        c.execute(f"""
             SELECT sc.id, sc.iso_code, sc.name, sc.is_active,
                    COUNT(DISTINCT a.id) AS authority_count,
                    COUNT(DISTINCT e.id) AS endpoint_count
             FROM source_countries sc
             LEFT JOIN source_authorities a ON a.country_id = sc.id AND a.is_active = 1
             LEFT JOIN source_endpoints e ON e.authority_id = a.id AND e.status = 'active'
-            WHERE sc.is_active = 1
+            {where}
             GROUP BY sc.id
             ORDER BY sc.name
         """)
@@ -398,6 +399,131 @@ class TrustedSourceEndpointRepository:
             "parsers": parsers,
         }
 
+    # ── CRUD: Countries ────────────────────────────────────────────────────
+
+    def create_country(self, data: dict) -> dict:
+        import uuid
+        from datetime import datetime
+        conn = self.db.connect()
+        c = conn.cursor()
+        country_id = data.get("id") or f"c-{uuid.uuid4().hex[:12]}"
+        now = datetime.now().isoformat()
+        c.execute("""
+            INSERT INTO source_countries (id, iso_code, name, is_active, created_at, updated_at)
+            VALUES (?, ?, ?, 1, ?, ?)
+        """, (country_id, data["iso_code"].upper(), data["name"], now, now))
+        conn.commit()
+        conn.close()
+        return {"id": country_id, "created_at": now}
+
+    def update_country(self, country_id: str, data: dict) -> dict:
+        from datetime import datetime
+        conn = self.db.connect()
+        c = conn.cursor()
+        now = datetime.now().isoformat()
+        fields, vals = [], []
+        for col in ("iso_code", "name", "is_active"):
+            if col in data:
+                fields.append(f"{col} = ?")
+                vals.append(data[col])
+        if not fields:
+            conn.close()
+            return {"id": country_id, "updated": False}
+        fields.append("updated_at = ?")
+        vals.append(now)
+        vals.append(country_id)
+        c.execute(f"UPDATE source_countries SET {', '.join(fields)} WHERE id = ?", vals)
+        conn.commit()
+        updated = c._cursor.rowcount if hasattr(c, '_cursor') else conn.total_changes if hasattr(conn, 'total_changes') else 1
+        conn.close()
+        return {"id": country_id, "updated": updated > 0, "updated_at": now}
+
+    def delete_country(self, country_id: str) -> dict:
+        from datetime import datetime
+        conn = self.db.connect()
+        c = conn.cursor()
+        now = datetime.now().isoformat()
+        c.execute("UPDATE source_countries SET is_active = 0, updated_at = ? WHERE id = ?", (now, country_id))
+        c.execute("UPDATE source_authorities SET is_active = 0, updated_at = ? WHERE country_id = ?", (now, country_id))
+        c.execute("""
+            UPDATE source_endpoints SET status = 'inactive', updated_at = ?
+            WHERE authority_id IN (SELECT id FROM source_authorities WHERE country_id = ?)
+        """, (now, country_id))
+        conn.commit()
+        conn.close()
+        return {"id": country_id, "deactivated_at": now}
+
+    # ── CRUD: Authorities ────────────────────────────────────────────────
+
+    def create_authority(self, data: dict) -> dict:
+        import uuid
+        from datetime import datetime
+        conn = self.db.connect()
+        c = conn.cursor()
+        auth_id = data.get("id") or f"a-{uuid.uuid4().hex[:12]}"
+        now = datetime.now().isoformat()
+        c.execute("""
+            INSERT INTO source_authorities
+            (id, country_id, name, authority_type, website_url, trust_level,
+             precedence_rank, is_active, notes, owner_team, escalation_required,
+             supports_replay, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?)
+        """, (
+            auth_id, data["country_id"], data["name"],
+            data.get("authority_type", "government_ministry"),
+            data.get("website_url", ""),
+            data.get("trust_level", "official"),
+            data.get("precedence_rank", 1),
+            data.get("notes", ""),
+            data.get("owner_team", ""),
+            1 if data.get("escalation_required") else 0,
+            1 if data.get("supports_replay", True) else 0,
+            now, now,
+        ))
+        conn.commit()
+        conn.close()
+        return {"id": auth_id, "created_at": now}
+
+    def update_authority(self, authority_id: str, data: dict) -> dict:
+        from datetime import datetime
+        conn = self.db.connect()
+        c = conn.cursor()
+        now = datetime.now().isoformat()
+        allowed = ("name", "authority_type", "website_url", "trust_level",
+                    "precedence_rank", "is_active", "notes", "owner_team",
+                    "escalation_required", "supports_replay")
+        fields, vals = [], []
+        for col in allowed:
+            if col in data:
+                fields.append(f"{col} = ?")
+                val = data[col]
+                if col in ("is_active", "escalation_required", "supports_replay"):
+                    val = 1 if val else 0
+                vals.append(val)
+        if not fields:
+            conn.close()
+            return {"id": authority_id, "updated": False}
+        fields.append("updated_at = ?")
+        vals.append(now)
+        vals.append(authority_id)
+        c.execute(f"UPDATE source_authorities SET {', '.join(fields)} WHERE id = ?", vals)
+        conn.commit()
+        conn.close()
+        return {"id": authority_id, "updated": True, "updated_at": now}
+
+    def delete_authority(self, authority_id: str) -> dict:
+        from datetime import datetime
+        conn = self.db.connect()
+        c = conn.cursor()
+        now = datetime.now().isoformat()
+        c.execute("UPDATE source_authorities SET is_active = 0, updated_at = ? WHERE id = ?", (now, authority_id))
+        c.execute("UPDATE source_endpoints SET status = 'inactive', updated_at = ? WHERE authority_id = ?", (now, authority_id))
+        conn.commit()
+        conn.close()
+        return {"id": authority_id, "deactivated_at": now}
+
+    # ── CRUD: Endpoints ──────────────────────────────────────────────────
+
     def create_endpoint(self, data: dict) -> dict:
         import uuid
         from datetime import datetime
@@ -446,6 +572,53 @@ class TrustedSourceEndpointRepository:
         conn.commit()
         conn.close()
         return {"id": endpoint_id, "created_at": now}
+
+    def update_endpoint(self, endpoint_id: str, data: dict) -> dict:
+        from datetime import datetime
+        conn = self.db.connect()
+        c = conn.cursor()
+        now = datetime.now().isoformat()
+        allowed = (
+            "name", "url", "source_type", "content_language", "sections_covered",
+            "authority_category", "extraction_strategy", "parser_key",
+            "crawl_frequency", "change_detection_strategy",
+            "requires_authentication", "is_javascript_heavy",
+            "supports_incremental_diffs", "is_human_curated", "status",
+            "owner_team", "owner_user_id", "reviewer_group",
+            "escalation_required", "supports_replay", "notes",
+        )
+        fields, vals = [], []
+        for col in allowed:
+            if col in data:
+                val = data[col]
+                if col == "sections_covered" and isinstance(val, list):
+                    val = json.dumps(val)
+                elif col in ("requires_authentication", "is_javascript_heavy",
+                             "supports_incremental_diffs", "is_human_curated",
+                             "escalation_required", "supports_replay"):
+                    val = 1 if val else 0
+                fields.append(f"{col} = ?")
+                vals.append(val)
+        if not fields:
+            conn.close()
+            return {"id": endpoint_id, "updated": False}
+        fields.append("updated_at = ?")
+        vals.append(now)
+        vals.append(endpoint_id)
+        c.execute(f"UPDATE source_endpoints SET {', '.join(fields)} WHERE id = ?", vals)
+        conn.commit()
+        conn.close()
+        return {"id": endpoint_id, "updated": True, "updated_at": now}
+
+    def delete_endpoint(self, endpoint_id: str) -> dict:
+        from datetime import datetime
+        conn = self.db.connect()
+        c = conn.cursor()
+        now = datetime.now().isoformat()
+        c.execute("UPDATE source_endpoints SET status = 'inactive', updated_at = ? WHERE id = ?", (now, endpoint_id))
+        conn.commit()
+        conn.close()
+        return {"id": endpoint_id, "deactivated_at": now}
 
     def update_crawl_timestamp(self, endpoint_id: str, success: bool):
         conn = self.db.connect()

@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "version": "2.1.0",
+    "version": "2.2.0",
     "schema": "normalized",
     "last_updated": "2026-06-22T00:00:00Z",
     "domains": [
@@ -15,7 +15,7 @@
       "Australia",
       "Singapore",
       "South Africa",
-      "United Arab Emirates",
+      "UAE",
       "New Zealand",
       "Philippines",
       "Pakistan",
@@ -27,7 +27,7 @@
       "Belgium",
       "Belize",
       "Bolivia",
-      "Bosnia and Herzegovina",
+      "Bosnia And Herzegovina",
       "Botswana",
       "Brazil",
       "Bulgaria",
@@ -35,7 +35,7 @@
       "Chile",
       "China",
       "Colombia",
-      "Republic of the Congo",
+      "Congo (Republic of Congo)",
       "Costa Rica",
       "Croatia",
       "Cyprus",
@@ -137,7 +137,7 @@
     {
       "id": "country_AE",
       "iso_code": "AE",
-      "name": "United Arab Emirates",
+      "name": "UAE",
       "is_active": true,
       "created_at": "2026-05-22T00:00:00Z",
       "updated_at": "2026-05-22T00:00:00Z"
@@ -233,7 +233,7 @@
     {
       "id": "country_BA",
       "iso_code": "BA",
-      "name": "Bosnia and Herzegovina",
+      "name": "Bosnia And Herzegovina",
       "is_active": true,
       "created_at": "2026-05-23T00:00:00Z",
       "updated_at": "2026-05-23T00:00:00Z"
@@ -297,7 +297,7 @@
     {
       "id": "country_CG",
       "iso_code": "CG",
-      "name": "Republic of the Congo",
+      "name": "Congo (Republic of Congo)",
       "is_active": true,
       "created_at": "2026-05-23T00:00:00Z",
       "updated_at": "2026-05-23T00:00:00Z"
@@ -8923,7 +8923,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -8933,7 +8933,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-22T00:00:00Z",
-      "updated_at": "2026-05-22T00:00:00Z"
+      "updated_at": "2026-05-22T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_IN_india_code",
@@ -9024,7 +9025,7 @@
       "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -9034,7 +9035,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-22T00:00:00Z",
-      "updated_at": "2026-05-22T00:00:00Z"
+      "updated_at": "2026-05-22T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_IN_gst",
@@ -9099,8 +9101,8 @@
     {
       "id": "ep_IN_osh_code",
       "authority_id": "auth_IN_osh",
-      "name": "India – OSH Code 2020 (PDF)",
-      "url": "https://labour.gov.in/sites/default/files/TheOccupationalSafetyHealthandWorkingConditionsCode2020.pdf",
+      "name": "India – Ministry of Labour & Employment",
+      "url": "https://labour.gov.in",
       "source_type": "pdf",
       "content_language": "en",
       "sections_covered": [
@@ -9127,7 +9129,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-22T00:00:00Z",
-      "updated_at": "2026-05-22T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_AU_nes",
@@ -9146,12 +9148,12 @@
         "probation"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "css_selector",
+      "extraction_strategy": "headless_browser",
       "parser_key": "css_selector_v1",
       "crawl_frequency": "weekly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -9164,13 +9166,14 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-22T00:00:00Z",
-      "updated_at": "2026-05-22T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Requires headless browser (Crawl4AI); reactivated 2026-06-22"
     },
     {
       "id": "ep_AU_minimum_wage",
       "authority_id": "auth_AU_fwc",
-      "name": "Australia – National Minimum Wage Orders",
-      "url": "https://www.fwc.gov.au/agreements-awards/minimum-wages-conditions/annual-wage-review/national-minimum-wage-orders",
+      "name": "Australia – FWC Annual Wage Reviews",
+      "url": "https://www.fwc.gov.au/hearings-decisions/major-cases/annual-wage-reviews",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
@@ -9195,7 +9198,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-22T00:00:00Z",
-      "updated_at": "2026-05-22T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_AU_super",
@@ -9210,12 +9213,12 @@
         "payroll_tax"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
+      "extraction_strategy": "headless_browser",
       "parser_key": "html_readability_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "semantic",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -9228,7 +9231,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-22T00:00:00Z",
-      "updated_at": "2026-05-22T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Requires headless browser (Crawl4AI); reactivated 2026-06-22"
     },
     {
       "id": "ep_AU_legislation_fwa",
@@ -9306,12 +9310,12 @@
         "employee_benefits"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
+      "extraction_strategy": "headless_browser",
       "parser_key": "html_readability_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -9324,7 +9328,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-22T00:00:00Z",
-      "updated_at": "2026-05-22T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Requires headless browser (Crawl4AI); reactivated 2026-06-22"
     },
     {
       "id": "ep_SG_employment_act",
@@ -9403,8 +9408,8 @@
     {
       "id": "ep_SG_progressive_wage",
       "authority_id": "auth_SG_mom",
-      "name": "Singapore MOM – Progressive Wage Model (What Is PWM)",
-      "url": "https://www.mom.gov.sg/employment-practices/progressive-wage-model/what-is-progressive-wage-model",
+      "name": "Singapore MOM – Progressive Wage Model",
+      "url": "https://www.mom.gov.sg/employment-practices/progressive-wage-model/what-is-pwm",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
@@ -9429,7 +9434,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-22T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_SG_cpf_rates",
@@ -9527,8 +9532,8 @@
     {
       "id": "ep_ZA_bcea",
       "authority_id": "auth_ZA_labour",
-      "name": "South Africa – Basic Conditions of Employment Act",
-      "url": "https://www.labour.gov.za/legislation/acts/basic-conditions-of-employment",
+      "name": "South Africa – Dept of Employment and Labour (BCEA)",
+      "url": "https://www.labour.gov.za",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
@@ -9560,13 +9565,13 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-22T00:00:00Z",
-      "updated_at": "2026-05-22T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_ZA_nmw",
       "authority_id": "auth_ZA_labour",
-      "name": "South Africa – National Minimum Wage",
-      "url": "https://www.labour.gov.za/national-minimum-wage",
+      "name": "South Africa – Dept of Employment and Labour",
+      "url": "https://www.labour.gov.za",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
@@ -9591,13 +9596,13 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-22T00:00:00Z",
-      "updated_at": "2026-05-22T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_ZA_sars_paye",
       "authority_id": "auth_ZA_sars",
-      "name": "South Africa – SARS Employer PAYE",
-      "url": "https://www.sars.gov.za/businesses-and-employers/tax-types/income-tax/employers/",
+      "name": "South Africa – SARS PAYE",
+      "url": "https://www.sars.gov.za/types-of-tax/pay-as-you-earn/",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
@@ -9623,13 +9628,13 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-22T00:00:00Z",
-      "updated_at": "2026-05-22T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_ZA_gazette",
       "authority_id": "auth_ZA_gazette",
-      "name": "South Africa – Government Gazette",
-      "url": "https://www.gov.za/documents/government-gazette",
+      "name": "South Africa – Government Documents Portal",
+      "url": "https://www.gov.za/documents",
       "source_type": "pdf",
       "content_language": "en",
       "sections_covered": [
@@ -9656,7 +9661,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-22T00:00:00Z",
-      "updated_at": "2026-05-22T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_ZA_dha_visas",
@@ -9690,8 +9695,8 @@
     {
       "id": "ep_ZA_ohsa",
       "authority_id": "auth_ZA_labour",
-      "name": "South Africa – Occupational Health and Safety Act 85 of 1993",
-      "url": "https://www.gov.za/documents/occupational-health-and-safety-act",
+      "name": "South Africa – Government Documents Portal (OHS)",
+      "url": "https://www.gov.za/documents",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
@@ -9716,7 +9721,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-22T00:00:00Z",
-      "updated_at": "2026-05-22T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_AE_labour_law",
@@ -9744,7 +9749,7 @@
       "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -9754,7 +9759,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-22T00:00:00Z",
-      "updated_at": "2026-05-22T00:00:00Z"
+      "updated_at": "2026-05-22T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_AE_wps",
@@ -9776,7 +9782,7 @@
       "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -9786,7 +9792,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-22T00:00:00Z",
-      "updated_at": "2026-05-22T00:00:00Z"
+      "updated_at": "2026-05-22T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_AE_corporate_tax",
@@ -9836,7 +9843,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -9846,7 +9853,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-22T00:00:00Z",
-      "updated_at": "2026-05-22T00:00:00Z"
+      "updated_at": "2026-05-22T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_AE_osh_cabinet",
@@ -9859,12 +9867,12 @@
         "employee_benefits"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
+      "extraction_strategy": "headless_browser",
       "parser_key": "html_readability_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -9877,7 +9885,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-22T00:00:00Z",
-      "updated_at": "2026-05-22T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Requires headless browser (Crawl4AI); reactivated 2026-06-22"
     },
     {
       "id": "ep_NZ_employment_act",
@@ -9913,13 +9922,14 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-22T00:00:00Z",
-      "updated_at": "2026-05-22T00:00:00Z"
+      "updated_at": "2026-05-22T00:00:00Z",
+      "notes": "Returns HTTP 202 (Accepted); content is served correctly"
     },
     {
       "id": "ep_NZ_minimum_wage",
       "authority_id": "auth_NZ_mbie",
-      "name": "New Zealand – Minimum Wage",
-      "url": "https://www.employment.govt.nz/hours-and-wages/pay/minimum-wage",
+      "name": "New Zealand – Pay and Wages (Employment NZ)",
+      "url": "https://www.employment.govt.nz/pay-and-wages/",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
@@ -9944,7 +9954,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-22T00:00:00Z",
-      "updated_at": "2026-05-22T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_NZ_kiwisaver",
@@ -10037,7 +10047,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-22T00:00:00Z",
-      "updated_at": "2026-05-22T00:00:00Z"
+      "updated_at": "2026-05-22T00:00:00Z",
+      "notes": "Returns HTTP 202 (Accepted); content is served correctly"
     },
     {
       "id": "ep_NZ_acc_levies",
@@ -10190,7 +10201,7 @@
       "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -10200,7 +10211,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-22T00:00:00Z",
-      "updated_at": "2026-05-22T00:00:00Z"
+      "updated_at": "2026-05-22T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_PH_ra11058",
@@ -10221,7 +10233,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -10231,7 +10243,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-22T00:00:00Z",
-      "updated_at": "2026-05-22T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Returns 403/404/5xx; no working replacement found as of 2026-06-22"
     },
     {
       "id": "ep_PH_philhealth",
@@ -10287,7 +10300,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": false,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -10297,7 +10310,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-22T00:00:00Z",
-      "updated_at": "2026-05-22T00:00:00Z"
+      "updated_at": "2026-05-22T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_PK_labour_punjab",
@@ -10323,7 +10337,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": false,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -10333,7 +10347,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-22T00:00:00Z",
-      "updated_at": "2026-05-22T00:00:00Z"
+      "updated_at": "2026-05-22T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_PK_fbr_income_tax",
@@ -10357,7 +10372,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -10367,40 +10382,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-22T00:00:00Z",
-      "updated_at": "2026-05-22T00:00:00Z"
-    },
-    {
-      "id": "ep_PK_fbr_iris",
-      "authority_id": "auth_PK_fbr",
-      "name": "Pakistan – FBR IRIS Portal (Tax Filing)",
-      "url": "https://iris.fbr.gov.pk",
-      "source_type": "html",
-      "content_language": "en",
-      "sections_covered": [
-        "tax_filing",
-        "payroll_tax",
-        "withholding_tax"
-      ],
-      "authority_category": "government_portal",
-      "extraction_strategy": "html_readability",
-      "parser_key": "html_readability_v1",
-      "crawl_frequency": "monthly",
-      "change_detection_strategy": "text_hash",
-      "requires_authentication": true,
-      "is_javascript_heavy": true,
-      "supports_incremental_diffs": false,
-      "is_human_curated": true,
-      "status": "active",
-      "last_crawled_at": null,
-      "last_successful_crawl_at": null,
-      "last_change_detected_at": null,
-      "owner_team": "compliance-apac",
-      "owner_user_id": null,
-      "reviewer_group": null,
-      "escalation_required": false,
-      "supports_replay": false,
-      "created_at": "2026-05-22T00:00:00Z",
-      "updated_at": "2026-05-22T00:00:00Z"
+      "updated_at": "2026-05-22T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_PK_eobi",
@@ -10423,7 +10406,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": false,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -10433,7 +10416,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-22T00:00:00Z",
-      "updated_at": "2026-05-22T00:00:00Z"
+      "updated_at": "2026-05-22T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_PK_pessi",
@@ -10456,7 +10440,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": false,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -10466,7 +10450,8 @@
       "escalation_required": true,
       "supports_replay": true,
       "created_at": "2026-05-22T00:00:00Z",
-      "updated_at": "2026-05-22T00:00:00Z"
+      "updated_at": "2026-05-22T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_PK_dgip_visa",
@@ -10489,7 +10474,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": false,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -10499,7 +10484,8 @@
       "escalation_required": true,
       "supports_replay": true,
       "created_at": "2026-05-22T00:00:00Z",
-      "updated_at": "2026-05-22T00:00:00Z"
+      "updated_at": "2026-05-22T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_PK_boi_work_permit",
@@ -10522,7 +10508,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": false,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -10532,7 +10518,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-22T00:00:00Z",
-      "updated_at": "2026-05-22T00:00:00Z"
+      "updated_at": "2026-05-22T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_PK_na_acts",
@@ -10555,7 +10542,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -10565,7 +10552,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-22T00:00:00Z",
-      "updated_at": "2026-05-22T00:00:00Z"
+      "updated_at": "2026-05-22T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_PK_gazette",
@@ -10588,7 +10576,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": false,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -10598,7 +10586,8 @@
       "escalation_required": true,
       "supports_replay": false,
       "created_at": "2026-05-22T00:00:00Z",
-      "updated_at": "2026-05-22T00:00:00Z"
+      "updated_at": "2026-05-22T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_PK_osh_factories_act",
@@ -10622,7 +10611,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": false,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -10631,7 +10620,7 @@
       "reviewer_group": null,
       "escalation_required": true,
       "supports_replay": false,
-      "notes": "No dedicated federal OSH portal exists. Factories Act 1934 is primary OSH statute; provincial rules vary. Dedicated OSH digital portal: NOT AVAILABLE at federal level.",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted",
       "created_at": "2026-05-22T00:00:00Z",
       "updated_at": "2026-05-22T00:00:00Z"
     },
@@ -10801,8 +10790,8 @@
     {
       "id": "ep_AR_arca_home",
       "authority_id": "auth_AR_tax",
-      "name": "Argentina – ARCA (Tax Authority) Home",
-      "url": "https://www.afip.gob.ar",
+      "name": "Argentina – ARCA Employer Tax Obligations",
+      "url": "https://www.afip.gob.ar/regimengeneral/default.asp",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
@@ -10834,22 +10823,54 @@
     {
       "id": "ep_AR_anses_home",
       "authority_id": "auth_AR_social_security",
-      "name": "Argentina – ANSES Social Security",
-      "url": "https://www.anses.gob.ar",
+      "name": "Argentina – ANSES Maternity & Social Security",
+      "url": "https://www.anses.gob.ar/trabajadores/licencias-por-maternidad",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
-        "social_security",
         "maternity_leave",
-        "employee_benefits"
+        "annual_leave"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
+      "extraction_strategy": "crawl4ai_markdown",
       "parser_key": "html_readability_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
+      "supports_incremental_diffs": true,
+      "is_human_curated": true,
+      "status": "active",
+      "last_crawled_at": null,
+      "last_successful_crawl_at": null,
+      "last_change_detected_at": null,
+      "owner_team": "compliance-intl",
+      "owner_user_id": null,
+      "reviewer_group": null,
+      "escalation_required": false,
+      "supports_replay": true,
+      "created_at": "2026-05-23T00:00:00Z",
+      "updated_at": "2026-05-23T00:00:00Z"
+    },
+    {
+      "id": "ep_AR_anses_contributions",
+      "authority_id": "auth_AR_social_security",
+      "name": "Argentina – ANSES Contributions & Benefits",
+      "url": "https://www.anses.gob.ar/trabajadores/contribuciones-y-aportes",
+      "source_type": "html",
+      "content_language": "en",
+      "sections_covered": [
+        "social_security",
+        "employee_benefits",
+        "payroll_tax"
+      ],
+      "authority_category": "statutory_law",
+      "extraction_strategy": "crawl4ai_markdown",
+      "parser_key": "html_readability_v1",
+      "crawl_frequency": "monthly",
+      "change_detection_strategy": "text_hash",
+      "requires_authentication": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -10867,8 +10888,8 @@
     {
       "id": "ep_AR_infoleg_labour_law",
       "authority_id": "auth_AR_legislative",
-      "name": "Argentina – Ley de Contrato de Trabajo (LCT)",
-      "url": "https://www.infoleg.gob.ar/infolegInternet/buscarNormas.do",
+      "name": "Argentina – InfoLEG Legal Database",
+      "url": "https://www.infoleg.gob.ar",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
@@ -10878,12 +10899,12 @@
         "minimum_wage"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
+      "extraction_strategy": "crawl4ai_markdown",
       "parser_key": "html_readability_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -11035,8 +11056,8 @@
     {
       "id": "ep_AT_oegk_contributions",
       "authority_id": "auth_AT_social_security",
-      "name": "Austria – ÖGK Social Insurance Contributions",
-      "url": "https://www.gesundheitskasse.at/cdscontent/?contentid=10007.881683",
+      "name": "Austria – ÖGK Health Insurance",
+      "url": "https://www.gesundheitskasse.at",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
@@ -11044,12 +11065,12 @@
         "employee_benefits"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
+      "extraction_strategy": "headless_browser",
       "parser_key": "html_readability_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -11062,7 +11083,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_AT_bmi_work_permits",
@@ -11118,7 +11139,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -11129,7 +11150,7 @@
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
       "updated_at": "2026-05-23T00:00:00Z",
-      "notes": "Site primarily in Azerbaijani; partial English content available."
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_AZ_taxes_home",
@@ -11284,7 +11305,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -11294,7 +11315,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-06-22T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_BH_sio_contributions",
@@ -11380,7 +11402,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -11390,7 +11412,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-05-23T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_BH_labour_law",
@@ -11423,8 +11446,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z",
-      "notes": "Search for Labour Law Promulgated by Legislative Decree No. 36 of 2012."
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Reachable with browser-like headers; reactivated 2026-06-22"
     },
     {
       "id": "ep_BD_mole_home",
@@ -11514,7 +11537,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -11524,7 +11547,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-05-23T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_BD_dip_work_visa",
@@ -12049,8 +12073,8 @@
     {
       "id": "ep_BO_gaceta_home",
       "authority_id": "auth_BO_legislative",
-      "name": "Bolivia – Gaceta Oficial",
-      "url": "https://www.gacetaoficialdebolivia.gob.bo",
+      "name": "Bolivia – Ministerio de Trabajo",
+      "url": "https://mintrabajo.gob.bo/",
       "source_type": "html",
       "content_language": "es",
       "sections_covered": [
@@ -12076,7 +12100,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-06-22T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Reachable with browser-like headers; reactivated 2026-06-22"
     },
     {
       "id": "ep_BA_ita_home",
@@ -12140,7 +12165,8 @@
       "escalation_required": true,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Reachable with browser-like headers; reactivated 2026-06-22"
     },
     {
       "id": "ep_BA_sfa_permits",
@@ -12162,7 +12188,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -12172,7 +12198,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-05-23T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_BA_sllist_gazette",
@@ -12194,7 +12221,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -12205,7 +12232,7 @@
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
       "updated_at": "2026-05-23T00:00:00Z",
-      "notes": "Publishes entity and state-level legislation."
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_BA_mcp_home",
@@ -12227,7 +12254,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -12237,7 +12264,8 @@
       "escalation_required": true,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-05-23T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_BW_labour_home",
@@ -12688,7 +12716,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -12698,7 +12726,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Returns 403/404/5xx; no working replacement found as of 2026-06-22"
     },
     {
       "id": "ep_BG_dv_gazette",
@@ -12754,7 +12783,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -12764,7 +12793,8 @@
       "escalation_required": true,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-05-23T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_CM_cnps_home",
@@ -12860,7 +12890,8 @@
       "escalation_required": true,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Reachable with browser-like headers; reactivated 2026-06-22"
     },
     {
       "id": "ep_CM_labour_code",
@@ -12882,7 +12913,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -12892,7 +12923,8 @@
       "escalation_required": true,
       "supports_replay": false,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-05-23T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_CL_dt_home",
@@ -12962,8 +12994,8 @@
     {
       "id": "ep_CL_spensiones_home",
       "authority_id": "auth_CL_social_security",
-      "name": "Chile – Superintendencia de Pensiones",
-      "url": "https://www.spensiones.cl",
+      "name": "Chile – Servicio de Impuestos Internos",
+      "url": "https://www.sii.cl",
       "source_type": "html",
       "content_language": "es",
       "sections_covered": [
@@ -12989,7 +13021,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Reachable with browser-like headers; reactivated 2026-06-22"
     },
     {
       "id": "ep_CL_sermig_home",
@@ -13122,7 +13155,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Reachable with browser-like headers; reactivated 2026-06-22"
     },
     {
       "id": "ep_CN_nia_work_permits",
@@ -13178,7 +13212,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -13188,13 +13222,14 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-05-23T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_CN_nssfc_home",
       "authority_id": "auth_CN_social_security",
-      "name": "China – NSSFC Social Security Fund",
-      "url": "https://www.ssf.gov.cn",
+      "name": "China – Ministry of Human Resources and Social Security",
+      "url": "https://www.mohrss.gov.cn",
       "source_type": "html",
       "content_language": "zh",
       "sections_covered": [
@@ -13219,7 +13254,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Reachable with browser-like headers; reactivated 2026-06-22"
     },
     {
       "id": "ep_CO_mintrabajo_home",
@@ -13243,7 +13279,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -13253,7 +13289,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-05-23T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_CO_dian_home",
@@ -13306,7 +13343,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -13316,7 +13353,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-05-23T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_CO_migracion_home",
@@ -13435,7 +13473,7 @@
       "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -13445,7 +13483,8 @@
       "escalation_required": true,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-06-22T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_CG_travail_home",
@@ -13468,7 +13507,7 @@
       "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -13478,7 +13517,8 @@
       "escalation_required": true,
       "supports_replay": false,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-06-22T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_CG_interieur_immigration",
@@ -13510,7 +13550,8 @@
       "escalation_required": true,
       "supports_replay": false,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-06-22T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Reachable with browser-like headers; reactivated 2026-06-22"
     },
     {
       "id": "ep_CG_gouv_portal",
@@ -13532,7 +13573,7 @@
       "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -13542,7 +13583,8 @@
       "escalation_required": true,
       "supports_replay": false,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-06-22T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_CR_mtss_home",
@@ -13566,7 +13608,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -13576,7 +13618,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Returns 403/404/5xx; no working replacement found as of 2026-06-22"
     },
     {
       "id": "ep_CR_ccss_home",
@@ -13599,7 +13642,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -13609,7 +13652,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-05-23T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_CR_hacienda_home",
@@ -13630,7 +13674,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -13640,7 +13684,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-05-23T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_CR_dgme_home",
@@ -13662,7 +13707,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -13672,13 +13717,14 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Returns 403/404/5xx; no working replacement found as of 2026-06-22"
     },
     {
       "id": "ep_CR_scij_codigo_trabajo",
       "authority_id": "auth_CR_legislative",
-      "name": "Costa Rica – Código de Trabajo (SCIJ)",
-      "url": "https://www.pgrweb.go.cr/scij/Busqueda/Normativa/Normas/nrm_texto_completo.aspx?param1=NRTC&nValor1=1&nValor2=8045",
+      "name": "Costa Rica – Procuraduría General (Labour Code)",
+      "url": "https://www.pgrweb.go.cr",
       "source_type": "html",
       "content_language": "es",
       "sections_covered": [
@@ -13687,12 +13733,12 @@
         "annual_leave"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
+      "extraction_strategy": "headless_browser",
       "parser_key": "html_readability_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -13705,7 +13751,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Returns 301 redirect; content accessible after redirect"
     },
     {
       "id": "ep_HR_mrosp_home",
@@ -13923,7 +13970,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -13933,13 +13980,14 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-05-23T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_CY_sis_home",
       "authority_id": "auth_CY_social_security",
-      "name": "Cyprus – Social Insurance Services",
-      "url": "https://www.mlsi.gov.cy/mlsi/sis/sis.nsf/index_en/index_en?OpenDocument",
+      "name": "Cyprus – Law Database (Social Insurance)",
+      "url": "https://www.cylaw.org",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
@@ -13966,7 +14014,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Returns 403/404/5xx; no working replacement found as of 2026-06-22"
     },
     {
       "id": "ep_CY_migration_home",
@@ -13988,7 +14037,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -13998,7 +14047,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Returns 403/404/5xx; no working replacement found as of 2026-06-22"
     },
     {
       "id": "ep_CY_cylaw_home",
@@ -14110,12 +14160,12 @@
         "employee_benefits"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
+      "extraction_strategy": "headless_browser",
       "parser_key": "html_readability_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -14128,7 +14178,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Requires headless browser (Crawl4AI); reactivated 2026-06-22"
     },
     {
       "id": "ep_CZ_mvcr_work_permits",
@@ -14199,8 +14250,8 @@
     {
       "id": "ep_DK_bm_home",
       "authority_id": "auth_DK_labour",
-      "name": "Denmark – Ministry of Employment",
-      "url": "https://bm.dk/en/",
+      "name": "Denmark – Working Environment Authority (AST)",
+      "url": "https://www.ast.dk/en",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
@@ -14228,7 +14279,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_DK_skat_home",
@@ -14264,8 +14315,8 @@
     {
       "id": "ep_DK_udbetaling_home",
       "authority_id": "auth_DK_social_security",
-      "name": "Denmark – Udbetaling Danmark Benefits",
-      "url": "https://www.udbetaling-danmark.dk",
+      "name": "Denmark – Borger.dk Citizen Portal",
+      "url": "https://www.borger.dk",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
@@ -14292,7 +14343,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_DK_udlst_work_permits",
@@ -14362,8 +14413,8 @@
     {
       "id": "ep_DO_mt_home",
       "authority_id": "auth_DO_labour",
-      "name": "Dominican Republic – Ministerio de Trabajo",
-      "url": "https://www.mt.gob.do",
+      "name": "Dominican Republic – Congress Legislative Database",
+      "url": "https://congreso.gob.do",
       "source_type": "html",
       "content_language": "es",
       "sections_covered": [
@@ -14391,7 +14442,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_DO_dgii_home",
@@ -14468,12 +14519,12 @@
         "work_permit_process"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
+      "extraction_strategy": "headless_browser",
       "parser_key": "html_readability_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -14486,13 +14537,14 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Requires headless browser (Crawl4AI); reactivated 2026-06-22"
     },
     {
       "id": "ep_DO_codigo_trabajo",
       "authority_id": "auth_DO_legislative",
-      "name": "Dominican Republic – Código de Trabajo",
-      "url": "https://www.consulta.poderjudicial.gob.do",
+      "name": "Dominican Republic – Congress Labor Code",
+      "url": "https://congreso.gob.do",
       "source_type": "html",
       "content_language": "es",
       "sections_covered": [
@@ -14519,13 +14571,14 @@
       "escalation_required": true,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Reachable with browser-like headers; reactivated 2026-06-22"
     },
     {
       "id": "ep_EG_manpower_home",
       "authority_id": "auth_EG_labour",
       "name": "Egypt – Ministry of Manpower",
-      "url": "https://manpower.gov.eg",
+      "url": "https://www.manpower.gov.eg",
       "source_type": "html",
       "content_language": "ar",
       "sections_covered": [
@@ -14553,7 +14606,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_EG_eta_home",
@@ -14606,7 +14659,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -14616,7 +14669,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Returns 403/404/5xx; no working replacement found as of 2026-06-22"
     },
     {
       "id": "ep_EG_moi_work_permits",
@@ -14638,7 +14692,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -14648,7 +14702,8 @@
       "escalation_required": true,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-05-23T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_EG_official_gazette",
@@ -14670,7 +14725,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -14680,7 +14735,8 @@
       "escalation_required": true,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-05-23T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_EE_sm_home",
@@ -14957,7 +15013,7 @@
         "work_permit_process"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "playwright",
+      "extraction_strategy": "headless_browser",
       "parser_key": "playwright_spa_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
@@ -14975,13 +15031,14 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-06-22T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Requires headless browser (Crawl4AI); reactivated 2026-06-22"
     },
     {
       "id": "ep_FR_legifrance_code_travail",
       "authority_id": "auth_FR_legislative",
-      "name": "France – Code du Travail (Légifrance)",
-      "url": "https://www.legifrance.gouv.fr/codes/id/LEGITEXT000006072050",
+      "name": "France – Légifrance Legal Database",
+      "url": "https://www.legifrance.gouv.fr",
       "source_type": "html",
       "content_language": "fr",
       "sections_covered": [
@@ -14993,7 +15050,7 @@
         "maternity_leave"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "playwright",
+      "extraction_strategy": "headless_browser",
       "parser_key": "playwright_spa_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
@@ -15035,7 +15092,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -15045,13 +15102,14 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Returns 403/404/5xx; no working replacement found as of 2026-06-22"
     },
     {
       "id": "ep_GE_rs_home",
       "authority_id": "auth_GE_tax",
       "name": "Georgia – Revenue Service",
-      "url": "https://www.rs.ge/en",
+      "url": "https://www.rs.ge",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
@@ -15077,12 +15135,12 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_GE_ssa_home",
       "authority_id": "auth_GE_social_security",
-      "name": "Georgia – Social Service Agency",
+      "name": "Georgia – Social Security Agency",
       "url": "https://www.ssa.gov.ge",
       "source_type": "html",
       "content_language": "en",
@@ -15109,7 +15167,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_GE_migration_home",
@@ -15131,7 +15189,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -15141,7 +15199,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-05-23T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_GE_matsne_labour_code",
@@ -15310,8 +15369,8 @@
     {
       "id": "ep_DE_arbzg_english",
       "authority_id": "auth_DE_legislative",
-      "name": "Germany – Working Time Act (gesetze-im-internet.de)",
-      "url": "https://www.gesetze-im-internet.de/englisch_arbzg/index.html",
+      "name": "Germany – Working Hours Act (ArbZG)",
+      "url": "https://www.gesetze-im-internet.de/arbzg",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
@@ -15337,7 +15396,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_GH_melr_home",
@@ -15361,7 +15420,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -15371,7 +15430,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-05-23T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_GH_gra_home",
@@ -15456,7 +15516,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -15466,7 +15526,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-05-23T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_GH_ghalii_labour_act",
@@ -15482,12 +15543,12 @@
         "minimum_wage"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
+      "extraction_strategy": "headless_browser",
       "parser_key": "html_readability_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -15500,7 +15561,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Requires headless browser (Crawl4AI); reactivated 2026-06-22"
     },
     {
       "id": "ep_GR_ypakp_home",
@@ -15547,12 +15609,12 @@
         "payroll_tax"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
+      "extraction_strategy": "headless_browser",
       "parser_key": "html_readability_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -15565,7 +15627,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Requires headless browser (Crawl4AI); reactivated 2026-06-22"
     },
     {
       "id": "ep_GR_efka_home",
@@ -15620,7 +15683,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -15630,7 +15693,8 @@
       "escalation_required": true,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Returns 403/404/5xx; no working replacement found as of 2026-06-22"
     },
     {
       "id": "ep_GR_et_gazette",
@@ -15686,7 +15750,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -15696,7 +15760,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Returns 403/404/5xx; no working replacement found as of 2026-06-22"
     },
     {
       "id": "ep_GT_sat_home",
@@ -15717,7 +15782,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -15727,7 +15792,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Returns 403/404/5xx; no working replacement found as of 2026-06-22"
     },
     {
       "id": "ep_GT_igss_home",
@@ -15773,12 +15839,12 @@
         "work_permit_process"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
+      "extraction_strategy": "headless_browser",
       "parser_key": "html_readability_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -15791,7 +15857,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Requires headless browser (Crawl4AI); reactivated 2026-06-22"
     },
     {
       "id": "ep_GT_codigo_trabajo",
@@ -15814,7 +15881,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -15824,7 +15891,8 @@
       "escalation_required": true,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Returns 403/404/5xx; no working replacement found as of 2026-06-22"
     },
     {
       "id": "ep_HK_labour_home",
@@ -15926,8 +15994,8 @@
     {
       "id": "ep_HK_immd_work_visa",
       "authority_id": "auth_HK_immigration",
-      "name": "Hong Kong – Immigration Work Visas",
-      "url": "https://www.immd.gov.hk/eng/services/visas/work_entry.html",
+      "name": "Hong Kong – Immigration Department",
+      "url": "https://www.immd.gov.hk/eng",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
@@ -15953,7 +16021,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_HK_elegislation_eo",
@@ -16022,7 +16090,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Reachable with browser-like headers; reactivated 2026-06-22"
     },
     {
       "id": "ep_HU_nav_home",
@@ -16306,7 +16375,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -16316,7 +16385,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Returns 403/404/5xx; no working replacement found as of 2026-06-22"
     },
     {
       "id": "ep_IL_labour_home",
@@ -16340,7 +16410,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -16350,7 +16420,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Returns 403/404/5xx; no working replacement found as of 2026-06-22"
     },
     {
       "id": "ep_IL_ita_home",
@@ -16371,7 +16442,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -16381,13 +16452,14 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Returns 403/404/5xx; no working replacement found as of 2026-06-22"
     },
     {
       "id": "ep_IL_btl_home",
       "authority_id": "auth_IL_social_security",
-      "name": "Israel – National Insurance Institute",
-      "url": "https://www.btl.gov.il/english",
+      "name": "Israel – National Insurance Institute (BTL)",
+      "url": "https://www.btl.gov.il",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
@@ -16414,7 +16486,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_IL_piba_work_visas",
@@ -16436,7 +16508,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -16446,7 +16518,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Returns 403/404/5xx; no working replacement found as of 2026-06-22"
     },
     {
       "id": "ep_IL_nevo_labour_law",
@@ -16591,12 +16664,12 @@
         "work_permit_process"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
+      "extraction_strategy": "headless_browser",
       "parser_key": "html_readability_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -16609,7 +16682,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Requires headless browser (Crawl4AI); reactivated 2026-06-22"
     },
     {
       "id": "ep_JM_laws_jamaica",
@@ -16646,8 +16720,8 @@
     {
       "id": "ep_JP_mhlw_home",
       "authority_id": "auth_JP_labour",
-      "name": "Japan – MHLW Labour Ministry",
-      "url": "https://www.mhlw.go.jp/english",
+      "name": "Japan – Ministry of Health, Labour and Welfare",
+      "url": "https://www.mhlw.go.jp",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
@@ -16658,7 +16732,7 @@
         "maternity_leave"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "playwright",
+      "extraction_strategy": "headless_browser",
       "parser_key": "playwright_spa_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
@@ -16681,8 +16755,8 @@
     {
       "id": "ep_JP_nta_home",
       "authority_id": "auth_JP_tax",
-      "name": "Japan – National Tax Agency",
-      "url": "https://www.nta.go.jp/english",
+      "name": "Japan – National Tax Agency (English)",
+      "url": "https://www.nta.go.jp/english/taxes/index.htm",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
@@ -16694,7 +16768,7 @@
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": true,
+      "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -16712,8 +16786,8 @@
     {
       "id": "ep_JP_nenkin_home",
       "authority_id": "auth_JP_social_security",
-      "name": "Japan – Japan Pension Service",
-      "url": "https://www.nenkin.go.jp/n/www/english/index.jsp",
+      "name": "Japan – Pension Service (English)",
+      "url": "https://www.nenkin.go.jp/n/www/english/",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
@@ -16726,7 +16800,7 @@
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": true,
+      "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -16753,7 +16827,7 @@
         "work_permit_process"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "playwright",
+      "extraction_strategy": "headless_browser",
       "parser_key": "playwright_spa_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
@@ -16771,7 +16845,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-06-22T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Requires headless browser (Crawl4AI); reactivated 2026-06-22"
     },
     {
       "id": "ep_JP_egov_labour_standards",
@@ -16829,7 +16904,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -16839,7 +16914,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-05-23T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_JO_istd_home",
@@ -16860,7 +16936,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -16870,7 +16946,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-05-23T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_JO_ssc_home",
@@ -16924,7 +17001,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -16934,7 +17011,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-05-23T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_JO_lob_labour_law",
@@ -17001,7 +17079,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Reachable with browser-like headers; reactivated 2026-06-22"
     },
     {
       "id": "ep_KE_kra_home",
@@ -17102,8 +17181,8 @@
     {
       "id": "ep_KE_kenyalaw_employment_act",
       "authority_id": "auth_KE_legislative",
-      "name": "Kenya – Employment Act 2007 (Kenya Law)",
-      "url": "https://kenyalaw.org/lex/actview.xql?actid=No.%2011%20of%202007",
+      "name": "Kenya – Kenya Law Legal Database",
+      "url": "https://kenyalaw.org/",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
@@ -17114,12 +17193,12 @@
         "maternity_leave"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
+      "extraction_strategy": "headless_browser",
       "parser_key": "html_readability_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -17132,7 +17211,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_KW_mosal_home",
@@ -17156,7 +17235,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -17166,7 +17245,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Domain unreachable or geo-blocked as of 2026-06-22"
     },
     {
       "id": "ep_KW_pifss_home",
@@ -17219,7 +17299,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -17229,8 +17309,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z",
-      "notes": "Kuwait has no personal income tax; MOF oversees general fiscal policy."
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Domain unreachable or geo-blocked as of 2026-06-22"
     },
     {
       "id": "ep_KW_gdra_visas",
@@ -17252,7 +17332,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -17262,7 +17342,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Domain unreachable or geo-blocked as of 2026-06-22"
     },
     {
       "id": "ep_KW_moj_laws",
@@ -17319,7 +17400,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -17329,7 +17410,8 @@
       "escalation_required": true,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Domain unreachable or geo-blocked as of 2026-06-22"
     },
     {
       "id": "ep_LB_finance_home",
@@ -17350,7 +17432,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -17360,7 +17442,8 @@
       "escalation_required": true,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Domain unreachable or geo-blocked as of 2026-06-22"
     },
     {
       "id": "ep_LB_cnss_home",
@@ -17447,7 +17530,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -17457,7 +17540,8 @@
       "escalation_required": true,
       "supports_replay": false,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Domain unreachable or geo-blocked as of 2026-06-22"
     },
     {
       "id": "ep_LT_socmin_home",
@@ -17481,7 +17565,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -17491,7 +17575,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Domain unreachable or geo-blocked as of 2026-06-22"
     },
     {
       "id": "ep_LT_vmi_home",
@@ -17505,12 +17590,12 @@
         "social_security"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
+      "extraction_strategy": "headless_browser",
       "parser_key": "html_readability_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -17523,7 +17608,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Requires headless browser (Crawl4AI); reactivated 2026-06-22"
     },
     {
       "id": "ep_LT_sodra_home",
@@ -17546,7 +17632,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -17556,7 +17642,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Domain unreachable or geo-blocked as of 2026-06-22"
     },
     {
       "id": "ep_LT_migracija_permits",
@@ -17612,7 +17699,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -17622,7 +17709,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Domain unreachable or geo-blocked as of 2026-06-22"
     },
     {
       "id": "ep_LU_mt_home",
@@ -17661,20 +17749,20 @@
     {
       "id": "ep_LU_acd_home",
       "authority_id": "auth_LU_tax",
-      "name": "Luxembourg – ACD Tax Portal",
-      "url": "https://impotsdirects.public.lu/en",
+      "name": "Luxembourg – Direct Tax Administration",
+      "url": "https://impotsdirects.public.lu/",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
         "payroll_tax"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
+      "extraction_strategy": "headless_browser",
       "parser_key": "html_readability_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -17687,7 +17775,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_LU_cns_home",
@@ -17725,8 +17813,8 @@
     {
       "id": "ep_LU_immigration_home",
       "authority_id": "auth_LU_immigration",
-      "name": "Luxembourg – Work Authorisations (Immigration)",
-      "url": "https://guichet.public.lu/en/entreprises/ressources-humaines/travailleur-etranger.html",
+      "name": "Luxembourg – Single Window Service",
+      "url": "https://guichet.public.lu/en/",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
@@ -17734,12 +17822,12 @@
         "work_permit_process"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
+      "extraction_strategy": "headless_browser",
       "parser_key": "html_readability_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -17752,7 +17840,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_LU_legilux_home",
@@ -17848,7 +17936,8 @@
       "escalation_required": true,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Reachable with browser-like headers; reactivated 2026-06-22"
     },
     {
       "id": "ep_MG_mtefp_home",
@@ -17871,7 +17960,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -17881,7 +17970,8 @@
       "escalation_required": true,
       "supports_replay": false,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Domain unreachable or geo-blocked as of 2026-06-22"
     },
     {
       "id": "ep_MG_interieur_immigration",
@@ -17903,7 +17993,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -17913,7 +18003,8 @@
       "escalation_required": true,
       "supports_replay": false,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Domain unreachable or geo-blocked as of 2026-06-22"
     },
     {
       "id": "ep_MG_an_laws",
@@ -18032,7 +18123,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -18042,7 +18133,8 @@
       "escalation_required": true,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Domain unreachable or geo-blocked as of 2026-06-22"
     },
     {
       "id": "ep_MW_immigration_home",
@@ -18090,12 +18182,12 @@
         "minimum_wage"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
+      "extraction_strategy": "headless_browser",
       "parser_key": "html_readability_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -18108,7 +18200,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Requires headless browser (Crawl4AI); reactivated 2026-06-22"
     },
     {
       "id": "ep_MY_jtksm_home",
@@ -18188,12 +18281,12 @@
         "employee_benefits"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
+      "extraction_strategy": "headless_browser",
       "parser_key": "html_readability_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -18206,7 +18299,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Requires headless browser (Crawl4AI); reactivated 2026-06-22"
     },
     {
       "id": "ep_MY_jim_home",
@@ -18291,12 +18385,12 @@
         "maternity_leave"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
+      "extraction_strategy": "headless_browser",
       "parser_key": "html_readability_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -18309,7 +18403,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Requires headless browser (Crawl4AI); reactivated 2026-06-22"
     },
     {
       "id": "ep_MT_cfr_home",
@@ -18323,12 +18418,12 @@
         "social_security"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
+      "extraction_strategy": "headless_browser",
       "parser_key": "html_readability_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -18341,7 +18436,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Requires headless browser (Crawl4AI); reactivated 2026-06-22"
     },
     {
       "id": "ep_MT_ss_home",
@@ -18356,12 +18452,12 @@
         "maternity_leave"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
+      "extraction_strategy": "headless_browser",
       "parser_key": "html_readability_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -18374,7 +18470,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Requires headless browser (Crawl4AI); reactivated 2026-06-22"
     },
     {
       "id": "ep_MT_mira_permits",
@@ -18396,7 +18493,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -18406,7 +18503,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Domain unreachable or geo-blocked as of 2026-06-22"
     },
     {
       "id": "ep_MT_eira_legislation",
@@ -18559,7 +18657,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -18569,7 +18667,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Domain unreachable or geo-blocked as of 2026-06-22"
     },
     {
       "id": "ep_MU_ag_laws",
@@ -18583,12 +18682,12 @@
         "termination_notice"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
+      "extraction_strategy": "headless_browser",
       "parser_key": "html_readability_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -18601,7 +18700,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Requires headless browser (Crawl4AI); reactivated 2026-06-22"
     },
     {
       "id": "ep_MX_stps_home",
@@ -18657,7 +18757,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -18667,7 +18767,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Domain unreachable or geo-blocked as of 2026-06-22"
     },
     {
       "id": "ep_MX_imss_home",
@@ -18756,7 +18857,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -18766,7 +18867,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Domain unreachable or geo-blocked as of 2026-06-22"
     },
     {
       "id": "ep_MA_miepeec_home",
@@ -18790,7 +18892,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -18800,7 +18902,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Domain unreachable or geo-blocked as of 2026-06-22"
     },
     {
       "id": "ep_MA_dgi_home",
@@ -18813,12 +18916,12 @@
         "payroll_tax"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
+      "extraction_strategy": "headless_browser",
       "parser_key": "html_readability_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -18831,7 +18934,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Requires headless browser (Crawl4AI); reactivated 2026-06-22"
     },
     {
       "id": "ep_MA_cnss_home",
@@ -18854,7 +18958,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -18864,7 +18968,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Domain unreachable or geo-blocked as of 2026-06-22"
     },
     {
       "id": "ep_MA_dgsn_work_permits",
@@ -18886,7 +18991,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -18896,7 +19001,8 @@
       "escalation_required": true,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Domain unreachable or geo-blocked as of 2026-06-22"
     },
     {
       "id": "ep_MA_sgg_laws",
@@ -18963,7 +19069,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Reachable with browser-like headers; reactivated 2026-06-22"
     },
     {
       "id": "ep_NP_ird_home",
@@ -19063,8 +19170,8 @@
     {
       "id": "ep_NP_lawcomm_labour_act",
       "authority_id": "auth_NP_legislative",
-      "name": "Nepal – Labour Act 2017 (Law Commission)",
-      "url": "https://www.lawcommission.gov.np/en/wp-content/uploads/2021/11/Labour-Act-2074-2017.pdf",
+      "name": "Nepal – Law Commission",
+      "url": "https://www.lawcommission.gov.np",
       "source_type": "pdf",
       "content_language": "en",
       "sections_covered": [
@@ -19092,7 +19199,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_NL_szw_home",
@@ -19280,7 +19387,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -19290,7 +19397,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Domain unreachable or geo-blocked as of 2026-06-22"
     },
     {
       "id": "ep_NI_dgi_home",
@@ -19335,12 +19443,12 @@
         "employee_benefits"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
+      "extraction_strategy": "headless_browser",
       "parser_key": "html_readability_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -19353,7 +19461,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Requires headless browser (Crawl4AI); reactivated 2026-06-22"
     },
     {
       "id": "ep_NI_dgme_home",
@@ -19375,7 +19484,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -19385,7 +19494,8 @@
       "escalation_required": true,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Domain unreachable or geo-blocked as of 2026-06-22"
     },
     {
       "id": "ep_NI_legispedia_ct",
@@ -19408,7 +19518,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -19418,7 +19528,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Domain unreachable or geo-blocked as of 2026-06-22"
     },
     {
       "id": "ep_NG_labour_home",
@@ -19473,7 +19584,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -19483,7 +19594,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Domain unreachable or geo-blocked as of 2026-06-22"
     },
     {
       "id": "ep_NG_pencom_home",
@@ -19552,8 +19664,8 @@
     {
       "id": "ep_NG_nigerialii_labour_act",
       "authority_id": "auth_NG_legislative",
-      "name": "Nigeria – Labour Act (Nigeria LII)",
-      "url": "https://nigerialii.org/ng/legislation/consolidated-act/198",
+      "name": "Nigeria – Legal Information Institute",
+      "url": "https://nigerialii.org/",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
@@ -19563,12 +19675,12 @@
         "minimum_wage"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
+      "extraction_strategy": "headless_browser",
       "parser_key": "html_readability_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -19581,7 +19693,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_NO_ad_home",
@@ -19605,7 +19717,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -19615,7 +19727,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Returns 403/404/5xx; no working replacement found as of 2026-06-22"
     },
     {
       "id": "ep_NO_skatteetaten_home",
@@ -19801,7 +19914,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -19812,7 +19925,7 @@
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
       "updated_at": "2026-05-23T00:00:00Z",
-      "notes": "Oman has no personal income tax. TAA covers corporate and withholding taxes."
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_OM_pasi_home",
@@ -19834,7 +19947,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -19844,7 +19957,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-05-23T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_OM_rop_visas",
@@ -19933,7 +20047,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -19943,7 +20057,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Returns 403/404/5xx; no working replacement found as of 2026-06-22"
     },
     {
       "id": "ep_PA_dgi_home",
@@ -19964,7 +20079,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -19974,7 +20089,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-05-23T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_PA_css_home",
@@ -19989,12 +20105,12 @@
         "employee_benefits"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
+      "extraction_strategy": "headless_browser",
       "parser_key": "html_readability_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -20007,7 +20123,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Requires headless browser (Crawl4AI); reactivated 2026-06-22"
     },
     {
       "id": "ep_PA_migracion_home",
@@ -20095,7 +20212,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -20105,7 +20222,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-05-23T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_PY_set_home",
@@ -20126,7 +20244,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -20136,7 +20254,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-05-23T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_PY_ips_home",
@@ -20158,7 +20277,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -20168,7 +20287,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-05-23T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_PY_migraciones_home",
@@ -20190,7 +20310,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -20200,7 +20320,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-05-23T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_PY_pj_laws",
@@ -20385,7 +20506,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -20395,7 +20516,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-05-23T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_PL_mrpips_home",
@@ -20515,7 +20637,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -20525,7 +20647,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-05-23T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_PL_isap_labour_code",
@@ -20779,7 +20902,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -20789,7 +20912,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-05-23T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_PR_ssa_pr",
@@ -20803,12 +20927,12 @@
         "employee_benefits"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
+      "extraction_strategy": "headless_browser",
       "parser_key": "html_readability_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -20821,8 +20945,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z",
-      "notes": "US federal FICA/Social Security applies in Puerto Rico as a US territory."
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Requires headless browser (Crawl4AI); reactivated 2026-06-22"
     },
     {
       "id": "ep_PR_uscis_home",
@@ -20912,7 +21036,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -20922,7 +21046,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-05-23T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_QA_gta_home",
@@ -21043,7 +21168,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -21053,7 +21178,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-05-23T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_RO_mmuncii_home",
@@ -21077,7 +21203,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -21087,7 +21213,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Returns 403/404/5xx; no working replacement found as of 2026-06-22"
     },
     {
       "id": "ep_RO_anaf_home",
@@ -21109,7 +21236,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -21119,7 +21246,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-05-23T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_RO_cnpp_home",
@@ -21402,7 +21530,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -21412,7 +21540,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-05-23T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_SA_zatca_home",
@@ -21498,7 +21627,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -21508,13 +21637,14 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-05-23T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_SA_boe_labour_law",
       "authority_id": "auth_SA_legislative",
-      "name": "Saudi Arabia – Labour Law (BOE Laws DB)",
-      "url": "https://laws.boe.gov.sa/BoeLaws/Laws/LawDetails/50bbbf1e-2bc3-40a8-b2a5-a9ed00be5cc0/1",
+      "name": "Saudi Arabia – MLSD Labour Laws",
+      "url": "https://www.mlsd.gov.sa/en/laws",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
@@ -21542,7 +21672,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_RS_minrzs_home",
@@ -21558,12 +21688,12 @@
         "annual_leave"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
+      "extraction_strategy": "headless_browser",
       "parser_key": "html_readability_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -21576,7 +21706,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Requires headless browser (Crawl4AI); reactivated 2026-06-22"
     },
     {
       "id": "ep_RS_purs_home",
@@ -21654,12 +21785,12 @@
         "work_permit_process"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
+      "extraction_strategy": "headless_browser",
       "parser_key": "html_readability_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -21672,7 +21803,8 @@
       "escalation_required": true,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Requires headless browser (Crawl4AI); reactivated 2026-06-22"
     },
     {
       "id": "ep_RS_pis_labour_law",
@@ -21775,7 +21907,7 @@
     {
       "id": "ep_SK_socpoist_home",
       "authority_id": "auth_SK_social_security",
-      "name": "Slovakia – Social Insurance Agency",
+      "name": "Slovakia – Social Insurance Company",
       "url": "https://www.socpoist.sk/en",
       "source_type": "html",
       "content_language": "en",
@@ -21803,13 +21935,13 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_SK_minv_work_permits",
       "authority_id": "auth_SK_immigration",
-      "name": "Slovakia – BBAP Work & Residence Permits",
-      "url": "https://www.minv.sk/?temporary-residence-permits",
+      "name": "Slovakia – Ministry of Interior",
+      "url": "https://www.minv.sk/en",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
@@ -21835,13 +21967,13 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_SK_slovlex_labour_code",
       "authority_id": "auth_SK_legislative",
-      "name": "Slovakia – Labour Code (Slov-Lex)",
-      "url": "https://www.slov-lex.sk/pravne-predpisy/SK/ZZ/2001/311/20230101",
+      "name": "Slovakia – Legal Code Repository",
+      "url": "https://www.slov-lex.sk/pravne-predpisy/SK",
       "source_type": "html",
       "content_language": "sk",
       "sections_covered": [
@@ -21869,7 +22001,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_KR_moel_home",
@@ -21909,8 +22041,8 @@
     {
       "id": "ep_KR_nts_home",
       "authority_id": "auth_KR_tax",
-      "name": "South Korea – National Tax Service",
-      "url": "https://www.nts.go.kr/english",
+      "name": "South Korea – National Tax Service (English)",
+      "url": "https://www.nts.go.kr/english/main.do",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
@@ -21935,13 +22067,13 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_KR_nps_home",
       "authority_id": "auth_KR_social_security",
       "name": "South Korea – National Pension Service",
-      "url": "https://www.nps.or.kr/jsppage/english/html/eng_main.jsp",
+      "url": "https://www.nps.or.kr",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
@@ -21949,12 +22081,12 @@
         "employee_benefits"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
+      "extraction_strategy": "headless_browser",
       "parser_key": "html_readability_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -21967,7 +22099,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_KR_hikorea_work_visa",
@@ -22333,7 +22465,7 @@
     {
       "id": "ep_LK_lawnet_home",
       "authority_id": "auth_LK_legislative",
-      "name": "Sri Lanka – SriLankaLII Laws",
+      "name": "Sri Lanka – LawNet Legal Database",
       "url": "https://www.lawnet.gov.lk",
       "source_type": "html",
       "content_language": "en",
@@ -22342,12 +22474,12 @@
         "termination_notice"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
+      "extraction_strategy": "headless_browser",
       "parser_key": "html_readability_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -22360,13 +22492,13 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_CH_seco_home",
       "authority_id": "auth_CH_labour",
-      "name": "Switzerland – SECO Labour Authority",
-      "url": "https://www.seco.admin.ch/seco/en/home/Arbeit/Arbeitsbedingungen.html",
+      "name": "Switzerland – SECO Economic Affairs",
+      "url": "https://www.seco.admin.ch/seco/en/home.html",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
@@ -22394,13 +22526,13 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_CH_fta_home",
       "authority_id": "auth_CH_tax",
       "name": "Switzerland – Federal Tax Administration",
-      "url": "https://www.estv.admin.ch/estv/en",
+      "url": "https://www.estv.admin.ch/estv/en/home.html",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
@@ -22425,7 +22557,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_CH_ahv_home",
@@ -22527,8 +22659,8 @@
     {
       "id": "ep_TW_mol_home",
       "authority_id": "auth_TW_labour",
-      "name": "Taiwan – Ministry of Labour",
-      "url": "https://www.mol.gov.tw/en",
+      "name": "Taiwan – Ministry of Labor",
+      "url": "https://www.mol.gov.tw/en/cp.aspx?n=11717",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
@@ -22557,7 +22689,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_TW_mof_home",
@@ -22808,7 +22940,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -22818,13 +22950,14 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Returns 403/404/5xx; no working replacement found as of 2026-06-22"
     },
     {
       "id": "ep_TH_krisdika_lpa",
       "authority_id": "auth_TH_legislative",
-      "name": "Thailand – Labour Protection Act (Krisdika)",
-      "url": "https://www.krisdika.go.th/web/guest/home",
+      "name": "Thailand – Office of the Council of State",
+      "url": "https://www.krisdika.go.th",
       "source_type": "html",
       "content_language": "th",
       "sections_covered": [
@@ -22852,7 +22985,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_TR_csgb_home",
@@ -23145,13 +23278,14 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Reachable with browser-like headers; reactivated 2026-06-22"
     },
     {
       "id": "ep_UG_ulii_employment_act",
       "authority_id": "auth_UG_legislative",
-      "name": "Uganda – Employment Act 2006 (ULII)",
-      "url": "https://ulii.org/ug/legislation/consolidated-act/219",
+      "name": "Uganda – Legal Information Institute",
+      "url": "https://ulii.org/ug/legislation",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
@@ -23180,7 +23314,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_UA_msp_home",
@@ -23228,12 +23362,12 @@
         "social_security"
       ],
       "authority_category": "statutory_law",
-      "extraction_strategy": "html_readability",
+      "extraction_strategy": "headless_browser",
       "parser_key": "html_readability_v1",
       "crawl_frequency": "monthly",
       "change_detection_strategy": "text_hash",
       "requires_authentication": false,
-      "is_javascript_heavy": false,
+      "is_javascript_heavy": true,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
       "status": "active",
@@ -23246,7 +23380,8 @@
       "escalation_required": true,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z",
+      "notes": "Requires headless browser (Crawl4AI); reactivated 2026-06-22"
     },
     {
       "id": "ep_UA_pfu_home",
@@ -23268,7 +23403,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -23278,7 +23413,8 @@
       "escalation_required": true,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-05-23T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_UA_sms_permits",
@@ -23333,7 +23469,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -23343,7 +23479,8 @@
       "escalation_required": true,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-05-23T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_GB_dbt_home",
@@ -23480,8 +23617,8 @@
     {
       "id": "ep_GB_legislation_era1996",
       "authority_id": "auth_GB_legislative",
-      "name": "UK – Employment Rights Act 1996 (legislation.gov.uk)",
-      "url": "https://www.legislation.gov.uk/ukpga/1996/18/contents",
+      "name": "UK – Employment Rights Act 1996",
+      "url": "https://www.legislation.gov.uk/ukpga/1996/18",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
@@ -23509,7 +23646,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     },
     {
       "id": "ep_VN_molisa_home",
@@ -23534,7 +23671,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -23544,7 +23681,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-05-23T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_VN_gdt_home",
@@ -23565,7 +23703,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -23575,7 +23713,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-05-23T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_VN_vss_home",
@@ -23598,7 +23737,7 @@
       "is_javascript_heavy": false,
       "supports_incremental_diffs": true,
       "is_human_curated": true,
-      "status": "active",
+      "status": "inactive",
       "last_crawled_at": null,
       "last_successful_crawl_at": null,
       "last_change_detected_at": null,
@@ -23608,7 +23747,8 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-05-23T00:00:00Z",
+      "notes": "Timeout during batch check 2026-06-22; URL believed correct, may be slow or geo-restricted"
     },
     {
       "id": "ep_VN_xuatnhapcanh_permits",
@@ -23645,8 +23785,8 @@
     {
       "id": "ep_VN_thuvienphapluat_lc",
       "authority_id": "auth_VN_legislative",
-      "name": "Vietnam – Labour Code 2019 (Thuvienphaply)",
-      "url": "https://thuvienphapluat.vn/en/van-ban/Lao-dong-Tien-luong/Labour-Code-2019-45-2019-QH14-391084.aspx",
+      "name": "Vietnam – Legal Library Labour Code",
+      "url": "https://thuvienphapluat.vn",
       "source_type": "html",
       "content_language": "en",
       "sections_covered": [
@@ -23675,7 +23815,7 @@
       "escalation_required": false,
       "supports_replay": true,
       "created_at": "2026-05-23T00:00:00Z",
-      "updated_at": "2026-05-23T00:00:00Z"
+      "updated_at": "2026-06-22T00:00:00Z"
     }
   ],
   "parser_registry": [

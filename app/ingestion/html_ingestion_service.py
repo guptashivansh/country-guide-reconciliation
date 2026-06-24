@@ -1,18 +1,22 @@
+import asyncio
 import hashlib
 import logging
 import time
 
 import requests
-from bs4 import BeautifulSoup
 
 from app.models.workflow_results import FailureDetail, IngestionResult
 from app.utils.config import (
     ingestion_max_content_length,
     ingestion_max_retries,
-    ingestion_min_line_length,
-    ingestion_strip_tags,
     ingestion_timeout,
 )
+
+try:
+    from crawl4ai import AsyncWebCrawler
+    _HAS_CRAWL4AI = True
+except Exception:
+    _HAS_CRAWL4AI = False
 
 
 logger = logging.getLogger(__name__)
@@ -30,25 +34,85 @@ _HEADERS = {
 
 
 class HtmlIngestionService:
-    def __init__(self, timeout=None, max_retries=None, strip_tags=None,
-                 min_line_length=None, max_content_length=None):
+    def __init__(self, timeout=None, max_retries=None,
+                 max_content_length=None):
         self.timeout = timeout if timeout is not None else ingestion_timeout()
         self.max_retries = max_retries if max_retries is not None else ingestion_max_retries()
-        self.strip_tags = strip_tags if strip_tags is not None else ingestion_strip_tags()
-        self.min_line_length = min_line_length if min_line_length is not None else ingestion_min_line_length()
         self.max_content_length = max_content_length if max_content_length is not None else ingestion_max_content_length()
+    def fetch_clean_text(self, url, engine=None):
+        if engine == "requests":
+            return self._fetch_requests(url)
+        if _HAS_CRAWL4AI and engine != "requests":
+            result = self._fetch_crawl4ai(url)
+            if result.succeeded:
+                return result
+            logger.info("Crawl4AI failed for %s, falling back to requests", url)
+        return self._fetch_requests(url)
 
-    def fetch_clean_text(self, url):
+    # -- Crawl4AI (primary) ---------------------------------------------------
+
+    def _fetch_crawl4ai(self, url):
+        loop = asyncio.new_event_loop()
+        try:
+            return loop.run_until_complete(self._crawl(url))
+        finally:
+            loop.close()
+
+    async def _crawl(self, url):
+        last_exc = None
+        for attempt in range(self.max_retries):
+            crawler = None
+            try:
+                logger.info(
+                    "Fetching source content via Crawl4AI",
+                    extra={"stage": "ingestion_fetch", "source_url": url, "attempt": attempt + 1},
+                )
+                crawler = AsyncWebCrawler()
+                await crawler.__aenter__()
+                result = await crawler.arun(url=url)
+
+                if not result.success:
+                    raise RuntimeError(result.error_message or "Crawl failed")
+
+                return self._build_success(url, result.markdown or "")
+            except Exception as exc:
+                last_exc = exc
+                logger.warning(
+                    "Crawl attempt failed — will retry",
+                    extra={"stage": "ingestion_fetch", "source_url": url,
+                           "attempt": attempt + 1, "error": str(exc)},
+                )
+                if attempt < self.max_retries - 1:
+                    await asyncio.sleep(2)
+            finally:
+                if crawler is not None:
+                    try:
+                        await crawler.__aexit__(None, None, None)
+                    except Exception:
+                        pass
+
+        return self._build_failure(url, last_exc, "crawl_error")
+
+    # -- requests fallback -----------------------------------------------------
+
+    def _fetch_requests(self, url):
         last_exc = None
         for attempt in range(self.max_retries):
             try:
                 logger.info(
-                    "Fetching source content",
+                    "Fetching source content via requests",
                     extra={"stage": "ingestion_fetch", "source_url": url, "attempt": attempt + 1},
                 )
                 resp = requests.get(url, headers=_HEADERS, timeout=self.timeout)
                 resp.raise_for_status()
-                break  # success
+
+                from bs4 import BeautifulSoup
+                soup = BeautifulSoup(resp.text, "html.parser")
+                for tag in soup(["script", "style", "nav", "footer", "header", "aside"]):
+                    tag.decompose()
+                text = soup.get_text(separator="\n", strip=True)
+
+                return self._build_success(url, text)
             except requests.exceptions.Timeout as exc:
                 last_exc = exc
                 logger.warning(
@@ -59,76 +123,50 @@ class HtmlIngestionService:
             except requests.exceptions.HTTPError as exc:
                 if exc.response is not None and exc.response.status_code >= 500 and attempt < self.max_retries - 1:
                     last_exc = exc
-                    logger.warning(
-                        "5xx from source — will retry",
-                        extra={"stage": "ingestion_fetch", "source_url": url,
-                               "status_code": exc.response.status_code, "attempt": attempt + 1},
-                    )
                     time.sleep(2)
                 else:
                     last_exc = exc
-                    break  # 4xx or final 5xx — no point retrying
+                    break
             except Exception as exc:
                 last_exc = exc
-                break  # non-retryable
+                break
 
-        if last_exc is not None:
-            failure_type = "network_error" if isinstance(last_exc, requests.RequestException) else "unknown_error"
-            logger.error(
-                "Failed to fetch or normalize source content",
-                extra={"stage": "ingestion", "source_url": url,
-                       "failure": str(last_exc), "failure_type": failure_type},
-            )
-            return IngestionResult(
-                status="failed",
-                source_url=url,
-                failure=FailureDetail(
-                    type=failure_type,
-                    reason=str(last_exc),
-                    metadata={"stage": "ingestion"},
-                ),
-            )
+        failure_type = "network_error" if isinstance(last_exc, requests.RequestException) else "unknown_error"
+        return self._build_failure(url, last_exc, failure_type)
 
-        try:
-            logger.info(
-                "Fetched source content",
-                extra={"stage": "ingestion_fetch", "source_url": url, "status_code": resp.status_code},
-            )
+    # -- shared helpers --------------------------------------------------------
 
-            soup = BeautifulSoup(resp.text, "html.parser")
-            for tag in soup(self.strip_tags):
-                tag.decompose()
+    def _build_success(self, url, text):
+        text = text.replace("\x00", "")
+        if len(text) > self.max_content_length:
+            logger.warning("Truncating content from %d to %d chars", len(text), self.max_content_length)
+            text = text[:self.max_content_length]
 
-            text = soup.get_text(separator="\n", strip=True)
-            text = "\n".join(line for line in text.splitlines() if len(line.strip()) > self.min_line_length)
-            if len(text) > self.max_content_length:
-                logger.warning("Truncating content from %d to %d chars", len(text), self.max_content_length)
-                text = text[:self.max_content_length]
+        logger.info(
+            "Normalized source content",
+            extra={"stage": "ingestion_normalize", "source_url": url, "character_count": len(text)},
+        )
+        content_hash = hashlib.md5(text.encode()).hexdigest()
+        return IngestionResult(
+            status="success",
+            source_url=url,
+            raw_text=text,
+            content_hash=content_hash,
+            metadata={"character_count": len(text), "engine": "crawl4ai" if _HAS_CRAWL4AI else "requests"},
+        )
 
-            logger.info(
-                "Normalized source content",
-                extra={"stage": "ingestion_normalize", "source_url": url, "character_count": len(text)},
-            )
-            content_hash = hashlib.md5(text.encode()).hexdigest()
-            return IngestionResult(
-                status="success",
-                source_url=url,
-                raw_text=text,
-                content_hash=content_hash,
-                metadata={"character_count": len(text)},
-            )
-        except Exception as e:
-            failure_type = "network_error" if isinstance(e, requests.RequestException) else "unknown_error"
-            logger.error(
-                "Failed to fetch or normalize source content",
-                extra={"stage": "ingestion", "source_url": url, "failure": str(e), "failure_type": failure_type},
-            )
-            return IngestionResult(
-                status="failed",
-                source_url=url,
-                failure=FailureDetail(
-                    type=failure_type,
-                    reason=str(e),
-                    metadata={"stage": "ingestion"},
-                ),
-            )
+    def _build_failure(self, url, exc, failure_type):
+        logger.error(
+            "Failed to fetch or normalize source content",
+            extra={"stage": "ingestion", "source_url": url,
+                   "failure": str(exc), "failure_type": failure_type},
+        )
+        return IngestionResult(
+            status="failed",
+            source_url=url,
+            failure=FailureDetail(
+                type=failure_type,
+                reason=str(exc),
+                metadata={"stage": "ingestion"},
+            ),
+        )
