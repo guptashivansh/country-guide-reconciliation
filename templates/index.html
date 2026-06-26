@@ -3506,9 +3506,24 @@
         body: JSON.stringify({ countries: selected }),
       });
       const data = await res.json();
-      toast(data.message, 'success');
-      loadMetrics();
-      loadQueue();
+      if (!data.success) { toast(data.message, 'error'); return; }
+      text.textContent = 'Syncing…';
+      const poll = setInterval(async () => {
+        try {
+          const sr = await fetch('/api/sync/status');
+          const ss = await sr.json();
+          if (!ss.running) {
+            clearInterval(poll);
+            toast(ss.message || 'Sync complete', 'success');
+            loadMetrics();
+            loadQueue();
+            btn.disabled = false;
+            icon.textContent = '⟳';
+            text.textContent = 'Sync Now';
+          }
+        } catch (_) {}
+      }, 5000);
+      return;
     } catch (e) {
       toast('Sync failed — check your connection', 'error');
     } finally {

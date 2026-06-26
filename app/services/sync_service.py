@@ -1,6 +1,9 @@
 import logging
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 logger = logging.getLogger(__name__)
+
+MAX_WORKERS = 5
 
 
 def run_single_job(services, job_id, source_url, country, sections=None, fetch_only=False, engine=None):
@@ -69,11 +72,6 @@ def run_single_job(services, job_id, source_url, country, sections=None, fetch_o
 
 
 def run_sync(services, countries=None, fetch_only=False, engine=None):
-    """
-    Run the full sync pipeline for all (or a subset of) country endpoints.
-
-    Returns a dict with keys: total_changes, endpoints_processed, failures.
-    """
     source_registry_service = services["source_registry_service"]
     ingestion_job_service = services["ingestion_job_service"]
 
@@ -90,35 +88,51 @@ def run_sync(services, countries=None, fetch_only=False, engine=None):
 
     logger.info(
         "Country guide sync started",
-        extra={"stage": "sync", "countries": list(selected_countries) or "all"},
+        extra={"stage": "sync", "countries": list(selected_countries) or "all", "endpoints": len(endpoints), "workers": MAX_WORKERS},
     )
 
+    jobs = []
     for source_endpoint in endpoints:
-        stats = _country_stats(source_endpoint.country)
         job_id = ingestion_job_service.create_job(source_endpoint.url, country=source_endpoint.country)
+        jobs.append((job_id, source_endpoint))
 
-        result = run_single_job(
-            services, job_id, source_endpoint.url,
-            source_endpoint.country, source_endpoint.sections,
-            fetch_only=fetch_only, engine=engine,
-        )
+    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as pool:
+        futures = {
+            pool.submit(
+                run_single_job,
+                services, job_id, ep.url, ep.country, ep.sections,
+                fetch_only=fetch_only, engine=engine,
+            ): (job_id, ep)
+            for job_id, ep in jobs
+        }
 
-        if result["success"]:
-            changes_queued = result["changes_queued"]
-            total_changes += changes_queued
-            stats["changes"] += changes_queued
-            logger.info(
-                "Source endpoint processed",
-                extra={
-                    "stage": "sync",
-                    "source_url": source_endpoint.url,
-                    "ingestion_job_id": job_id,
-                    "changes_queued": changes_queued,
-                },
-            )
-        else:
-            failures += 1
-            stats["failed"] = True
+        for future in as_completed(futures):
+            job_id, ep = futures[future]
+            stats = _country_stats(ep.country)
+            try:
+                result = future.result()
+            except Exception as e:
+                logger.error("Job future failed", extra={"stage": "sync", "source_url": ep.url, "failure": str(e)})
+                failures += 1
+                stats["failed"] = True
+                continue
+
+            if result["success"]:
+                changes_queued = result["changes_queued"]
+                total_changes += changes_queued
+                stats["changes"] += changes_queued
+                logger.info(
+                    "Source endpoint processed",
+                    extra={
+                        "stage": "sync",
+                        "source_url": ep.url,
+                        "ingestion_job_id": job_id,
+                        "changes_queued": changes_queued,
+                    },
+                )
+            else:
+                failures += 1
+                stats["failed"] = True
 
     logger.info(
         "Country guide sync completed",

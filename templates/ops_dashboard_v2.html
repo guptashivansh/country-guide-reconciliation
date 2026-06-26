@@ -3975,16 +3975,33 @@ async function runSync() {
   count.textContent = selected.length ? selected.length + ' countries' : 'all countries';
 
   try {
-    fill.style.width = '30%';
-    status.textContent = 'fetching & reconciling…';
+    fill.style.width = '20%';
+    status.textContent = 'starting sync…';
     const body = selected.length ? { countries: selected } : {};
     const res = await fetch('/api/sync', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
     const data = await res.json();
-    fill.style.width = '100%';
-    status.textContent = 'complete';
-    setTimeout(() => banner.classList.remove('open'), 1500);
-    toast(data.message || `Sync complete · ${data.changes_queued || 0} changes queued`, 'info');
-    loadAll();
+    if (!data.success) { throw new Error(data.message); }
+    status.textContent = 'syncing sources…';
+    fill.style.width = '30%';
+
+    const poll = setInterval(async () => {
+      try {
+        const sr = await fetch('/api/sync/status');
+        const ss = await sr.json();
+        if (ss.running) {
+          const pct = Math.min(30 + (ss.endpoints_processed || 0) * 0.15, 95);
+          fill.style.width = pct + '%';
+          status.textContent = `syncing… ${ss.endpoints_processed || 0} endpoints processed`;
+        } else {
+          clearInterval(poll);
+          fill.style.width = '100%';
+          status.textContent = 'complete';
+          setTimeout(() => banner.classList.remove('open'), 1500);
+          toast(ss.message || 'Sync complete', 'info');
+          loadAll();
+        }
+      } catch (_) {}
+    }, 5000);
   } catch (err) {
     fill.style.width = '100%';
     status.textContent = 'failed';
@@ -4291,8 +4308,18 @@ async function syncCountry(country, event) {
       body: JSON.stringify({ countries: [country] }),
     });
     const data = await res.json();
-    toast(data.message || ('Sync complete for ' + country), data.success ? 'info' : 'danger');
-    loadAll();
+    if (!data.success) { toast(data.message, 'danger'); return; }
+    const poll = setInterval(async () => {
+      try {
+        const sr = await fetch('/api/sync/status');
+        const ss = await sr.json();
+        if (!ss.running) {
+          clearInterval(poll);
+          toast(ss.message || ('Sync complete for ' + country), 'info');
+          loadAll();
+        }
+      } catch (_) {}
+    }, 3000);
   } catch (err) {
     toast('Sync failed: ' + err.message, 'danger');
   }

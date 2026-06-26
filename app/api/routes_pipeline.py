@@ -1,6 +1,7 @@
 """Ingestion/sync/metrics API routes — sync, retry-job, ingestion-jobs, metrics, PDF intake."""
 
 import logging
+import threading
 
 from flask import Blueprint, jsonify, request
 
@@ -9,6 +10,9 @@ from app.services.slack_service import send_sync_alert
 from app.utils.config import slack_webhook_url
 
 logger = logging.getLogger(__name__)
+
+_sync_lock = threading.Lock()
+_sync_status = {"running": False, "last_result": None}
 
 
 def create_pipeline_blueprint(
@@ -108,6 +112,9 @@ def create_pipeline_blueprint(
     @bp.route("/api/sync", methods=["POST"])
     @_limit("5 per minute")
     def sync():
+        if _sync_status["running"]:
+            return jsonify({"success": False, "message": "Sync already in progress"}), 409
+
         body = request.get_json(silent=True) or {}
         selected_countries = list(body.get("countries") or [])
         fetch_only = bool(body.get("fetch_only"))
@@ -121,16 +128,36 @@ def create_pipeline_blueprint(
             "extraction_service": extraction_service,
             "reconciliation_service": reconciliation_service,
         }
-        result = run_sync(services, countries=selected_countries or None, fetch_only=fetch_only, engine=engine)
-        send_sync_alert(slack_webhook_url(), result, triggered_by="manual")
 
-        total_changes = result["total_changes"]
+        def _run():
+            try:
+                _sync_status["running"] = True
+                _sync_status["last_result"] = None
+                result = run_sync(services, countries=selected_countries or None, fetch_only=fetch_only, engine=engine)
+                send_sync_alert(slack_webhook_url(), result, triggered_by="manual")
+                _sync_status["last_result"] = result
+            except Exception as e:
+                logger.error("Background sync failed", extra={"failure": str(e)})
+                _sync_status["last_result"] = {"total_changes": 0, "endpoints_processed": 0, "failures": 1, "error": str(e)}
+            finally:
+                _sync_status["running"] = False
+
+        threading.Thread(target=_run, daemon=True).start()
+        return jsonify({"success": True, "message": "Sync started in background"})
+
+    @bp.route("/api/sync/status", methods=["GET"])
+    def sync_status():
+        result = _sync_status["last_result"]
+        if _sync_status["running"]:
+            return jsonify({"running": True, "message": "Sync in progress"})
+        if result is None:
+            return jsonify({"running": False, "message": "No sync has run yet"})
         return jsonify({
-            "success": True,
-            "changes_queued": total_changes,
-            "endpoints_processed": result["endpoints_processed"],
-            "failures": result["failures"],
-            "message": f"{total_changes} change(s) queued for review" if total_changes > 0 else "No changes detected"
+            "running": False,
+            "changes_queued": result.get("total_changes", 0),
+            "endpoints_processed": result.get("endpoints_processed", 0),
+            "failures": result.get("failures", 0),
+            "message": f"{result.get('total_changes', 0)} change(s) queued for review",
         })
 
     @bp.route("/api/intake/pdf", methods=["POST"])
