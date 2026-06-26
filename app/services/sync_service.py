@@ -3,7 +3,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 logger = logging.getLogger(__name__)
 
-MAX_WORKERS = 5
+MAX_WORKERS = 3
 
 
 def run_single_job(services, job_id, source_url, country, sections=None, fetch_only=False, engine=None):

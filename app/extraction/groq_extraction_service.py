@@ -1,4 +1,6 @@
 import logging
+import threading
+import time
 
 from groq import Groq
 from groq import AuthenticationError, RateLimitError
@@ -13,6 +15,8 @@ logger = logging.getLogger(__name__)
 
 
 class GroqExtractionService:
+    RPM_PER_KEY = 30
+
     def __init__(self, api_keys, parser=None, chunker=None, aggregator=None, max_attempts=2, model=None):
         if isinstance(api_keys, str):
             api_keys = [api_keys] if api_keys else []
@@ -23,6 +27,9 @@ class GroqExtractionService:
         self.chunker = chunker or ContentChunker()
         self.aggregator = aggregator or EmploymentRuleAggregator()
         self.max_attempts = max_attempts
+        self._min_interval = 60.0 / (self.RPM_PER_KEY * max(len(self._clients), 1))
+        self._last_call = 0.0
+        self._lock = threading.Lock()
 
     @property
     def client(self):
@@ -31,6 +38,17 @@ class GroqExtractionService:
     def _rotate_key(self):
         self._current = (self._current + 1) % len(self._clients)
         logger.info("Rotated to next Groq API key", extra={"key_index": self._current})
+
+    def _throttle(self):
+        with self._lock:
+            elapsed = time.time() - self._last_call
+            if elapsed < self._min_interval:
+                wait = self._min_interval - elapsed
+            else:
+                wait = 0
+            self._last_call = time.time() + wait
+        if wait:
+            time.sleep(wait)
 
     def extract_employment_rules(self, content, source_url, country, sections):
         if self.client is None:
@@ -223,17 +241,24 @@ Content:
         )
 
     def _request_extraction(self, prompt):
-        for attempt in range(len(self._clients)):
+        max_attempts = max(len(self._clients) * 2, 4)
+        for attempt in range(max_attempts):
+            self._throttle()
             try:
                 response = self.client.chat.completions.create(
                     model=self.model,
                     messages=[{"role": "user", "content": prompt}],
                     temperature=0.1,
                 )
-                return response.choices[0].message.content.strip()
-            except (RateLimitError, AuthenticationError) as exc:
-                logger.warning(
-                    "Groq key %d failed (%s), rotating to next key", self._current, type(exc).__name__
-                )
                 self._rotate_key()
-        raise RateLimitError("All Groq API keys have been exhausted")
+                return response.choices[0].message.content.strip()
+            except RateLimitError:
+                logger.warning("Groq rate-limited on key %d, rotating", self._current)
+                self._rotate_key()
+                backoff = min(2 ** attempt, 30)
+                logger.info("Backing off %ds before retry", backoff)
+                time.sleep(backoff)
+            except AuthenticationError:
+                logger.warning("Groq auth failed on key %d, rotating", self._current)
+                self._rotate_key()
+        raise RuntimeError("All Groq API keys exhausted after retries")
