@@ -33,10 +33,9 @@ class IngestionJobRepository:
                 country TEXT
             )
         ''')
-        try:
+        columns = self.db.get_table_columns(conn, "ingestion_jobs")
+        if "country" not in columns:
             c.execute("ALTER TABLE ingestion_jobs ADD COLUMN country TEXT")
-        except Exception:
-            pass
         conn.commit()
         conn.close()
 

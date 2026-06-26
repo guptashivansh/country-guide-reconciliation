@@ -25,12 +25,8 @@ def groq_api_key():
 
 
 def groq_api_keys():
-    """Return list of Groq API keys. Reads GROQ_API_KEYS (comma-separated) with GROQ_API_KEY as fallback."""
-    multi = os.environ.get("GROQ_API_KEYS", "")
-    keys = [k.strip().strip("'").strip('"') for k in multi.split(",") if k.strip()]
-    if not keys and groq_api_key():
-        keys = [groq_api_key()]
-    return keys
+    raw = os.environ.get("GROQ_API_KEYS", "") or os.environ.get("GROQ_API_KEY", "")
+    return [k.strip().strip("'").strip('"') for k in raw.split(",") if k.strip()]
 
 
 def anthropic_api_key():
@@ -38,12 +34,8 @@ def anthropic_api_key():
 
 
 def anthropic_api_keys():
-    """Return list of Anthropic API keys. Reads ANTHROPIC_API_KEYS (comma-separated) with ANTHROPIC_API_KEY as fallback."""
-    multi = os.environ.get("ANTHROPIC_API_KEYS", "")
-    keys = [k.strip().strip("'").strip('"') for k in multi.split(",") if k.strip()]
-    if not keys and anthropic_api_key():
-        keys = [anthropic_api_key()]
-    return keys
+    raw = os.environ.get("ANTHROPIC_API_KEYS", "") or os.environ.get("ANTHROPIC_API_KEY", "")
+    return [k.strip().strip("'").strip('"') for k in raw.split(",") if k.strip()]
 
 
 def extraction_chunk_size():
@@ -80,11 +72,8 @@ def gemini_api_key():
 
 
 def gemini_api_keys():
-    multi = os.environ.get("GEMINI_API_KEYS", "")
-    keys = [k.strip().strip("'").strip('"') for k in multi.split(",") if k.strip()]
-    if not keys and gemini_api_key():
-        keys = [gemini_api_key()]
-    return keys
+    raw = os.environ.get("GEMINI_API_KEYS", "") or os.environ.get("GEMINI_API_KEY", "")
+    return [k.strip().strip("'").strip('"') for k in raw.split(",") if k.strip()]
 
 
 def gemini_model():
