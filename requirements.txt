@@ -11,3 +11,5 @@ anthropic>=0.40,<1
 google-genai>=1.0,<2
 psycopg2-binary>=2.9,<3
 python-dotenv>=1.0,<2
+pytest>=8,<9
+pytest-cov>=5,<7

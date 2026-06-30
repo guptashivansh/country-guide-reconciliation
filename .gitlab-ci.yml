@@ -1,0 +1,26 @@
+image: python:3.13-slim
+
+stages:
+  - test
+  - build
+  - push
+  - pre-deploy
+  - deploy
+
+variables:
+  DOCKER_HOST: tcp://dind.gitlab-ci:2375
+  DOCKER_TLS_CERTDIR: ''
+  SERVICE_NAME: country-guide-recon
+  DOCKER_IMAGE: python:3.13-slim
+  PACK_MANAGER: pip
+  TEST_COV: pytest --ignore=tests/e2e --cov=app --cov-report=xml:coverage.xml --junitxml=test-report.xml
+
+include:
+  - project: 'skuad/ci-templates'
+    ref: main
+    file:
+      - '/.backend.yml'
+  - project: 'skuad/ci-templates'
+    ref: main
+    file:
+      - '/.secrets.yml'
