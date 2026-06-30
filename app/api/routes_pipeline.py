@@ -66,6 +66,8 @@ def create_pipeline_blueprint(
             services, new_job_id, source_url,
             country=endpoint.country if endpoint else country,
             sections=endpoint.sections if endpoint else None,
+            resume_from=retry_result.get("resume_from", "queued"),
+            existing_snapshot_id=retry_result.get("existing_snapshot_id"),
         )
 
         if pipeline_result["success"]:
@@ -224,6 +226,7 @@ def create_pipeline_blueprint(
                     reason = extraction_result.failure.reason if extraction_result.failure else "extraction returned no rules"
                     ingestion_job_service.mark_failed(job_id, reason)
                     return
+                source_snapshot_service.mark_extraction_succeeded(snapshot_id, rules=extraction_result.rules)
                 ingestion_job_service.mark_extracted(job_id)
 
                 reconciliation_result = reconciliation_service.reconcile_extracted_rules(

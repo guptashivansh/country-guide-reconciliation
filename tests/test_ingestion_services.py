@@ -75,4 +75,6 @@ class TestIngestionJobService:
             "job_id": 43,
             "source_url": "https://example.com",
             "country": "India",
+            "resume_from": "queued",
+            "existing_snapshot_id": None,
         }

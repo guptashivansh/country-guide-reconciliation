@@ -1,8 +1,10 @@
 from app import create_app
 from app.repositories.country_guide_repository import CountryGuideRepository
 from app.repositories.ingestion_job_repository import IngestionJobRepository
+from app.repositories.provenance_repository import ProvenanceRepository
 from app.repositories.source_snapshot_repository import SourceSnapshotRepository
-from app.utils.config import database_path, load_env_file
+from app.services.provenance_service import ProvenanceService
+from app.utils.config import database_path, load_env_file, parser_version
 from app.utils.logging_config import configure_logging
 
 import logging
@@ -23,8 +25,13 @@ def init_db():
 
 
 def seed_initial_guide():
-    repository = CountryGuideRepository(database_path())
-    repository.seed_initial_country_guide()
+    db_path = database_path()
+    repository = CountryGuideRepository(db_path)
+    provenance_service = ProvenanceService(
+        ProvenanceRepository(db_path),
+        parser_version=parser_version(),
+    )
+    repository.seed_initial_country_guide(provenance_service=provenance_service)
 
 
 if __name__ == "__main__":

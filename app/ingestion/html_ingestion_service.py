@@ -139,8 +139,7 @@ class HtmlIngestionService:
     def _build_success(self, url, text):
         text = text.replace("\x00", "")
         if len(text) > self.max_content_length:
-            logger.warning("Truncating content from %d to %d chars", len(text), self.max_content_length)
-            text = text[:self.max_content_length]
+            text = self._smart_truncate(text, self.max_content_length, url)
 
         logger.info(
             "Normalized source content",
@@ -154,6 +153,32 @@ class HtmlIngestionService:
             content_hash=content_hash,
             metadata={"character_count": len(text), "engine": "crawl4ai" if _HAS_CRAWL4AI else "requests"},
         )
+
+    @staticmethod
+    def _smart_truncate(text, max_length, url):
+        import re
+        lines = text.split("\n")
+        start = 0
+        for i, line in enumerate(lines):
+            stripped = line.strip().lower()
+            if not stripped:
+                continue
+            if any(kw in stripped for kw in (
+                "skip to", "cookie", "accept all", "menu", "navigation",
+                "sign in", "log in", "search", "subscribe",
+            )):
+                start = i + 1
+                continue
+            if len(stripped) < 15 and not re.search(r"\d", stripped):
+                start = i + 1
+                continue
+            break
+        trimmed = "\n".join(lines[start:])
+        if len(trimmed) <= max_length:
+            return trimmed
+        logger.warning("Truncating content from %d to %d chars (skipped %d boilerplate lines)",
+                       len(text), max_length, start)
+        return trimmed[:max_length]
 
     def _build_failure(self, url, exc, failure_type):
         logger.error(

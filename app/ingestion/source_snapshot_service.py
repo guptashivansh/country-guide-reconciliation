@@ -1,3 +1,4 @@
+import json
 import logging
 
 
@@ -26,8 +27,11 @@ class SourceSnapshotService:
         )
         return snapshot_id
 
-    def mark_extraction_succeeded(self, snapshot_id):
-        self.source_snapshot_repository.update_extraction_status(snapshot_id, "succeeded")
+    def mark_extraction_succeeded(self, snapshot_id, rules=None):
+        rules_json = json.dumps([r.model_dump() if hasattr(r, 'model_dump') else r for r in rules]) if rules else None
+        self.source_snapshot_repository.update_extraction_status(
+            snapshot_id, "succeeded", extracted_rules_json=rules_json,
+        )
         logger.info(
             "Marked snapshot extraction succeeded",
             extra={"stage": "snapshot", "source_snapshot_id": snapshot_id},
@@ -42,3 +46,6 @@ class SourceSnapshotService:
 
     def get_snapshot(self, snapshot_id):
         return self.source_snapshot_repository.get_snapshot(snapshot_id)
+
+    def get_latest_by_source_url(self, source_url):
+        return self.source_snapshot_repository.get_latest_by_source_url(source_url)

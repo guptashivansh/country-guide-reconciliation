@@ -25,7 +25,7 @@ from app.services.provenance_service import ProvenanceService
 from app.services.temporal_rule_service import TemporalRuleService
 from app.drift.detector import DriftDetector
 from app.drift.repository import DriftRepository
-from app.utils.config import anthropic_api_keys, claude_model, database_path, extraction_chunk_size, gemini_api_keys, gemini_model, groq_api_keys, groq_model, load_env_file, official_sources_json_url, slack_webhook_url, sync_cron_schedule, parser_version  # noqa: E501
+from app.utils.config import anthropic_api_keys, claude_model, database_path, extraction_chunk_size, gemini_api_keys, gemini_model, groq_api_keys, groq_model, load_env_file, official_sources_json_url, ollama_base_url, ollama_model, slack_webhook_url, sync_cron_schedule, parser_version  # noqa: E501
 from app.utils.db import Database
 from app.utils.logging_config import configure_logging
 
@@ -61,7 +61,9 @@ def build_services(db_path=None):
             "anthropic": claude_model(),
             "gemini": gemini_model(),
             "groq": groq_model(),
+            "ollama": ollama_model(),
         },
+        ollama_base_url=ollama_base_url(),
     )
     reconciliation_engine = LLMReconciliationEngine(
         reconciliation_provider,

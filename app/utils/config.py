@@ -39,7 +39,7 @@ def anthropic_api_keys():
 
 
 def extraction_chunk_size():
-    return int(os.environ.get("EXTRACTION_CHUNK_SIZE", "6000"))
+    return int(os.environ.get("EXTRACTION_CHUNK_SIZE", "24000"))
 
 
 def official_sources_json_url():
@@ -80,6 +80,14 @@ def gemini_model():
     return os.environ.get("GEMINI_MODEL", "gemini-2.0-flash")
 
 
+def ollama_model():
+    return os.environ.get("OLLAMA_MODEL", "qwen2.5:3b")
+
+
+def ollama_base_url():
+    return os.environ.get("OLLAMA_BASE_URL", "http://host.docker.internal:11434")
+
+
 def parser_version():
     return os.environ.get("PARSER_VERSION", f"groq/{groq_model()}/v1")
 
@@ -94,4 +102,4 @@ def ingestion_max_retries():
 
 
 def ingestion_max_content_length():
-    return int(os.environ.get("INGESTION_MAX_CONTENT_LENGTH", "6000"))
+    return int(os.environ.get("INGESTION_MAX_CONTENT_LENGTH", "24000"))

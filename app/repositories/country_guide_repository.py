@@ -328,7 +328,7 @@ class CountryGuideRepository:
         conn.close()
         return {"country": country, "section": section, "old_value": old_value, "new_value": new_value, "updated_at": timestamp}
 
-    def seed_initial_country_guide(self):
+    def seed_initial_country_guide(self, provenance_service=None):
         initial_data = [
             ("India", "annual_leave", "12 days per year", "https://labour.gov.in/", ""),
             ("India", "working_hours", "48 hours per week, 9 hours per day", "https://labour.gov.in/", ""),
@@ -356,6 +356,13 @@ class CountryGuideRepository:
 
         conn.commit()
         conn.close()
+
+        # Record source-traceable provenance for each seeded rule, mirroring the
+        # Notion auto-seed path. Without this, seeded rows are flagged NO_PROVENANCE
+        # by the drift detector. Best-effort: never let provenance break seeding.
+        if provenance_service:
+            for country, section, value, url, _ in initial_data:
+                provenance_service.record_seed(country, section, value, url)
 
     def list_countries_summary(self):
         conn = self.connect()

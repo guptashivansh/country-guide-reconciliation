@@ -25,6 +25,9 @@ class SourceSnapshotRepository:
                 extraction_status TEXT NOT NULL
             )
         ''')
+        columns = self.db.get_table_columns(conn, "source_snapshots")
+        if "extracted_rules_json" not in columns:
+            c.execute("ALTER TABLE source_snapshots ADD COLUMN extracted_rules_json TEXT")
         conn.commit()
         conn.close()
 
@@ -41,13 +44,19 @@ class SourceSnapshotRepository:
         conn.close()
         return snapshot_id
 
-    def update_extraction_status(self, snapshot_id, extraction_status):
+    def update_extraction_status(self, snapshot_id, extraction_status, extracted_rules_json=None):
         conn = self.connect()
         c = conn.cursor()
-        c.execute(
-            "UPDATE source_snapshots SET extraction_status=? WHERE id=?",
-            (extraction_status, snapshot_id),
-        )
+        if extracted_rules_json is not None:
+            c.execute(
+                "UPDATE source_snapshots SET extraction_status=?, extracted_rules_json=? WHERE id=?",
+                (extraction_status, extracted_rules_json, snapshot_id),
+            )
+        else:
+            c.execute(
+                "UPDATE source_snapshots SET extraction_status=? WHERE id=?",
+                (extraction_status, snapshot_id),
+            )
         conn.commit()
         conn.close()
 
@@ -55,7 +64,7 @@ class SourceSnapshotRepository:
         conn = self.connect()
         c = conn.cursor()
         c.execute("""
-            SELECT id, source_url, raw_text, content_hash, captured_at, extraction_status
+            SELECT id, source_url, raw_text, content_hash, captured_at, extraction_status, extracted_rules_json
             FROM source_snapshots
             WHERE id=?
         """, (snapshot_id,))
@@ -63,6 +72,26 @@ class SourceSnapshotRepository:
         conn.close()
         if not row:
             return None
+        return self._row_to_dict(row)
+
+    def get_latest_by_source_url(self, source_url):
+        conn = self.connect()
+        c = conn.cursor()
+        c.execute("""
+            SELECT id, source_url, raw_text, content_hash, captured_at, extraction_status, extracted_rules_json
+            FROM source_snapshots
+            WHERE source_url=?
+            ORDER BY id DESC
+            LIMIT 1
+        """, (source_url,))
+        row = c.fetchone()
+        conn.close()
+        if not row:
+            return None
+        return self._row_to_dict(row)
+
+    @staticmethod
+    def _row_to_dict(row):
         return {
             "id": row[0],
             "source_url": row[1],
@@ -70,4 +99,5 @@ class SourceSnapshotRepository:
             "content_hash": row[3],
             "captured_at": row[4],
             "extraction_status": row[5],
+            "extracted_rules_json": row[6] if len(row) > 6 else None,
         }

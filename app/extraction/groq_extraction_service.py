@@ -15,12 +15,12 @@ logger = logging.getLogger(__name__)
 
 
 class GroqExtractionService:
-    RPM_PER_KEY = 30
+    RPM_PER_KEY = 15
 
     def __init__(self, api_keys, parser=None, chunker=None, aggregator=None, max_attempts=2, model=None):
         if isinstance(api_keys, str):
             api_keys = [api_keys] if api_keys else []
-        self._clients = [Groq(api_key=k) for k in api_keys if k]
+        self._clients = [Groq(api_key=k, max_retries=0) for k in api_keys if k]
         self._current = 0
         self.model = model or "llama-3.3-70b-versatile"
         self.parser = parser or EmploymentRuleParser()

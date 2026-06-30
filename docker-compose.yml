@@ -7,6 +7,8 @@ services:
       - .env
     environment:
       - DATABASE_URL=postgresql://regulift:${POSTGRES_PASSWORD:-regulift}@db:5432/country_guides
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       db:
         condition: service_started

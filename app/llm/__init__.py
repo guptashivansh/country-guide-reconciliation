@@ -1,22 +1,24 @@
 """LLM provider registry.
 
 ``create_reconciliation_provider`` picks the highest-priority backend that has
-at least one API key configured.  Priority order: Anthropic > Gemini > Groq.
+at least one API key configured.  Priority order: Anthropic > Ollama > Gemini > Groq.
 """
 
 from app.llm.claude_provider import ClaudeProvider
 from app.llm.gemini_provider import GeminiProvider
 from app.llm.groq_provider import GroqProvider
+from app.llm.ollama_provider import OllamaProvider
 
 # Priority-ordered list of (name, provider_class, default_model)
 _PROVIDER_ORDER = [
     ("anthropic", ClaudeProvider, "claude-sonnet-4-6"),
+    ("ollama", OllamaProvider, "qwen2.5:3b"),
     ("gemini", GeminiProvider, "gemini-2.0-flash"),
     ("groq", GroqProvider, "llama-3.3-70b-versatile"),
 ]
 
 
-def create_reconciliation_provider(api_keys_by_name, models_by_name=None):
+def create_reconciliation_provider(api_keys_by_name, models_by_name=None, **kwargs):
     """Return an LLMProvider instance for the highest-priority backend with keys.
 
     Parameters
@@ -35,8 +37,15 @@ def create_reconciliation_provider(api_keys_by_name, models_by_name=None):
     models_by_name = models_by_name or {}
 
     for name, cls, default_model in _PROVIDER_ORDER:
+        if name == "ollama":
+            model = models_by_name.get(name, default_model)
+            base_url = kwargs.get("ollama_base_url", "http://host.docker.internal:11434")
+            provider = cls(model=model, base_url=base_url)
+            if provider.configured:
+                return provider
+            continue
         keys = api_keys_by_name.get(name)
-        if keys:  # truthy: non-None, non-empty list
+        if keys:
             model = models_by_name.get(name, default_model)
             return cls(keys, model=model)
 

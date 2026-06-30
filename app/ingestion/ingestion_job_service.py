@@ -26,11 +26,28 @@ class IngestionJobService:
         new_id = self.ingestion_job_repository.create_job(
             original["source_url"], country=original.get("country"),
         )
+
+        if original.get("extracted_at"):
+            resume_from = "extracted"
+        elif original.get("normalized_at"):
+            resume_from = "normalized"
+        else:
+            resume_from = "queued"
+
         logger.info(
             "Ingestion job retried",
-            extra={"stage": "queued", "original_job_id": job_id, "new_job_id": new_id, "source_url": original["source_url"]},
+            extra={
+                "stage": "queued", "original_job_id": job_id, "new_job_id": new_id,
+                "source_url": original["source_url"], "resume_from": resume_from,
+            },
         )
-        return {"job_id": new_id, "source_url": original["source_url"], "country": original.get("country")}
+        return {
+            "job_id": new_id,
+            "source_url": original["source_url"],
+            "country": original.get("country"),
+            "resume_from": resume_from,
+            "existing_snapshot_id": original.get("source_snapshot_id"),
+        }
 
     def mark_fetched(self, job_id):
         self.ingestion_job_repository.transition_job(job_id, "fetched")
