@@ -7,10 +7,6 @@ services:
       - .env
     environment:
       - DATABASE_URL=postgresql://regulift:${POSTGRES_PASSWORD:-regulift}@db:5432/country_guides
-      - EXTRACTION_PROVIDER=ollama
-      - OLLAMA_EXTRACTION_MODEL=qwen3:latest
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     depends_on:
       db:
         condition: service_started

@@ -5,7 +5,6 @@ from flask_limiter.util import get_remote_address
 from app.api.routes import create_api_blueprint, warm_drift_cache
 from app.extraction.content_chunker import ContentChunker
 from app.extraction.groq_extraction_service import GroqExtractionService
-from app.extraction.ollama_extraction_service import OllamaExtractionService
 from app.ingestion.html_ingestion_service import HtmlIngestionService
 from app.ingestion.pdf_ingestion_service import PdfIngestionService
 from app.ingestion.ingestion_job_service import IngestionJobService
@@ -26,35 +25,20 @@ from app.services.provenance_service import ProvenanceService
 from app.services.temporal_rule_service import TemporalRuleService
 from app.drift.detector import DriftDetector
 from app.drift.repository import DriftRepository
-from app.utils.config import anthropic_api_keys, claude_model, database_path, extraction_chunk_size, gemini_api_keys, gemini_model, groq_api_keys, groq_model, load_env_file, official_sources_json_url, ollama_base_url, ollama_model, slack_webhook_url, sync_cron_schedule, parser_version  # noqa: E501
+from app.utils.config import anthropic_api_keys, claude_model, database_path, extraction_chunk_size, gemini_api_keys, gemini_model, groq_api_keys, groq_model, load_env_file, official_sources_json_url, slack_webhook_url, sync_cron_schedule, parser_version  # noqa: E501
 from app.utils.db import Database
 from app.utils.logging_config import configure_logging
 
 
 def _create_extraction_service():
     import logging
-    import os
     _logger = logging.getLogger(__name__)
     chunker = ContentChunker(max_chunk_size=extraction_chunk_size())
-    force_ollama = os.environ.get("EXTRACTION_PROVIDER", "").lower() == "ollama"
     keys = groq_api_keys()
-    if keys and not force_ollama:
-        _logger.info("Using Groq for extraction")
-        return GroqExtractionService(keys, chunker=chunker, model=groq_model())
-    extraction_model = os.environ.get("OLLAMA_EXTRACTION_MODEL", "") or ollama_model()
-    ollama_svc = OllamaExtractionService(
-        model=extraction_model, base_url=ollama_base_url(), chunker=chunker,
-    )
-    try:
-        import requests
-        resp = requests.get(f"{ollama_base_url()}/api/tags", timeout=2)
-        if resp.ok:
-            _logger.info("Using Ollama for extraction (model=%s)", extraction_model)
-            return ollama_svc
-    except Exception:
-        pass
-    _logger.warning("No Groq keys and Ollama unreachable — extraction will fail at runtime")
-    return GroqExtractionService([], chunker=chunker, model=groq_model())
+    if not keys:
+        _logger.warning("No Groq API keys configured — extraction will fail at runtime")
+    _logger.info("Using Groq for extraction")
+    return GroqExtractionService(keys, chunker=chunker, model=groq_model())
 
 
 def build_services(db_path=None):
@@ -80,17 +64,15 @@ def build_services(db_path=None):
 
     reconciliation_provider = create_reconciliation_provider(
         api_keys_by_name={
-            "anthropic": anthropic_api_keys(),
             "gemini": gemini_api_keys(),
+            "anthropic": anthropic_api_keys(),
             "groq": groq_api_keys(),
         },
         models_by_name={
-            "anthropic": claude_model(),
             "gemini": gemini_model(),
+            "anthropic": claude_model(),
             "groq": groq_model(),
-            "ollama": ollama_model(),
         },
-        ollama_base_url=ollama_base_url(),
     )
     reconciliation_engine = LLMReconciliationEngine(
         reconciliation_provider,
