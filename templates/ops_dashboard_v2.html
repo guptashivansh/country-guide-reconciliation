@@ -1036,6 +1036,8 @@ input:focus, button:focus, select:focus, textarea:focus, [tabindex]:focus { outl
 }
 .prov-value a:hover { color: var(--purple); border-bottom-color: var(--purple); }
 .prov-value .prov-trust { display: inline-flex; align-items: center; vertical-align: middle; }
+.prov-info-icon { font-size: 12px; color: var(--ink-4); cursor: help; margin-left: 4px; opacity: 0.7; }
+.prov-info-icon:hover { opacity: 1; color: var(--purple); }
 .rai-block .verdict.crit { color: var(--crit); }
 
 .conf {
@@ -2112,7 +2114,7 @@ input:focus, button:focus, select:focus, textarea:focus, [tabindex]:focus { outl
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
     Hub
   </a>
-  <a href="/guide" class="btn" style="text-decoration:none; border-color:var(--purple-line); color:var(--purple-2); background:var(--purple-soft);">
+  <a href="https://www.notion.so/skuad/Skuad-Country-Product-Guides-7ed6a2f53972448db2cb107a8d20b661#efcb034468c143d18b2ee66ca0e4874f" target="_blank" rel="noopener" class="btn" style="text-decoration:none; border-color:var(--purple-line); color:var(--purple-2); background:var(--purple-soft);">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
     Live Guide
   </a>
@@ -2282,11 +2284,6 @@ input:focus, button:focus, select:focus, textarea:focus, [tabindex]:focus { outl
       </div>
       <div class="right">
         <button class="btn" onclick="bulkMarkReviewed()">Mark as reviewed</button>
-        <button class="btn btn-warn" onclick="bulkEscalate()">Escalate</button>
-        <button class="btn btn-danger" onclick="bulkReject()">Reject</button>
-        <button class="btn btn-primary" onclick="bulkApproveSelected()">
-          ✓ Approve all minor <span style="font-family:var(--font-mono); font-weight:500; opacity:0.85; margin-left:2px;" id="bulkMinorCount"></span>
-        </button>
       </div>
     </div>
     <div class="review-list" id="reviewList">
@@ -2458,38 +2455,6 @@ input:focus, button:focus, select:focus, textarea:focus, [tabindex]:focus { outl
   </div>
 </footer>
 
-<!-- ── Reject Rationale Modal ── -->
-<div class="modal-scrim" id="rejectModal" onclick="if(event.target===this) closeRejectModal()">
-  <div class="modal reject-modal" style="width:480px;">
-    <button class="close" onclick="closeRejectModal()" aria-label="Close">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
-    <h3>Reject change</h3>
-    <p class="sub">Provide a rationale for rejecting this update. The current guide value will be retained.</p>
-    <input type="hidden" id="rejectItemId" value="" />
-    <div class="field-group">
-      <div class="field-label">Rationale</div>
-      <select id="rejectRationale">
-        <option value="Outdated or superseded source">Outdated or superseded source</option>
-        <option value="Insufficient evidence">Insufficient evidence</option>
-        <option value="Incorrect extraction">Incorrect extraction</option>
-        <option value="Duplicate change">Duplicate change</option>
-        <option value="Not applicable to scope">Not applicable to scope</option>
-        <option value="Other">Other</option>
-      </select>
-    </div>
-    <div class="field-group">
-      <div class="field-label">Notes (optional)</div>
-      <textarea id="rejectNotes" placeholder="Additional context for the audit trail…"></textarea>
-    </div>
-    <div class="modal-actions">
-      <button class="btn" onclick="closeRejectModal()">Cancel</button>
-      <button class="btn btn-danger" onclick="confirmReject()">
-        Reject &amp; log to audit
-      </button>
-    </div>
-  </div>
-</div>
 
 <!-- ── Sync Modal ── -->
 <div class="modal-scrim" id="syncModal" onclick="if(event.target===this) closeSync()">
@@ -3324,7 +3289,8 @@ function renderReview() {
 
   // bulk bar
   const minorItems = items.filter(i=>{ const s=(i.severity||'').toLowerCase(); return s!=='critical'&&s!=='major'; });
-  document.getElementById('bulkMinorCount').textContent = '(' + minorItems.length + ')';
+  const bulkMinorEl = document.getElementById('bulkMinorCount');
+  if (bulkMinorEl) bulkMinorEl.textContent = '(' + minorItems.length + ')';
   document.getElementById('selectedTotal').textContent = all;
 
   if (!filtered.length) {
@@ -3391,14 +3357,6 @@ function renderReview() {
           <span class="rcard-spacer"></span>
           ${isAutoApprovable ? '<span class="auto-approvable">' + conf + '% · auto-approvable</span>' : ''}
           <span class="rcard-time" title="Detected ${item.created_at ? fmtTime(item.created_at) : ''}">Detected ${timeAgo(item.created_at)}${item.created_at ? ' · ' + fmtDate(item.created_at) : ''}${item.source_url ? ' · ' + extractHost(item.source_url) : ''}</span>
-          <div class="rcard-head-actions">
-            <button class="btn btn-warn" onclick="doAction('escalate',${item.id}); event.stopPropagation();" title="Escalate [E]">Escalate</button>
-            <button class="btn btn-danger" onclick="openRejectModal(${item.id}); event.stopPropagation();" title="Reject [R]">Reject</button>
-            <button class="btn btn-primary" onclick="doAction('approve',${item.id}); event.stopPropagation();" title="Approve [A]">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-              Approve
-            </button>
-          </div>
           <button class="rcard-expand" onclick="toggleCollapse(this)" title="Expand/Collapse">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
@@ -3452,6 +3410,10 @@ function renderReview() {
               const trustLevel = (conf !== null && conf >= 90) ? 'verified' : (conf !== null && conf >= 70) ? 'review' : 'unknown';
               const trustLabel = trustLevel === 'verified' ? 'Verified' : trustLevel === 'review' ? 'Review required' : 'Unverified';
               const srcType = item.source_url ? (item.source_url.startsWith('seed://') ? 'Seed data' : item.source_url.includes('notion') ? 'Notion import' : 'Government source') : 'Unknown';
+              const srcConfMap = { 'Government source': 95, 'Notion import': 75, 'Seed data': 60, 'Unknown': 0 };
+              const srcConf = srcConfMap[srcType] || 0;
+              const srcConfTip = { 'Government source': 'Government sources are primary legal authorities and receive the highest source confidence rating.', 'Notion import': 'Notion imports are curated internal references verified by the compliance team.', 'Seed data': 'Seed data is baseline information loaded during initial setup; accuracy may vary.', 'Unknown': 'Source type could not be determined.' };
+              const parserConfTip = 'Parser confidence reflects how accurately the extraction model identified and parsed this data point from the source document.';
               return `
             <details class="prov-drawer">
               <summary class="prov-toggle">
@@ -3480,7 +3442,11 @@ function renderReview() {
                     <div class="prov-value">${sectionLabel(item.section)}</div>
                   </div>
                   <div>
-                    <div class="prov-key">Parser confidence</div>
+                    <div class="prov-key">Source confidence <span class="prov-info-icon" title="${srcConfTip[srcType] || srcConfTip['Unknown']}">ⓘ</span></div>
+                    <div class="prov-value">${srcConf}%</div>
+                  </div>
+                  <div>
+                    <div class="prov-key">Parser confidence <span class="prov-info-icon" title="${parserConfTip}">ⓘ</span></div>
                     <div class="prov-value">${conf !== null ? conf + '%' : '—'}</div>
                   </div>
                   <div>
@@ -3567,7 +3533,7 @@ function renderReview() {
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg>
             Compare versions
           </button>
-          <span class="hint">Decision is logged immutably to audit trail · <span class="mono" style="font-size:10px;">A</span> approve · <span class="mono" style="font-size:10px;">R</span> reject · <span class="mono" style="font-size:10px;">E</span> escalate</span>
+          <span class="hint">Decision is logged immutably to audit trail</span>
         </div>
       </div>
     </article>`;
