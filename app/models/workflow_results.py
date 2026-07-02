@@ -44,7 +44,7 @@ class ExtractionResult(BaseModel):
 
     @property
     def succeeded(self):
-        return self.status in {"success", "partial"} and bool(self.rules)
+        return self.status in {"success", "partial"}
 
 
 class ReconciliationResult(BaseModel):

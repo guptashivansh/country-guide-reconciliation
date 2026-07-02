@@ -31,4 +31,5 @@ class SourceEndpoint:
     is_javascript_heavy: bool = False
     owner_team: str = ""
     notes: str = ""
+    parent_endpoint_id: str = ""
     status: str = "active"

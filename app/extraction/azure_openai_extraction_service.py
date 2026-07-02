@@ -2,8 +2,8 @@ import json
 import threading
 import time
 
-from groq import Groq
-from groq import AuthenticationError, RateLimitError
+from openai import OpenAI
+from openai import AuthenticationError, RateLimitError
 
 from app.extraction.content_chunker import ContentChunker
 from app.extraction.employment_rule_parser import EmploymentRuleParser
@@ -13,15 +13,19 @@ from app.extraction import extraction_logger as log
 from app.models.workflow_results import ExtractionResult, FailureDetail
 
 
-class GroqExtractionService:
-    RPM_PER_KEY = 15
+class AzureOpenAIExtractionService:
+    RPM_PER_KEY = 10
 
-    def __init__(self, api_keys, parser=None, chunker=None, aggregator=None, max_attempts=2, model=None):
+    def __init__(self, api_keys, base_url=None, parser=None, chunker=None,
+                 aggregator=None, max_attempts=2, model=None):
         if isinstance(api_keys, str):
             api_keys = [api_keys] if api_keys else []
-        self._clients = [Groq(api_key=k, max_retries=0) for k in api_keys if k]
+        self._clients = [
+            OpenAI(base_url=base_url, api_key=k, max_retries=0)
+            for k in api_keys if k
+        ]
         self._current = 0
-        self.model = model or "llama-3.3-70b-versatile"
+        self.model = model or "gpt-4o"
         self.parser = parser or EmploymentRuleParser()
         self.chunker = chunker or ContentChunker()
         self.aggregator = aggregator or EmploymentRuleAggregator()
@@ -50,13 +54,13 @@ class GroqExtractionService:
 
     def extract_employment_rules(self, content, source_url, country, sections):
         if self.client is None:
-            log.log_no_api_key("Groq", "GROQ_API_KEY")
+            log.log_no_api_key("Azure OpenAI", "OPENAI_AZURE_API_KEY")
             return ExtractionResult(
                 status="failed",
                 source_url=source_url,
                 failure=FailureDetail(
                     type="configuration_error",
-                    reason="GROQ_API_KEY is not configured",
+                    reason="OPENAI_AZURE_API_KEY is not configured",
                     metadata={"stage": "extraction_config"},
                 ),
             )
@@ -173,7 +177,7 @@ class GroqExtractionService:
         )
 
     def _call_llm(self, prompt, response_format=None):
-        max_attempts = max(len(self._clients) * 2, 4)
+        max_attempts = 8
         for attempt in range(max_attempts):
             self._throttle()
             try:
@@ -187,12 +191,15 @@ class GroqExtractionService:
                 response = self.client.chat.completions.create(**kwargs)
                 self._rotate_key()
                 return response.choices[0].message.content.strip()
-            except RateLimitError:
-                backoff = min(2 ** attempt, 30)
-                log.log_rate_limited("Groq", backoff, attempt + 1, max_attempts)
+            except RateLimitError as e:
+                retry_after = getattr(e, 'retry_after', None)
+                if not retry_after and hasattr(e, 'response') and e.response:
+                    retry_after = e.response.headers.get('retry-after')
+                backoff = int(retry_after) if retry_after else min(15 * (2 ** attempt), 120)
+                log.log_rate_limited("Azure OpenAI", backoff, attempt + 1, max_attempts)
                 self._rotate_key()
                 time.sleep(backoff)
             except AuthenticationError:
-                log.log_auth_failed("Groq", self._current)
+                log.log_auth_failed("Azure OpenAI", self._current)
                 self._rotate_key()
-        raise RuntimeError("All Groq API keys exhausted after retries")
+        raise RuntimeError("All Azure OpenAI API keys exhausted after retries")

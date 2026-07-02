@@ -96,6 +96,7 @@ class TrustedSourceEndpointRepository:
                 escalation_required INTEGER DEFAULT 0,
                 supports_replay INTEGER DEFAULT 1,
                 notes TEXT,
+                parent_endpoint_id TEXT REFERENCES source_endpoints(id),
                 created_at TEXT,
                 updated_at TEXT
             )
@@ -133,6 +134,11 @@ class TrustedSourceEndpointRepository:
         c.execute("CREATE INDEX IF NOT EXISTS idx_source_endpoints_authority ON source_endpoints(authority_id)")
         c.execute("CREATE INDEX IF NOT EXISTS idx_source_endpoints_status ON source_endpoints(status)")
         c.execute("CREATE INDEX IF NOT EXISTS idx_url_classifications_domain ON url_classifications(domain)")
+
+        try:
+            c.execute("ALTER TABLE source_endpoints ADD COLUMN parent_endpoint_id TEXT REFERENCES source_endpoints(id)")
+        except Exception:
+            pass
 
         conn.commit()
 
@@ -221,8 +227,9 @@ class TrustedSourceEndpointRepository:
                  supports_incremental_diffs, is_human_curated, status,
                  last_crawled_at, last_successful_crawl_at, last_change_detected_at,
                  owner_team, owner_user_id, reviewer_group,
-                 escalation_required, supports_replay, notes, created_at, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                 escalation_required, supports_replay, notes,
+                 parent_endpoint_id, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 ep["id"], ep["authority_id"], ep.get("name"),
                 ep["url"], ep.get("source_type", "html"),
@@ -245,6 +252,7 @@ class TrustedSourceEndpointRepository:
                 1 if ep.get("escalation_required") else 0,
                 1 if ep.get("supports_replay", True) else 0,
                 ep.get("notes"),
+                ep.get("parent_endpoint_id"),
                 ep.get("created_at"), ep.get("updated_at"),
             ))
 
@@ -284,7 +292,8 @@ class TrustedSourceEndpointRepository:
                 a.id, a.name, a.authority_type, a.website_url,
                 a.trust_level, a.precedence_rank, a.escalation_required,
                 a.supports_replay,
-                sc.id, sc.iso_code, sc.name
+                sc.id, sc.iso_code, sc.name,
+                e.parent_endpoint_id
             FROM source_endpoints e
             JOIN source_authorities a ON e.authority_id = a.id
             JOIN source_countries sc ON a.country_id = sc.id
@@ -312,7 +321,8 @@ class TrustedSourceEndpointRepository:
                 a.id, a.name, a.authority_type, a.website_url,
                 a.trust_level, a.precedence_rank, a.escalation_required,
                 a.supports_replay,
-                sc.id, sc.iso_code, sc.name
+                sc.id, sc.iso_code, sc.name,
+                e.parent_endpoint_id
             FROM source_endpoints e
             JOIN source_authorities a ON e.authority_id = a.id
             JOIN source_countries sc ON a.country_id = sc.id
@@ -541,8 +551,9 @@ class TrustedSourceEndpointRepository:
              requires_authentication, is_javascript_heavy,
              supports_incremental_diffs, is_human_curated, status,
              owner_team, owner_user_id, reviewer_group,
-             escalation_required, supports_replay, notes, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+             escalation_required, supports_replay, notes,
+             parent_endpoint_id, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             endpoint_id,
             data["authority_id"],
@@ -567,6 +578,7 @@ class TrustedSourceEndpointRepository:
             1 if data.get("escalation_required") else 0,
             1 if data.get("supports_replay", True) else 0,
             data.get("notes", ""),
+            data.get("parent_endpoint_id"),
             now, now,
         ))
         conn.commit()
@@ -586,6 +598,7 @@ class TrustedSourceEndpointRepository:
             "supports_incremental_diffs", "is_human_curated", "status",
             "owner_team", "owner_user_id", "reviewer_group",
             "escalation_required", "supports_replay", "notes",
+            "parent_endpoint_id",
         )
         fields, vals = [], []
         for col in allowed:
@@ -812,6 +825,7 @@ class TrustedSourceEndpointRepository:
             is_javascript_heavy=bool(r[11]),
             owner_team=r[14] or "",
             notes=r[15] or "",
+            parent_endpoint_id=r[29] or "" if len(r) > 29 else "",
             status=r[16] or "active",
         )
 

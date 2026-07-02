@@ -605,7 +605,7 @@
           html += '<div class="feed-item-sub">';
           if (country) html += country + ' &middot; ';
           html += 'job #' + (job.id || '?');
-          if (job.rules_extracted) html += ' &middot; ' + job.rules_extracted + ' rules';
+          if (job.rules_extracted != null) html += ' &middot; ' + job.rules_extracted + ' rules';
           html += '</div>';
           html += '</div>';
           html += '<div class="feed-item-right">';

@@ -93,11 +93,7 @@ def create_pipeline_blueprint(
 
         jobs = ingestion_job_service.list_recent_jobs(limit=500)
         crawl_failures = len([j for j in jobs if j.get("state") == "failed"])
-        last_ok_ts = max(
-            (j.get("reconciled_at") for j in jobs
-             if j.get("state") == "reconciled" and j.get("reconciled_at")),
-            default=None,
-        )
+        last_ok_ts = ingestion_job_service.last_successful_sync_time()
 
         registry = source_registry_service.get_registry_stats()
 
@@ -227,7 +223,7 @@ def create_pipeline_blueprint(
                     ingestion_job_service.mark_failed(job_id, reason)
                     return
                 source_snapshot_service.mark_extraction_succeeded(snapshot_id, rules=extraction_result.rules)
-                ingestion_job_service.mark_extracted(job_id)
+                ingestion_job_service.mark_extracted(job_id, rules_extracted=len(extraction_result.rules))
 
                 reconciliation_result = reconciliation_service.reconcile_extracted_rules(
                     country=jurisdiction,

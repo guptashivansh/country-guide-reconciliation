@@ -501,6 +501,7 @@
           <th>Source</th>
           <th>Stages</th>
           <th>Timestamp</th>
+          <th>Rules</th>
           <th style="width:36px"></th>
         </tr>
       </thead>
@@ -668,6 +669,11 @@
       html += '</div></td>';
 
       html += '<td><span class="job-ts">' + fmtTime(job.created_at || job.reconciled_at) + '</span></td>';
+
+      html += '<td>';
+      if (job.rules_extracted != null) html += '<span class="job-rules-count">' + job.rules_extracted + '</span>';
+      else html += '<span class="job-rules-count" style="opacity:0.4">—</span>';
+      html += '</td>';
 
       var hasDetail = cls === 'failed' || job.source_snapshot_id;
       html += '<td><button class="job-expand-btn' + (hasDetail ? '' : ' invisible') + '" data-idx="' + globalIdx + '" aria-label="Expand details">&#x25B6;</button></td>';

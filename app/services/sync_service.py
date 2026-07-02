@@ -1,10 +1,7 @@
 import json
 import logging
-from concurrent.futures import ThreadPoolExecutor, as_completed
 
 logger = logging.getLogger(__name__)
-
-MAX_WORKERS = 3
 
 STAGE_ORDER = ["queued", "fetched", "normalized", "extracted", "reconciled"]
 
@@ -78,7 +75,7 @@ def run_single_job(services, job_id, source_url, country, sections=None,
             )
             if extraction_result.succeeded:
                 source_snapshot_service.mark_extraction_succeeded(snapshot_id, rules=extraction_result.rules)
-                ingestion_job_service.mark_extracted(job_id)
+                ingestion_job_service.mark_extracted(job_id, rules_extracted=len(extraction_result.rules))
                 extracted_rules = extraction_result.rules
                 content_hash = snapshot["content_hash"]
             else:
@@ -144,53 +141,46 @@ def run_sync(services, countries=None, fetch_only=False, engine=None):
     def _country_stats(country):
         return per_country.setdefault(country, {"changes": 0, "failed": False})
 
-    logger.info(
-        "Country guide sync started",
-        extra={"stage": "sync", "countries": list(selected_countries) or "all", "endpoints": len(endpoints), "workers": MAX_WORKERS},
-    )
+    print(f"\n{'='*60}")
+    print(f"  SYNC STARTED — {len(endpoints)} endpoints for {list(selected_countries) or 'all countries'}")
+    print(f"{'='*60}\n")
 
     jobs = []
     for source_endpoint in endpoints:
         job_id = ingestion_job_service.create_job(source_endpoint.url, country=source_endpoint.country)
         jobs.append((job_id, source_endpoint))
 
-    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as pool:
-        futures = {
-            pool.submit(
-                run_single_job,
+    for i, (job_id, ep) in enumerate(jobs, 1):
+        stats = _country_stats(ep.country)
+        short_url = ep.url.replace("https://", "").replace("http://", "")
+        print(f"  [{i}/{len(jobs)}] {ep.country} — {short_url}")
+
+        try:
+            result = run_single_job(
                 services, job_id, ep.url, ep.country, ep.sections,
                 fetch_only=fetch_only, engine=engine,
-            ): (job_id, ep)
-            for job_id, ep in jobs
-        }
+            )
+        except Exception as e:
+            print(f"         ✗ EXCEPTION: {e}")
+            failures += 1
+            stats["failed"] = True
+            continue
 
-        for future in as_completed(futures):
-            job_id, ep = futures[future]
-            stats = _country_stats(ep.country)
-            try:
-                result = future.result()
-            except Exception as e:
-                logger.error("Job future failed", extra={"stage": "sync", "source_url": ep.url, "failure": str(e)})
-                failures += 1
-                stats["failed"] = True
-                continue
+        if result["success"]:
+            changes_queued = result["changes_queued"]
+            total_changes += changes_queued
+            stats["changes"] += changes_queued
+            job = ingestion_job_service.get_job(job_id)
+            rules = job.get("rules_extracted") if job else "?"
+            print(f"         ✓ {rules} rules extracted, {changes_queued} changes queued")
+        else:
+            failures += 1
+            stats["failed"] = True
+            print(f"         ✗ FAILED: {result.get('failure_reason', 'unknown')}")
 
-            if result["success"]:
-                changes_queued = result["changes_queued"]
-                total_changes += changes_queued
-                stats["changes"] += changes_queued
-                logger.info(
-                    "Source endpoint processed",
-                    extra={
-                        "stage": "sync",
-                        "source_url": ep.url,
-                        "ingestion_job_id": job_id,
-                        "changes_queued": changes_queued,
-                    },
-                )
-            else:
-                failures += 1
-                stats["failed"] = True
+    print(f"\n{'='*60}")
+    print(f"  SYNC COMPLETE — {total_changes} changes, {failures} failures")
+    print(f"{'='*60}\n")
 
     logger.info(
         "Country guide sync completed",

@@ -21,6 +21,7 @@ CONTEXT_FIELDS = (
     "review_item_id",
     "failure",
     "endpoint_count",
+    "rules_extracted",
 )
 
 
@@ -53,3 +54,5 @@ def configure_logging():
         handler.setLevel(level)
 
     logging.getLogger("werkzeug").setLevel(logging.WARNING)
+    logging.getLogger("httpx").setLevel(logging.WARNING)
+    logging.getLogger("openai").setLevel(logging.WARNING)

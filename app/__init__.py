@@ -25,7 +25,7 @@ from app.services.provenance_service import ProvenanceService
 from app.services.temporal_rule_service import TemporalRuleService
 from app.drift.detector import DriftDetector
 from app.drift.repository import DriftRepository
-from app.utils.config import anthropic_api_keys, claude_model, database_path, extraction_chunk_size, gemini_api_keys, gemini_model, groq_api_keys, groq_model, load_env_file, official_sources_json_url, slack_webhook_url, sync_cron_schedule, parser_version  # noqa: E501
+from app.utils.config import anthropic_api_keys, azure_openai_api_keys, azure_openai_base_url, azure_openai_extraction_model, azure_openai_reconciliation_model, claude_model, extraction_chunk_size, extraction_provider, gemini_api_keys, gemini_model, groq_api_keys, groq_model, load_env_file, official_sources_json_url, slack_webhook_url, sync_cron_schedule, parser_version  # noqa: E501
 from app.utils.db import Database
 from app.utils.logging_config import configure_logging
 
@@ -34,9 +34,22 @@ def _create_extraction_service():
     import logging
     _logger = logging.getLogger(__name__)
     chunker = ContentChunker(max_chunk_size=extraction_chunk_size())
+    forced = extraction_provider()
+
+    if forced != "groq":
+        azure_url = azure_openai_base_url()
+        azure_keys = azure_openai_api_keys()
+        if azure_url and azure_keys and azure_keys[0]:
+            from app.extraction.azure_openai_extraction_service import AzureOpenAIExtractionService
+            _logger.info("Using Azure OpenAI for extraction (model: %s)", azure_openai_extraction_model())
+            return AzureOpenAIExtractionService(
+                azure_keys, base_url=azure_url, chunker=chunker,
+                model=azure_openai_extraction_model(),
+            )
+
     keys = groq_api_keys()
     if not keys:
-        _logger.warning("No Groq API keys configured — extraction will fail at runtime")
+        _logger.warning("No extraction API keys configured — extraction will fail at runtime")
     _logger.info("Using Groq for extraction")
     return GroqExtractionService(keys, chunker=chunker, model=groq_model())
 
@@ -64,14 +77,19 @@ def build_services(db_path=None):
 
     reconciliation_provider = create_reconciliation_provider(
         api_keys_by_name={
+            "azure_openai": azure_openai_api_keys(),
             "gemini": gemini_api_keys(),
             "anthropic": anthropic_api_keys(),
             "groq": groq_api_keys(),
         },
         models_by_name={
+            "azure_openai": azure_openai_reconciliation_model(),
             "gemini": gemini_model(),
             "anthropic": claude_model(),
             "groq": groq_model(),
+        },
+        provider_kwargs_by_name={
+            "azure_openai": {"base_url": azure_openai_base_url()},
         },
     )
     reconciliation_engine = LLMReconciliationEngine(

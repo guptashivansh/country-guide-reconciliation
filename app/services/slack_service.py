@@ -22,12 +22,12 @@ COUNTRY_REGION = {
     # APAC
     "Australia": "APAC", "Bangladesh": "APAC", "China": "APAC", "Hong Kong": "APAC",
     "India": "APAC", "Indonesia": "APAC", "Japan": "APAC", "Malaysia": "APAC",
-    "Nepal": "APAC", "New Zealand": "APAC", "Pakistan": "APAC", "Philippines": "APAC",
+    "Nepal": "APAC", "New Zealand": "APAC", "Philippines": "APAC",
     "Singapore": "APAC", "South Korea": "APAC", "Sri Lanka": "APAC", "Taiwan": "APAC",
     "Thailand": "APAC", "Vietnam": "APAC",
     # EMEA
-    "Austria": "EMEA", "Azerbaijan": "EMEA", "Bahrain": "EMEA", "Belgium": "EMEA",
-    "Bosnia And Herzegovina": "EMEA", "Botswana": "EMEA", "Bulgaria": "EMEA",
+    "Austria": "EMEA", "Belgium": "EMEA",
+    "Botswana": "EMEA", "Bulgaria": "EMEA",
     "Cameroon": "EMEA", "Congo (Republic of Congo)": "EMEA", "Croatia": "EMEA",
     "Cyprus": "EMEA", "Czech Republic": "EMEA", "Denmark": "EMEA", "Egypt": "EMEA",
     "Estonia": "EMEA", "France": "EMEA", "Georgia": "EMEA", "Germany": "EMEA",
@@ -37,15 +37,15 @@ COUNTRY_REGION = {
     "Malta": "EMEA", "Mauritius": "EMEA", "Morocco": "EMEA", "Netherlands": "EMEA",
     "Nigeria": "EMEA", "Norway": "EMEA", "Oman": "EMEA", "Poland": "EMEA",
     "Portugal": "EMEA", "Qatar": "EMEA", "Romania": "EMEA", "Rwanda": "EMEA",
-    "Saudi Arabia": "EMEA", "Serbia": "EMEA", "Slovakia": "EMEA", "South Africa": "EMEA",
+    "Saudi Arabia": "EMEA", "Serbia": "EMEA", "Slovakia": "EMEA",
     "Spain": "EMEA", "Switzerland": "EMEA", "Turkey": "EMEA", "UAE": "EMEA",
     "Uganda": "EMEA", "Ukraine": "EMEA", "United Kingdom": "EMEA",
     # Americas
-    "Argentina": "Americas", "Belize": "Americas", "Bolivia": "Americas",
+    "Argentina": "Americas", "Belize": "Americas",
     "Brazil": "Americas", "Chile": "Americas", "Colombia": "Americas",
     "Costa Rica": "Americas", "Dominican Republic": "Americas",
     "Guatemala": "Americas", "Jamaica": "Americas", "Mexico": "Americas",
-    "Nicaragua": "Americas", "Panama": "Americas", "Paraguay": "Americas",
+    "Panama": "Americas",
     "Peru": "Americas", "Puerto Rico": "Americas",
 }
 

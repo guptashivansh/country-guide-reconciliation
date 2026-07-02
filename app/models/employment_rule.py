@@ -12,9 +12,9 @@ class EmploymentRule(BaseModel):
     @classmethod
     def validate_section(cls, value, info):
         section = value.strip()
-        allowed_sections = set(info.context.get("allowed_sections", [])) if info.context else set()
         if not section:
             raise ValueError("section is required")
+        allowed_sections = set(info.context.get("allowed_sections", [])) if info.context else set()
         if allowed_sections and section not in allowed_sections:
             raise ValueError(f"unsupported section: {section}")
         return section

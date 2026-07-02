@@ -4291,8 +4291,10 @@ function toggleCheck(e, id) {
 }
 
 function toggleDriftRow(tr) {
-  if (!tr.nextElementSibling || !tr.nextElementSibling.classList.contains('detail-row')) return;
-  tr.classList.toggle('expanded');
+  const detail = tr.nextElementSibling;
+  if (!detail || !detail.classList.contains('detail-row')) return;
+  const expanding = tr.classList.toggle('expanded');
+  detail.style.display = expanding ? '' : 'none';
 }
 
 function togglePipeRow(tr) { tr.classList.toggle('expanded'); }

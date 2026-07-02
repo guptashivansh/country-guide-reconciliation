@@ -10,14 +10,14 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from app.utils.config import database_path, load_env_file, official_sources_json_url
+from app.utils.config import load_env_file, official_sources_json_url
 from app.repositories.source_endpoint_repository import TrustedSourceEndpointRepository
 from app.utils.db import Database
 
 load_env_file()
 
 json_path = sys.argv[1] if len(sys.argv) > 1 else None
-db = Database(database_path())
+db = Database()
 repo = TrustedSourceEndpointRepository(db, json_url=official_sources_json_url())
 
 repo.initialize_schema()

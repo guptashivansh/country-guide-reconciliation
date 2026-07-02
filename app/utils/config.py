@@ -16,9 +16,6 @@ def load_env_file(path=".env"):
             os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
 
 
-def database_path():
-    return os.environ.get("COUNTRY_GUIDE_DB", "country_guides.db")
-
 
 def groq_api_key():
     return os.environ.get("GROQ_API_KEY")
@@ -88,8 +85,38 @@ def ollama_base_url():
     return os.environ.get("OLLAMA_BASE_URL", "http://host.docker.internal:11434")
 
 
+def extraction_provider():
+    return os.environ.get("EXTRACTION_PROVIDER", "").lower()
+
+
+def azure_openai_api_key():
+    return os.environ.get("OPENAI_AZURE_API_KEY", "")
+
+
+def azure_openai_api_keys():
+    raw = os.environ.get("OPENAI_AZURE_API_KEY", "")
+    return [k.strip().strip("'").strip('"') for k in raw.split(",") if k.strip()]
+
+
+def azure_openai_base_url():
+    return os.environ.get("OPENAI_AZURE_URL", "")
+
+
+def azure_openai_extraction_model():
+    return os.environ.get("AZURE_OPENAI_EXTRACTION_MODEL", "gpt-4o")
+
+
+def azure_openai_reconciliation_model():
+    return os.environ.get("AZURE_OPENAI_RECONCILIATION_MODEL", "gpt-4o-mini")
+
+
 def parser_version():
-    return os.environ.get("PARSER_VERSION", f"groq/{groq_model()}/v1")
+    custom = os.environ.get("PARSER_VERSION")
+    if custom:
+        return custom
+    if azure_openai_base_url() and azure_openai_api_keys():
+        return f"azure_openai/{azure_openai_extraction_model()}/v1"
+    return f"groq/{groq_model()}/v1"
 
 
 def ingestion_timeout():

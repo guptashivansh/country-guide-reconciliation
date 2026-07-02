@@ -1,0 +1,3099 @@
+[
+  {
+    "endpoint_id": "ep_GT_igss_home",
+    "country": "Guatemala",
+    "url": "https://www.igssgt.org",
+    "sections": [
+      "social_security",
+      "employee_benefits"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page primarily serves as a navigation hub with links to various sub-pages and does not contain specific employment law rules or values directly on the page. It provides general information about the Instituto Guatemalteco de Seguridad Social (IGSS) and links to related resources, but no explicit employment law content is present in the analyzed content.",
+    "sub_pages": [
+      {
+        "url": "https://www.igssgt.org/trabajador-migrante/",
+        "sections": [
+          "social_security"
+        ],
+        "description": "This sub-page likely contains information about social security coverage for migrant workers."
+      },
+      {
+        "url": "https://www.igssgt.org/cuota-voluntaria/",
+        "sections": [
+          "social_security",
+          "employee_benefits"
+        ],
+        "description": "This sub-page likely provides details about voluntary contributions to the social security system and associated benefits."
+      },
+      {
+        "url": "https://www.igssgt.org/ivs/",
+        "sections": [
+          "pension",
+          "social_security"
+        ],
+        "description": "This sub-page likely covers the Programa de Invalidez, Vejez y Sobrevivencia (IVS), which pertains to pensions and social security benefits."
+      },
+      {
+        "url": "https://www.igssgt.org/ema/",
+        "sections": [
+          "health_insurance",
+          "social_security"
+        ],
+        "description": "This sub-page likely discusses the Programa de Enfermedad, Maternidad y Accidentes (EMA), which relates to health insurance and social security benefits."
+      },
+      {
+        "url": "https://www.igssgt.org/precapi/",
+        "sections": [
+          "employee_benefits",
+          "social_security"
+        ],
+        "description": "This sub-page likely provides information about the Programa Especial de Protecci\u00f3n para Trabajadoras de Casa Particular, which focuses on social security and benefits for domestic workers."
+      },
+      {
+        "url": "https://www.igssgt.org/plan-de-pensiones-trabajadores-al-servicio-del-igss/",
+        "sections": [
+          "pension",
+          "employee_benefits"
+        ],
+        "description": "This sub-page likely details the pension plan for workers employed by the IGSS."
+      }
+    ]
+  },
+  {
+    "endpoint_id": "ep_GT_igm_home",
+    "country": "Guatemala",
+    "url": "https://igm.gob.gt",
+    "sections": [
+      "visa_types",
+      "work_permit_process"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page primarily serves as a navigation/index page with links to various sub-pages and categories. It does not contain specific employment law rules or values directly on the page. Instead, it provides links to other pages that may contain relevant information.",
+    "sub_pages": [
+      {
+        "url": "https://igm.gob.gt/requisitos-de-ingreso-a-territorio-guatemalteco/",
+        "sections": [
+          "visa_types",
+          "foreigners_registration"
+        ],
+        "description": "This page likely contains information about visa requirements for entering Guatemala, which may include details on visa types and registration processes for foreigners."
+      },
+      {
+        "url": "https://igm.gob.gt/formularios-tramites-de-extranjeria/",
+        "sections": [
+          "work_permit_process",
+          "foreigners_registration"
+        ],
+        "description": "This page likely provides forms and details related to foreigner procedures, including work permit processes and registration requirements."
+      },
+      {
+        "url": "https://igm.gob.gt/garante-guatemalteco/",
+        "sections": [
+          "work_permit_process"
+        ],
+        "description": "This page may include information about guarantor requirements for foreigners, which could be relevant to the work permit process."
+      },
+      {
+        "url": "https://igm.gob.gt/expedientes-extranjeria/",
+        "sections": [
+          "work_permit_process"
+        ],
+        "description": "This page likely contains details about the documentation or files required for foreigner-related processes, including work permits."
+      },
+      {
+        "url": "https://igm.gob.gt/tarifario-de-extranjeria/",
+        "sections": [
+          "work_permit_process"
+        ],
+        "description": "This page likely outlines the fees associated with foreigner-related processes, including work permits."
+      }
+    ]
+  },
+  {
+    "endpoint_id": "ep_GT_codigo_trabajo",
+    "country": "Guatemala",
+    "url": "https://www.congreso.gob.gt",
+    "sections": [
+      "working_hours",
+      "termination_notice",
+      "annual_leave"
+    ],
+    "status": "crawl_failed",
+    "error": "403 Client Error: Forbidden for url: https://www.congreso.gob.gt/"
+  },
+  {
+    "endpoint_id": "ep_HK_labour_home",
+    "country": "Hong Kong",
+    "url": "https://www.labour.gov.hk",
+    "sections": [
+      "working_hours",
+      "minimum_wage",
+      "termination_notice",
+      "annual_leave"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page appears to be a landing/navigation page with no direct employment law rules or values provided in the content. Additionally, no links were found on the page to sub-pages that could contain employment law content.",
+    "sub_pages": []
+  },
+  {
+    "endpoint_id": "ep_HK_ird_home",
+    "country": "Hong Kong",
+    "url": "https://www.ird.gov.hk",
+    "sections": [
+      "payroll_tax"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page is empty and contains no content or links. It does not provide any employment law rules or values, nor does it link to any sub-pages that could contain such information. Therefore, it is classified as a landing/navigation page without extractable rules.",
+    "sub_pages": []
+  },
+  {
+    "endpoint_id": "ep_HK_mpfa_home",
+    "country": "Hong Kong",
+    "url": "https://www.mpfa.org.hk",
+    "sections": [
+      "social_security",
+      "employee_benefits"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page primarily serves as a navigation hub with links to various sub-pages related to the Mandatory Provident Fund (MPF) system. It does not contain specific employment law rules or values directly on the page. Instead, it provides links to sub-pages that may contain relevant content.",
+    "sub_pages": [
+      {
+        "url": "https://www.mpfa.org.hk/mpf-system/mandatory-contributions",
+        "sections": [
+          "employee_benefits",
+          "employer_obligations"
+        ],
+        "description": "Details about mandatory contributions to the MPF system, which are relevant to employer and employee obligations."
+      },
+      {
+        "url": "https://www.mpfa.org.hk/mpf-system/voluntary-contributions-or-tax-deductible-voluntary-contributions",
+        "sections": [
+          "employee_benefits",
+          "income_tax"
+        ],
+        "description": "Information on voluntary contributions to the MPF system, including tax-deductible options."
+      },
+      {
+        "url": "https://www.mpfa.org.hk/mpf-system/withdrawal-of-mpf",
+        "sections": [
+          "employee_benefits",
+          "social_security"
+        ],
+        "description": "Explains the rules and conditions for withdrawing MPF funds, which relate to employee benefits and social security."
+      },
+      {
+        "url": "https://www.mpfa.org.hk/mpf-system/long-service-and-severance-payments",
+        "sections": [
+          "employee_benefits",
+          "termination_notice"
+        ],
+        "description": "Covers the offsetting arrangements for long service payments and severance payments under the MPF system."
+      },
+      {
+        "url": "https://www.mpfa.org.hk/mpf-investment/retirement-planning-calculator",
+        "sections": [
+          "employee_benefits",
+          "pension"
+        ],
+        "description": "Provides a retirement planning calculator to help employees plan their pensions and benefits."
+      }
+    ]
+  },
+  {
+    "endpoint_id": "ep_HK_immd_work_visa",
+    "country": "Hong Kong",
+    "url": "https://www.immd.gov.hk/eng/services/visas/work_entry.html",
+    "sections": [
+      "visa_types",
+      "work_permit_process"
+    ],
+    "status": "crawl_failed",
+    "error": "404 Client Error: Not Found for url: https://www.immd.gov.hk/eng/services/visas/work_entry.html"
+  },
+  {
+    "endpoint_id": "ep_HK_elegislation_eo",
+    "country": "Hong Kong",
+    "url": "https://www.elegislation.gov.hk/hk/cap57",
+    "sections": [
+      "working_hours",
+      "termination_notice",
+      "annual_leave",
+      "minimum_wage",
+      "maternity_leave"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page does not contain any visible employment law rules or values in its content. Instead, it appears to be a placeholder or navigation page with no links to sub-pages or detailed content. The message 'Loading required resource. Please wait' suggests that the page may rely on dynamic content loading, but no actual rules or links are present in the provided content.",
+    "sub_pages": []
+  },
+  {
+    "endpoint_id": "ep_HU_ngm_home",
+    "country": "Hungary",
+    "url": "https://ngm.gov.hu",
+    "sections": [
+      "working_hours",
+      "minimum_wage",
+      "termination_notice",
+      "annual_leave"
+    ],
+    "status": "crawl_failed",
+    "error": "HTTPSConnectionPool(host='ngm.gov.hu', port=443): Max retries exceeded with url: / (Caused by SSLError(SSLCertVerificationError(1, \"[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: Hostname mismatch, certificate is not valid for 'ngm.gov.hu'. (_ssl.c:1032)\")))"
+  },
+  {
+    "endpoint_id": "ep_HU_nav_home",
+    "country": "Hungary",
+    "url": "https://nav.gov.hu/en",
+    "sections": [
+      "payroll_tax",
+      "social_security"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page primarily serves as a navigation hub with links to various sub-pages related to taxation, customs, and administrative matters. It does not contain specific employment law rules or values directly on the page itself.",
+    "sub_pages": [
+      {
+        "url": "https://nav.gov.hu/en/taxation/taxinfo",
+        "sections": [
+          "payroll_tax",
+          "income_tax"
+        ],
+        "description": "This sub-page likely contains guidelines and summaries on taxation, which may include payroll tax and income tax information."
+      },
+      {
+        "url": "https://nav.gov.hu/en/taxation/taxpayer_registration",
+        "sections": [
+          "payroll_tax",
+          "social_security"
+        ],
+        "description": "This sub-page likely provides information on taxpayer registration, which may include details relevant to payroll tax and social security obligations."
+      },
+      {
+        "url": "https://nav.gov.hu/en/taxation/tax_reliefs",
+        "sections": [
+          "payroll_tax",
+          "social_security"
+        ],
+        "description": "This sub-page likely covers taxpayers' statements to access tax reliefs, which may include payroll tax and social security-related reliefs."
+      },
+      {
+        "url": "https://nav.gov.hu/en/taxation/eSZJA",
+        "sections": [
+          "income_tax",
+          "payroll_tax"
+        ],
+        "description": "This sub-page likely provides information on electronic personal income tax returns, which may include payroll tax-related details."
+      },
+      {
+        "url": "https://nav.gov.hu/en/taxation/payment-facility-arrangements",
+        "sections": [
+          "payroll_tax",
+          "social_security"
+        ],
+        "description": "This sub-page likely contains information on payment facility arrangements, which may include payroll tax and social security payment options."
+      }
+    ]
+  },
+  {
+    "endpoint_id": "ep_HU_neak_home",
+    "country": "Hungary",
+    "url": "https://neak.gov.hu",
+    "sections": [
+      "social_security",
+      "maternity_leave",
+      "employee_benefits"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page primarily serves as a navigation hub with links to various sub-pages and categories. It does not contain specific employment law rules or values directly on the page. Instead, it provides links to other pages that may contain relevant content.",
+    "sub_pages": [
+      {
+        "url": "https://www.allamkincstar.gov.hu/egeszsegbiztositas",
+        "sections": [
+          "social_security",
+          "employee_benefits"
+        ],
+        "description": "This sub-page likely contains information about monetary benefits and social security provisions related to health insurance."
+      },
+      {
+        "url": "https://neak.gov.hu/felso_menu/lakossagnak/ellatas_magyarorszagon/jogosultsag_az_ellatasra/jogosultsag_az_ellatasra",
+        "sections": [
+          "social_security"
+        ],
+        "description": "This sub-page likely provides details about eligibility for social security benefits and entitlements in Hungary."
+      },
+      {
+        "url": "https://neak.gov.hu/felso_menu/lakossagnak/ellatas_magyarorszagon/gyogyszer_segedeszkoz_gyogyfuro_tamogatas/gyogyszer_gyse_gyogyfurdo",
+        "sections": [
+          "employee_benefits"
+        ],
+        "description": "This sub-page likely covers benefits related to subsidized access to medications, medical aids, and therapeutic services."
+      },
+      {
+        "url": "https://neak.gov.hu/felso_menu/lakossagnak/ellatas_kulfoldon/az_europai_egeszsegbiztositasi_kartya/eu_kartya",
+        "sections": [
+          "social_security"
+        ],
+        "description": "This sub-page likely provides information about the European Health Insurance Card and its applicability for social security benefits abroad."
+      }
+    ]
+  },
+  {
+    "endpoint_id": "ep_HU_oif_work_permits",
+    "country": "Hungary",
+    "url": "https://www.oif.gov.hu",
+    "sections": [
+      "visa_types",
+      "work_permit_process"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page primarily serves as a navigation hub with links to sub-pages covering various topics related to residence, employment, and permits in Hungary. It does not contain specific employment law rules or values directly on the page itself.",
+    "sub_pages": [
+      {
+        "url": "https://www.oif.gov.hu/munkavallalasvegzettseg-nelkul",
+        "sections": [
+          "work_permit_process",
+          "visa_types"
+        ],
+        "description": "This sub-page likely provides information on work permits and visa requirements for individuals without formal qualifications."
+      },
+      {
+        "url": "https://www.oif.gov.hu/munkavallalas-kozepfoku-vegzettseggel-szakkepesitessel",
+        "sections": [
+          "work_permit_process",
+          "visa_types"
+        ],
+        "description": "This sub-page likely covers work permits and visa requirements for individuals with secondary education or vocational qualifications."
+      },
+      {
+        "url": "https://www.oif.gov.hu/munkavallalas-felsofokuegyetemi-vegzettseggel",
+        "sections": [
+          "work_permit_process",
+          "visa_types"
+        ],
+        "description": "This sub-page likely provides information on work permits and visa requirements for individuals with higher education or university degrees."
+      },
+      {
+        "url": "https://www.oif.gov.hu/informacios-es-kommunikacios-technologiakkal-foglalkozo-vezetoszakember",
+        "sections": [
+          "work_permit_process",
+          "visa_types"
+        ],
+        "description": "This sub-page likely details work permit and visa requirements for professionals in information and communication technology roles."
+      },
+      {
+        "url": "https://www.oif.gov.hu/tajekoztatok/szezonalis-munkavallalas-celu-tartozkodasi-engedely",
+        "sections": [
+          "work_permit_process",
+          "visa_types"
+        ],
+        "description": "This sub-page likely provides information on seasonal work permits and visa requirements."
+      },
+      {
+        "url": "https://www.oif.gov.hu/tajekoztatok/magyarorszagon-harmadik-orszagbeli-allampolgarokat-foglalkoztato-munkaltatok-fogado-szervezetek-reszere",
+        "sections": [
+          "employer_obligations",
+          "work_permit_process"
+        ],
+        "description": "This sub-page likely outlines employer obligations and processes for hiring third-country nationals in Hungary."
+      },
+      {
+        "url": "https://www.oif.gov.hu/tajekoztatok/tajekoztatas-magyarorszagon-vendegmunkast-foglalkoztato-munkaltatok-fogado-szervezetek-reszere",
+        "sections": [
+          "employer_obligations",
+          "work_permit_process"
+        ],
+        "description": "This sub-page likely provides guidance for employers hosting guest workers in Hungary."
+      },
+      {
+        "url": "https://www.oif.gov.hu/tajekoztatok/tajekoztato-harmadik-orszagbeli-allampolgarok-rovid-idotartamu-magyarorszagi-foglalkoztatasa-kapcsan-foglalkoztatok-szamara",
+        "sections": [
+          "employer_obligations",
+          "work_permit_process"
+        ],
+        "description": "This sub-page likely covers employer obligations and processes for short-term employment of third-country nationals in Hungary."
+      }
+    ]
+  },
+  {
+    "endpoint_id": "ep_HU_jogtar_labour_code",
+    "country": "Hungary",
+    "url": "https://net.jogtar.hu/jogszabaly?docid=A1200001.TV",
+    "sections": [
+      "working_hours",
+      "termination_notice",
+      "annual_leave",
+      "overtime"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page primarily serves as an index/navigation page for accessing the full text of the 2012 Labor Code (Mt.) and other related legal documents. It does not contain specific employment law rules or values directly within the visible content. Instead, it provides links to sub-pages or sections where such rules might be found.",
+    "sub_pages": [
+      {
+        "url": "https://net.jogtar.hu/jogszabaly?docid=A1200001.TV#tartalom",
+        "sections": [
+          "working_hours",
+          "termination_notice",
+          "annual_leave",
+          "overtime"
+        ],
+        "description": "This sub-page likely contains the detailed content of the 2012 Labor Code, including rules on working hours, termination notice, annual leave, and overtime."
+      },
+      {
+        "url": "https://net.jogtar.hu/jogszabaly?docid=00000001.TXT",
+        "sections": [
+          "legislation",
+          "acts"
+        ],
+        "description": "This sub-page likely contains newly introduced legislation, which may include updates or amendments to employment laws."
+      },
+      {
+        "url": "https://net.jogtar.hu/jogszabaly?docid=00000003.TXT",
+        "sections": [
+          "legislation",
+          "acts"
+        ],
+        "description": "This sub-page likely contains modified legislation, which may include changes to employment law provisions."
+      }
+    ]
+  },
+  {
+    "endpoint_id": "ep_ID_kemnaker_home",
+    "country": "Indonesia",
+    "url": "https://www.kemnaker.go.id",
+    "sections": [
+      "working_hours",
+      "minimum_wage",
+      "termination_notice",
+      "annual_leave"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page primarily serves as a navigation or landing page with links to various sub-pages and resources. It does not contain any specific employment law rules or values directly on the page. Instead, it provides links to other sections or external pages that may contain relevant content.",
+    "sub_pages": [
+      {
+        "url": "https://www.kemnaker.go.id/unit/phi-jsk",
+        "sections": [
+          "termination_notice",
+          "industrial_relations"
+        ],
+        "description": "This sub-page is likely related to industrial relations and may contain information about termination notice and dispute resolution."
+      },
+      {
+        "url": "http://jdih.kemnaker.go.id/",
+        "sections": [
+          "legislation",
+          "statutory_instruments",
+          "official_gazette"
+        ],
+        "description": "This sub-page appears to be the legal information center (JDIH) and may contain legislation, statutory instruments, and official gazettes related to employment law."
+      },
+      {
+        "url": "https://www.kemnaker.go.id/unit/binapenta-pkk",
+        "sections": [
+          "employee_benefits",
+          "expatriate_employment"
+        ],
+        "description": "This sub-page is likely related to workforce placement and protection, which may include information on employee benefits and expatriate employment."
+      },
+      {
+        "url": "https://www.kemnaker.go.id/unit/binwasnaker-k3",
+        "sections": [
+          "workplace_safety",
+          "osh_obligations",
+          "factory_inspections"
+        ],
+        "description": "This sub-page is likely related to labor supervision and occupational safety and health (OSH), including workplace safety and factory inspections."
+      },
+      {
+        "url": "https://www.kemnaker.go.id/news/all",
+        "sections": [
+          "legislation",
+          "industrial_relations",
+          "working_hours",
+          "minimum_wage"
+        ],
+        "description": "This sub-page contains news and updates, which may include information on employment laws, working hours, minimum wage, and industrial relations."
+      }
+    ]
+  },
+  {
+    "endpoint_id": "ep_ID_pajak_home",
+    "country": "Indonesia",
+    "url": "https://www.pajak.go.id",
+    "sections": [
+      "payroll_tax"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page primarily serves as a navigation or index page with links to various sub-pages. It does not contain specific employment law rules or values, such as payroll tax rates or regulations, but instead provides links to other pages that may contain such information.",
+    "sub_pages": [
+      {
+        "url": "https://fiskal.kemenkeu.go.id/informasi-publik/kurs-pajak",
+        "sections": [
+          "payroll_tax"
+        ],
+        "description": "This page likely contains information about exchange rates used for tax purposes, which could be relevant to payroll tax calculations."
+      },
+      {
+        "url": "https://fiskal.kemenkeu.go.id/informasi-publik/kmk-tarif-bunga",
+        "sections": [
+          "payroll_tax"
+        ],
+        "description": "This page likely provides information on interest rates, which may be relevant for payroll tax or other tax-related calculations."
+      },
+      {
+        "url": "https://www.pajak.go.id/index.php/id/peraturan",
+        "sections": [
+          "legislation",
+          "payroll_tax"
+        ],
+        "description": "This page likely contains tax-related regulations, which may include payroll tax rules or other relevant legislation."
+      }
+    ]
+  },
+  {
+    "endpoint_id": "ep_ID_bpjs_home",
+    "country": "Indonesia",
+    "url": "https://www.bpjsketenagakerjaan.go.id",
+    "sections": [
+      "social_security",
+      "employee_benefits"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page primarily serves as a navigation/landing page with links to various sub-pages and sections. It does not contain specific employment law rules or values directly on the page. Instead, it provides links to sub-pages that may contain relevant content related to social security and employee benefits.",
+    "sub_pages": [
+      {
+        "url": "https://www.bpjsketenagakerjaan.go.id/penerima-upah.html",
+        "sections": [
+          "social_security",
+          "employee_benefits"
+        ],
+        "description": "This sub-page likely contains information about social security and benefits for wage earners (Penerima Upah)."
+      },
+      {
+        "url": "https://www.bpjsketenagakerjaan.go.id/bukan-penerima-upah.html",
+        "sections": [
+          "social_security",
+          "employee_benefits"
+        ],
+        "description": "This sub-page likely contains information about social security and benefits for non-wage earners (Bukan Penerima Upah)."
+      },
+      {
+        "url": "https://www.bpjsketenagakerjaan.go.id/jasa-konstruksi.html",
+        "sections": [
+          "social_security",
+          "employee_benefits"
+        ],
+        "description": "This sub-page likely contains information about social security and benefits for construction workers."
+      },
+      {
+        "url": "https://www.bpjsketenagakerjaan.go.id/pekerja-migran-indonesia.html",
+        "sections": [
+          "social_security",
+          "employee_benefits"
+        ],
+        "description": "This sub-page likely contains information about social security and benefits for Indonesian migrant workers."
+      },
+      {
+        "url": "https://www.bpjsketenagakerjaan.go.id/cara-klaim.html",
+        "sections": [
+          "social_security",
+          "employee_benefits"
+        ],
+        "description": "This sub-page likely provides details on how to claim social security benefits."
+      },
+      {
+        "url": "https://www.bpjsketenagakerjaan.go.id/perumahan.html",
+        "sections": [
+          "employee_benefits"
+        ],
+        "description": "This sub-page likely contains information about housing benefits for employees."
+      }
+    ]
+  },
+  {
+    "endpoint_id": "ep_ID_imigrasi_kitas",
+    "country": "Indonesia",
+    "url": "https://www.imigrasi.go.id",
+    "sections": [
+      "visa_types",
+      "work_permit_process"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page serves as a navigation hub for various immigration-related topics, including visa types and work permits, but does not contain specific employment law rules or values directly on the page itself. It primarily links to sub-pages where detailed content may be found.",
+    "sub_pages": [
+      {
+        "url": "https://www.imigrasi.go.id/wna/daftar-visa-indonesia",
+        "sections": [
+          "visa_types"
+        ],
+        "description": "This sub-page likely contains information about different types of visas available for foreigners in Indonesia."
+      },
+      {
+        "url": "https://www.imigrasi.go.id/wna/izin-tinggal-keimigrasian",
+        "sections": [
+          "work_permit_process"
+        ],
+        "description": "This sub-page likely provides details on the process for obtaining residence permits, which may include work permits for expatriates."
+      },
+      {
+        "url": "https://evisa.imigrasi.go.id/",
+        "sections": [
+          "visa_types",
+          "work_visa"
+        ],
+        "description": "This sub-page likely contains information about electronic visa applications, including work visas."
+      },
+      {
+        "url": "https://evisa.imigrasi.go.id/web/application_bvk",
+        "sections": [
+          "visa_types"
+        ],
+        "description": "This sub-page likely provides information about visas on arrival and other specific visa categories."
+      }
+    ]
+  },
+  {
+    "endpoint_id": "ep_ID_jdih_manpower_law",
+    "country": "Indonesia",
+    "url": "https://jdih.bpk.go.id/penelusuranpuu/view/1166",
+    "sections": [
+      "working_hours",
+      "termination_notice",
+      "annual_leave",
+      "minimum_wage"
+    ],
+    "status": "crawl_failed",
+    "error": "403 Client Error: Forbidden for url: https://jdih.bpk.go.id/penelusuranpuu/view/1166"
+  },
+  {
+    "endpoint_id": "ep_IL_labour_home",
+    "country": "Israel",
+    "url": "https://www.gov.il/en/ministries/ministry-of-labour",
+    "sections": [
+      "working_hours",
+      "minimum_wage",
+      "termination_notice",
+      "annual_leave"
+    ],
+    "status": "crawl_failed",
+    "error": "403 Client Error: Forbidden for url: https://www.gov.il/en/ministries/ministry-of-labour"
+  },
+  {
+    "endpoint_id": "ep_IL_ita_home",
+    "country": "Israel",
+    "url": "https://www.gov.il/en/departments/israel_tax_authority",
+    "sections": [
+      "payroll_tax"
+    ],
+    "status": "crawl_failed",
+    "error": "403 Client Error: Forbidden for url: https://www.gov.il/en/departments/israel_tax_authority"
+  },
+  {
+    "endpoint_id": "ep_IL_btl_home",
+    "country": "Israel",
+    "url": "https://www.btl.gov.il/english",
+    "sections": [
+      "social_security",
+      "maternity_leave",
+      "employee_benefits"
+    ],
+    "status": "crawl_failed",
+    "error": "404 Client Error: NOT FOUND for url: https://www.btl.gov.il/english"
+  },
+  {
+    "endpoint_id": "ep_IL_piba_work_visas",
+    "country": "Israel",
+    "url": "https://www.gov.il/en/departments/population_and_immigration_authority",
+    "sections": [
+      "visa_types",
+      "work_permit_process"
+    ],
+    "status": "crawl_failed",
+    "error": "403 Client Error: Forbidden for url: https://www.gov.il/en/departments/population_and_immigration_authority"
+  },
+  {
+    "endpoint_id": "ep_IL_nevo_labour_law",
+    "country": "Israel",
+    "url": "https://www.nevo.co.il",
+    "sections": [
+      "working_hours",
+      "termination_notice",
+      "annual_leave"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page primarily serves as a navigation/index page with links to various legal resources, tools, and documents. It does not contain specific employment law rules or values directly on the page. Instead, it provides links to sub-pages that may contain relevant content.",
+    "sub_pages": [
+      {
+        "url": "https://www.nevo.co.il/HakikaSearch.aspx",
+        "sections": [
+          "legislation",
+          "working_hours",
+          "termination_notice",
+          "annual_leave"
+        ],
+        "description": "This page likely contains searchable legislation, including employment laws related to working hours, termination notice, and annual leave."
+      },
+      {
+        "url": "https://www.nevo.co.il/FilesSearch.aspx",
+        "sections": [
+          "employer_obligations",
+          "employee_benefits",
+          "termination_notice"
+        ],
+        "description": "This page likely contains forms and government documents related to employer obligations, employee benefits, and termination processes."
+      },
+      {
+        "url": "https://www.nevo.co.il/Calc/",
+        "sections": [
+          "working_hours",
+          "overtime",
+          "payroll_tax"
+        ],
+        "description": "This page likely provides calculators for employment-related metrics such as working hours, overtime pay, and payroll tax."
+      },
+      {
+        "url": "https://www.nevo.co.il/General/war2updates.aspx",
+        "sections": [
+          "legislation",
+          "working_hours",
+          "termination_notice"
+        ],
+        "description": "This page likely contains emergency legislation updates, which may include temporary changes to working hours or termination notice rules."
+      },
+      {
+        "url": "https://www.nevo.co.il/law_html/law00/157751.htm",
+        "sections": [
+          "working_hours",
+          "termination_notice",
+          "annual_leave"
+        ],
+        "description": "This page likely contains specific regulations or laws related to employment, including working hours, termination notice, and annual leave."
+      }
+    ]
+  },
+  {
+    "endpoint_id": "ep_JM_mlss_home",
+    "country": "Jamaica",
+    "url": "https://mlss.gov.jm",
+    "sections": [
+      "working_hours",
+      "minimum_wage",
+      "termination_notice",
+      "annual_leave"
+    ],
+    "status": "crawl_failed",
+    "error": "HTTPSConnectionPool(host='mlss.gov.jm', port=443): Read timed out. (read timeout=15)"
+  },
+  {
+    "endpoint_id": "ep_JM_taj_home",
+    "country": "Jamaica",
+    "url": "https://www.jamaicatax.gov.jm",
+    "sections": [
+      "payroll_tax"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page primarily serves as a navigation/index page with links to various sub-pages related to tax administration. It does not contain specific employment law rules or values directly on the page. The 'Payroll' link and other related links may lead to content relevant to employment law, but this page itself does not provide such details.",
+    "sub_pages": [
+      {
+        "url": "https://www.jamaicatax.gov.jm/web/guest/payroll",
+        "sections": [
+          "payroll_tax",
+          "income_tax",
+          "employer_obligations"
+        ],
+        "description": "Likely contains information on payroll tax obligations, income tax deductions, and employer responsibilities related to payroll."
+      },
+      {
+        "url": "https://www.jamaicatax.gov.jm/web/guest/education-tax1",
+        "sections": [
+          "payroll_tax",
+          "social_security"
+        ],
+        "description": "May provide details on education tax, which could be part of payroll tax and social security contributions."
+      },
+      {
+        "url": "https://www.jamaicatax.gov.jm/web/guest/withholding-tax-on-specified-services",
+        "sections": [
+          "withholding_tax",
+          "payroll_tax"
+        ],
+        "description": "Likely includes information on withholding tax obligations for specified services, which may overlap with payroll tax requirements."
+      },
+      {
+        "url": "https://www.jamaicatax.gov.jm/web/guest/income-tax",
+        "sections": [
+          "income_tax",
+          "payroll_tax"
+        ],
+        "description": "Expected to cover income tax regulations, including deductions from employee salaries as part of payroll tax."
+      }
+    ]
+  },
+  {
+    "endpoint_id": "ep_JM_nis_home",
+    "country": "Jamaica",
+    "url": "https://mlss.gov.jm/departments/national-insurance-scheme",
+    "sections": [
+      "social_security",
+      "employee_benefits",
+      "maternity_leave"
+    ],
+    "status": "crawl_failed",
+    "error": "HTTPSConnectionPool(host='mlss.gov.jm', port=443): Read timed out. (read timeout=15)"
+  },
+  {
+    "endpoint_id": "ep_JM_pica_home",
+    "country": "Jamaica",
+    "url": "https://pica.gov.jm",
+    "sections": [
+      "visa_types",
+      "work_permit_process"
+    ],
+    "status": "crawl_failed",
+    "error": "403 Client Error: Forbidden for url: https://pica.gov.jm/"
+  },
+  {
+    "endpoint_id": "ep_JM_laws_jamaica",
+    "country": "Jamaica",
+    "url": "https://moj.gov.jm/laws",
+    "sections": [
+      "working_hours",
+      "termination_notice"
+    ],
+    "status": "crawl_failed",
+    "error": "HTTPSConnectionPool(host='moj.gov.jm', port=443): Max retries exceeded with url: /laws (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1032)')))"
+  },
+  {
+    "endpoint_id": "ep_JP_mhlw_home",
+    "country": "Japan",
+    "url": "https://www.mhlw.go.jp/english",
+    "sections": [
+      "working_hours",
+      "minimum_wage",
+      "termination_notice",
+      "annual_leave",
+      "maternity_leave"
+    ],
+    "status": "crawl_failed",
+    "error": "403 Client Error: Forbidden for url: https://www.mhlw.go.jp/english/"
+  },
+  {
+    "endpoint_id": "ep_JP_nta_home",
+    "country": "Japan",
+    "url": "https://www.nta.go.jp/english",
+    "sections": [
+      "payroll_tax"
+    ],
+    "status": "crawl_failed",
+    "error": "403 Client Error: Forbidden for url: http://cf.www.nta.go.jp/english/"
+  },
+  {
+    "endpoint_id": "ep_JP_nenkin_home",
+    "country": "Japan",
+    "url": "https://www.nenkin.go.jp/n/www/english/index.jsp",
+    "sections": [
+      "social_security",
+      "employee_benefits"
+    ],
+    "status": "crawl_failed",
+    "error": "404 Client Error: Not Found for url: https://www.nenkin.go.jp/n/www/english/index.jsp"
+  },
+  {
+    "endpoint_id": "ep_JP_isa_work_visa",
+    "country": "Japan",
+    "url": "https://www.moj.go.jp/isa/applications/procedures/nyukan35.html",
+    "sections": [
+      "visa_types",
+      "work_permit_process"
+    ],
+    "status": "crawl_failed",
+    "error": "404 Client Error: Not Found for url: https://www.moj.go.jp/isa/applications/procedures/nyukan35.html"
+  },
+  {
+    "endpoint_id": "ep_JP_egov_labour_standards",
+    "country": "Japan",
+    "url": "https://laws.e-gov.go.jp/en/law/322AC0000000049",
+    "sections": [
+      "working_hours",
+      "termination_notice",
+      "annual_leave",
+      "overtime"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page content provided does not contain any specific employment law rules or values. Additionally, no links were found on the page, indicating that it is likely a landing or navigation page without direct content or sub-pages to analyze.",
+    "sub_pages": []
+  },
+  {
+    "endpoint_id": "ep_JO_mol_home",
+    "country": "Jordan",
+    "url": "https://www.mol.gov.jo",
+    "sections": [
+      "working_hours",
+      "minimum_wage",
+      "termination_notice",
+      "annual_leave"
+    ],
+    "status": "crawl_failed",
+    "error": "HTTPSConnectionPool(host='www.mol.gov.jo', port=443): Max retries exceeded with url: / (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.mol.gov.jo', port=443) at 0x13320b250>, 'Connection to www.mol.gov.jo timed out. (connect timeout=15)'))"
+  },
+  {
+    "endpoint_id": "ep_JO_istd_home",
+    "country": "Jordan",
+    "url": "https://www.istd.gov.jo",
+    "sections": [
+      "payroll_tax"
+    ],
+    "status": "crawl_failed",
+    "error": "HTTPSConnectionPool(host='www.istd.gov.jo', port=443): Max retries exceeded with url: / (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.istd.gov.jo', port=443) at 0x13320b610>, 'Connection to www.istd.gov.jo timed out. (connect timeout=15)'))"
+  },
+  {
+    "endpoint_id": "ep_JO_ssc_home",
+    "country": "Jordan",
+    "url": "https://www.ssc.gov.jo",
+    "sections": [
+      "social_security",
+      "employee_benefits"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page primarily serves as a navigation hub with links to various sub-pages and documents related to social security and employee benefits. It does not contain specific employment law rules or values directly on the page itself.",
+    "sub_pages": [
+      {
+        "url": "https://www.ssc.gov.jo/%d8%a7%d9%84%d8%aa%d8%b4%d8%b1%d9%8a%d8%b9%d8%a7%d8%aa/",
+        "sections": [
+          "social_security",
+          "legislation"
+        ],
+        "description": "This sub-page likely contains information about the stages of legislation and the application of social security laws."
+      },
+      {
+        "url": "https://www.ssc.gov.jo/wp-content/uploads/2024/01/\u0642\u0627\u0646\u0648\u0646-\u0627\u0644\u0636\u0645\u0627\u0646-\u0627\u0644\u0627\u062c\u062a\u0645\u0627\u0639\u064a-\u0631\u0642\u0645-\u0661-\u0644\u0633\u0646\u0629-\u0662\u0660\u0661\u0664-\u0648\u0641\u0642\u0627\u064b-\u0644\u0627\u0653\u062e\u0631-\u0627\u0644\u062a\u0639\u062f\u064a\u0644\u0627\u062a-\u062d\u062a\u0649-\u062a\u0627\u0631\u064a\u062e-\u0661\u0666_\u0664_\u0662\u0660\u0662\u0663_compressed.pdf",
+        "sections": [
+          "social_security"
+        ],
+        "description": "This document contains the Social Security Law No. 1 of 2014 with the latest amendments as of April 16, 2023."
+      },
+      {
+        "url": "https://www.ssc.gov.jo/%d8%a7%d9%84%d8%aa%d8%b4%d8%b1%d9%8a%d8%b9%d8%a7%d8%aa/%d9%86%d8%b8%d8%a7%d9%85-%d8%a7%d9%84%d9%85%d9%86%d8%a7%d9%81%d8%b9-%d8%a7%d9%84%d8%aa%d8%a3%d9%85%d9%8a%d9%86%d8%a9-%d8%a7%d9%84%d9%85%d8%b9%d8%af%d9%84/",
+        "sections": [
+          "employee_benefits",
+          "social_security"
+        ],
+        "description": "This sub-page likely contains details about the system of insurance benefits and its amendments."
+      },
+      {
+        "url": "https://www.ssc.gov.jo/wp-content/uploads/2024/12/\u0646\u0638\u0627\u0645-\u062a\u062e\u0641\u064a\u0636-\u0627\u0634\u062a\u0631\u0627\u0643\u0627\u062a-\u062a\u0623\u0645\u064a\u0646-\u0627\u0644\u0634\u064a\u062e\u0648\u062e\u0629-\u0648\u0627\u0644\u0639\u062c\u0632-\u0648\u0627\u0644\u0648\u0641\u0627\u0629-\u0644\u0644\u0639\u0627\u0645\u0644\u064a\u0646-\u0641\u064a-\u0645\u0646\u0634\u0622\u062a-\u0627\u0644\u0642\u0637\u0627\u0639-\u0627\u0644\u062e\u0627\u0635.pdf",
+        "sections": [
+          "social_security",
+          "employee_benefits"
+        ],
+        "description": "This document outlines the system for reducing insurance contributions for old age, disability, and death for private sector workers."
+      },
+      {
+        "url": "https://www.ssc.gov.jo/%d8%a7%d9%84%d8%aa%d8%b4%d8%b1%d9%8a%d8%b9%d8%a7%d8%aa/%d8%a3%d8%b3%d8%b3-%d9%85%d9%86%d8%ad-%d8%a7%d9%84%d8%b3%d9%84%d9%81-%d9%84%d9%85%d8%aa%d9%82%d8%a7%d8%b9%d8%af%d9%8a-%d8%a7%d9%84%d9%85%d8%a4%d8%b3%d8%b3%d8%a9-%d8%a7%d9%84%d8%b9%d8%a7%d9%85%d8%a9/",
+        "sections": [
+          "employee_benefits",
+          "social_security"
+        ],
+        "description": "This sub-page likely contains the rules for granting advances to retirees or their eligible heirs."
+      }
+    ]
+  },
+  {
+    "endpoint_id": "ep_JO_moi_work_permits",
+    "country": "Jordan",
+    "url": "https://www.moi.gov.jo",
+    "sections": [
+      "visa_types",
+      "work_permit_process"
+    ],
+    "status": "crawl_failed",
+    "error": "HTTPSConnectionPool(host='www.moi.gov.jo', port=443): Max retries exceeded with url: / (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.moi.gov.jo', port=443) at 0x13320a350>, 'Connection to www.moi.gov.jo timed out. (connect timeout=15)'))"
+  },
+  {
+    "endpoint_id": "ep_JO_lob_labour_law",
+    "country": "Jordan",
+    "url": "https://www.lob.gov.jo",
+    "sections": [
+      "working_hours",
+      "termination_notice",
+      "annual_leave"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page content is inaccessible due to JavaScript requirements, and no links are found on the page. Without visible content or links, it cannot contain employment law rules or values directly. It appears to be a landing/navigation page but lacks functional navigation elements.",
+    "sub_pages": []
+  },
+  {
+    "endpoint_id": "ep_KE_labour_home",
+    "country": "Kenya",
+    "url": "https://www.labour.go.ke",
+    "sections": [
+      "working_hours",
+      "minimum_wage",
+      "termination_notice",
+      "annual_leave"
+    ],
+    "status": "crawl_failed",
+    "error": "HTTPSConnectionPool(host='www.labour.go.ke', port=443): Max retries exceeded with url: / (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate in certificate chain (_ssl.c:1032)')))"
+  },
+  {
+    "endpoint_id": "ep_KE_kra_home",
+    "country": "Kenya",
+    "url": "https://www.kra.go.ke",
+    "sections": [
+      "payroll_tax",
+      "social_security"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page primarily serves as a navigation/index page with links to various sub-pages. It does not contain specific employment law rules or values, such as details on payroll tax rates or social security contributions. Instead, it provides links to sub-pages that may contain relevant content.",
+    "sub_pages": [
+      {
+        "url": "https://www.kra.go.ke/individual/filing-paying/types-of-taxes/paye",
+        "sections": [
+          "payroll_tax"
+        ],
+        "description": "This sub-page likely contains information about Pay As You Earn (PAYE), which is directly related to payroll tax obligations for employees and employers."
+      },
+      {
+        "url": "https://www.kra.go.ke/individual/filing-paying/types-of-taxes/individual-income-tax",
+        "sections": [
+          "payroll_tax"
+        ],
+        "description": "This sub-page likely provides details on individual income tax, which is relevant to payroll tax calculations and compliance."
+      },
+      {
+        "url": "https://www.kra.go.ke/individual/special-needs/learn-about-tax-exemption/people-with-disability",
+        "sections": [
+          "social_security"
+        ],
+        "description": "This sub-page may include information on tax exemptions and benefits for persons with disabilities, which could relate to social security provisions."
+      }
+    ]
+  },
+  {
+    "endpoint_id": "ep_KE_nssf_home",
+    "country": "Kenya",
+    "url": "https://www.nssf.or.ke",
+    "sections": [
+      "social_security",
+      "employee_benefits"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page primarily serves as a navigation hub with links to various sub-pages and resources. It does not contain specific employment law rules or values directly on the page itself. While it mentions topics like social security and benefits, these are broad categories without detailed legal content or rules.",
+    "sub_pages": [
+      {
+        "url": "https://www.nssf.or.ke/nssf-act",
+        "sections": [
+          "acts",
+          "social_security"
+        ],
+        "description": "This sub-page likely contains the NSSF Act 2013, which governs social security provisions and may include legal frameworks related to employee benefits."
+      },
+      {
+        "url": "https://www.nssf.or.ke/benefits",
+        "sections": [
+          "employee_benefits",
+          "social_security"
+        ],
+        "description": "This sub-page likely provides details on the benefits offered by NSSF, including retirement benefits and other employee-related provisions."
+      },
+      {
+        "url": "https://www.nssf.or.ke/employers",
+        "sections": [
+          "employer_obligations",
+          "social_security"
+        ],
+        "description": "This sub-page likely outlines obligations for employers regarding contributions to social security and compliance with NSSF regulations."
+      },
+      {
+        "url": "https://www.nssf.or.ke/employed-member",
+        "sections": [
+          "social_security",
+          "employee_benefits"
+        ],
+        "description": "This sub-page likely provides information specific to employed members, including their rights and benefits under the NSSF framework."
+      },
+      {
+        "url": "https://www.nssf.or.ke/voluntary-member",
+        "sections": [
+          "social_security",
+          "employee_benefits"
+        ],
+        "description": "This sub-page likely provides information for voluntary members, including how they can contribute to and benefit from NSSF programs."
+      }
+    ]
+  },
+  {
+    "endpoint_id": "ep_KE_immigration_home",
+    "country": "Kenya",
+    "url": "https://www.immigration.go.ke",
+    "sections": [
+      "visa_types",
+      "work_permit_process"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page primarily serves as a navigation hub with links to various sub-pages. It does not contain specific employment law rules or values directly on the page. Instead, it provides links to sections that may contain relevant content, such as work permits and passes, but these need to be explored further.",
+    "sub_pages": [
+      {
+        "url": "https://immigration.go.ke/work-permits-and-passes/",
+        "sections": [
+          "work_permit",
+          "work_permit_process"
+        ],
+        "description": "This sub-page likely contains information about the process for obtaining work permits and passes for expatriates or foreign nationals."
+      },
+      {
+        "url": "https://immigration.go.ke/foreign-nationals-management-services/",
+        "sections": [
+          "foreigners_registration",
+          "work_permit_process"
+        ],
+        "description": "This sub-page likely provides details on the registration and management of foreign nationals, including permits and passes."
+      },
+      {
+        "url": "https://immigration.go.ke/passes-and-work-permits/",
+        "sections": [
+          "work_permit",
+          "work_permit_process"
+        ],
+        "description": "This sub-page likely provides additional details on the types of work permits and passes available, as well as the application process."
+      }
+    ]
+  },
+  {
+    "endpoint_id": "ep_KE_kenyalaw_employment_act",
+    "country": "Kenya",
+    "url": "https://kenyalaw.org/lex/actview.xql?actid=No.%2011%20of%202007",
+    "sections": [
+      "working_hours",
+      "termination_notice",
+      "annual_leave",
+      "minimum_wage",
+      "maternity_leave"
+    ],
+    "status": "crawl_failed",
+    "error": "404 Client Error: Not Found for url: https://kenyalaw.org/lex/actview.xql?actid=No.%2011%20of%202007"
+  },
+  {
+    "endpoint_id": "ep_KW_mosal_home",
+    "country": "Kuwait",
+    "url": "https://www.mosal.gov.kw",
+    "sections": [
+      "working_hours",
+      "minimum_wage",
+      "termination_notice",
+      "annual_leave"
+    ],
+    "status": "crawl_failed",
+    "error": "HTTPSConnectionPool(host='www.mosal.gov.kw', port=443): Max retries exceeded with url: / (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.mosal.gov.kw', port=443) at 0x13320ad50>, 'Connection to www.mosal.gov.kw timed out. (connect timeout=15)'))"
+  },
+  {
+    "endpoint_id": "ep_KW_pifss_home",
+    "country": "Kuwait",
+    "url": "https://www.pifss.gov.kw",
+    "sections": [
+      "social_security",
+      "employee_benefits"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page primarily serves as a navigation hub with links to various sub-pages and sections. It does not contain specific employment law rules or values directly on the page. Instead, it provides access to other pages that may contain relevant content.",
+    "sub_pages": [
+      {
+        "url": "http://www.pifss.gov.kw/sites/Ar/pages/pensionsocialsecuritysector/brieflegislationguide.aspx",
+        "sections": [
+          "social_security"
+        ],
+        "description": "This page likely contains a legislative guide related to social security, which may include rules and regulations about pensions and related benefits."
+      },
+      {
+        "url": "http://www.pifss.gov.kw/sites/Ar/pages/eservices/unemploymentinsurance.aspx",
+        "sections": [
+          "employee_benefits"
+        ],
+        "description": "This page appears to cover unemployment insurance, which is a form of employee benefit."
+      },
+      {
+        "url": "http://www.pifss.gov.kw/sites/Ar/pages/personsdefination.aspx",
+        "sections": [
+          "social_security"
+        ],
+        "description": "This page likely provides general information about social security and its applicability to individuals."
+      }
+    ]
+  },
+  {
+    "endpoint_id": "ep_KW_mof_home",
+    "country": "Kuwait",
+    "url": "https://www.mof.gov.kw",
+    "sections": [
+      "payroll_tax"
+    ],
+    "status": "crawl_failed",
+    "error": "HTTPSConnectionPool(host='www.mof.gov.kw', port=443): Max retries exceeded with url: / (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.mof.gov.kw', port=443) at 0x13320a350>, 'Connection to www.mof.gov.kw timed out. (connect timeout=15)'))"
+  },
+  {
+    "endpoint_id": "ep_KW_gdra_visas",
+    "country": "Kuwait",
+    "url": "https://www.gdra.moi.gov.kw",
+    "sections": [
+      "visa_types",
+      "work_permit_process"
+    ],
+    "status": "crawl_failed",
+    "error": "HTTPSConnectionPool(host='www.gdra.moi.gov.kw', port=443): Max retries exceeded with url: / (Caused by NameResolutionError(\"HTTPSConnection(host='www.gdra.moi.gov.kw', port=443): Failed to resolve 'www.gdra.moi.gov.kw' ([Errno 8] nodename nor servname provided, or not known)\"))"
+  },
+  {
+    "endpoint_id": "ep_KW_moj_laws",
+    "country": "Kuwait",
+    "url": "https://www.moj.gov.kw",
+    "sections": [
+      "working_hours",
+      "termination_notice",
+      "annual_leave"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page primarily serves as a navigation hub with links to various sub-pages and resources. It does not contain specific employment law rules or values directly on the page. The content is focused on general information about the Ministry of Justice and its services, rather than employment law specifics.",
+    "sub_pages": [
+      {
+        "url": "https://www.moj.gov.kw/AR/pages/Search09.aspx",
+        "sections": [
+          "termination_notice",
+          "working_hours"
+        ],
+        "description": "This sub-page likely contains procedural information related to ministry actions, which may include employment-related processes such as termination notice or working hours."
+      },
+      {
+        "url": "https://www.moj.gov.kw/AR/pages/Statistics02.aspx",
+        "sections": [
+          "annual_leave",
+          "working_hours"
+        ],
+        "description": "This sub-page may include statistical reports or studies that could touch on employment-related metrics like annual leave or working hours."
+      },
+      {
+        "url": "https://www.moj.gov.kw/AR/pages/Goals.aspx",
+        "sections": [
+          "employee_benefits",
+          "working_hours"
+        ],
+        "description": "This sub-page outlines the ministry's goals and values, which might include references to employee benefits or working hours as part of broader justice initiatives."
+      }
+    ]
+  },
+  {
+    "endpoint_id": "ep_LB_labor_home",
+    "country": "Lebanon",
+    "url": "https://www.labor.gov.lb",
+    "sections": [
+      "working_hours",
+      "minimum_wage",
+      "termination_notice",
+      "annual_leave"
+    ],
+    "status": "crawl_failed",
+    "error": "403 Client Error: Forbidden for url: https://www.labor.gov.lb/"
+  },
+  {
+    "endpoint_id": "ep_LB_finance_home",
+    "country": "Lebanon",
+    "url": "https://www.finance.gov.lb",
+    "sections": [
+      "payroll_tax"
+    ],
+    "status": "crawl_failed",
+    "error": "HTTPSConnectionPool(host='www.finance.gov.lb', port=443): Max retries exceeded with url: / (Caused by NewConnectionError(\"HTTPSConnection(host='www.finance.gov.lb', port=443): Failed to establish a new connection: [Errno 61] Connection refused\"))"
+  },
+  {
+    "endpoint_id": "ep_LB_cnss_home",
+    "country": "Lebanon",
+    "url": "https://www.cnss.gov.lb",
+    "sections": [
+      "social_security",
+      "maternity_leave",
+      "employee_benefits"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page primarily serves as a navigation/landing page with links to various sub-pages and resources. It does not contain specific employment law rules or values directly on the page. Instead, it provides links to other pages or documents that may contain relevant information.",
+    "sub_pages": [
+      {
+        "url": "https://www.cnss.gov.lb/%d8%a3%d8%ac%d9%87%d8%b2%d8%a9-%d8%a7%d9%84%d8%b5%d9%86%d8%af%d9%88%d9%82/",
+        "sections": [
+          "social_security"
+        ],
+        "description": "This page likely contains information about the structure and functioning of the National Social Security Fund, which may include details about social security benefits."
+      },
+      {
+        "url": "https://www.cnss.gov.lb/%d9%81%d8%b1%d9%88%d8%b9-%d8%a7%d9%84%d8%b6%d9%85%d8%a7%d9%86/",
+        "sections": [
+          "social_security"
+        ],
+        "description": "This page likely provides details about the branches of the social security system, which may include regional offices or specific programs."
+      },
+      {
+        "url": "https://www.cnss.gov.lb/%d8%a7%d9%84%d8%aa%d8%b9%d8%a7%d9%85%d9%8a%d9%85/",
+        "sections": [
+          "social_security",
+          "employee_benefits"
+        ],
+        "description": "This page likely contains circulars or directives from the general manager, which may include updates on employee benefits or social security policies."
+      },
+      {
+        "url": "https://www.cnss.gov.lb/%d8%a7%d9%84%d9%85%d8%b0%d9%83%d9%91%d8%b1%d8%a7%d8%aa-%d8%a5%d8%b9%d9%84%d8%a7%d9%85%d9%8a%d9%91%d8%a9/",
+        "sections": [
+          "social_security",
+          "employee_benefits"
+        ],
+        "description": "This page likely contains media memos or announcements related to social security and employee benefits."
+      },
+      {
+        "url": "https://www.cnss.gov.lb/%d8%a3%d8%ae%d8%a8%d8%a7%d8%b1-%d9%85%d8%af%d9%8a%d8%b1%d9%8a%d9%91%d8%a9-%d8%a7%d9%84%d8%b9%d9%84%d8%a7%d9%82%d8%a7%d8%aa-%d8%a7%d9%84%d8%b9%d8%a7%d9%85%d9%91%d8%a9-2/",
+        "sections": [
+          "social_security",
+          "employee_benefits"
+        ],
+        "description": "This page likely contains news and updates from the public relations department, which may include information on social security and employee benefits."
+      }
+    ]
+  },
+  {
+    "endpoint_id": "ep_LB_gs_permits",
+    "country": "Lebanon",
+    "url": "https://www.general-security.gov.lb",
+    "sections": [
+      "visa_types",
+      "work_permit_process"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page primarily serves as a navigation/index page with links to various sub-pages. It does not contain specific employment law rules or values directly on the page. However, it links to sub-pages that likely contain relevant content related to employment law, particularly regarding expatriate employment, work permits, and visa types.",
+    "sub_pages": [
+      {
+        "url": "https://www.general-security.gov.lb/ar/posts/556",
+        "sections": [
+          "visa_types",
+          "work_permit_process"
+        ],
+        "description": "This sub-page likely contains information about different types of visas and their requirements, which may include work-related visas."
+      },
+      {
+        "url": "https://www.general-security.gov.lb/ar/posts/501",
+        "sections": [
+          "work_permit_process",
+          "expatriate_employment"
+        ],
+        "description": "This sub-page appears to address the process for extending work permits and managing the employment of Syrian workers in Lebanon."
+      },
+      {
+        "url": "https://www.general-security.gov.lb/ar/posts/431",
+        "sections": [
+          "work_permit_process",
+          "expatriate_employment"
+        ],
+        "description": "This sub-page likely discusses the requirements for foreign workers to obtain clearance when leaving Lebanon, which is relevant to work permit processes."
+      },
+      {
+        "url": "https://www.general-security.gov.lb/ar/posts/170",
+        "sections": [
+          "work_permit_process",
+          "expatriate_employment"
+        ],
+        "description": "This sub-page likely covers the process for transferring sponsorships, which is a key aspect of expatriate employment and work permit management."
+      },
+      {
+        "url": "https://www.general-security.gov.lb/ar/posts/168",
+        "sections": [
+          "work_permit_process",
+          "expatriate_employment"
+        ],
+        "description": "This sub-page likely contains information about the fees associated with hiring foreign domestic workers, which is relevant to work permit processes."
+      }
+    ]
+  },
+  {
+    "endpoint_id": "ep_LB_pcm_laws",
+    "country": "Lebanon",
+    "url": "https://www.pcm.gov.lb",
+    "sections": [
+      "working_hours",
+      "termination_notice"
+    ],
+    "status": "crawl_failed",
+    "error": "HTTPSConnectionPool(host='www.pcm.gov.lb', port=443): Max retries exceeded with url: / (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.pcm.gov.lb', port=443) at 0x13431d1d0>, 'Connection to www.pcm.gov.lb timed out. (connect timeout=15)'))"
+  },
+  {
+    "endpoint_id": "ep_LT_socmin_home",
+    "country": "Lithuania",
+    "url": "https://socmin.lrv.lt/en",
+    "sections": [
+      "working_hours",
+      "minimum_wage",
+      "termination_notice",
+      "annual_leave"
+    ],
+    "status": "crawl_failed",
+    "error": "403 Client Error: Forbidden for url: https://socmin.lrv.lt/en"
+  },
+  {
+    "endpoint_id": "ep_LT_vmi_home",
+    "country": "Lithuania",
+    "url": "https://www.vmi.lt/evmi/en/home",
+    "sections": [
+      "payroll_tax",
+      "social_security"
+    ],
+    "status": "crawl_failed",
+    "error": "404 Client Error:  for url: https://www.vmi.lt/evmi/en/home"
+  },
+  {
+    "endpoint_id": "ep_LT_sodra_home",
+    "country": "Lithuania",
+    "url": "https://www.sodra.lt/en",
+    "sections": [
+      "social_security",
+      "maternity_leave",
+      "employee_benefits"
+    ],
+    "status": "crawl_failed",
+    "error": "403 Client Error: Forbidden for url: https://www.sodra.lt/en"
+  },
+  {
+    "endpoint_id": "ep_LT_migracija_permits",
+    "country": "Lithuania",
+    "url": "https://www.migracija.lt/en",
+    "sections": [
+      "visa_types",
+      "work_permit_process"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page content provided ('Migris') does not contain any specific employment law rules or values. Additionally, no links were found on the page, which suggests it is a landing/navigation page without direct content related to employment law. It does not provide any extractable rules or detailed information about visa types or work permit processes.",
+    "sub_pages": []
+  },
+  {
+    "endpoint_id": "ep_LT_etar_labour_code",
+    "country": "Lithuania",
+    "url": "https://www.e-tar.lt/portal/en/legalAct/TAR.6269DBED2B6E/asr",
+    "sections": [
+      "working_hours",
+      "termination_notice",
+      "annual_leave",
+      "overtime"
+    ],
+    "status": "crawl_failed",
+    "error": "403 Client Error: Forbidden for url: https://www.e-tar.lt/portal/en/legalAct/TAR.6269DBED2B6E/asr"
+  },
+  {
+    "endpoint_id": "ep_LU_mt_home",
+    "country": "Luxembourg",
+    "url": "https://mt.gouvernement.lu",
+    "sections": [
+      "working_hours",
+      "minimum_wage",
+      "termination_notice",
+      "annual_leave"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page primarily serves as a navigation or landing page for the Ministry of Labor's website. It contains links to various sub-pages and sections but does not provide specific employment law rules or values directly on the page. The content is focused on directing users to other resources rather than presenting detailed legal information.",
+    "sub_pages": [
+      {
+        "url": "https://mt.gouvernement.lu/fr/le-ministere/attributions.html",
+        "sections": [
+          "employer_obligations",
+          "working_hours"
+        ],
+        "description": "This page likely outlines the responsibilities and attributions of the Ministry of Labor, which may include employer obligations and working hours."
+      },
+      {
+        "url": "https://mt.gouvernement.lu/fr/legislation.html",
+        "sections": [
+          "legislation",
+          "minimum_wage",
+          "termination_notice",
+          "annual_leave"
+        ],
+        "description": "This page likely contains links to labor-related legislation, including rules on minimum wage, termination notice, and annual leave."
+      },
+      {
+        "url": "https://mt.gouvernement.lu/fr/dossiers.html",
+        "sections": [
+          "working_hours",
+          "minimum_wage",
+          "termination_notice",
+          "annual_leave"
+        ],
+        "description": "This page may provide dossiers or detailed information on specific labor topics, including working hours, minimum wage, termination notice, and annual leave."
+      },
+      {
+        "url": "https://mt.gouvernement.lu/fr/observatoire-emploi.html",
+        "sections": [
+          "employee_benefits",
+          "working_hours"
+        ],
+        "description": "This page likely focuses on employment statistics and trends, which may include information on working hours and employee benefits."
+      },
+      {
+        "url": "https://mt.gouvernement.lu/fr/publications.html",
+        "sections": [
+          "legislation",
+          "working_hours",
+          "minimum_wage"
+        ],
+        "description": "This page likely contains publications related to labor laws and policies, including working hours and minimum wage."
+      }
+    ]
+  },
+  {
+    "endpoint_id": "ep_LU_acd_home",
+    "country": "Luxembourg",
+    "url": "https://impotsdirects.public.lu/en",
+    "sections": [
+      "payroll_tax"
+    ],
+    "status": "crawl_failed",
+    "error": "404 Client Error: Not Found for url: https://impotsdirects.public.lu/en.html"
+  },
+  {
+    "endpoint_id": "ep_LU_cns_home",
+    "country": "Luxembourg",
+    "url": "https://cns.public.lu/en",
+    "sections": [
+      "social_security",
+      "maternity_leave",
+      "employee_benefits"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page primarily serves as a navigation hub with links to various sub-pages covering topics related to social security, maternity leave, and employee benefits. However, it does not contain specific employment law rules or values directly on the page. Instead, it provides links to sub-pages where such content might be found.",
+    "sub_pages": [
+      {
+        "url": "https://cns.public.lu/en/assure/droits-demarches/demarches-frequentes/formulaire-declaration-maternite.html",
+        "sections": [
+          "maternity_leave"
+        ],
+        "description": "This sub-page likely contains information or forms related to maternity leave declarations."
+      },
+      {
+        "url": "https://cns.public.lu/en/assure/droits-demarches/bases-bonnes-pratiques/assurance-maladie-bref.html",
+        "sections": [
+          "social_security",
+          "health_insurance"
+        ],
+        "description": "This sub-page likely provides an overview of health insurance and social security benefits."
+      },
+      {
+        "url": "https://cns.public.lu/en/assure/droits-demarches/dossiers-thematiques/salaries-independants.html",
+        "sections": [
+          "employee_benefits",
+          "social_security"
+        ],
+        "description": "This sub-page likely discusses benefits and social security provisions for employees and self-employed individuals."
+      },
+      {
+        "url": "https://cns.public.lu/en/assure/remboursements/prestations-remboursees.html",
+        "sections": [
+          "employee_benefits",
+          "health_insurance"
+        ],
+        "description": "This sub-page likely details reimbursed services and benefits available to employees under health insurance."
+      }
+    ]
+  },
+  {
+    "endpoint_id": "ep_LU_immigration_home",
+    "country": "Luxembourg",
+    "url": "https://guichet.public.lu/en/entreprises/ressources-humaines/travailleur-etranger.html",
+    "sections": [
+      "visa_types",
+      "work_permit_process"
+    ],
+    "status": "crawl_failed",
+    "error": "404 Client Error: Not Found for url: https://guichet.public.lu/en/entreprises/ressources-humaines/travailleur-etranger.html"
+  },
+  {
+    "endpoint_id": "ep_LU_legilux_home",
+    "country": "Luxembourg",
+    "url": "https://legilux.public.lu",
+    "sections": [
+      "working_hours",
+      "termination_notice",
+      "annual_leave"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page does not contain any specific employment law rules or values. It is a landing page that requires JavaScript to function and does not display any content or links to sub-pages in its current state. Therefore, it cannot be classified as a content page.",
+    "sub_pages": []
+  },
+  {
+    "endpoint_id": "ep_MG_cnaps_home",
+    "country": "Madagascar",
+    "url": "https://www.cnaps.mg",
+    "sections": [
+      "social_security",
+      "employee_benefits"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page primarily serves as a navigation or landing page, providing links to various sub-pages that likely contain specific employment law content. The page itself does not contain any explicit employment law rules or values, such as specific durations for maternity leave or minimum wage amounts. Instead, it lists categories and services related to social security and employee benefits, which are relevant to the requested sections.",
+    "sub_pages": [
+      {
+        "url": "https://www.cnaps.mg/fr/categorie/prestations-familiales",
+        "sections": [
+          "employee_benefits"
+        ],
+        "description": "This page likely contains information about family benefits, such as allowances for children or other family-related support."
+      },
+      {
+        "url": "https://www.cnaps.mg/fr/categorie/accidents-de-travail-et-maladies-professionnelles",
+        "sections": [
+          "employee_benefits"
+        ],
+        "description": "This page likely covers benefits related to workplace accidents and occupational diseases."
+      },
+      {
+        "url": "https://www.cnaps.mg/fr/categorie/prestations-de-retraite",
+        "sections": [
+          "social_security"
+        ],
+        "description": "This page likely provides details about retirement benefits and pensions."
+      },
+      {
+        "url": "https://www.cnaps.mg/fr/categorie/hygiene-sante-et-actions-sociales",
+        "sections": [
+          "employee_benefits"
+        ],
+        "description": "This page likely discusses health, hygiene, and social welfare benefits for employees."
+      },
+      {
+        "url": "https://www.cnaps.mg/fr/categorie/paiement-des-cotisations",
+        "sections": [
+          "social_security"
+        ],
+        "description": "This page likely provides information about the payment of social security contributions by employers or employees."
+      }
+    ]
+  },
+  {
+    "endpoint_id": "ep_MG_mfb_home",
+    "country": "Madagascar",
+    "url": "https://www.mfb.gov.mg",
+    "sections": [
+      "payroll_tax"
+    ],
+    "status": "crawl_failed",
+    "error": "HTTPSConnectionPool(host='www.mfb.gov.mg', port=443): Max retries exceeded with url: / (Caused by SSLError(SSLCertVerificationError(1, \"[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: Hostname mismatch, certificate is not valid for 'www.mfb.gov.mg'. (_ssl.c:1032)\")))"
+  },
+  {
+    "endpoint_id": "ep_MG_mtefp_home",
+    "country": "Madagascar",
+    "url": "https://www.mtefp.gov.mg",
+    "sections": [
+      "working_hours",
+      "minimum_wage",
+      "termination_notice"
+    ],
+    "status": "crawl_failed",
+    "error": "HTTPSConnectionPool(host='www.mtefp.gov.mg', port=443): Max retries exceeded with url: / (Caused by NameResolutionError(\"HTTPSConnection(host='www.mtefp.gov.mg', port=443): Failed to resolve 'www.mtefp.gov.mg' ([Errno 8] nodename nor servname provided, or not known)\"))"
+  },
+  {
+    "endpoint_id": "ep_MG_interieur_immigration",
+    "country": "Madagascar",
+    "url": "https://www.interieur.gov.mg",
+    "sections": [
+      "visa_types",
+      "work_permit_process"
+    ],
+    "status": "crawl_failed",
+    "error": "HTTPSConnectionPool(host='www.interieur.gov.mg', port=443): Max retries exceeded with url: / (Caused by NameResolutionError(\"HTTPSConnection(host='www.interieur.gov.mg', port=443): Failed to resolve 'www.interieur.gov.mg' ([Errno 8] nodename nor servname provided, or not known)\"))"
+  },
+  {
+    "endpoint_id": "ep_MG_an_laws",
+    "country": "Madagascar",
+    "url": "https://www.assemblee-nationale.mg",
+    "sections": [
+      "working_hours",
+      "termination_notice"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page appears to be a navigation/index page for the Assembl\u00e9e Nationale de Madagascar, providing links to various sections and sub-pages related to parliamentary activities, legislative processes, and public transparency. It does not contain specific employment law rules or values directly on the page itself.",
+    "sub_pages": [
+      {
+        "url": "https://www.assemblee-nationale.mg/textes/",
+        "sections": [
+          "legislation",
+          "statutory_instruments"
+        ],
+        "description": "This sub-page likely contains legislative texts, which may include employment laws or statutory instruments relevant to working hours or termination notice."
+      },
+      {
+        "url": "https://www.assemblee-nationale.mg/consultation-citoyenne/",
+        "sections": [
+          "employee_benefits",
+          "working_hours"
+        ],
+        "description": "This sub-page may include public consultations on employment-related topics, such as working hours or employee benefits."
+      },
+      {
+        "url": "https://www.assemblee-nationale.mg/contact/",
+        "sections": [
+          "recruitments",
+          "termination_notice"
+        ],
+        "description": "This sub-page might provide information on recruitment processes or termination-related notices, though it is primarily a contact page."
+      }
+    ]
+  },
+  {
+    "endpoint_id": "ep_MW_mra_home",
+    "country": "Malawi",
+    "url": "https://www.mra.mw",
+    "sections": [
+      "payroll_tax"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page appears to be a landing page for the Malawi Revenue Authority, as it does not contain any specific employment law rules or values. Additionally, no links were found on the page to suggest navigation to sub-pages with relevant content.",
+    "sub_pages": []
+  },
+  {
+    "endpoint_id": "ep_MW_labour_home",
+    "country": "Malawi",
+    "url": "https://www.labour.gov.mw",
+    "sections": [
+      "working_hours",
+      "minimum_wage",
+      "termination_notice",
+      "annual_leave"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page serves as a navigation/index page for the Ministry of Labour's website. It provides links to various sub-pages and downloadable documents but does not contain specific employment law rules or values directly within its content. The page primarily introduces the ministry and its functions without detailing employment law provisions like working hours, minimum wage, termination notice, or annual leave.",
+    "sub_pages": [
+      {
+        "url": "https://www.labour.gov.mw/index.php/downloads/labour-act",
+        "sections": [
+          "acts",
+          "legislation"
+        ],
+        "description": "Likely contains the Labour Act, which may include provisions on working hours, minimum wage, termination notice, and annual leave."
+      },
+      {
+        "url": "https://www.labour.gov.mw/images/documents/employment-act.pdf",
+        "sections": [
+          "acts",
+          "legislation",
+          "working_hours",
+          "minimum_wage",
+          "termination_notice",
+          "annual_leave"
+        ],
+        "description": "Direct link to the Employment Act, which is expected to cover employment law topics such as working hours, minimum wage, termination notice, and annual leave."
+      },
+      {
+        "url": "https://www.labour.gov.mw/images/documents/workers_compensation_act.pdf",
+        "sections": [
+          "acts",
+          "employee_benefits",
+          "social_security"
+        ],
+        "description": "Likely contains rules related to workers' compensation and employee benefits."
+      },
+      {
+        "url": "https://www.labour.gov.mw/images/documents/Malawi-Pension-Act_2023.pdf",
+        "sections": [
+          "acts",
+          "pension",
+          "employee_benefits"
+        ],
+        "description": "Likely contains provisions related to pensions and retirement benefits."
+      },
+      {
+        "url": "https://www.labour.gov.mw/images/documents/labour_relations_act.pdf",
+        "sections": [
+          "acts",
+          "industrial_relations"
+        ],
+        "description": "Likely contains rules related to industrial relations and employer-employee obligations."
+      }
+    ]
+  },
+  {
+    "endpoint_id": "ep_MW_masm_home",
+    "country": "Malawi",
+    "url": "https://www.masm.org.mw",
+    "sections": [
+      "social_security",
+      "employee_benefits"
+    ],
+    "status": "crawl_failed",
+    "error": "HTTPSConnectionPool(host='www.masm.org.mw', port=443): Max retries exceeded with url: / (Caused by NameResolutionError(\"HTTPSConnection(host='www.masm.org.mw', port=443): Failed to resolve 'www.masm.org.mw' ([Errno 8] nodename nor servname provided, or not known)\"))"
+  },
+  {
+    "endpoint_id": "ep_MW_immigration_home",
+    "country": "Malawi",
+    "url": "https://www.immigration.gov.mw",
+    "sections": [
+      "visa_types",
+      "work_permit_process"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page primarily serves as a navigation hub with links to various sub-pages related to immigration, visas, permits, and citizenship. It does not contain specific employment law rules or values directly on the page. However, it links to sub-pages that may contain relevant content about visa types and work permit processes.",
+    "sub_pages": [
+      {
+        "url": "https://www.immigration.gov.mw/visa/types-of-malawi-visa/",
+        "sections": [
+          "visa_types"
+        ],
+        "description": "This sub-page likely provides details about the different types of visas available in Malawi, which may include work visas."
+      },
+      {
+        "url": "https://www.immigration.gov.mw/visa/visa-application-process/",
+        "sections": [
+          "visa_types"
+        ],
+        "description": "This sub-page likely explains the process for applying for visas, which may include steps for obtaining work visas."
+      },
+      {
+        "url": "https://www.immigration.gov.mw/permits/temporary-employee-permit/",
+        "sections": [
+          "work_permit_process"
+        ],
+        "description": "This sub-page likely provides information about temporary employee permits, which are relevant to the work permit process."
+      },
+      {
+        "url": "https://www.immigration.gov.mw/permits/permanent-residence-permit/",
+        "sections": [
+          "work_permit_process"
+        ],
+        "description": "This sub-page likely provides details about permanent residence permits, which may be relevant to long-term work permits."
+      },
+      {
+        "url": "https://www.immigration.gov.mw/permits/business-residence-permit/",
+        "sections": [
+          "work_permit_process"
+        ],
+        "description": "This sub-page likely provides information about business residence permits, which may be relevant to expatriate employment and work permits."
+      }
+    ]
+  },
+  {
+    "endpoint_id": "ep_MW_malawilii_employment_act",
+    "country": "Malawi",
+    "url": "https://malawilii.org/mw/legislation/consolidated-act/55",
+    "sections": [
+      "working_hours",
+      "termination_notice",
+      "annual_leave",
+      "minimum_wage"
+    ],
+    "status": "crawl_failed",
+    "error": "404 Client Error: Not Found for url: https://malawilii.org/mw/legislation/consolidated-act/55"
+  },
+  {
+    "endpoint_id": "ep_MY_jtksm_home",
+    "country": "Malaysia",
+    "url": "https://jtksm.mohr.gov.my",
+    "sections": [
+      "working_hours",
+      "minimum_wage",
+      "termination_notice",
+      "annual_leave",
+      "maternity_leave"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page content indicates that it is a landing page for the Jabatan Tenaga Kerja Semenanjung Malaysia (JTKSM) website. It primarily serves as a navigation/index page with no specific employment law rules or values provided directly on the page. The only link present ('Skip to main content') is not relevant to employment law content.",
+    "sub_pages": []
+  },
+  {
+    "endpoint_id": "ep_MY_lhdn_home",
+    "country": "Malaysia",
+    "url": "https://www.hasil.gov.my",
+    "sections": [
+      "payroll_tax"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page primarily serves as a navigation/index page with links to various sub-pages related to taxation and employer obligations. It does not contain specific employment law rules or values directly on the page itself. However, it includes links that may lead to relevant content on payroll tax and employer obligations.",
+    "sub_pages": [
+      {
+        "url": "https://www.hasil.gov.my/perkhidmatan/",
+        "sections": [
+          "payroll_tax",
+          "employer_obligations"
+        ],
+        "description": "This page likely provides services and guidelines related to employer obligations and payroll tax compliance."
+      },
+      {
+        "url": "https://www.hasil.gov.my/majikan/",
+        "sections": [
+          "payroll_tax",
+          "employer_obligations"
+        ],
+        "description": "This page appears to focus on employer responsibilities, including payroll tax and related obligations."
+      },
+      {
+        "url": "https://www.hasil.gov.my/majikan/majikan-payroll-spesifikasi-data/",
+        "sections": [
+          "payroll_tax"
+        ],
+        "description": "This page likely contains specific data specifications for payroll tax reporting and compliance."
+      },
+      {
+        "url": "https://www.hasil.gov.my/majikan/pembayaran-pcb/",
+        "sections": [
+          "payroll_tax"
+        ],
+        "description": "This page likely provides details on the payment process for PCB (Potongan Cukai Berjadual), which is related to payroll tax."
+      },
+      {
+        "url": "https://www.hasil.gov.my/majikan/majikan-manual-jadual-pcb/",
+        "sections": [
+          "payroll_tax"
+        ],
+        "description": "This page likely contains a manual or guidelines for employers regarding PCB schedules, which are part of payroll tax."
+      }
+    ]
+  },
+  {
+    "endpoint_id": "ep_MY_epf_home",
+    "country": "Malaysia",
+    "url": "https://www.kwsp.gov.my",
+    "sections": [
+      "social_security",
+      "employee_benefits"
+    ],
+    "status": "crawl_failed",
+    "error": "403 Client Error: Forbidden for url: https://www.kwsp.gov.my/"
+  },
+  {
+    "endpoint_id": "ep_MY_jim_home",
+    "country": "Malaysia",
+    "url": "https://www.imi.gov.my",
+    "sections": [
+      "visa_types",
+      "work_permit_process"
+    ],
+    "status": "classify_failed",
+    "error": "Request timed out."
+  },
+  {
+    "endpoint_id": "ep_MY_agc_employment_act",
+    "country": "Malaysia",
+    "url": "https://www.agc.gov.my/agcportal/uploads/files/Publications/LOM/EN/Act%20265.pdf",
+    "sections": [
+      "working_hours",
+      "termination_notice",
+      "annual_leave",
+      "minimum_wage",
+      "maternity_leave"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page is a 404 error page, indicating that the intended content is not available. It does not contain any employment law rules or values. The only link provided redirects to the homepage, which is a general navigation page and not specific to employment law content.",
+    "sub_pages": [
+      {
+        "url": "https://www.agc.gov.my/",
+        "sections": [],
+        "description": "This is the homepage of the Attorney General's Chambers of Malaysia. It likely contains general navigation to various legal resources but does not directly provide employment law content."
+      }
+    ]
+  },
+  {
+    "endpoint_id": "ep_MT_dier_home",
+    "country": "Malta",
+    "url": "https://dier.gov.mt",
+    "sections": [
+      "working_hours",
+      "minimum_wage",
+      "termination_notice",
+      "annual_leave",
+      "maternity_leave"
+    ],
+    "status": "crawl_failed",
+    "error": "403 Client Error: Forbidden for url: https://dier.gov.mt/"
+  },
+  {
+    "endpoint_id": "ep_MT_cfr_home",
+    "country": "Malta",
+    "url": "https://cfr.gov.mt",
+    "sections": [
+      "payroll_tax",
+      "social_security"
+    ],
+    "status": "crawl_failed",
+    "error": "403 Client Error: Forbidden for url: https://mtca.gov.mt/"
+  },
+  {
+    "endpoint_id": "ep_MT_ss_home",
+    "country": "Malta",
+    "url": "https://socialsecurity.gov.mt",
+    "sections": [
+      "social_security",
+      "employee_benefits",
+      "maternity_leave"
+    ],
+    "status": "crawl_failed",
+    "error": "403 Client Error: Forbidden for url: https://socialsecurity.gov.mt/"
+  },
+  {
+    "endpoint_id": "ep_MT_mira_permits",
+    "country": "Malta",
+    "url": "https://www.migrationsupport.gov.mt",
+    "sections": [
+      "visa_types",
+      "work_permit_process"
+    ],
+    "status": "crawl_failed",
+    "error": "HTTPSConnectionPool(host='www.migrationsupport.gov.mt', port=443): Max retries exceeded with url: / (Caused by NameResolutionError(\"HTTPSConnection(host='www.migrationsupport.gov.mt', port=443): Failed to resolve 'www.migrationsupport.gov.mt' ([Errno 8] nodename nor servname provided, or not known)\"))"
+  },
+  {
+    "endpoint_id": "ep_MT_eira_legislation",
+    "country": "Malta",
+    "url": "https://legislation.mt/eli/cap/452/eng/pdf",
+    "sections": [
+      "working_hours",
+      "termination_notice",
+      "annual_leave"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page primarily serves as a navigation or landing page with links to various sections of the legislation website. It does not contain specific employment law rules or values directly on the page. Instead, it provides links to other pages where such content might be found.",
+    "sub_pages": [
+      {
+        "url": "https://legislation.mt/eli/cap/452",
+        "sections": [
+          "legislation",
+          "industrial_relations",
+          "working_hours",
+          "termination_notice",
+          "annual_leave"
+        ],
+        "description": "This page likely contains the full text of the Employment and Industrial Relations Act, which may include rules on working hours, termination notice, and annual leave."
+      },
+      {
+        "url": "https://legislation.mt/Acts",
+        "sections": [
+          "acts",
+          "legislation"
+        ],
+        "description": "This page likely contains a list of acts, including those related to employment law."
+      },
+      {
+        "url": "https://legislation.mt/LegalNotices",
+        "sections": [
+          "statutory_instruments",
+          "sro_notifications"
+        ],
+        "description": "This page likely contains legal notices, which may include updates or amendments to employment laws."
+      },
+      {
+        "url": "https://legislation.mt/ByLaws",
+        "sections": [
+          "legislation"
+        ],
+        "description": "This page likely contains by-laws, which may include specific regulations related to employment."
+      },
+      {
+        "url": "https://parlament.mt/en/14th-leg/bills",
+        "sections": [
+          "bills"
+        ],
+        "description": "This page likely contains information about parliamentary bills, which may include proposed changes to employment laws."
+      }
+    ]
+  },
+  {
+    "endpoint_id": "ep_MU_labour_home",
+    "country": "Mauritius",
+    "url": "https://labour.govmu.org",
+    "sections": [
+      "working_hours",
+      "minimum_wage",
+      "termination_notice",
+      "annual_leave"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page appears to be a navigation or index page with links to various sub-pages but does not contain any specific employment law rules or values directly on the page. The content primarily consists of placeholders, navigation elements, and links to other sections of the website.",
+    "sub_pages": [
+      {
+        "url": "https://labour.govmu.org/Pages/National-Wage-Consultative-Council-(NWCC).aspx",
+        "sections": [
+          "minimum_wage"
+        ],
+        "description": "This page likely contains information related to the National Wage Consultative Council, which may include details about minimum wage regulations."
+      },
+      {
+        "url": "https://labour.govmu.org/SitePages/ViewAllReports.aspx?RType=Reports and Publications",
+        "sections": [
+          "legislation",
+          "working_hours",
+          "minimum_wage",
+          "termination_notice",
+          "annual_leave"
+        ],
+        "description": "This page likely contains reports and publications that may cover various employment law topics, including working hours, minimum wage, termination notice, and annual leave."
+      },
+      {
+        "url": "https://labour.govmu.org/SitePages/ViewAllReports.aspx?RType=Documents",
+        "sections": [
+          "legislation",
+          "working_hours",
+          "minimum_wage",
+          "termination_notice",
+          "annual_leave"
+        ],
+        "description": "This page likely contains documents that may include employment law content such as working hours, minimum wage, termination notice, and annual leave."
+      },
+      {
+        "url": "https://labour.govmu.org/SitePages/ViewAllReports.aspx?RType=Useful Links",
+        "sections": [
+          "legislation",
+          "working_hours",
+          "minimum_wage",
+          "termination_notice",
+          "annual_leave"
+        ],
+        "description": "This page likely provides useful links to external or internal resources related to employment law topics such as working hours, minimum wage, termination notice, and annual leave."
+      }
+    ]
+  },
+  {
+    "endpoint_id": "ep_MU_mra_home",
+    "country": "Mauritius",
+    "url": "https://www.mra.mu",
+    "sections": [
+      "payroll_tax"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page primarily serves as a navigation/index page with links to various sub-pages. It does not contain specific employment law rules or values directly on the page. Instead, it provides links to other sections or resources that may contain relevant content.",
+    "sub_pages": [
+      {
+        "url": "https://www.mra.mu/index.php/taxes-duties",
+        "sections": [
+          "payroll_tax",
+          "income_tax",
+          "withholding_tax"
+        ],
+        "description": "This page likely provides information on various taxes and duties, including payroll tax, income tax, and withholding tax."
+      },
+      {
+        "url": "https://eservices38.mra.mu/centralLogin/login",
+        "sections": [
+          "tax_filing",
+          "payroll_tax"
+        ],
+        "description": "This sub-page appears to be a portal for filing corporate tax returns, which may include payroll tax-related filings."
+      },
+      {
+        "url": "https://eservices3.mra.mu/vatreturn/taxpayerlogin.jsp",
+        "sections": [
+          "tax_filing"
+        ],
+        "description": "This sub-page is likely a portal for filing VAT returns, which may be tangentially related to payroll tax compliance."
+      },
+      {
+        "url": "https://eservices.mra.mu/taxservices/login?from=taxportal",
+        "sections": [
+          "tax_filing",
+          "payroll_tax"
+        ],
+        "description": "This sub-page appears to be a portal for filing standard tax returns, which could include payroll tax-related filings."
+      },
+      {
+        "url": "https://eservices2.mra.mu/mrapayments/userlogin.jsp",
+        "sections": [
+          "payroll_tax",
+          "tax_filing"
+        ],
+        "description": "This sub-page is likely a portal for making e-payments for taxes, including payroll tax."
+      }
+    ]
+  },
+  {
+    "endpoint_id": "ep_MU_ss_home",
+    "country": "Mauritius",
+    "url": "https://socialsecurity.govmu.org",
+    "sections": [
+      "social_security",
+      "employee_benefits",
+      "maternity_leave"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page primarily serves as a navigation hub with links to various sub-pages and does not contain specific employment law rules or values. It provides general information about the Ministry and links to other sections, but no explicit details on employment laws such as maternity leave, employee benefits, or social security are present in the content provided.",
+    "sub_pages": [
+      {
+        "url": "https://socialsecurity.govmu.org/socialsecurity/?page_id=5856",
+        "sections": [
+          "employee_benefits",
+          "social_security"
+        ],
+        "description": "This sub-page likely contains information about pensions and benefits, which may include details on employee benefits and social security."
+      },
+      {
+        "url": "https://socialsecurity.govmu.org/socialsecurity/?page_id=3792",
+        "sections": [
+          "social_security"
+        ],
+        "description": "This sub-page likely covers social aid, which may include aspects of social security support."
+      },
+      {
+        "url": "https://socialsecurity.govmu.org/socialsecurity/?page_id=5926",
+        "sections": [
+          "social_security"
+        ],
+        "description": "This sub-page likely focuses on elderly welfare, which could be a component of social security."
+      },
+      {
+        "url": "https://socialsecurity.govmu.org/socialsecurity/?page_id=5050",
+        "sections": [
+          "social_security"
+        ],
+        "description": "This sub-page likely provides information on medical care, which may be related to social security benefits."
+      },
+      {
+        "url": "https://socialsecurity.govmu.org/socialsecurity/?page_id=1097",
+        "sections": [
+          "legislation"
+        ],
+        "description": "This sub-page likely contains legislative information, which may include laws related to social security or employee benefits."
+      }
+    ]
+  },
+  {
+    "endpoint_id": "ep_MU_pio_home",
+    "country": "Mauritius",
+    "url": "https://passportimmigration.govmu.org",
+    "sections": [
+      "visa_types",
+      "work_permit_process"
+    ],
+    "status": "crawl_failed",
+    "error": "HTTPSConnectionPool(host='passportimmigration.govmu.org', port=443): Max retries exceeded with url: / (Caused by NameResolutionError(\"HTTPSConnection(host='passportimmigration.govmu.org', port=443): Failed to resolve 'passportimmigration.govmu.org' ([Errno 8] nodename nor servname provided, or not known)\"))"
+  },
+  {
+    "endpoint_id": "ep_MU_ag_laws",
+    "country": "Mauritius",
+    "url": "https://attorneygeneral.govmu.org/Pages/Laws.aspx",
+    "sections": [
+      "working_hours",
+      "termination_notice"
+    ],
+    "status": "crawl_failed",
+    "error": "404 Client Error: Not Found for url: https://attorneygeneral.govmu.org/Pages/Laws.aspx"
+  },
+  {
+    "endpoint_id": "ep_MX_stps_home",
+    "country": "Mexico",
+    "url": "https://www.gob.mx/stps",
+    "sections": [
+      "working_hours",
+      "minimum_wage",
+      "termination_notice",
+      "annual_leave",
+      "maternity_leave"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page primarily serves as a navigation or landing page with links to other resources. It does not contain specific employment law rules or values directly on the page. Instead, it provides links to other pages that may contain relevant content.",
+    "sub_pages": [
+      {
+        "url": "https://www.gob.mx/stps/acciones-y-programas/proteccion-de-datos-personales-331484?state=published",
+        "sections": [],
+        "description": "This page appears to focus on personal data protection and is not directly related to employment law content."
+      },
+      {
+        "url": "https://www.gob.mx/stps/acciones-y-programas/unidad-de-transparencia-362446?state=published",
+        "sections": [],
+        "description": "This page is likely about transparency initiatives and does not seem to cover employment law topics."
+      },
+      {
+        "url": "https://www.gob.mx/tramites",
+        "sections": [
+          "working_hours",
+          "minimum_wage",
+          "termination_notice",
+          "annual_leave",
+          "maternity_leave"
+        ],
+        "description": "This page may contain links to specific employment-related procedures or regulations, including those related to working hours, minimum wage, termination notice, annual leave, and maternity leave."
+      },
+      {
+        "url": "https://www.gob.mx/stps/en",
+        "sections": [
+          "working_hours",
+          "minimum_wage",
+          "termination_notice",
+          "annual_leave",
+          "maternity_leave"
+        ],
+        "description": "This is the English version of the STPS page, which may provide employment law content or links to relevant sections."
+      }
+    ]
+  },
+  {
+    "endpoint_id": "ep_MX_sat_home",
+    "country": "Mexico",
+    "url": "https://www.sat.gob.mx",
+    "sections": [
+      "payroll_tax"
+    ],
+    "status": "crawl_failed",
+    "error": "HTTPSConnectionPool(host='www.sat.gob.mx', port=443): Read timed out. (read timeout=15)"
+  },
+  {
+    "endpoint_id": "ep_MX_imss_home",
+    "country": "Mexico",
+    "url": "https://www.imss.gob.mx",
+    "sections": [
+      "social_security",
+      "maternity_leave",
+      "employee_benefits"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page is empty and contains no content or links. It does not provide any employment law rules or values, nor does it link to sub-pages that could contain such information. Therefore, it is classified as a landing page with no extractable rules.",
+    "sub_pages": []
+  },
+  {
+    "endpoint_id": "ep_MX_inm_home",
+    "country": "Mexico",
+    "url": "https://www.inm.gob.mx",
+    "sections": [
+      "visa_types",
+      "work_permit_process"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page is empty and contains no content or links. It does not provide any employment law rules or values, nor does it serve as a navigation page with links to relevant sub-pages. Therefore, it cannot be classified as a 'content' page or a functional 'landing' page.",
+    "sub_pages": []
+  },
+  {
+    "endpoint_id": "ep_MX_lft_diputados",
+    "country": "Mexico",
+    "url": "https://www.diputados.gob.mx/LeyesBiblio/pdf/LFT.pdf",
+    "sections": [
+      "working_hours",
+      "termination_notice",
+      "annual_leave",
+      "minimum_wage"
+    ],
+    "status": "crawl_failed",
+    "error": "HTTPSConnectionPool(host='www.diputados.gob.mx', port=443): Max retries exceeded with url: /LeyesBiblio/pdf/LFT.pdf (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.diputados.gob.mx', port=443) at 0x13320bb10>, 'Connection to www.diputados.gob.mx timed out. (connect timeout=15)'))"
+  },
+  {
+    "endpoint_id": "ep_MA_miepeec_home",
+    "country": "Morocco",
+    "url": "https://www.miepeec.gov.ma",
+    "sections": [
+      "working_hours",
+      "minimum_wage",
+      "termination_notice",
+      "annual_leave"
+    ],
+    "status": "crawl_failed",
+    "error": "HTTPSConnectionPool(host='www.miepeec.gov.ma', port=443): Max retries exceeded with url: / (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.miepeec.gov.ma', port=443) at 0x13320b110>, 'Connection to www.miepeec.gov.ma timed out. (connect timeout=15)'))"
+  },
+  {
+    "endpoint_id": "ep_MA_dgi_home",
+    "country": "Morocco",
+    "url": "https://www.tax.gov.ma",
+    "sections": [
+      "payroll_tax"
+    ],
+    "status": "crawl_failed",
+    "error": "HTTPSConnectionPool(host='www.tax.gov.ma', port=443): Max retries exceeded with url: / (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1032)')))"
+  },
+  {
+    "endpoint_id": "ep_MA_cnss_home",
+    "country": "Morocco",
+    "url": "https://www.cnss.ma",
+    "sections": [
+      "social_security",
+      "maternity_leave",
+      "employee_benefits"
+    ],
+    "status": "crawl_failed",
+    "error": "HTTPSConnectionPool(host='www.cnss.ma', port=443): Max retries exceeded with url: / (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.cnss.ma', port=443) at 0x13320a850>, 'Connection to www.cnss.ma timed out. (connect timeout=15)'))"
+  },
+  {
+    "endpoint_id": "ep_MA_dgsn_work_permits",
+    "country": "Morocco",
+    "url": "https://www.dgsn.ma",
+    "sections": [
+      "visa_types",
+      "work_permit_process"
+    ],
+    "status": "crawl_failed",
+    "error": "HTTPSConnectionPool(host='www.dgsn.ma', port=443): Max retries exceeded with url: / (Caused by NameResolutionError(\"HTTPSConnection(host='www.dgsn.ma', port=443): Failed to resolve 'www.dgsn.ma' ([Errno 8] nodename nor servname provided, or not known)\"))"
+  },
+  {
+    "endpoint_id": "ep_MA_sgg_laws",
+    "country": "Morocco",
+    "url": "https://www.sgg.gov.ma",
+    "sections": [
+      "working_hours",
+      "termination_notice",
+      "annual_leave"
+    ],
+    "status": "crawl_failed",
+    "error": "HTTPSConnectionPool(host='www.sgg.gov.ma', port=443): Max retries exceeded with url: / (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.sgg.gov.ma', port=443) at 0x1332096d0>, 'Connection to www.sgg.gov.ma timed out. (connect timeout=15)'))"
+  },
+  {
+    "endpoint_id": "ep_NP_moless_home",
+    "country": "Nepal",
+    "url": "https://moless.gov.np",
+    "sections": [
+      "working_hours",
+      "minimum_wage",
+      "termination_notice",
+      "annual_leave"
+    ],
+    "status": "crawl_failed",
+    "error": "HTTPSConnectionPool(host='moless.gov.np', port=443): Max retries exceeded with url: / (Caused by SSLError(SSLCertVerificationError(1, \"[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: Hostname mismatch, certificate is not valid for 'moless.gov.np'. (_ssl.c:1032)\")))"
+  },
+  {
+    "endpoint_id": "ep_NP_ird_home",
+    "country": "Nepal",
+    "url": "https://www.ird.gov.np",
+    "sections": [
+      "payroll_tax"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page primarily serves as a navigation/index page with links to various sub-pages and categories. It does not contain specific employment law rules or values directly on the page. Instead, it provides links to sub-pages that may contain relevant content.",
+    "sub_pages": [
+      {
+        "url": "https://www.ird.gov.np/category/incometaxact/",
+        "sections": [
+          "income_tax",
+          "payroll_tax"
+        ],
+        "description": "This sub-page likely contains information about income tax laws, which may include payroll tax regulations."
+      },
+      {
+        "url": "https://www.ird.gov.np/category/incometaxrules/",
+        "sections": [
+          "income_tax",
+          "payroll_tax"
+        ],
+        "description": "This sub-page likely contains rules and regulations related to income tax, including payroll tax details."
+      },
+      {
+        "url": "https://www.ird.gov.np/category/taxrateincentives/",
+        "sections": [
+          "income_tax",
+          "payroll_tax"
+        ],
+        "description": "This sub-page likely provides information on tax rates and incentives, which may include payroll tax specifics."
+      },
+      {
+        "url": "https://www.ird.gov.np/category/pan/",
+        "sections": [
+          "income_tax",
+          "payroll_tax"
+        ],
+        "description": "This sub-page likely contains information about Permanent Account Numbers (PAN), which are relevant for payroll tax and income tax compliance."
+      },
+      {
+        "url": "https://www.ird.gov.np/category/reform-plan/",
+        "sections": [
+          "income_tax",
+          "payroll_tax"
+        ],
+        "description": "This sub-page may include reform plans related to tax systems, potentially covering payroll tax updates."
+      }
+    ]
+  },
+  {
+    "endpoint_id": "ep_NP_ssf_home",
+    "country": "Nepal",
+    "url": "https://www.ssf.gov.np",
+    "sections": [
+      "social_security",
+      "employee_benefits"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page primarily serves as a navigation hub, providing links to various sub-pages related to social security and employment-related topics. It does not contain specific employment law rules or values directly on the page itself.",
+    "sub_pages": [
+      {
+        "url": "https://www.ssf.gov.np/list/act_regulation",
+        "sections": [
+          "legislation",
+          "social_security"
+        ],
+        "description": "Likely contains acts and regulations related to social security and employment laws."
+      },
+      {
+        "url": "https://www.ssf.gov.np/pages/withdraw-claim-process",
+        "sections": [
+          "social_security",
+          "employee_benefits"
+        ],
+        "description": "Details the process for claiming benefits under social security."
+      },
+      {
+        "url": "https://www.ssf.gov.np/list/claim-forms",
+        "sections": [
+          "social_security",
+          "employee_benefits"
+        ],
+        "description": "Provides forms for claiming social security benefits."
+      },
+      {
+        "url": "https://www.ssf.gov.np/services/the-amount-to-be-deposited-in-the-fund-to-be-included-in-the-scheme",
+        "sections": [
+          "social_security",
+          "employee_benefits"
+        ],
+        "description": "Information about contributions to social security schemes for formal sector employees."
+      },
+      {
+        "url": "https://ssf.gov.np/services/arrangements-related-to-discounts-and-concessions-received-by-workers-in-foreign-employment",
+        "sections": [
+          "expatriate_employment",
+          "social_security"
+        ],
+        "description": "Details discounts and concessions for workers in foreign employment under social security schemes."
+      },
+      {
+        "url": "https://www.ssf.gov.np/pages/hospital-rate-list",
+        "sections": [
+          "health_insurance",
+          "social_security"
+        ],
+        "description": "Contains rates for health treatments covered under social security."
+      },
+      {
+        "url": "https://www.ssf.gov.np/list/information-about-loan",
+        "sections": [
+          "social_security",
+          "employee_benefits"
+        ],
+        "description": "Provides information about loans available under social security schemes."
+      },
+      {
+        "url": "https://www.ssf.gov.np/employment-history",
+        "sections": [
+          "social_security",
+          "employee_benefits"
+        ],
+        "description": "Tracks employment history for contributors to social security."
+      }
+    ]
+  },
+  {
+    "endpoint_id": "ep_NP_immigration_home",
+    "country": "Nepal",
+    "url": "https://www.immigration.gov.np",
+    "sections": [
+      "visa_types",
+      "work_permit_process"
+    ],
+    "status": "crawl_failed",
+    "error": "HTTPSConnectionPool(host='www.immigration.gov.np', port=443): Max retries exceeded with url: / (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.immigration.gov.np', port=443) at 0x133208e10>, 'Connection to www.immigration.gov.np timed out. (connect timeout=15)'))"
+  },
+  {
+    "endpoint_id": "ep_NP_lawcomm_labour_act",
+    "country": "Nepal",
+    "url": "https://www.lawcommission.gov.np/en/wp-content/uploads/2021/11/Labour-Act-2074-2017.pdf",
+    "sections": [
+      "working_hours",
+      "termination_notice",
+      "annual_leave",
+      "minimum_wage"
+    ],
+    "status": "crawl_failed",
+    "error": "404 Client Error: Not Found for url: https://www.lawcommission.gov.np/en/wp-content/uploads/2021/11/Labour-Act-2074-2017.pdf"
+  },
+  {
+    "endpoint_id": "ep_NL_szw_home",
+    "country": "Netherlands",
+    "url": "https://www.government.nl/ministries/ministry-of-social-affairs-and-employment",
+    "sections": [
+      "working_hours",
+      "minimum_wage",
+      "termination_notice",
+      "annual_leave",
+      "maternity_leave"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page primarily serves as a navigation or landing page for the Ministry of Social Affairs and Employment. It provides an overview of the ministry's mission, leadership, and links to other sub-pages but does not contain specific employment law rules or values such as working hours, minimum wage, or maternity leave. Instead, it links to other pages where such information might be found.",
+    "sub_pages": [
+      {
+        "url": "https://www.government.nl/ministries/ministry-of-social-affairs-and-employment/topics",
+        "sections": [
+          "working_hours",
+          "minimum_wage",
+          "termination_notice",
+          "annual_leave",
+          "maternity_leave"
+        ],
+        "description": "This page likely contains detailed information on various employment-related topics, including working hours, minimum wage, termination notice, annual leave, and maternity leave."
+      },
+      {
+        "url": "https://www.government.nl/documents",
+        "sections": [
+          "legislation",
+          "statutory_instruments",
+          "acts"
+        ],
+        "description": "This page likely contains official documents, acts, and statutory instruments related to employment laws and policies."
+      },
+      {
+        "url": "https://www.government.nl/ministries/ministry-of-social-affairs-and-employment/organisational-structure",
+        "sections": [
+          "employer_obligations",
+          "employee_benefits"
+        ],
+        "description": "This page might provide information about the ministry's structure and its responsibilities, including employer obligations and employee benefits."
+      }
+    ]
+  },
+  {
+    "endpoint_id": "ep_NL_belastingdienst_home",
+    "country": "Netherlands",
+    "url": "https://www.belastingdienst.nl/wps/wcm/connect/en/individuals/individuals",
+    "sections": [
+      "payroll_tax"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page primarily serves as a navigation hub, providing links to various sub-pages related to tax and employment topics. It does not contain specific employment law rules or values directly on the page. Instead, it links to other pages where such content might be found.",
+    "sub_pages": [
+      {
+        "url": "https://www.belastingdienst.nl/wps/wcm/connect/en/individuals/content/coming-to-work-in-the-netherlands-30-percent-facility",
+        "sections": [
+          "expatriate_employment"
+        ],
+        "description": "This sub-page likely contains information about the 30% tax facility for expats, which is relevant to expatriate employment."
+      },
+      {
+        "url": "https://www.belastingdienst.nl/wps/wcm/connect/en/individuals/content/tax-credits-international",
+        "sections": [
+          "income_tax"
+        ],
+        "description": "This sub-page likely provides details about international tax credits, which are relevant to income tax."
+      },
+      {
+        "url": "https://www.belastingdienst.nl/wps/wcm/connect/en/individuals/content/non-resident-taxpayer-how-do-i-file-my-income-tax-return",
+        "sections": [
+          "tax_filing"
+        ],
+        "description": "This sub-page likely explains how non-resident taxpayers can file their income tax returns."
+      },
+      {
+        "url": "https://www.belastingdienst.nl/wps/wcm/connect/en/individuals/content/qualifying-non-resident-taxpayer-mortgage-interest-deduction",
+        "sections": [
+          "income_tax"
+        ],
+        "description": "This sub-page likely discusses mortgage interest deductions for qualifying non-resident taxpayers, which is related to income tax."
+      },
+      {
+        "url": "https://www.belastingdienst.nl/wps/wcm/connect/en/individuals/content/what-are-the-consequences-of-being-seconded",
+        "sections": [
+          "expatriate_employment"
+        ],
+        "description": "This sub-page likely covers the consequences of being seconded abroad, which is relevant to expatriate employment."
+      },
+      {
+        "url": "https://www.belastingdienst.nl/wps/wcm/connect/en/individuals/content/tax-treaty-with-germany",
+        "sections": [
+          "income_tax"
+        ],
+        "description": "This sub-page likely provides information about the tax treaty with Germany, which is relevant to income tax."
+      },
+      {
+        "url": "https://www.belastingdienst.nl/wps/wcm/connect/en/individuals/content/tax-treaty-with-belgium",
+        "sections": [
+          "income_tax"
+        ],
+        "description": "This sub-page likely provides information about the tax treaty with Belgium, which is relevant to income tax."
+      },
+      {
+        "url": "https://www.belastingdienst.nl/wps/wcm/connect/en/individuals/content/multiple-countries-double-taxation",
+        "sections": [
+          "income_tax"
+        ],
+        "description": "This sub-page likely discusses double taxation issues for individuals with income from multiple countries, which is relevant to income tax."
+      }
+    ]
+  },
+  {
+    "endpoint_id": "ep_NL_uwv_home",
+    "country": "Netherlands",
+    "url": "https://www.uwv.nl/en",
+    "sections": [
+      "social_security",
+      "maternity_leave",
+      "employee_benefits"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page appears to be a landing or navigation page as it does not contain any specific employment law rules or values. Additionally, no links were found on the page to further analyze or map to the specified sections. The content provided is minimal and does not indicate the presence of detailed employment law information.",
+    "sub_pages": []
+  },
+  {
+    "endpoint_id": "ep_NL_ind_home",
+    "country": "Netherlands",
+    "url": "https://ind.nl/en",
+    "sections": [
+      "visa_types",
+      "work_permit_process"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page primarily serves as a navigation hub with links to various sub-pages related to immigration, residence permits, and other services provided by the IND. It does not contain specific employment law rules or values directly on the page.",
+    "sub_pages": [
+      {
+        "url": "https://ind.nl/en/residence-permits",
+        "sections": [
+          "visa_types",
+          "work_permit_process"
+        ],
+        "description": "This page likely contains information about applying for or extending residence permits, which may include details about visa types and work permit processes."
+      },
+      {
+        "url": "https://ind.nl/en/business-portal",
+        "sections": [
+          "work_permit_process"
+        ],
+        "description": "This portal is likely targeted at businesses and may include information about the process for obtaining work permits for employees."
+      },
+      {
+        "url": "https://ind.nl/en/required-amounts-income-requirements",
+        "sections": [
+          "visa_types",
+          "work_permit_process"
+        ],
+        "description": "This page likely provides details about income requirements, which may be relevant to visa types and work permit processes."
+      }
+    ]
+  },
+  {
+    "endpoint_id": "ep_NL_wetten_bw7",
+    "country": "Netherlands",
+    "url": "https://wetten.overheid.nl/BWBR0005290/2023-07-01",
+    "sections": [
+      "working_hours",
+      "termination_notice",
+      "annual_leave"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page primarily serves as a navigation/index page with links to various sections and articles of the Dutch Civil Code (Burgerlijk Wetboek Boek 7). It does not contain specific employment law rules or values directly on the page. Instead, it provides links to sub-pages where such content might be found.",
+    "sub_pages": [
+      {
+        "url": "https://wetten.overheid.nl/BWBR0005290/2023-07-01#Boek7",
+        "sections": [
+          "working_hours",
+          "termination_notice",
+          "annual_leave"
+        ],
+        "description": "This sub-page likely contains the full text of Book 7 of the Dutch Civil Code, which includes provisions on employment contracts and related topics such as working hours, termination notice, and annual leave."
+      },
+      {
+        "url": "https://wetten.overheid.nl/BWBR0005290/2023-07-01#Boek7_Titeldeel1",
+        "sections": [
+          "working_hours",
+          "termination_notice"
+        ],
+        "description": "This sub-page likely contains specific sections on employment-related agreements, including working hours and termination notice."
+      }
+    ]
+  },
+  {
+    "endpoint_id": "ep_NI_mitrab_home",
+    "country": "Nicaragua",
+    "url": "https://www.mitrab.gob.ni",
+    "sections": [
+      "working_hours",
+      "minimum_wage",
+      "termination_notice",
+      "annual_leave"
+    ],
+    "status": "crawl_failed",
+    "error": "HTTPSConnectionPool(host='www.mitrab.gob.ni', port=443): Max retries exceeded with url: / (Caused by NameResolutionError(\"HTTPSConnection(host='www.mitrab.gob.ni', port=443): Failed to resolve 'www.mitrab.gob.ni' ([Errno 8] nodename nor servname provided, or not known)\"))"
+  },
+  {
+    "endpoint_id": "ep_NI_dgi_home",
+    "country": "Nicaragua",
+    "url": "https://www.dgi.gob.ni",
+    "sections": [
+      "payroll_tax"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page content indicates that the requested URL was rejected, and no actual content or links are available for analysis. This suggests the page is either inaccessible or improperly configured, making it impossible to determine if it contains employment law rules or serves as a navigation page.",
+    "sub_pages": []
+  },
+  {
+    "endpoint_id": "ep_NI_inss_home",
+    "country": "Nicaragua",
+    "url": "https://www.inss.gob.ni",
+    "sections": [
+      "social_security",
+      "employee_benefits"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page appears to be a landing/navigation page for the Instituto Nicarag\u00fcense de Seguridad Social (INSS). It does not contain specific employment law rules or values but instead provides a link to another page ('P\u00e1gina Principal'). The content provided does not include any detailed information about social security or employee benefits, which are the sections this endpoint is supposed to cover.",
+    "sub_pages": [
+      {
+        "url": "https://inss-princ.inss.gob.ni",
+        "sections": [
+          "social_security",
+          "employee_benefits"
+        ],
+        "description": "This sub-page likely contains more detailed information about social security and employee benefits, as it is linked from the main INSS page and appears to be the primary entry point for further content."
+      }
+    ]
+  },
+  {
+    "endpoint_id": "ep_NI_dgme_home",
+    "country": "Nicaragua",
+    "url": "https://www.migraci\u00f3n.gob.ni",
+    "sections": [
+      "visa_types",
+      "work_permit_process"
+    ],
+    "status": "crawl_failed",
+    "error": "HTTPSConnectionPool(host='www.xn--migracin-13a.gob.ni', port=443): Max retries exceeded with url: / (Caused by NameResolutionError(\"HTTPSConnection(host='www.xn--migracin-13a.gob.ni', port=443): Failed to resolve 'www.xn--migracin-13a.gob.ni' ([Errno 8] nodename nor servname provided, or not known)\"))"
+  },
+  {
+    "endpoint_id": "ep_NI_legispedia_ct",
+    "country": "Nicaragua",
+    "url": "https://legislacion.asamblea.gob.ni",
+    "sections": [
+      "working_hours",
+      "termination_notice",
+      "annual_leave"
+    ],
+    "status": "crawl_failed",
+    "error": "HTTPSConnectionPool(host='legislacion.asamblea.gob.ni', port=443): Max retries exceeded with url: / (Caused by ConnectTimeoutError(<HTTPSConnection(host='legislacion.asamblea.gob.ni', port=443) at 0x112a6de50>, 'Connection to legislacion.asamblea.gob.ni timed out. (connect timeout=15)'))"
+  },
+  {
+    "endpoint_id": "ep_NG_labour_home",
+    "country": "Nigeria",
+    "url": "https://www.labour.gov.ng",
+    "sections": [
+      "working_hours",
+      "minimum_wage",
+      "termination_notice",
+      "annual_leave"
+    ],
+    "status": "crawl_failed",
+    "error": "500 Server Error: Internal Server Error for url: https://www.labour.gov.ng/"
+  },
+  {
+    "endpoint_id": "ep_NG_firs_home",
+    "country": "Nigeria",
+    "url": "https://www.firs.gov.ng",
+    "sections": [
+      "payroll_tax"
+    ],
+    "status": "crawl_failed",
+    "error": "HTTPSConnectionPool(host='www.firs.gov.ng', port=443): Max retries exceeded with url: / (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.firs.gov.ng', port=443) at 0x112a6e210>, 'Connection to www.firs.gov.ng timed out. (connect timeout=15)'))"
+  },
+  {
+    "endpoint_id": "ep_NG_pencom_home",
+    "country": "Nigeria",
+    "url": "https://www.pencom.gov.ng",
+    "sections": [
+      "social_security",
+      "employee_benefits"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page primarily serves as a navigation/index page with links to various sub-pages. It does not contain specific employment law rules or values directly on the page. Instead, it provides access to resources and regulatory documents that may contain such information.",
+    "sub_pages": [
+      {
+        "url": "https://www.pencom.gov.ng/pension-reform-act/",
+        "sections": [
+          "pension",
+          "social_security"
+        ],
+        "description": "This sub-page likely contains the Pension Reform Act, which governs pension-related regulations and social security provisions in Nigeria."
+      },
+      {
+        "url": "https://www.pencom.gov.ng/pra2014/",
+        "sections": [
+          "pension",
+          "social_security"
+        ],
+        "description": "This sub-page likely provides details about the 2014 Pension Reform Act, which includes rules and guidelines on pensions and social security."
+      },
+      {
+        "url": "https://www.pencom.gov.ng/category/regulations-guidelines-circulars-frameworks/",
+        "sections": [
+          "pension",
+          "employee_benefits"
+        ],
+        "description": "This sub-page likely contains regulatory documents, guidelines, and circulars related to pensions and employee benefits."
+      },
+      {
+        "url": "https://www.pencom.gov.ng/category/publications/annual-reports/",
+        "sections": [
+          "pension",
+          "social_security"
+        ],
+        "description": "This sub-page likely contains annual reports that may include data and insights on pensions and social security systems."
+      },
+      {
+        "url": "https://www.pencom.gov.ng/category/publications/monthly-reports/",
+        "sections": [
+          "pension",
+          "social_security"
+        ],
+        "description": "This sub-page likely contains monthly reports with updates on pension contributions and social security metrics."
+      },
+      {
+        "url": "https://www.pencom.gov.ng/category/publications/quarterly-reports/",
+        "sections": [
+          "pension",
+          "social_security"
+        ],
+        "description": "This sub-page likely contains quarterly reports that provide updates on pension and social security-related activities."
+      }
+    ]
+  },
+  {
+    "endpoint_id": "ep_NG_nis_home",
+    "country": "Nigeria",
+    "url": "https://immigration.gov.ng",
+    "sections": [
+      "visa_types",
+      "work_permit_process"
+    ],
+    "status": "ok",
+    "page_type": "landing",
+    "has_extractable_rules": false,
+    "reasoning": "The page primarily serves as a navigation/index page with links to various sub-pages and documents. It does not contain specific employment law rules or values directly on the page. However, it links to sub-pages that may contain relevant content, particularly related to visa types and work permit processes.",
+    "sub_pages": [
+      {
+        "url": "https://immigration.gov.ng/nigerian-visa/",
+        "sections": [
+          "visa_types"
+        ],
+        "description": "This sub-page likely provides information about different types of visas available in Nigeria, including their requirements and application processes."
+      },
+      {
+        "url": "http://twp.immigration.gov.ng/",
+        "sections": [
+          "work_permit_process"
+        ],
+        "description": "This sub-page is likely dedicated to the Temporary Work Permit (TWP) process, detailing the application procedure and requirements for obtaining a work permit in Nigeria."
+      },
+      {
+        "url": "https://immigration.gov.ng/combined-expatriate-residence-permit-and-aliens-card-cerpac/",
+        "sections": [
+          "work_permit_process",
+          "expatriate_employment"
+        ],
+        "description": "This sub-page likely provides information about the Combined Expatriate Residence Permit and Aliens Card (CERPAC), which is relevant for expatriates working in Nigeria."
+      },
+      {
+        "url": "https://immigration.gov.ng/e-cerpac-combined-expatriate-residence-permit-and-aliens-card/",
+        "sections": [
+          "work_permit_process",
+          "expatriate_employment"
+        ],
+        "description": "This sub-page likely provides details about the electronic version of the CERPAC, which is relevant for expatriates and their work authorization in Nigeria."
+      }
+    ]
+  },
+  {
+    "endpoint_id": "ep_NG_nigerialii_labour_act",
+    "country": "Nigeria",
+    "url": "https://nigerialii.org/ng/legislation/consolidated-act/198",
+    "sections": [
+      "working_hours",
+      "termination_notice",
+      "annual_leave",
+      "minimum_wage"
+    ],
+    "status": "crawl_failed",
+    "error": "404 Client Error: Not Found for url: https://nigerialii.org/ng/legislation/consolidated-act/198"
+  }
+]

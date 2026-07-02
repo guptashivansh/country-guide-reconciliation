@@ -64,9 +64,9 @@ class IngestionJobService:
             extra={"stage": "normalized", "ingestion_job_id": job_id, "source_snapshot_id": source_snapshot_id},
         )
 
-    def mark_extracted(self, job_id):
-        self.ingestion_job_repository.transition_job(job_id, "extracted")
-        logger.info("Ingestion job extracted", extra={"stage": "extracted", "ingestion_job_id": job_id})
+    def mark_extracted(self, job_id, rules_extracted=None):
+        self.ingestion_job_repository.transition_job(job_id, "extracted", rules_extracted=rules_extracted)
+        logger.info("Ingestion job extracted", extra={"stage": "extracted", "ingestion_job_id": job_id, "rules_extracted": rules_extracted})
 
     def mark_reconciled(self, job_id):
         self.ingestion_job_repository.transition_job(job_id, "reconciled")
@@ -85,3 +85,6 @@ class IngestionJobService:
 
     def list_recent_jobs(self, limit=25):
         return self.ingestion_job_repository.list_recent_jobs(limit=limit)
+
+    def last_successful_sync_time(self):
+        return self.ingestion_job_repository.last_successful_sync_time()
