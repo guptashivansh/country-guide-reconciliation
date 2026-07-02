@@ -164,13 +164,11 @@
       </div>
       <div class="right">
         <button class="btn" onclick="bulkMarkReviewed()">Mark as reviewed</button>
-        {% if not demo %}
-        <button class="btn btn-warn" onclick="bulkEscalate()">Escalate</button>
-        <button class="btn btn-danger" onclick="bulkReject()">Reject</button>
-        <button class="btn btn-primary" onclick="bulkApproveSelected()">
+        <button class="btn btn-warn bulk-action-btn" onclick="bulkEscalate()">Escalate</button>
+        <button class="btn btn-danger bulk-action-btn" onclick="bulkReject()">Reject</button>
+        <button class="btn btn-primary bulk-action-btn" onclick="bulkApproveSelected()">
           ✓ Approve all minor <span style="font-family:var(--font-mono); font-weight:500; opacity:0.85; margin-left:2px;" id="bulkMinorCount"></span>
         </button>
-        {% endif %}
       </div>
     </div>
     <div class="review-list" id="reviewList">
@@ -319,7 +317,7 @@
 </div>
 
 <!-- ─── Scripts (load order matters: core → tabs → ui) ─── -->
-<script>var DEMO_MODE = {{ 'true' if demo else 'false' }};</script>
+<script>var DEMO_MODE = localStorage.getItem('atlas:demo') === '1';</script>
 <script src="{{ url_for('static', filename='js/ops/ops-core.js') }}"></script>
 <script src="{{ url_for('static', filename='js/ops/ops-review.js') }}"></script>
 <script src="{{ url_for('static', filename='js/ops/ops-tabs.js') }}"></script>

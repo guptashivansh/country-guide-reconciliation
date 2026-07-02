@@ -1,6 +1,26 @@
 // ops-core.js — Constants, state, utilities, data loading
 
 // ═══════════════════════════════════════════════════
+//  DEMO MODE (client-side from localStorage)
+// ═══════════════════════════════════════════════════
+(function applyDemoMode() {
+  if (typeof DEMO_MODE === 'undefined') return;
+  if (!DEMO_MODE) return;
+
+  var guideLink = document.getElementById('liveGuideLink');
+  if (guideLink) {
+    guideLink.href = 'https://www.notion.so/skuad/Skuad-Country-Product-Guides-7ed6a2f53972448db2cb107a8d20b661#efcb034468c143d18b2ee66ca0e4874f';
+    guideLink.target = '_blank';
+    guideLink.rel = 'noopener';
+  }
+
+  var rejectModal = document.getElementById('rejectModal');
+  if (rejectModal) rejectModal.style.display = 'none';
+
+  document.querySelectorAll('.bulk-action-btn').forEach(function(btn) { btn.style.display = 'none'; });
+})();
+
+// ═══════════════════════════════════════════════════
 //  CONSTANTS & STATE
 // ═══════════════════════════════════════════════════
 var FLAGS = {};

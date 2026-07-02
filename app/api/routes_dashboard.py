@@ -31,8 +31,7 @@ def create_dashboard_blueprint(review_service, config_service=None):
 
     @bp.route("/ops")
     def index():
-        demo = request.args.get("demo") == "1"
-        return render_template("ops_dashboard_v2.html", demo=demo)
+        return render_template("ops_dashboard_v2.html")
 
     @bp.route("/ops-legacy")
     def ops_legacy():

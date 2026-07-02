@@ -204,6 +204,10 @@ a.pcard:hover .pcard-cta-arrow { transform: translateX(3px); }
     <span id="themeIcon">☾</span>
     <span id="themeLabel">Dark</span>
   </button>
+  <button class="appbar-theme" id="demoBtn" onclick="toggleDemo()">
+    <span id="demoIcon">⚑</span>
+    <span id="demoLabel">Demo</span>
+  </button>
 </header>
 
 <main class="hub-main">
@@ -310,6 +314,22 @@ a.pcard:hover .pcard-cta-arrow { transform: translateX(3px); }
     html.setAttribute('data-mode', mode);
     document.getElementById('themeIcon').textContent  = mode === 'dark' ? '☀' : '☾';
     document.getElementById('themeLabel').textContent = mode === 'dark' ? 'Light' : 'Dark';
+  }
+
+  const demoOn = localStorage.getItem('atlas:demo') === '1';
+  applyDemo(demoOn);
+
+  function toggleDemo() {
+    const next = localStorage.getItem('atlas:demo') === '1' ? '0' : '1';
+    localStorage.setItem('atlas:demo', next);
+    applyDemo(next === '1');
+  }
+  function applyDemo(on) {
+    const btn = document.getElementById('demoBtn');
+    btn.style.borderColor = on ? 'var(--purple-line)' : '';
+    btn.style.color = on ? 'var(--purple-2)' : '';
+    btn.style.background = on ? 'var(--purple-soft)' : '';
+    document.getElementById('demoLabel').textContent = on ? 'Demo ✓' : 'Demo';
   }
 </script>
 
