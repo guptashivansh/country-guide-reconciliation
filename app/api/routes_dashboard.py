@@ -1,6 +1,6 @@
 """HTML page routes — dashboard, guide pages, compliance surfaces."""
 
-from flask import Blueprint, abort, redirect, render_template
+from flask import Blueprint, abort, redirect, render_template, request
 
 from app.api._helpers import make_config_helpers
 
@@ -31,7 +31,8 @@ def create_dashboard_blueprint(review_service, config_service=None):
 
     @bp.route("/ops")
     def index():
-        return render_template("ops_dashboard_v2.html")
+        demo = request.args.get("demo") == "1"
+        return render_template("ops_dashboard_v2.html", demo=demo)
 
     @bp.route("/ops-legacy")
     def ops_legacy():

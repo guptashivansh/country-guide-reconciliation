@@ -1,3 +1,38 @@
+{% if not demo %}
+<!-- ── Reject Rationale Modal ── -->
+<div class="modal-scrim" id="rejectModal" onclick="if(event.target===this) closeRejectModal()">
+  <div class="modal reject-modal" style="width:480px;">
+    <button class="close" onclick="closeRejectModal()" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <h3>Reject change</h3>
+    <p class="sub">Provide a rationale for rejecting this update. The current guide value will be retained.</p>
+    <input type="hidden" id="rejectItemId" value="" />
+    <div class="field-group">
+      <div class="field-label">Rationale</div>
+      <select id="rejectRationale">
+        <option value="Outdated or superseded source">Outdated or superseded source</option>
+        <option value="Insufficient evidence">Insufficient evidence</option>
+        <option value="Incorrect extraction">Incorrect extraction</option>
+        <option value="Duplicate change">Duplicate change</option>
+        <option value="Not applicable to scope">Not applicable to scope</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+    <div class="field-group">
+      <div class="field-label">Notes (optional)</div>
+      <textarea id="rejectNotes" placeholder="Additional context for the audit trail…"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeRejectModal()">Cancel</button>
+      <button class="btn btn-danger" onclick="confirmReject()">
+        Reject &amp; log to audit
+      </button>
+    </div>
+  </div>
+</div>
+{% endif %}
+
 <!-- ── Sync Modal ── -->
 <div class="modal-scrim" id="syncModal" onclick="if(event.target===this) closeSync()">
   <div class="modal">

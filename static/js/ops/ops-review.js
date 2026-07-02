@@ -128,6 +128,14 @@ function renderReview() {
           <span class="rcard-spacer"></span>
           ${isAutoApprovable ? '<span class="auto-approvable">' + conf + '% · auto-approvable</span>' : ''}
           <span class="rcard-time" title="Detected ${item.created_at ? fmtTime(item.created_at) : ''}">Detected ${timeAgo(item.created_at)}${item.created_at ? ' · ' + fmtDate(item.created_at) : ''}${item.source_url ? ' · ' + extractHost(item.source_url) : ''}</span>
+          ${!DEMO_MODE ? `<div class="rcard-head-actions">
+            <button class="btn btn-warn" onclick="doAction('escalate',${item.id}); event.stopPropagation();" title="Escalate [E]">Escalate</button>
+            <button class="btn btn-danger" onclick="openRejectModal(${item.id}); event.stopPropagation();" title="Reject [R]">Reject</button>
+            <button class="btn btn-primary" onclick="doAction('approve',${item.id}); event.stopPropagation();" title="Approve [A]">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              Approve
+            </button>
+          </div>` : ''}
           <button class="rcard-expand" onclick="toggleCollapse(this)" title="Expand/Collapse">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
@@ -304,7 +312,7 @@ function renderReview() {
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg>
             Compare versions
           </button>
-          <span class="hint">Decision is logged immutably to audit trail</span>
+          <span class="hint">Decision is logged immutably to audit trail${!DEMO_MODE ? ' · <span class="mono" style="font-size:10px;">A</span> approve · <span class="mono" style="font-size:10px;">R</span> reject · <span class="mono" style="font-size:10px;">E</span> escalate' : ''}</span>
         </div>
       </div>
     </article>`;
