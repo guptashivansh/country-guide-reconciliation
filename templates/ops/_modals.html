@@ -1,0 +1,385 @@
+<!-- ── Sync Modal ── -->
+<div class="modal-scrim" id="syncModal" onclick="if(event.target===this) closeSync()">
+  <div class="modal">
+    <button class="close" onclick="closeSync()" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <h3>Sync sources</h3>
+    <p class="sub">Pull the freshest snapshot from official government sources, then run reconciliation.</p>
+    <div class="modal-section">
+      <h4>
+        <span>Countries to sync</span>
+        <a class="all-link" onclick="toggleAllCountries()">Select / deselect all</a>
+      </h4>
+      <div class="search-bar" style="margin-bottom:12px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="syncCountrySearch" placeholder="Search countries…" oninput="filterSyncCountries()" />
+      </div>
+      <div class="country-grid" id="countryGrid"></div>
+      <div id="syncCountryEmpty" style="display:none; padding:16px; text-align:center; color:var(--ink-3); font-size:13px; grid-column:1/-1;">No countries match your search.</div>
+    </div>
+    <div class="modal-actions">
+      <span class="est">Selected: <b id="modalCount">0</b></span>
+      <button class="btn" onclick="closeSync()">Cancel</button>
+      <button class="btn btn-primary btn-lg" onclick="runSync()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
+        Start sync
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Drift Country Modal ── -->
+<div class="modal-scrim" id="driftCountryModal" onclick="if(event.target===this) closeDriftModal()">
+  <div class="modal">
+    <button class="close" onclick="closeDriftModal()" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <h3>Country</h3>
+    <p class="sub">Pick which countries appear in the strip. Click a pill there to filter the dashboard.</p>
+    <div class="modal-section">
+      <h4>
+        <span>All countries with drift data</span>
+        <a class="all-link" onclick="toggleAllDriftCountries()">Select / deselect all</a>
+      </h4>
+      <div class="country-grid" id="driftCountryGrid"></div>
+    </div>
+    <div class="modal-actions">
+      <span class="est">Showing: <b id="driftModalCount">0</b> in strip</span>
+      <button class="btn" onclick="closeDriftModal()">Cancel</button>
+      <button class="btn btn-primary btn-lg" onclick="applyDriftSelection()">Apply</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Add Source Modal ── -->
+<div class="modal-scrim" id="addSourceModal" onclick="if(event.target===this) closeAddSourceModal()">
+  <div class="modal" style="width:560px;">
+    <button class="close" onclick="closeAddSourceModal()" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <h3>Add source endpoint</h3>
+    <p class="sub">Register a new government source endpoint for the compliance sync pipeline.</p>
+
+    <div class="field-group" style="margin-top:18px;">
+      <div class="field-label">Country</div>
+      <select id="addSrcCountry" onchange="onAddSrcCountryChange()">
+        <option value="">Select a country…</option>
+      </select>
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">Authority</div>
+      <select id="addSrcAuthority" disabled>
+        <option value="">Select a country first…</option>
+      </select>
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">Endpoint name</div>
+      <input id="addSrcName" type="text" placeholder="e.g. Employment Standards — Leave entitlements" style="width:100%; height:36px; padding:0 12px; font-family:var(--font-ui); font-size:13px; border:1px solid var(--paper-line); border-radius:var(--r-s); background:var(--paper-2); color:var(--ink); outline:none;" />
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">URL</div>
+      <input id="addSrcUrl" type="url" placeholder="https://…" style="width:100%; height:36px; padding:0 12px; font-family:var(--font-mono); font-size:12px; border:1px solid var(--paper-line); border-radius:var(--r-s); background:var(--paper-2); color:var(--ink); outline:none;" />
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+      <div class="field-group">
+        <div class="field-label">Source type</div>
+        <select id="addSrcType">
+          <option value="html">HTML</option>
+          <option value="pdf">PDF</option>
+          <option value="api">API</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Crawl frequency</div>
+        <select id="addSrcFreq">
+          <option value="weekly">Weekly</option>
+          <option value="monthly" selected>Monthly</option>
+          <option value="quarterly">Quarterly</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+      <div class="field-group">
+        <div class="field-label">Extraction strategy</div>
+        <select id="addSrcStrategy">
+          <option value="html_readability">HTML Readability</option>
+          <option value="pdf_extract">PDF Extract</option>
+          <option value="api_json">API JSON</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Content language</div>
+        <select id="addSrcLang">
+          <option value="en" selected>English</option>
+          <option value="es">Spanish</option>
+          <option value="fr">French</option>
+          <option value="de">German</option>
+          <option value="pt">Portuguese</option>
+          <option value="ar">Arabic</option>
+          <option value="zh">Chinese</option>
+          <option value="ja">Japanese</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">Sections covered</div>
+      <div id="addSrcSections" style="display:flex; gap:6px; flex-wrap:wrap;"></div>
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">Notes (optional)</div>
+      <textarea id="addSrcNotes" placeholder="Any additional context about this source…" style="width:100%; min-height:60px; resize:vertical; font-family:var(--font-ui); font-size:13px; line-height:1.5; padding:10px 12px; border:1px solid var(--paper-line); border-radius:var(--r-m); background:var(--paper-2); color:var(--ink); outline:none;"></textarea>
+    </div>
+
+    <div id="addSrcError" style="display:none; padding:10px 14px; background:var(--crit-soft); border:1px solid var(--crit-line); border-radius:var(--r-m); color:var(--crit-2); font-size:13px; font-weight:600; margin-bottom:12px;"></div>
+
+    <div class="modal-actions">
+      <button class="btn" onclick="closeAddSourceModal()">Cancel</button>
+      <button class="btn btn-primary btn-lg" id="addSrcSubmit" onclick="submitAddSource()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Create endpoint
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Edit Source Modal ─── -->
+<div class="modal-scrim" id="editSourceModal" onclick="if(event.target===this) closeEditSourceModal()">
+  <div class="modal" style="width:560px;">
+    <button class="close" onclick="closeEditSourceModal()" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <h3>Edit source endpoint</h3>
+    <p class="sub">Update this endpoint's configuration.</p>
+    <input type="hidden" id="editSrcId" />
+
+    <div class="field-group" style="margin-top:18px;">
+      <div class="field-label">Endpoint name</div>
+      <input id="editSrcName" type="text" style="width:100%; height:36px; padding:0 12px; font-family:var(--font-ui); font-size:13px; border:1px solid var(--paper-line); border-radius:var(--r-s); background:var(--paper-2); color:var(--ink); outline:none;" />
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">URL</div>
+      <input id="editSrcUrl" type="url" style="width:100%; height:36px; padding:0 12px; font-family:var(--font-mono); font-size:12px; border:1px solid var(--paper-line); border-radius:var(--r-s); background:var(--paper-2); color:var(--ink); outline:none;" />
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+      <div class="field-group">
+        <div class="field-label">Source type</div>
+        <select id="editSrcType">
+          <option value="html">HTML</option>
+          <option value="pdf">PDF</option>
+          <option value="api">API</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Crawl frequency</div>
+        <select id="editSrcFreq">
+          <option value="weekly">Weekly</option>
+          <option value="monthly">Monthly</option>
+          <option value="quarterly">Quarterly</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+      <div class="field-group">
+        <div class="field-label">Extraction strategy</div>
+        <select id="editSrcStrategy">
+          <option value="html_readability">HTML Readability</option>
+          <option value="playwright">Playwright</option>
+          <option value="css_selector">CSS Selector</option>
+          <option value="pdf_extract">PDF Extract</option>
+          <option value="ocr_pdf">OCR PDF</option>
+          <option value="api_json">API JSON</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Content language</div>
+        <select id="editSrcLang">
+          <option value="en">English</option>
+          <option value="es">Spanish</option>
+          <option value="fr">French</option>
+          <option value="de">German</option>
+          <option value="pt">Portuguese</option>
+          <option value="ar">Arabic</option>
+          <option value="zh">Chinese</option>
+          <option value="ja">Japanese</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+      <div class="field-group">
+        <div class="field-label">Change detection</div>
+        <select id="editSrcDetection">
+          <option value="semantic">Semantic</option>
+          <option value="hash">Hash</option>
+          <option value="visual">Visual</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Owner team</div>
+        <input id="editSrcOwner" type="text" style="width:100%; height:36px; padding:0 12px; font-family:var(--font-ui); font-size:13px; border:1px solid var(--paper-line); border-radius:var(--r-s); background:var(--paper-2); color:var(--ink); outline:none;" />
+      </div>
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">Sections covered</div>
+      <div id="editSrcSections" style="display:flex; gap:6px; flex-wrap:wrap;"></div>
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">Notes</div>
+      <textarea id="editSrcNotes" style="width:100%; min-height:60px; resize:vertical; font-family:var(--font-ui); font-size:13px; line-height:1.5; padding:10px 12px; border:1px solid var(--paper-line); border-radius:var(--r-m); background:var(--paper-2); color:var(--ink); outline:none;"></textarea>
+    </div>
+
+    <div style="display:flex; gap:12px; margin-bottom:14px;">
+      <label style="display:flex; align-items:center; gap:6px; font-size:13px; color:var(--ink-2); cursor:pointer;">
+        <input type="checkbox" id="editSrcJsHeavy" style="accent-color:var(--purple);" /> JavaScript heavy
+      </label>
+      <label style="display:flex; align-items:center; gap:6px; font-size:13px; color:var(--ink-2); cursor:pointer;">
+        <input type="checkbox" id="editSrcAuth" style="accent-color:var(--purple);" /> Requires auth
+      </label>
+      <label style="display:flex; align-items:center; gap:6px; font-size:13px; color:var(--ink-2); cursor:pointer;">
+        <input type="checkbox" id="editSrcEscalation" style="accent-color:var(--purple);" /> Escalation required
+      </label>
+    </div>
+
+    <div id="editSrcError" style="display:none; padding:10px 14px; background:var(--crit-soft); border:1px solid var(--crit-line); border-radius:var(--r-m); color:var(--crit-2); font-size:13px; font-weight:600; margin-bottom:12px;"></div>
+
+    <div class="modal-actions">
+      <button class="btn" onclick="closeEditSourceModal()">Cancel</button>
+      <button class="btn btn-primary btn-lg" id="editSrcSubmit" onclick="submitEditSource()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" width="14" height="14"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+        Save changes
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Add Country Modal ─── -->
+<div class="modal-scrim" id="addCountryModal" onclick="if(event.target===this) closeAddCountryModal()">
+  <div class="modal" style="width:420px;">
+    <button class="close" onclick="closeAddCountryModal()" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <h3 id="countryModalTitle">Add country</h3>
+    <p class="sub">Add a new country to the source registry.</p>
+    <input type="hidden" id="editCountryId" />
+
+    <div class="field-group" style="margin-top:18px;">
+      <div class="field-label">Country name</div>
+      <input id="addCountryName" type="text" placeholder="e.g. United Kingdom" style="width:100%; height:36px; padding:0 12px; font-family:var(--font-ui); font-size:13px; border:1px solid var(--paper-line); border-radius:var(--r-s); background:var(--paper-2); color:var(--ink); outline:none;" />
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">ISO code (2-letter)</div>
+      <input id="addCountryIso" type="text" maxlength="2" placeholder="e.g. GB" style="width:100%; height:36px; padding:0 12px; font-family:var(--font-mono); font-size:13px; text-transform:uppercase; border:1px solid var(--paper-line); border-radius:var(--r-s); background:var(--paper-2); color:var(--ink); outline:none;" />
+    </div>
+
+    <div id="addCountryError" style="display:none; padding:10px 14px; background:var(--crit-soft); border:1px solid var(--crit-line); border-radius:var(--r-m); color:var(--crit-2); font-size:13px; font-weight:600; margin-bottom:12px;"></div>
+
+    <div class="modal-actions">
+      <button class="btn" onclick="closeAddCountryModal()">Cancel</button>
+      <button class="btn btn-primary btn-lg" id="addCountrySubmit" onclick="submitCountry()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Save
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Add Authority Modal ─── -->
+<div class="modal-scrim" id="addAuthorityModal" onclick="if(event.target===this) closeAddAuthorityModal()">
+  <div class="modal" style="width:480px;">
+    <button class="close" onclick="closeAddAuthorityModal()" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <h3 id="authorityModalTitle">Add authority</h3>
+    <p class="sub">Register a new government authority under a country.</p>
+    <input type="hidden" id="editAuthorityId" />
+
+    <div class="field-group" style="margin-top:18px;">
+      <div class="field-label">Country</div>
+      <select id="addAuthCountry">
+        <option value="">Select a country…</option>
+      </select>
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">Authority name</div>
+      <input id="addAuthName" type="text" placeholder="e.g. Ministry of Labour" style="width:100%; height:36px; padding:0 12px; font-family:var(--font-ui); font-size:13px; border:1px solid var(--paper-line); border-radius:var(--r-s); background:var(--paper-2); color:var(--ink); outline:none;" />
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+      <div class="field-group">
+        <div class="field-label">Authority type</div>
+        <select id="addAuthType">
+          <option value="government_ministry">Government Ministry</option>
+          <option value="labor_authority">Labor Authority</option>
+          <option value="tax_authority">Tax Authority</option>
+          <option value="social_security">Social Security</option>
+          <option value="immigration">Immigration</option>
+          <option value="regulatory_body">Regulatory Body</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Trust level</div>
+        <select id="addAuthTrust">
+          <option value="official" selected>Official</option>
+          <option value="semi_official">Semi-official</option>
+          <option value="trusted_third_party">Trusted third party</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">Website URL</div>
+      <input id="addAuthUrl" type="url" placeholder="https://…" style="width:100%; height:36px; padding:0 12px; font-family:var(--font-mono); font-size:12px; border:1px solid var(--paper-line); border-radius:var(--r-s); background:var(--paper-2); color:var(--ink); outline:none;" />
+    </div>
+
+    <div class="field-group">
+      <div class="field-label">Notes (optional)</div>
+      <textarea id="addAuthNotes" placeholder="Any notes about this authority…" style="width:100%; min-height:50px; resize:vertical; font-family:var(--font-ui); font-size:13px; line-height:1.5; padding:10px 12px; border:1px solid var(--paper-line); border-radius:var(--r-m); background:var(--paper-2); color:var(--ink); outline:none;"></textarea>
+    </div>
+
+    <div id="addAuthError" style="display:none; padding:10px 14px; background:var(--crit-soft); border:1px solid var(--crit-line); border-radius:var(--r-m); color:var(--crit-2); font-size:13px; font-weight:600; margin-bottom:12px;"></div>
+
+    <div class="modal-actions">
+      <button class="btn" onclick="closeAddAuthorityModal()">Cancel</button>
+      <button class="btn btn-primary btn-lg" id="addAuthSubmit" onclick="submitAuthority()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Save
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Confirm Delete Modal ─── -->
+<div class="modal-scrim" id="confirmDeleteModal" onclick="if(event.target===this) closeDeleteModal()">
+  <div class="modal" style="width:420px;">
+    <button class="close" onclick="closeDeleteModal()" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <h3>Confirm deactivation</h3>
+    <p class="sub" id="deleteModalMsg">Are you sure you want to deactivate this item?</p>
+    <div class="modal-actions" style="margin-top:18px;">
+      <button class="btn" onclick="closeDeleteModal()">Cancel</button>
+      <button class="btn btn-danger btn-lg" id="deleteModalConfirm" onclick="confirmDelete()">Deactivate</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Toast ─── -->
+<div class="toast" id="toast">
+  <span class="ic" id="toastIc">✓</span>
+  <span id="toastMsg"></span>
+</div>

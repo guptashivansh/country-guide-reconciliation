@@ -1,0 +1,58 @@
+<!-- ─── App bar ─── -->
+<header class="appbar">
+  <a href="/" class="brand" style="text-decoration:none;color:inherit">
+    <div class="brand-mark">R</div>
+    <span class="brand-name">Regulift</span>
+    <span class="brand-slash">/</span>
+    <span class="brand-tag">Compliance Intelligence</span>
+  </a>
+  <div class="spacer"></div>
+  <div class="search-bar" role="search">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+    <input type="search" placeholder="Search country, source, change…" id="globalSearch" />
+    <span class="kbd">⌘K</span>
+  </div>
+  <div class="notif-wrap">
+    <button class="iconbtn" title="Notifications" id="notifBtn" onclick="toggleNotifPanel()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+      <span class="badge-dot" id="notifCount">0</span>
+    </button>
+    <div class="notif-panel" id="notifPanel">
+      <div class="notif-header">
+        <h3>Notifications</h3>
+        <span class="notif-count" id="notifTotalBadge">0</span>
+      </div>
+      <div class="notif-tabs" id="notifTabs">
+        <button class="notif-tab active" data-ntab="all">All <span class="ct" id="ntAll">0</span></button>
+        <button class="notif-tab" data-ntab="critical">Critical <span class="ct" id="ntCrit">0</span></button>
+        <button class="notif-tab" data-ntab="drift">Drift <span class="ct" id="ntDrift">0</span></button>
+        <button class="notif-tab" data-ntab="system">System <span class="ct" id="ntSystem">0</span></button>
+      </div>
+      <div class="notif-body" id="notifBody"></div>
+      <div class="notif-footer">
+        <a onclick="goTab('review'); closeNotifPanel();">View all in review queue →</a>
+      </div>
+    </div>
+  </div>
+  <a href="/" class="btn" style="text-decoration:none;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+    Hub
+  </a>
+  <a href="https://www.notion.so/skuad/Skuad-Country-Product-Guides-7ed6a2f53972448db2cb107a8d20b661#efcb034468c143d18b2ee66ca0e4874f" target="_blank" rel="noopener" class="btn" style="text-decoration:none; border-color:var(--purple-line); color:var(--purple-2); background:var(--purple-soft);">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+    Live Guide
+  </a>
+  <button class="btn-sync" onclick="openSync()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
+    Sync sources
+    <span class="kbd">S</span>
+  </button>
+</header>
+
+<!-- ─── Sync running banner ─── -->
+<div class="sync-banner" id="syncBanner">
+  <svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v5h-5"/></svg>
+  <span class="status"><b>Syncing</b> · <span id="syncStatus">contacting sources…</span></span>
+  <div class="prog"><div class="f" id="syncProgFill"></div></div>
+  <span class="count" id="syncCount"></span>
+</div>
