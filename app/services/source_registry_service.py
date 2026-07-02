@@ -11,6 +11,10 @@ class SourceRegistryService:
     def list_countries(self):
         return self.source_endpoint_repository.list_countries()
 
+    def active_country_names(self):
+        """Canonical set of active country names — use to filter all country-scoped queries."""
+        return {c["name"] for c in self.source_endpoint_repository.list_countries()}
+
     def list_authorities(self, country_id=None):
         return self.source_endpoint_repository.list_authorities(country_id)
 

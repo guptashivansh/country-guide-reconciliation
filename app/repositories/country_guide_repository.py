@@ -367,6 +367,11 @@ class CountryGuideRepository:
     def list_countries_summary(self):
         conn = self.connect()
         c = conn.cursor()
+        try:
+            c.execute("SELECT name FROM source_countries WHERE is_active = 1")
+            active = {r[0] for r in c.fetchall()}
+        except Exception:
+            active = None
         c.execute("""
             SELECT country, COUNT(*) as n, MAX(last_updated) as updated
             FROM country_guide
@@ -375,7 +380,10 @@ class CountryGuideRepository:
         """)
         rows = c.fetchall()
         conn.close()
-        return [{"country": r[0], "rule_count": r[1], "last_updated": r[2]} for r in rows]
+        results = [{"country": r[0], "rule_count": r[1], "last_updated": r[2]} for r in rows]
+        if active is not None:
+            results = [r for r in results if r["country"] in active]
+        return results
 
     def get_country_sections(self, country):
         conn = self.connect()

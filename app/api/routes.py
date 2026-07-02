@@ -68,6 +68,7 @@ def create_api_blueprint(
 
     parent.register_blueprint(create_review_blueprint(
         review_service=review_service,
+        source_registry_service=source_registry_service,
         limiter=limiter,
     ))
 
@@ -75,6 +76,7 @@ def create_api_blueprint(
         review_service=review_service,
         temporal_rule_service=temporal_rule_service,
         config_service=config_service,
+        source_registry_service=source_registry_service,
         limiter=limiter,
     ))
 

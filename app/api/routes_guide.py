@@ -18,7 +18,7 @@ def _fmt_date(iso):
         return iso or "—"
 
 
-def create_guide_blueprint(review_service, temporal_rule_service=None, config_service=None, limiter=None):
+def create_guide_blueprint(review_service, temporal_rule_service=None, config_service=None, source_registry_service=None, limiter=None):
     bp = Blueprint("guide", __name__)
     h = make_config_helpers(config_service)
     _flag = h["flag"]
@@ -31,7 +31,12 @@ def create_guide_blueprint(review_service, temporal_rule_service=None, config_se
 
     @bp.route("/api/guide")
     def get_guide():
-        return jsonify(review_service.list_country_guide_entries())
+        entries = review_service.list_country_guide_entries()
+        if source_registry_service:
+            active = source_registry_service.active_country_names()
+            if active:
+                entries = [e for e in entries if e.get("country") in active]
+        return jsonify(entries)
 
     @bp.route("/api/guide/<country>/<section>", methods=["PUT"])
     def edit_rule(country, section):

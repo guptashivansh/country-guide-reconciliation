@@ -36,7 +36,11 @@ def create_pipeline_blueprint(
 
     @bp.route("/api/ingestion-jobs")
     def get_ingestion_jobs():
-        return jsonify(ingestion_job_service.list_recent_jobs(limit=500))
+        active = source_registry_service.active_country_names()
+        jobs = ingestion_job_service.list_recent_jobs(limit=500)
+        if active:
+            jobs = [j for j in jobs if j.get("country") in active]
+        return jsonify(jobs)
 
     @bp.route("/api/retry-job/<int:job_id>", methods=["POST"])
     @_limit("10 per minute")
@@ -85,13 +89,18 @@ def create_pipeline_blueprint(
 
     @bp.route("/api/metrics")
     def get_metrics():
+        active = source_registry_service.active_country_names()
         queue = review_service.list_pending_review_items()
+        if active:
+            queue = [i for i in queue if i.get("country") in active]
         pending = [i for i in queue if i.get("status") == "pending"]
         critical = [i for i in pending if (i.get("severity") or "").lower() == "critical"]
         confidences = [float(i["confidence"]) for i in pending if i.get("confidence") is not None]
         avg_conf = round(sum(confidences) / len(confidences) * 100) if confidences else None
 
         jobs = ingestion_job_service.list_recent_jobs(limit=500)
+        if active:
+            jobs = [j for j in jobs if j.get("country") in active]
         crawl_failures = len([j for j in jobs if j.get("state") == "failed"])
         last_ok_ts = ingestion_job_service.last_successful_sync_time()
 

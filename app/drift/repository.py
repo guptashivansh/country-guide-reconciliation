@@ -21,6 +21,14 @@ class DriftRepository:
 
     def list_countries(self) -> List[str]:
         with self._connect() as conn:
+            try:
+                rows = conn.execute(
+                    "SELECT name FROM source_countries WHERE is_active = 1 ORDER BY name"
+                ).fetchall()
+                if rows:
+                    return [r["name"] for r in rows]
+            except Exception:
+                pass
             rows = conn.execute(
                 "SELECT DISTINCT country FROM country_guide ORDER BY country"
             ).fetchall()
@@ -106,16 +114,18 @@ class DriftRepository:
         if not core_sections:
             return {}
         with self._connect() as conn:
-            guide_countries = {r["country"] for r in conn.execute(
-                "SELECT DISTINCT country FROM country_guide"
-            ).fetchall()}
             try:
-                registry_countries = {r["name"] for r in conn.execute(
+                active_countries = {r["name"] for r in conn.execute(
                     "SELECT name FROM source_countries WHERE is_active = 1"
                 ).fetchall()}
             except Exception:
-                registry_countries = set()
-            countries = sorted(guide_countries | registry_countries)
+                active_countries = set()
+            if active_countries:
+                countries = sorted(active_countries)
+            else:
+                countries = sorted({r["country"] for r in conn.execute(
+                    "SELECT DISTINCT country FROM country_guide"
+                ).fetchall()})
 
             placeholders = ",".join("?" * len(core_sections))
             rows = conn.execute(

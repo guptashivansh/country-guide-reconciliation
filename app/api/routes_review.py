@@ -15,7 +15,7 @@ def _review_payload():
     }
 
 
-def create_review_blueprint(review_service, limiter=None):
+def create_review_blueprint(review_service, source_registry_service=None, limiter=None):
     bp = Blueprint("review", __name__)
 
     def _limit(limit_string):
@@ -25,7 +25,12 @@ def create_review_blueprint(review_service, limiter=None):
 
     @bp.route("/api/queue")
     def get_queue():
-        return jsonify(review_service.list_pending_review_items())
+        items = review_service.list_pending_review_items()
+        if source_registry_service:
+            active = source_registry_service.active_country_names()
+            if active:
+                items = [i for i in items if i.get("country") in active]
+        return jsonify(items)
 
     @bp.route("/api/approve/<int:item_id>", methods=["POST"])
     @_limit("30 per minute")
@@ -135,6 +140,10 @@ def create_review_blueprint(review_service, limiter=None):
     @bp.route("/api/audit")
     def get_audit():
         entries = review_service.list_audit_entries()
+        if source_registry_service:
+            active = source_registry_service.active_country_names()
+            if active:
+                entries = [e for e in entries if e.get("country") in active]
         country_filter = request.args.get("country")
         since_filter = request.args.get("since")
         if country_filter:
