@@ -1,6 +1,8 @@
 import json
 import logging
 
+from app.ingestion.notion_section_parser import canonical_country, parse_sections
+
 logger = logging.getLogger(__name__)
 
 STAGE_ORDER = ["queued", "fetched", "normalized", "extracted", "reconciled"]
@@ -192,3 +194,45 @@ def run_sync(services, countries=None, fetch_only=False, engine=None):
         "failures": failures,
         "per_country": per_country,
     }
+
+
+def run_notion_reconciliation(services):
+    """
+    Fetch current Notion content, parse into sections, compare against
+    all pending review items, and auto-resolve matches.
+    """
+    notion_service = services.get("notion_ingestion_service")
+    reconciliation_service = services.get("reconciliation_service")
+    if not notion_service or not reconciliation_service:
+        logger.warning("Notion reconciliation skipped: missing services")
+        return {"resolved": 0, "unresolved": 0, "skipped": True}
+
+    print(f"\n{'='*60}")
+    print("  NOTION RECONCILIATION — fetching current Notion content")
+    print(f"{'='*60}\n")
+
+    country_texts = notion_service.fetch_all_employment_guides()
+    if not country_texts:
+        logger.warning("Notion reconciliation skipped: no content fetched")
+        print("  No Notion content fetched — skipping reconciliation")
+        return {"resolved": 0, "unresolved": 0, "skipped": True}
+
+    notion_sections = {}
+    for raw_country, text in country_texts.items():
+        country = canonical_country(raw_country)
+        sections = parse_sections(text)
+        if sections:
+            notion_sections[country] = sections
+
+    print(f"  Parsed {len(notion_sections)} countries from Notion")
+
+    result = reconciliation_service.reconcile_against_notion(notion_sections)
+
+    print(f"  Resolved: {result['resolved']} | Unresolved: {result['unresolved']}")
+    print(f"{'='*60}\n")
+
+    logger.info(
+        "Notion reconciliation complete",
+        extra={"resolved": result["resolved"], "unresolved": result["unresolved"]},
+    )
+    return result

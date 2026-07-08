@@ -6,6 +6,7 @@ from app.api.routes import create_api_blueprint, warm_drift_cache
 from app.extraction.content_chunker import ContentChunker
 from app.extraction.groq_extraction_service import GroqExtractionService
 from app.ingestion.html_ingestion_service import HtmlIngestionService
+from app.ingestion.notion_ingestion_service import NotionIngestionService
 from app.ingestion.pdf_ingestion_service import PdfIngestionService
 from app.ingestion.ingestion_job_service import IngestionJobService
 from app.ingestion.source_snapshot_service import SourceSnapshotService
@@ -25,7 +26,7 @@ from app.services.provenance_service import ProvenanceService
 from app.services.temporal_rule_service import TemporalRuleService
 from app.drift.detector import DriftDetector
 from app.drift.repository import DriftRepository
-from app.utils.config import anthropic_api_keys, azure_openai_api_keys, azure_openai_base_url, azure_openai_extraction_model, azure_openai_reconciliation_model, claude_model, extraction_chunk_size, extraction_provider, gemini_api_keys, gemini_model, groq_api_keys, groq_model, load_env_file, official_sources_json_url, slack_webhook_url, sync_cron_schedule, parser_version  # noqa: E501
+from app.utils.config import anthropic_api_keys, azure_openai_api_keys, azure_openai_base_url, azure_openai_extraction_model, azure_openai_reconciliation_model, claude_model, extraction_chunk_size, extraction_provider, gemini_api_keys, gemini_model, groq_api_keys, groq_model, load_env_file, notion_api_key, official_sources_json_url, slack_webhook_url, sync_cron_schedule, parser_version  # noqa: E501
 from app.utils.db import Database
 from app.utils.logging_config import configure_logging
 
@@ -119,6 +120,10 @@ def build_services(db_path=None):
             country_guide_repository,
             reconciliation_engine=reconciliation_engine,
         ),
+        "notion_ingestion_service": NotionIngestionService(
+            page_id="7ed6a2f53972448db2cb107a8d20b661",
+            api_key=notion_api_key(),
+        ),
     }
 
 
@@ -153,6 +158,7 @@ def create_app(db_path=None):
         drift_detector=services["drift_detector"],
         config_service=services["config_service"],
         pdf_ingestion_service=services["pdf_ingestion_service"],
+        notion_ingestion_service=services["notion_ingestion_service"],
         limiter=limiter,
     ))
 
@@ -178,39 +184,29 @@ def _auto_seed_if_empty(services):
 
     def _seed():
         import logging
-        from app.ingestion.notion_ingestion_service import NotionIngestionService
-        from app.services.provenance_service import ProvenanceService
-        from app.utils.config import parser_version
-        import re
+        from app.ingestion.notion_section_parser import canonical_country, parse_sections
 
         logger = logging.getLogger(__name__)
         logger.info("Auto-seeding country_guide from Notion (background)...")
 
-        NOTION_PAGE_ID = "7ed6a2f53972448db2cb107a8d20b661"
         NOTION_SOURCE_URL = "https://skuad.notion.site/Skuad-Country-Product-Guides-7ed6a2f53972448db2cb107a8d20b661"
-        COUNTRY_ALIASES = {"united arab emirates": "UAE"}
 
         try:
-            from notion_import import FIELD_TO_SECTION, _parse_sections, _canonical_country
-
-            notion_service = NotionIngestionService(page_id=NOTION_PAGE_ID)
+            notion_service = services["notion_ingestion_service"]
             country_texts = notion_service.fetch_all_employment_guides()
 
-            provenance_service = ProvenanceService(
-                services["provenance_repository"],
-                parser_version=parser_version(),
-            )
+            prov_service = services["provenance_service"]
 
             total = 0
             for raw_country, content in country_texts.items():
-                country = _canonical_country(raw_country)
-                sections = _parse_sections(content)
+                country = canonical_country(raw_country)
+                sections = parse_sections(content)
                 for section, value in sections.items():
                     repo.upsert_guide_entry(
                         country=country, section=section,
                         value=value, source_url=NOTION_SOURCE_URL,
                     )
-                    provenance_service.record_seed(country, section, value, NOTION_SOURCE_URL)
+                    prov_service.record_seed(country, section, value, NOTION_SOURCE_URL)
                     total += 1
                 logger.info("Seeded %s (%d sections)", country, len(sections))
 

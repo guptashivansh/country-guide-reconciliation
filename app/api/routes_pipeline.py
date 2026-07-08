@@ -5,7 +5,7 @@ import threading
 
 from flask import Blueprint, jsonify, request
 
-from app.services.sync_service import run_sync, run_single_job
+from app.services.sync_service import run_sync, run_single_job, run_notion_reconciliation
 from app.services.slack_service import send_sync_alert
 from app.utils.config import slack_webhook_url
 
@@ -24,6 +24,7 @@ def create_pipeline_blueprint(
     extraction_service,
     reconciliation_service,
     pdf_ingestion_service=None,
+    notion_ingestion_service=None,
     executor=None,
     limiter=None,
 ):
@@ -116,6 +117,17 @@ def create_pipeline_blueprint(
             "trusted_source_count": registry["countries"],
         })
 
+    @bp.route("/api/notion/pages")
+    def notion_pages():
+        if not notion_ingestion_service:
+            return jsonify({})
+        try:
+            urls = notion_ingestion_service.fetch_page_urls()
+            return jsonify(urls)
+        except Exception as e:
+            logger.error("Failed to fetch Notion page URLs: %s", e)
+            return jsonify({})
+
     @bp.route("/api/sync", methods=["POST"])
     @_limit("5 per minute")
     def sync():
@@ -123,6 +135,7 @@ def create_pipeline_blueprint(
             return jsonify({"success": False, "message": "Sync already in progress"}), 409
 
         body = request.get_json(silent=True) or {}
+        source = body.get("source", "external")
         selected_countries = list(body.get("countries") or [])
         fetch_only = bool(body.get("fetch_only"))
         engine = body.get("engine")
@@ -134,14 +147,18 @@ def create_pipeline_blueprint(
             "ingestion_job_service": ingestion_job_service,
             "extraction_service": extraction_service,
             "reconciliation_service": reconciliation_service,
+            "notion_ingestion_service": notion_ingestion_service,
         }
 
         def _run():
             try:
                 _sync_status["running"] = True
                 _sync_status["last_result"] = None
-                result = run_sync(services, countries=selected_countries or None, fetch_only=fetch_only, engine=engine)
-                send_sync_alert(slack_webhook_url(), result, triggered_by="manual")
+                if source == "notion":
+                    result = run_notion_reconciliation(services)
+                else:
+                    result = run_sync(services, countries=selected_countries or None, fetch_only=fetch_only, engine=engine)
+                    send_sync_alert(slack_webhook_url(), result, triggered_by="manual")
                 _sync_status["last_result"] = result
             except Exception as e:
                 logger.error("Background sync failed", extra={"failure": str(e)})
@@ -150,7 +167,8 @@ def create_pipeline_blueprint(
                 _sync_status["running"] = False
 
         threading.Thread(target=_run, daemon=True).start()
-        return jsonify({"success": True, "message": "Sync started in background"})
+        msg = "Notion sync started in background" if source == "notion" else "Sync started in background"
+        return jsonify({"success": True, "message": msg, "source": source})
 
     @bp.route("/api/sync/status", methods=["GET"])
     def sync_status():
@@ -159,13 +177,18 @@ def create_pipeline_blueprint(
             return jsonify({"running": True, "message": "Sync in progress"})
         if result is None:
             return jsonify({"running": False, "message": "No sync has run yet"})
-        return jsonify({
+        resolved = result.get("resolved", 0)
+        resp = {
             "running": False,
             "changes_queued": result.get("total_changes", 0),
             "endpoints_processed": result.get("endpoints_processed", 0),
             "failures": result.get("failures", 0),
+            "resolved": resolved,
             "message": f"{result.get('total_changes', 0)} change(s) queued for review",
-        })
+        }
+        if resolved:
+            resp["message"] = f"{resolved} item(s) auto-resolved from Notion"
+        return jsonify(resp)
 
     @bp.route("/api/intake/pdf", methods=["POST"])
     @_limit("10 per minute")

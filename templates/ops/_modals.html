@@ -38,21 +38,34 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>
     <h3>Sync sources</h3>
-    <p class="sub">Pull the freshest snapshot from official government sources, then run reconciliation.</p>
+    <p class="sub">Pull the freshest data and run reconciliation against the review queue.</p>
     <div class="modal-section">
-      <h4>
-        <span>Countries to sync</span>
-        <a class="all-link" onclick="toggleAllCountries()">Select / deselect all</a>
-      </h4>
-      <div class="search-bar" style="margin-bottom:12px;">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input id="syncCountrySearch" placeholder="Search countries…" oninput="filterSyncCountries()" />
+      <h4><span>Source</span></h4>
+      <div class="sync-source-toggle" style="display:flex; gap:8px; margin-bottom:16px;">
+        <button class="chip active" id="syncSrcBoth" onclick="setSyncSource('both')">Both</button>
+        <button class="chip" id="syncSrcExternal" onclick="setSyncSource('external')">External sources</button>
+        <button class="chip" id="syncSrcNotion" onclick="setSyncSource('notion')">Notion</button>
       </div>
-      <div class="country-grid" id="countryGrid"></div>
-      <div id="syncCountryEmpty" style="display:none; padding:16px; text-align:center; color:var(--ink-3); font-size:13px; grid-column:1/-1;">No countries match your search.</div>
+      <div id="syncExternalOptions">
+        <h4>
+          <span>Countries to sync</span>
+          <a class="all-link" onclick="toggleAllCountries()">Select / deselect all</a>
+        </h4>
+        <div class="search-bar" style="margin-bottom:12px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input id="syncCountrySearch" placeholder="Search countries…" oninput="filterSyncCountries()" />
+        </div>
+        <div class="country-grid" id="countryGrid"></div>
+        <div id="syncCountryEmpty" style="display:none; padding:16px; text-align:center; color:var(--ink-3); font-size:13px; grid-column:1/-1;">No countries match your search.</div>
+      </div>
+      <div id="syncNotionOptions" style="display:none;">
+        <p style="color:var(--ink-3); font-size:13px; line-height:1.6; padding:8px 0;">
+          Fetch current content from Notion and auto-resolve any pending review items where the Notion guide already reflects the proposed change.
+        </p>
+      </div>
     </div>
     <div class="modal-actions">
-      <span class="est">Selected: <b id="modalCount">0</b></span>
+      <span class="est" id="syncModalEst">Selected: <b id="modalCount">0</b></span>
       <button class="btn" onclick="closeSync()">Cancel</button>
       <button class="btn btn-primary btn-lg" onclick="runSync()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>

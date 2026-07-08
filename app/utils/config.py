@@ -130,3 +130,7 @@ def ingestion_max_retries():
 
 def ingestion_max_content_length():
     return int(os.environ.get("INGESTION_MAX_CONTENT_LENGTH", "24000"))
+
+
+def notion_api_key():
+    return os.environ.get("NOTION_API_KEY", "")

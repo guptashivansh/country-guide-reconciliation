@@ -57,6 +57,7 @@ def create_api_blueprint(
     drift_detector=None,
     config_service=None,
     pdf_ingestion_service=None,
+    notion_ingestion_service=None,
     limiter=None,
 ):
     parent = Blueprint("country_guide_routes", __name__)
@@ -102,6 +103,7 @@ def create_api_blueprint(
         extraction_service=extraction_service,
         reconciliation_service=reconciliation_service,
         pdf_ingestion_service=pdf_ingestion_service,
+        notion_ingestion_service=notion_ingestion_service,
         executor=_executor,
         limiter=limiter,
     ))

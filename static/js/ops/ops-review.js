@@ -135,7 +135,12 @@ function renderReview() {
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
               Approve
             </button>
-          </div>` : ''}
+          </div>` : `<div class="rcard-head-actions">
+            <a class="btn btn-primary" href="${NOTION_PAGES[item.country] || 'https://www.notion.so/skuad/Skuad-Country-Product-Guides-7ed6a2f53972448db2cb107a8d20b661'}" target="_blank" rel="noopener" onclick="event.stopPropagation();">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              Edit in Notion
+            </a>
+          </div>`}
           <button class="rcard-expand" onclick="toggleCollapse(this)" title="Expand/Collapse">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
           </button>
@@ -194,7 +199,7 @@ function renderReview() {
               const srcConfTip = { 'Government source': 'Government sources are primary legal authorities and receive the highest source confidence rating.', 'Notion import': 'Notion imports are curated internal references verified by the compliance team.', 'Seed data': 'Seed data is baseline information loaded during initial setup; accuracy may vary.', 'Unknown': 'Source type could not be determined.' };
               const parserConfTip = 'Parser confidence reflects how accurately the extraction model identified and parsed this data point from the source document.';
               return `
-            <details class="prov-drawer">
+            <details class="prov-drawer" open>
               <summary class="prov-toggle">
                 <div class="prov-title">
                   <span class="prov-caret">›</span>
@@ -221,11 +226,11 @@ function renderReview() {
                     <div class="prov-value">${sectionLabel(item.section)}</div>
                   </div>
                   <div>
-                    <div class="prov-key">Source confidence <span class="prov-info-icon" title="${srcConfTip[srcType] || srcConfTip['Unknown']}">ⓘ</span></div>
+                    <div class="prov-key">Source confidence <span class="prov-info-icon" data-tip="${srcConfTip[srcType] || srcConfTip['Unknown']}">ⓘ</span></div>
                     <div class="prov-value">${srcConf}%</div>
                   </div>
                   <div>
-                    <div class="prov-key">Parser confidence <span class="prov-info-icon" title="${parserConfTip}">ⓘ</span></div>
+                    <div class="prov-key">Parser confidence <span class="prov-info-icon" data-tip="${parserConfTip}">ⓘ</span></div>
                     <div class="prov-value">${conf !== null ? conf + '%' : '—'}</div>
                   </div>
                   <div>

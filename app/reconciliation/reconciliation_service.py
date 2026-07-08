@@ -1,9 +1,17 @@
 import logging
+import re
 
 from app.models.workflow_results import FailureDetail, ReconciliationResult
 
 
 logger = logging.getLogger(__name__)
+
+
+def _normalize_for_comparison(text: str) -> str:
+    text = re.sub(r"\s+", " ", text.strip()).lower()
+    text = re.sub(r"^[-•*]\s+", "", text, flags=re.MULTILINE)
+    text = re.sub(r"^\d+\.\s+", "", text, flags=re.MULTILINE)
+    return text.strip()
 
 
 class ReconciliationService:
@@ -13,6 +21,73 @@ class ReconciliationService:
 
     def reconcile_canonical_rules(self, old_rule, new_rule):
         return self.reconciliation_engine.reconcile(old_rule, new_rule)
+
+    def reconcile_against_notion(self, notion_sections_by_country):
+        """
+        Compare pending review items against current Notion content.
+        Auto-resolve items where Notion now reflects the proposed change.
+
+        Args:
+            notion_sections_by_country: {country: {section: value}}
+
+        Returns:
+            {"resolved": int, "unresolved": int, "details": [...]}
+        """
+        pending_items = self.country_guide_repository.list_pending_review_items()
+        resolved = 0
+        unresolved = 0
+        details = []
+
+        for item in pending_items:
+            country = item["country"]
+            section = item["section"]
+            new_value = item["new_value"] or ""
+
+            country_sections = notion_sections_by_country.get(country)
+            if not country_sections:
+                unresolved += 1
+                continue
+
+            notion_value = country_sections.get(section)
+            if notion_value is None:
+                unresolved += 1
+                continue
+
+            norm_new = _normalize_for_comparison(new_value)
+            norm_notion = _normalize_for_comparison(notion_value)
+
+            matched = False
+            if norm_new == norm_notion:
+                matched = True
+            elif norm_new and norm_notion:
+                shorter, longer = (norm_new, norm_notion) if len(norm_new) <= len(norm_notion) else (norm_notion, norm_new)
+                if shorter in longer and len(shorter) >= 0.6 * len(longer):
+                    matched = True
+
+            if matched:
+                result = self.country_guide_repository.resolve_review_item_via_notion(item["id"])
+                if result:
+                    resolved += 1
+                    details.append({
+                        "item_id": item["id"],
+                        "country": country,
+                        "section": section,
+                        "status": "resolved_via_notion",
+                    })
+                    logger.info(
+                        "Auto-resolved review item via Notion",
+                        extra={"item_id": item["id"], "country": country, "section": section},
+                    )
+                else:
+                    unresolved += 1
+            else:
+                unresolved += 1
+
+        logger.info(
+            "Notion reconciliation complete",
+            extra={"resolved": resolved, "unresolved": unresolved},
+        )
+        return {"resolved": resolved, "unresolved": unresolved, "details": details}
 
     def reconcile_extracted_rules(self, country, extracted_data, source_url, source_hash, source_snapshot_id):
         changes_found = 0

@@ -24,6 +24,7 @@
 //  CONSTANTS & STATE
 // ═══════════════════════════════════════════════════
 var FLAGS = {};
+var NOTION_PAGES = {};
 var SECTION_LABELS = {annual_leave:"Annual Leave",sick_leave:"Sick Leave",maternity_leave:"Maternity Leave",public_holidays:"Public Holidays",working_hours:"Working Hours",overtime:"Overtime",probation:"Probation",minimum_wage:"Minimum Wage",income_tax:"Income Tax",payroll_tax:"Payroll Tax",withholding_tax:"Withholding Tax",health_insurance:"Health Insurance",social_security:"Social Security",pension:"Pension",employee_benefits:"Employee Benefits",termination_notice:"Termination Notice",employer_obligations:"Employer Obligations",industrial_relations:"Industrial Relations",work_permit:"Work Permit",work_visa:"Work Visa",expatriate_employment:"Expatriate Employment",workplace_safety:"Workplace Safety",osh_obligations:"OSH Obligations"};
 
 var DATA = { queue: [], audit: [], drift: [], jobs: [], metrics: {}, coverage: {} };
@@ -34,7 +35,7 @@ var currentFilter = 'all';
 var selectedDriftCountries = new Set();
 var reviewPageSize = 10;
 var reviewShowing = 10;
-var sortMode = 'severity'; // 'severity' | 'time' | 'confidence'
+var sortMode = 'time'; // 'severity' | 'time' | 'confidence'
 var activeCountryFilter = new URLSearchParams(location.search).get('country') || null;
 
 function flag(country) { return FLAGS[country] || '🌐'; }
@@ -85,7 +86,11 @@ async function loadAll() {
   ]);
   FLAGS = flags;
   DATA = { metrics, queue, audit, drift, jobs, coverage, sourceCountries };
-  renderAll();
+  if (typeof DEMO_MODE !== 'undefined' && DEMO_MODE && !Object.keys(NOTION_PAGES).length) {
+    fetch('/api/notion/pages').then(r => r.json()).then(p => { NOTION_PAGES = p; renderAll(); }).catch(() => renderAll());
+  } else {
+    renderAll();
+  }
 }
 
 function renderAll() {

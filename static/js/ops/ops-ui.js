@@ -52,8 +52,23 @@ function toggleAllCountries() {
   updateModalCount();
 }
 
+var _syncSource = 'both';
+
+function setSyncSource(src) {
+  _syncSource = src;
+  document.getElementById('syncSrcBoth').classList.toggle('active', src === 'both');
+  document.getElementById('syncSrcExternal').classList.toggle('active', src === 'external');
+  document.getElementById('syncSrcNotion').classList.toggle('active', src === 'notion');
+  document.getElementById('syncExternalOptions').style.display = '';
+  document.getElementById('syncNotionOptions').style.display = src === 'notion' ? '' : 'none';
+  document.getElementById('syncModalEst').style.display = '';
+}
+
 async function runSync() {
-  const selected = [...document.querySelectorAll('#countryGrid .country-cb.checked')].map(el => el.dataset.country);
+  const source = _syncSource;
+  const isNotion = source === 'notion';
+  const isBoth = source === 'both';
+  const selected = isNotion ? [] : [...document.querySelectorAll('#countryGrid .country-cb.checked')].map(el => el.dataset.country);
   closeSync();
 
   const banner = document.getElementById('syncBanner');
@@ -62,17 +77,17 @@ async function runSync() {
   const count = document.getElementById('syncCount');
   banner.classList.add('open');
   fill.style.width = '10%';
-  status.textContent = 'contacting sources…';
-  count.textContent = selected.length ? selected.length + ' countries' : 'all countries';
+  status.textContent = isNotion ? 'fetching Notion content…' : 'contacting sources…';
+  count.textContent = isNotion ? 'Notion' : (selected.length ? selected.length + ' countries' : 'all countries');
 
   try {
     fill.style.width = '20%';
-    status.textContent = 'starting sync…';
-    const body = selected.length ? { countries: selected } : {};
+    status.textContent = isBoth ? 'syncing external sources…' : isNotion ? 'reconciling against Notion…' : 'starting sync…';
+    const body = isNotion ? { source: 'notion' } : (selected.length ? { countries: selected } : {});
     const res = await fetch('/api/sync', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
     const data = await res.json();
     if (!data.success) { throw new Error(data.message); }
-    status.textContent = 'syncing sources…';
+    status.textContent = isBoth ? 'syncing external sources…' : isNotion ? 'reconciling…' : 'syncing sources…';
     fill.style.width = '30%';
 
     const poll = setInterval(async () => {
@@ -80,19 +95,43 @@ async function runSync() {
         const sr = await fetch('/api/sync/status');
         const ss = await sr.json();
         if (ss.running) {
-          const pct = Math.min(30 + (ss.endpoints_processed || 0) * 0.15, 95);
+          const pct = Math.min(30 + (ss.endpoints_processed || 0) * 0.15, isBoth ? 60 : 95);
           fill.style.width = pct + '%';
-          status.textContent = `syncing… ${ss.endpoints_processed || 0} endpoints processed`;
+          status.textContent = isBoth ? `syncing external… ${ss.endpoints_processed || 0} endpoints` : isNotion ? 'reconciling…' : `syncing… ${ss.endpoints_processed || 0} endpoints processed`;
         } else {
           clearInterval(poll);
-          fill.style.width = '100%';
-          status.textContent = 'complete';
-          setTimeout(() => banner.classList.remove('open'), 1500);
-          toast(ss.message || 'Sync complete', 'info');
-          loadAll();
+          if (isBoth) {
+            fill.style.width = '65%';
+            status.textContent = 'reconciling against Notion…';
+            const nr = await fetch('/api/sync', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ source: 'notion' }) });
+            const nd = await nr.json();
+            if (!nd.success) { throw new Error(nd.message); }
+            const poll2 = setInterval(async () => {
+              try {
+                const sr2 = await fetch('/api/sync/status');
+                const ss2 = await sr2.json();
+                if (ss2.running) {
+                  fill.style.width = Math.min(65 + 30 * 0.5, 95) + '%';
+                } else {
+                  clearInterval(poll2);
+                  fill.style.width = '100%';
+                  status.textContent = 'complete';
+                  setTimeout(() => banner.classList.remove('open'), 1500);
+                  toast((ss.message || '') + (ss2.resolved ? ` · ${ss2.resolved} resolved via Notion` : ''), 'info');
+                  loadAll();
+                }
+              } catch (_) {}
+            }, 2000);
+          } else {
+            fill.style.width = '100%';
+            status.textContent = 'complete';
+            setTimeout(() => banner.classList.remove('open'), 1500);
+            toast(ss.message || 'Sync complete', 'info');
+            loadAll();
+          }
         }
       } catch (_) {}
-    }, 5000);
+    }, isBoth ? 5000 : isNotion ? 2000 : 5000);
   } catch (err) {
     fill.style.width = '100%';
     status.textContent = 'failed';
@@ -270,6 +309,7 @@ function openSync() {
   const search = document.getElementById('syncCountrySearch');
   search.value = '';
   filterSyncCountries();
+  setSyncSource('both');
 }
 function closeSync() { document.getElementById('syncModal').classList.remove('open'); }
 

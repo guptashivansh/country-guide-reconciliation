@@ -427,8 +427,7 @@ class CountryGuideRepository:
               AND source_url NOT LIKE ?
             ORDER BY
                 CASE status WHEN 'escalated' THEN 0 ELSE 1 END,
-                CASE severity WHEN 'critical' THEN 1 WHEN 'major' THEN 2 ELSE 3 END,
-                confidence DESC
+                created_at DESC
         """, ('seed://%',))
         rows = c.fetchall()
         conn.close()
@@ -627,6 +626,52 @@ class CountryGuideRepository:
             "confidence": confidence, "source_snapshot_id": source_snapshot_id,
             "reviewer_assignee": assignee, "reviewer_rationale": rationale, "reviewer_comment": comment,
             "effective_date": resolved_effective_date, "version_number": version_number,
+            "approval_reference": approval_reference,
+        }
+
+    def resolve_review_item_via_notion(self, item_id):
+        conn = self.connect()
+        c = conn.cursor()
+        c.execute("""
+            SELECT country, section, old_value, new_value, source_url, source_hash, effective_date
+            FROM review_queue
+            WHERE id=? AND status IN ('pending', 'escalated')
+        """, (item_id,))
+        item = c.fetchone()
+        if not item:
+            conn.close()
+            return None
+
+        country, section, old_value, new_value, source_url, source_hash, queued_effective_date = item
+        timestamp = self._now()
+        resolved_effective_date = self._normalize_effective_date(queued_effective_date, timestamp)
+        approval_reference = f"notion_sync:{item_id}"
+        version_number = self._publish_rule_version(
+            c, country, section, new_value, source_url, source_hash or "",
+            effective_date=resolved_effective_date,
+            created_at=timestamp,
+            approval_reference=approval_reference,
+        )
+        c.execute("""
+            UPDATE review_queue
+            SET status='resolved_via_notion', reviewed_at=?, reviewer_comment=?,
+                reviewer_assignee=?, effective_date=?
+            WHERE id=?
+        """, (timestamp, "Auto-resolved: Notion content matches proposed change",
+              "notion_sync", resolved_effective_date, item_id))
+        c.execute('''
+            INSERT INTO audit_log
+            (action, country, section, old_value, new_value, decision, reviewer_comment,
+             timestamp, reviewer_assignee, reviewer_rationale)
+            VALUES ('REVIEW', ?, ?, ?, ?, 'resolved_via_notion', ?, ?, ?, ?)
+        ''', (country, section, old_value, new_value,
+              "Auto-resolved: Notion content matches proposed change",
+              timestamp, "notion_sync", "Notion sync matched proposed value"))
+        conn.commit()
+        conn.close()
+        return {
+            "country": country, "section": section, "status": "resolved_via_notion",
+            "reviewed_at": timestamp, "item_id": item_id, "version_number": version_number,
             "approval_reference": approval_reference,
         }
 

@@ -315,9 +315,18 @@ a{color:inherit;text-decoration:none} button{font:inherit;color:inherit;cursor:p
 </main>
 
 <script>
+const DEMO_MODE = localStorage.getItem('atlas:demo') === '1';
 const html = document.documentElement;
 const saved = localStorage.getItem('atlas:theme') || 'light';
 applyTheme(saved);
+
+if (DEMO_MODE) {
+  document.querySelectorAll('.rule-editable').forEach(function(el) {
+    el.style.cursor = 'default';
+    el.removeAttribute('title');
+    el.removeAttribute('onclick');
+  });
+}
 
 function toggleTheme() {
   const next = html.getAttribute('data-mode') === 'dark' ? 'light' : 'dark';
@@ -457,6 +466,7 @@ function fmtLine(btn, prefix) {
 }
 
 function startEdit(el) {
+  if (DEMO_MODE) return;
   var rule = el.closest('.rule');
   var editArea = rule.querySelector('.rule-edit-area');
   var editor = rule.querySelector('.rule-editor');
