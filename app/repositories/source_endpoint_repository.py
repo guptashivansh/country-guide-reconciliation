@@ -140,6 +140,11 @@ class TrustedSourceEndpointRepository:
         except Exception:
             pass
 
+        try:
+            c.execute("ALTER TABLE source_endpoints ADD COLUMN consecutive_failures INTEGER DEFAULT 0")
+        except Exception:
+            pass
+
         conn.commit()
 
         c.execute("SELECT COUNT(*) FROM source_countries")
@@ -297,7 +302,7 @@ class TrustedSourceEndpointRepository:
             FROM source_endpoints e
             JOIN source_authorities a ON e.authority_id = a.id
             JOIN source_countries sc ON a.country_id = sc.id
-            WHERE e.status = 'active'
+            WHERE e.status IN ('active', 'suspended')
               AND a.is_active = 1
               AND sc.is_active = 1
             ORDER BY sc.name, a.precedence_rank, e.name
@@ -326,7 +331,7 @@ class TrustedSourceEndpointRepository:
             FROM source_endpoints e
             JOIN source_authorities a ON e.authority_id = a.id
             JOIN source_countries sc ON a.country_id = sc.id
-            WHERE sc.name = ? AND e.status = 'active' AND a.is_active = 1
+            WHERE sc.name = ? AND e.status IN ('active', 'suspended') AND a.is_active = 1
             ORDER BY a.precedence_rank, e.name
         """, (country_name,))
         rows = c.fetchall()
@@ -641,13 +646,24 @@ class TrustedSourceEndpointRepository:
         if success:
             c.execute("""
                 UPDATE source_endpoints
-                SET last_crawled_at = ?, last_successful_crawl_at = ?
+                SET last_crawled_at = ?, last_successful_crawl_at = ?,
+                    consecutive_failures = 0
                 WHERE id = ?
             """, (now, now, endpoint_id))
         else:
             c.execute("""
-                UPDATE source_endpoints SET last_crawled_at = ? WHERE id = ?
+                UPDATE source_endpoints
+                SET last_crawled_at = ?,
+                    consecutive_failures = COALESCE(consecutive_failures, 0) + 1
+                WHERE id = ?
             """, (now, endpoint_id))
+            c.execute("""
+                UPDATE source_endpoints
+                SET status = 'suspended'
+                WHERE id = ? AND consecutive_failures >= 3 AND status = 'active'
+            """, (endpoint_id,))
+            if c.rowcount > 0:
+                logger.warning("Auto-suspended endpoint %s after 3+ consecutive failures", endpoint_id)
         conn.commit()
         conn.close()
 

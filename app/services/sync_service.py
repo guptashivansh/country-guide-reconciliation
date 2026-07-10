@@ -1,7 +1,10 @@
 import json
 import logging
+import threading
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from app.ingestion.notion_section_parser import canonical_country, parse_sections
+from app.services.endpoint_health import check_endpoints
 
 logger = logging.getLogger(__name__)
 
@@ -9,7 +12,7 @@ STAGE_ORDER = ["queued", "fetched", "normalized", "extracted", "reconciled"]
 
 
 def run_single_job(services, job_id, source_url, country, sections=None,
-                   fetch_only=False, engine=None,
+                   fetch_only=False, engine=None, js_heavy=False,
                    resume_from="queued", existing_snapshot_id=None):
     ingestion_service = services["ingestion_service"]
     source_snapshot_service = services["source_snapshot_service"]
@@ -24,7 +27,7 @@ def run_single_job(services, job_id, source_url, country, sections=None,
     try:
         # ── Stage 1: Crawl + Normalize ──
         if STAGE_ORDER.index(resume_from) < STAGE_ORDER.index("normalized"):
-            ingestion_result = ingestion_service.fetch_clean_text(source_url, engine=engine)
+            ingestion_result = ingestion_service.fetch_clean_text(source_url, engine=engine, js_heavy=js_heavy)
 
             if not ingestion_result.succeeded:
                 failure_reason = ingestion_result.failure.reason if ingestion_result.failure else "source fetch failed"
@@ -128,70 +131,136 @@ def run_single_job(services, job_id, source_url, country, sections=None,
         return {"success": False, "failure_reason": str(e)}
 
 
-def run_sync(services, countries=None, fetch_only=False, engine=None):
+_SYNC_WORKERS = 5
+
+
+def run_sync(services, countries=None, fetch_only=False, engine=None, on_progress=None):
     source_registry_service = services["source_registry_service"]
     ingestion_job_service = services["ingestion_job_service"]
+    ep_repo = source_registry_service.source_endpoint_repository
 
     selected_countries = set(countries or [])
     all_endpoints = source_registry_service.list_trusted_source_endpoints()
-    endpoints = [e for e in all_endpoints if not selected_countries or e.country in selected_countries]
+    endpoints = [e for e in all_endpoints
+                 if e.status == 'active'
+                 and (not selected_countries or e.country in selected_countries)]
 
+    print(f"\n{'='*60}")
+    print(f"  PRE-SYNC HEALTH CHECK — {len(endpoints)} endpoints")
+    print(f"{'='*60}\n")
+
+    health_results = check_endpoints(endpoints)
+    broken_ids = {r["endpoint_id"] for r in health_results if not r["ok"]}
+    if broken_ids:
+        skipped_eps = [e for e in endpoints if e.endpoint_id in broken_ids]
+        endpoints = [e for e in endpoints if e.endpoint_id not in broken_ids]
+        for ep in skipped_eps:
+            short = ep.url.replace("https://", "").replace("http://", "")
+            detail = next((r for r in health_results if r["endpoint_id"] == ep.endpoint_id), {})
+            print(f"  SKIP {ep.country} — {short} ({detail.get('error', 'unreachable')})")
+            try:
+                ep_repo.update_crawl_timestamp(ep.endpoint_id, success=False)
+            except Exception:
+                pass
+        print(f"\n  {len(broken_ids)} endpoint(s) unreachable — skipped\n")
+
+    lock = threading.Lock()
     total_changes = 0
     failures = 0
+    processed = 0
     per_country = {}
 
     def _country_stats(country):
         return per_country.setdefault(country, {"changes": 0, "failed": False})
 
-    print(f"\n{'='*60}")
-    print(f"  SYNC STARTED — {len(endpoints)} endpoints for {list(selected_countries) or 'all countries'}")
+    total = len(endpoints)
+    print(f"{'='*60}")
+    print(f"  SYNC STARTED — {total} endpoints ({_SYNC_WORKERS} workers) for {list(selected_countries) or 'all countries'}")
     print(f"{'='*60}\n")
 
-    jobs = []
-    for source_endpoint in endpoints:
-        job_id = ingestion_job_service.create_job(source_endpoint.url, country=source_endpoint.country)
-        jobs.append((job_id, source_endpoint))
+    def _process_endpoint(i, ep):
+        nonlocal total_changes, failures, processed
 
-    for i, (job_id, ep) in enumerate(jobs, 1):
-        stats = _country_stats(ep.country)
+        job_id = ingestion_job_service.create_job(ep.url, country=ep.country)
         short_url = ep.url.replace("https://", "").replace("http://", "")
-        print(f"  [{i}/{len(jobs)}] {ep.country} — {short_url}")
+        success = False
 
         try:
             result = run_single_job(
                 services, job_id, ep.url, ep.country, ep.sections,
                 fetch_only=fetch_only, engine=engine,
+                js_heavy=getattr(ep, 'is_javascript_heavy', False),
             )
         except Exception as e:
-            print(f"         ✗ EXCEPTION: {e}")
-            failures += 1
-            stats["failed"] = True
-            continue
+            with lock:
+                failures += 1
+                processed += 1
+                _country_stats(ep.country)["failed"] = True
+                print(f"  [{processed}/{total}] {ep.country} — {short_url} ✗ EXCEPTION: {e}")
+            try:
+                ep_repo.update_crawl_timestamp(ep.endpoint_id, success=False)
+            except Exception:
+                pass
+            return
 
-        if result["success"]:
-            changes_queued = result["changes_queued"]
-            total_changes += changes_queued
-            stats["changes"] += changes_queued
-            job = ingestion_job_service.get_job(job_id)
-            rules = job.get("rules_extracted") if job else "?"
-            print(f"         ✓ {rules} rules extracted, {changes_queued} changes queued")
-        else:
-            failures += 1
-            stats["failed"] = True
-            print(f"         ✗ FAILED: {result.get('failure_reason', 'unknown')}")
+        with lock:
+            processed += 1
+            stats = _country_stats(ep.country)
+            if result["success"]:
+                success = True
+                changes_queued = result.get("changes_queued", 0)
+                total_changes += changes_queued
+                stats["changes"] += changes_queued
+                job = ingestion_job_service.get_job(job_id)
+                rules = job.get("rules_extracted") if job else "?"
+                print(f"  [{processed}/{total}] {ep.country} — {short_url} ✓ {rules} rules, {changes_queued} changes")
+            else:
+                failures += 1
+                stats["failed"] = True
+                reason = result.get("failure_reason", "unknown")[:60]
+                print(f"  [{processed}/{total}] {ep.country} — {short_url} ✗ {reason}")
 
+            if on_progress:
+                on_progress({
+                    "endpoints_processed": processed,
+                    "endpoints_total": total,
+                    "current_country": ep.country,
+                    "current_url": ep.url,
+                    "changes_so_far": total_changes,
+                    "failures": failures,
+                })
+
+        try:
+            ep_repo.update_crawl_timestamp(ep.endpoint_id, success=success)
+        except Exception:
+            pass
+
+    with ThreadPoolExecutor(max_workers=_SYNC_WORKERS) as pool:
+        futures = {
+            pool.submit(_process_endpoint, i, ep): ep
+            for i, ep in enumerate(endpoints, 1)
+        }
+        for future in as_completed(futures):
+            try:
+                future.result()
+            except Exception as e:
+                logger.error("Unexpected worker error: %s", e)
+
+    skipped_count = len(broken_ids) if broken_ids else 0
     print(f"\n{'='*60}")
-    print(f"  SYNC COMPLETE — {total_changes} changes, {failures} failures")
+    print(f"  SYNC COMPLETE — {total_changes} changes, {failures} failures, {skipped_count} skipped")
     print(f"{'='*60}\n")
 
     logger.info(
         "Country guide sync completed",
-        extra={"stage": "sync", "changes_queued": total_changes, "failures": failures},
+        extra={"stage": "sync", "changes_queued": total_changes,
+               "failures": failures, "skipped": skipped_count},
     )
     return {
         "total_changes": total_changes,
         "endpoints_processed": len(endpoints),
         "failures": failures,
+        "skipped": skipped_count,
         "per_country": per_country,
     }
 

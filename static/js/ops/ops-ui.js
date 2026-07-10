@@ -95,9 +95,21 @@ async function runSync() {
         const sr = await fetch('/api/sync/status');
         const ss = await sr.json();
         if (ss.running) {
-          const pct = Math.min(30 + (ss.endpoints_processed || 0) * 0.15, isBoth ? 60 : 95);
+          const processed = ss.endpoints_processed || 0;
+          const total = ss.endpoints_total || 0;
+          const pct = total ? Math.max(Math.round((processed / total) * (isBoth ? 60 : 95)), 5) : (isBoth ? 30 : 10);
           fill.style.width = pct + '%';
-          status.textContent = isBoth ? `syncing external… ${ss.endpoints_processed || 0} endpoints` : isNotion ? 'reconciling…' : `syncing… ${ss.endpoints_processed || 0} endpoints processed`;
+          const country = ss.current_country || '';
+          status.textContent = total
+            ? `${processed}/${total} endpoints` + (country ? ` · ${country}` : '')
+            : (isNotion ? 'reconciling…' : 'syncing…');
+          const statsEl = document.getElementById('syncStats');
+          if (statsEl && total) {
+            const parts = [];
+            if (ss.changes_so_far) parts.push(`${ss.changes_so_far} changes`);
+            if (ss.failures) parts.push(`${ss.failures} failed`);
+            statsEl.textContent = parts.join(' · ');
+          }
         } else {
           clearInterval(poll);
           if (isBoth) {

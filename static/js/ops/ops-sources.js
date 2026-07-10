@@ -487,11 +487,18 @@ function renderUnifiedSources() {
     const failCt = eps.filter(e => e._job && e._job.state === 'failed').length;
     const queuedCt = eps.filter(e => isJobInProgress(e._job)).length;
     const notSyncedCt = eps.filter(e => !e._job).length;
+    const suspendedCt = eps.filter(e => e.status === 'suspended').length;
     const healthCls = failCt ? 'crit' : okCt === eps.length ? 'ok' : 'warn';
     const healthLabel = failCt ? `${failCt} failing`
       : okCt === eps.length ? 'All healthy'
       : queuedCt ? `${queuedCt} queued`
       : `${notSyncedCt} not synced`;
+
+    const coveredSections = new Set();
+    eps.forEach(e => (e.sections || []).forEach(s => coveredSections.add(s)));
+    const priorityCovered = [...PRIORITY_SECTIONS].filter(s => coveredSections.has(s)).length;
+    const priorityTotal = PRIORITY_SECTIONS.size;
+    const coverageCls = priorityCovered === priorityTotal ? 'ok' : priorityCovered >= priorityTotal * 0.6 ? 'warn' : 'crit';
 
     const latestTime = eps.reduce((t, e) => {
       if (!e._job) return t;
@@ -508,6 +515,8 @@ function renderUnifiedSources() {
         <div class="src-country-meta">
           <span class="src-country-stat">${eps.length} endpoint${eps.length !== 1 ? 's' : ''}</span>
           <span class="badge ${healthCls}" style="font-size:10px; padding:1px 7px;"><span class="d"></span> ${healthLabel}</span>
+          <span class="badge ${coverageCls}" style="font-size:10px; padding:1px 7px;"><span class="d"></span> ${priorityCovered}/${priorityTotal} priority</span>
+          ${suspendedCt ? `<span class="badge crit" style="font-size:10px; padding:1px 7px;">${suspendedCt} suspended</span>` : ''}
           ${latestTime ? `<span class="src-country-stat">${timeAgo(latestTime)}</span>` : ''}
           <div class="src-country-actions" onclick="event.stopPropagation()">
             <button title="Add authority" onclick="openAddAuthorityModal('${escHtml(cId)}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
@@ -528,16 +537,21 @@ function renderUnifiedSources() {
             <div class="src-ep-header">
               <span class="src-ep-name" title="${escHtml(ep.endpoint_id)}">${escHtml(ep.name || ep.authority)}</span>
               <span class="badge ${jCls}" style="font-size:10px; padding:1px 7px;"><span class="d"></span> ${jLabel}</span>
+              ${ep.status === 'suspended' ? '<span class="badge crit" style="font-size:10px; padding:1px 7px;">Suspended</span>' : ''}
             </div>
             ${ep.name ? `<div class="src-ep-auth">${escHtml(ep.authority)}</div>` : ''}
             <div class="src-ep-url"><a href="${escHtml(ep.url)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${escHtml(ep.url)}</a></div>
             ${renderPipelineSteps(j)}
             <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
-              <div class="src-ep-tags">
-                <span class="t strategy">${escHtml(ep.extraction_strategy)}</span>
-                <span class="t type">${escHtml(ep.source_type)}</span>
-                <span class="t freq">${escHtml(ep.crawl_frequency)}</span>
-                ${ep.owner_team ? `<span class="t">${escHtml(ep.owner_team)}</span>` : ''}
+              <div>
+                <div class="src-ep-sections">
+                  ${[...(ep.sections || [])].sort((a,b) => (PRIORITY_SECTIONS.has(a)?0:1) - (PRIORITY_SECTIONS.has(b)?0:1)).map(s => `<span class="s${PRIORITY_SECTIONS.has(s) ? ' priority' : ''}">${escHtml(s.replace(/_/g, ' '))}</span>`).join('')}
+                </div>
+                <div class="src-ep-tags">
+                  ${ep.extraction_strategy ? `<span class="t strategy">${escHtml(ep.extraction_strategy)}</span>` : ''}
+                  ${ep.source_type ? `<span class="t type">${escHtml(ep.source_type)}</span>` : ''}
+                  ${ep.crawl_frequency ? `<span class="t freq">${escHtml(ep.crawl_frequency)}</span>` : ''}
+                </div>
               </div>
               ${jTime ? `<span style="font-family:var(--font-mono); font-size:10.5px; color:var(--ink-4); white-space:nowrap;">${timeAgo(jTime)}</span>` : ''}
             </div>
@@ -801,6 +815,14 @@ function openSrcDrawer(country, idx) {
       <div class="src-drawer-value"><a href="${escHtml(ep.url)}" target="_blank" rel="noopener">${escHtml(ep.url)}</a></div>
     </div>
 
+    ${ep.sections && ep.sections.length ? `
+    <div class="src-drawer-field">
+      <div class="src-drawer-label">Sections covered</div>
+      <div class="src-drawer-tags" style="display:flex;flex-wrap:wrap;gap:5px;">
+        ${ep.sections.map(s => `<span style="font-size:11px;padding:3px 9px;border-radius:4px;background:var(--ok-soft);border:1px solid var(--ok-line);color:var(--ok-2);">${escHtml(s.replace(/_/g, ' '))}</span>`).join('')}
+      </div>
+    </div>` : ''}
+
     <div class="src-drawer-divider"></div>
 
     <div class="src-drawer-row">
@@ -870,15 +892,6 @@ function openSrcDrawer(country, idx) {
         <div class="src-drawer-value">${ep.supports_replay ? '<span style="color:var(--ok);">Yes</span>' : 'No'}</div>
       </div>
     </div>
-
-    ${ep.sections && ep.sections.length ? `
-    <div class="src-drawer-divider"></div>
-    <div class="src-drawer-field">
-      <div class="src-drawer-label">Sections covered</div>
-      <div class="src-drawer-tags">
-        ${ep.sections.map(s => `<span style="font-size:11px;padding:3px 9px;border-radius:4px;background:var(--ok-soft);border:1px solid var(--ok-line);color:var(--ok-2);">${escHtml(s)}</span>`).join('')}
-      </div>
-    </div>` : ''}
 
     ${ep.notes ? `
     <div class="src-drawer-divider"></div>

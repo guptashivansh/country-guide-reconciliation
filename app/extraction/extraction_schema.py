@@ -47,12 +47,14 @@ Extract values ONLY for these sections if found: {sections_str}
 
 For each rule found, provide:
 - section: must be one of the allowed section names listed above
-- value: the extracted rule as a clear, concise string (e.g. "12 days per year", "30 days notice required")
+- value: the extracted rule as a clear, concise string with specific numbers, durations, or thresholds (e.g. "12 days per year", "30 days notice required", "During probation: 2 weeks; After probation: 1 month")
 - confidence: float between 0.0 and 1.0
 - severity: "critical" (visa/permit/termination rules), "major" (wage/tax/leave rules), or "minor" (procedural/administrative)
 - source_paragraph: the exact sentence from the content that supports this value
 
 Only include sections where you find a specific, concrete value.
+Do NOT extract vague references to laws or acts without the actual rule details (e.g. "as per the Employment Act" or "Notice period required for dismissal as per the Protection Against Dismissal Act" are NOT acceptable — extract the specific durations, amounts, or conditions instead).
+If the content only names a law without stating the concrete rule, omit that section entirely.
 If no rules are found, return an empty rules array.
 
 Content:

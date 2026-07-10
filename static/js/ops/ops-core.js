@@ -26,6 +26,11 @@
 var FLAGS = {};
 var NOTION_PAGES = {};
 var SECTION_LABELS = {annual_leave:"Annual Leave",sick_leave:"Sick Leave",maternity_leave:"Maternity Leave",public_holidays:"Public Holidays",working_hours:"Working Hours",overtime:"Overtime",probation:"Probation",minimum_wage:"Minimum Wage",income_tax:"Income Tax",payroll_tax:"Payroll Tax",withholding_tax:"Withholding Tax",health_insurance:"Health Insurance",social_security:"Social Security",pension:"Pension",employee_benefits:"Employee Benefits",termination_notice:"Termination Notice",employer_obligations:"Employer Obligations",industrial_relations:"Industrial Relations",work_permit:"Work Permit",work_visa:"Work Visa",expatriate_employment:"Expatriate Employment",workplace_safety:"Workplace Safety",osh_obligations:"OSH Obligations"};
+var PRIORITY_SECTIONS = new Set([
+  'annual_leave','sick_leave','maternity_leave','paternity_leave','parental_leave','public_holidays',
+  'health_insurance','social_security','pension','employee_benefits',
+  'termination_notice','termination_scenarios','severance_payable','notice_period_probation'
+]);
 
 var DATA = { queue: [], audit: [], drift: [], jobs: [], metrics: {}, coverage: {} };
 var selectedIds = new Set();

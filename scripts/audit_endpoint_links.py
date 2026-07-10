@@ -74,7 +74,8 @@ Rules:
 - "landing" = page is an index/navigation page with links to content but no rules itself
 - For "content" pages, sub_pages should be empty
 - For "landing" pages, map the links to the most relevant sections from the allowed list
-- Only include links that are likely to have employment law content
+- Only include links that are likely to have employment law content relevant to an Employer of Record (EOR)
+- SKIP pages about general/corporate taxation (VAT, capital gains, investment income, corporate tax) — only include tax pages about payroll processing, employer withholding on employee salaries, or employee income tax brackets
 - Sections must come from this allowed list: {all_sections}
 - Prefer direct/specific links over broad category pages
 """

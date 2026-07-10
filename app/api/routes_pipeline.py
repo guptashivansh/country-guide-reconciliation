@@ -5,6 +5,7 @@ import threading
 
 from flask import Blueprint, jsonify, request
 
+from app.services.endpoint_health import check_endpoints
 from app.services.sync_service import run_sync, run_single_job, run_notion_reconciliation
 from app.services.slack_service import send_sync_alert
 from app.utils.config import slack_webhook_url
@@ -12,7 +13,7 @@ from app.utils.config import slack_webhook_url
 logger = logging.getLogger(__name__)
 
 _sync_lock = threading.Lock()
-_sync_status = {"running": False, "last_result": None}
+_sync_status = {"running": False, "last_result": None, "progress": None}
 
 
 def create_pipeline_blueprint(
@@ -71,6 +72,7 @@ def create_pipeline_blueprint(
             services, new_job_id, source_url,
             country=endpoint.country if endpoint else country,
             sections=endpoint.sections if endpoint else None,
+            js_heavy=endpoint.is_javascript_heavy if endpoint else False,
             resume_from=retry_result.get("resume_from", "queued"),
             existing_snapshot_id=retry_result.get("existing_snapshot_id"),
         )
@@ -117,6 +119,26 @@ def create_pipeline_blueprint(
             "trusted_source_count": registry["countries"],
         })
 
+    @bp.route("/api/endpoints/health", methods=["POST"])
+    @_limit("2 per minute")
+    def endpoint_health():
+        body = request.get_json(silent=True) or {}
+        selected_countries = body.get("countries")
+        all_endpoints = source_registry_service.list_trusted_source_endpoints()
+        endpoints = [
+            e for e in all_endpoints
+            if e.status == "active"
+            and (not selected_countries or e.country in selected_countries)
+        ]
+        results = check_endpoints(endpoints)
+        broken = [r for r in results if not r["ok"]]
+        return jsonify({
+            "checked": len(results),
+            "healthy": len(results) - len(broken),
+            "broken": len(broken),
+            "details": broken,
+        })
+
     @bp.route("/api/notion/pages")
     def notion_pages():
         if not notion_ingestion_service:
@@ -154,10 +176,15 @@ def create_pipeline_blueprint(
             try:
                 _sync_status["running"] = True
                 _sync_status["last_result"] = None
+                _sync_status["progress"] = None
+
+                def on_progress(info):
+                    _sync_status["progress"] = info
+
                 if source == "notion":
                     result = run_notion_reconciliation(services)
                 else:
-                    result = run_sync(services, countries=selected_countries or None, fetch_only=fetch_only, engine=engine)
+                    result = run_sync(services, countries=selected_countries or None, fetch_only=fetch_only, engine=engine, on_progress=on_progress)
                     send_sync_alert(slack_webhook_url(), result, triggered_by="manual")
                 _sync_status["last_result"] = result
             except Exception as e:
@@ -174,7 +201,8 @@ def create_pipeline_blueprint(
     def sync_status():
         result = _sync_status["last_result"]
         if _sync_status["running"]:
-            return jsonify({"running": True, "message": "Sync in progress"})
+            prog = _sync_status.get("progress") or {}
+            return jsonify({"running": True, "message": "Sync in progress", **prog})
         if result is None:
             return jsonify({"running": False, "message": "No sync has run yet"})
         resolved = result.get("resolved", 0)
