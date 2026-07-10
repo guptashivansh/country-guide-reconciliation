@@ -15,7 +15,8 @@ STAGE_ORDER = ["queued", "fetched", "normalized", "extracted", "reconciled"]
 def run_single_job(services, job_id, source_url, country, sections=None,
                    fetch_only=False, engine=None, js_heavy=False,
                    resume_from="queued", existing_snapshot_id=None,
-                   content_language=None):
+                   content_language=None,
+                   cached_etag=None, cached_last_modified=None):
     ingestion_service = services["ingestion_service"]
     source_snapshot_service = services["source_snapshot_service"]
     ingestion_job_service = services["ingestion_job_service"]
@@ -25,11 +26,23 @@ def run_single_job(services, job_id, source_url, country, sections=None,
     snapshot_id = existing_snapshot_id
     content_hash = None
     extracted_rules = None
+    resp_cache = {}
 
     try:
         # ── Stage 1: Crawl + Normalize ──
         if STAGE_ORDER.index(resume_from) < STAGE_ORDER.index("normalized"):
-            ingestion_result = ingestion_service.fetch_clean_text(source_url, engine=engine, js_heavy=js_heavy)
+            ingestion_result = ingestion_service.fetch_clean_text(
+                source_url, engine=engine, js_heavy=js_heavy,
+                cached_etag=cached_etag, cached_last_modified=cached_last_modified)
+
+            if ingestion_result.metadata.get("not_modified"):
+                ingestion_job_service.mark_reconciled(job_id)
+                return {"success": True, "changes_queued": 0, "not_modified": True}
+
+            resp_cache = {
+                "etag": ingestion_result.metadata.get("resp_etag"),
+                "last_modified": ingestion_result.metadata.get("resp_last_modified"),
+            }
 
             if not ingestion_result.succeeded:
                 failure_reason = ingestion_result.failure.reason if ingestion_result.failure else "source fetch failed"
@@ -128,7 +141,12 @@ def run_single_job(services, job_id, source_url, country, sections=None,
             return {"success": False, "failure_reason": failure_reason}
 
         ingestion_job_service.mark_reconciled(job_id)
-        return {"success": True, "changes_queued": reconciliation_result.changes_queued}
+        return {
+            "success": True,
+            "changes_queued": reconciliation_result.changes_queued,
+            "content_hash": content_hash,
+            "resp_cache": resp_cache,
+        }
 
     except Exception as e:
         logger.error(
@@ -176,6 +194,7 @@ def run_sync(services, countries=None, fetch_only=False, engine=None, on_progres
     total_changes = 0
     failures = 0
     processed = 0
+    not_modified_count = 0
     per_country = {}
 
     def _country_stats(country):
@@ -187,11 +206,17 @@ def run_sync(services, countries=None, fetch_only=False, engine=None, on_progres
     print(f"{'='*60}\n")
 
     def _process_endpoint(i, ep):
-        nonlocal total_changes, failures, processed
+        nonlocal total_changes, failures, processed, not_modified_count
 
         job_id = ingestion_job_service.create_job(ep.url, country=ep.country)
         short_url = ep.url.replace("https://", "").replace("http://", "")
         success = False
+
+        cache = {}
+        try:
+            cache = ep_repo.get_cache_headers(ep.endpoint_id)
+        except Exception:
+            pass
 
         try:
             result = run_single_job(
@@ -199,6 +224,8 @@ def run_sync(services, countries=None, fetch_only=False, engine=None, on_progres
                 fetch_only=fetch_only, engine=engine,
                 js_heavy=getattr(ep, 'is_javascript_heavy', False),
                 content_language=getattr(ep, 'content_language', None),
+                cached_etag=cache.get("etag"),
+                cached_last_modified=cache.get("last_modified"),
             )
         except Exception as e:
             with lock:
@@ -215,7 +242,11 @@ def run_sync(services, countries=None, fetch_only=False, engine=None, on_progres
         with lock:
             processed += 1
             stats = _country_stats(ep.country)
-            if result["success"]:
+            if result.get("not_modified"):
+                success = True
+                not_modified_count += 1
+                print(f"  [{processed}/{total}] {ep.country} — {short_url} ○ not modified")
+            elif result["success"]:
                 success = True
                 changes_queued = result.get("changes_queued", 0)
                 total_changes += changes_queued
@@ -241,8 +272,16 @@ def run_sync(services, countries=None, fetch_only=False, engine=None, on_progres
 
         try:
             ep_repo.update_crawl_timestamp(ep.endpoint_id, success=success)
-        except Exception:
-            pass
+            if success and not result.get("not_modified"):
+                resp_cache = result.get("resp_cache", {})
+                ep_repo.update_cache_headers(
+                    ep.endpoint_id,
+                    etag=resp_cache.get("etag"),
+                    last_modified=resp_cache.get("last_modified"),
+                    content_hash=result.get("content_hash"),
+                )
+        except Exception as cache_err:
+            logger.warning("Failed to update cache headers for %s: %s", ep.endpoint_id, cache_err)
 
     with ThreadPoolExecutor(max_workers=_SYNC_WORKERS) as pool:
         futures = {
@@ -256,8 +295,9 @@ def run_sync(services, countries=None, fetch_only=False, engine=None, on_progres
                 logger.error("Unexpected worker error: %s", e)
 
     skipped_count = len(broken_ids) if broken_ids else 0
+    cached_msg = f", {not_modified_count} cached" if not_modified_count else ""
     print(f"\n{'='*60}")
-    print(f"  SYNC COMPLETE — {total_changes} changes, {failures} failures, {skipped_count} skipped")
+    print(f"  SYNC COMPLETE — {total_changes} changes, {failures} failures, {skipped_count} skipped{cached_msg}")
     print(f"{'='*60}\n")
 
     logger.info(
@@ -270,6 +310,7 @@ def run_sync(services, countries=None, fetch_only=False, engine=None, on_progres
         "endpoints_processed": len(endpoints),
         "failures": failures,
         "skipped": skipped_count,
+        "not_modified": not_modified_count,
         "per_country": per_country,
     }
 

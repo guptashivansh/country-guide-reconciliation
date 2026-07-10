@@ -56,9 +56,11 @@ class HtmlIngestionService:
         self.timeout = timeout if timeout is not None else ingestion_timeout()
         self.max_retries = max_retries if max_retries is not None else ingestion_max_retries()
         self.max_content_length = max_content_length if max_content_length is not None else ingestion_max_content_length()
-    def fetch_clean_text(self, url, engine=None, js_heavy=False):
+    def fetch_clean_text(self, url, engine=None, js_heavy=False,
+                         cached_etag=None, cached_last_modified=None):
         if engine == "requests":
-            return self._fetch_requests(url)
+            return self._fetch_requests(url, cached_etag=cached_etag,
+                                        cached_last_modified=cached_last_modified)
         if engine == "crawl4ai" and _HAS_CRAWL4AI:
             result = self._fetch_crawl4ai(url)
             if result.succeeded:
@@ -73,8 +75,9 @@ class HtmlIngestionService:
             logger.info("Crawl4AI failed for JS-heavy %s, falling back to requests", url)
             return self._fetch_requests(url)
 
-        result = self._fetch_requests(url)
-        if result.succeeded:
+        result = self._fetch_requests(url, cached_etag=cached_etag,
+                                      cached_last_modified=cached_last_modified)
+        if result.succeeded or result.metadata.get("not_modified"):
             return result
         if _HAS_CRAWL4AI:
             logger.info("requests failed for %s, falling back to Crawl4AI", url)
@@ -127,7 +130,7 @@ class HtmlIngestionService:
 
     # -- requests fallback -----------------------------------------------------
 
-    def _fetch_requests(self, url):
+    def _fetch_requests(self, url, cached_etag=None, cached_last_modified=None):
         last_exc = None
         got_403 = False
         for attempt in range(self.max_retries):
@@ -136,13 +139,27 @@ class HtmlIngestionService:
                     "Fetching source content via requests",
                     extra={"stage": "ingestion_fetch", "source_url": url, "attempt": attempt + 1},
                 )
-                resp = requests.get(url, headers=_HEADERS, timeout=self.timeout)
+                headers = dict(_HEADERS)
+                if cached_etag:
+                    headers["If-None-Match"] = cached_etag
+                if cached_last_modified:
+                    headers["If-Modified-Since"] = cached_last_modified
+                resp = requests.get(url, headers=headers, timeout=self.timeout)
+                if resp.status_code == 304:
+                    logger.info("Content not modified (304) — skipping",
+                                extra={"stage": "ingestion_fetch", "source_url": url})
+                    return IngestionResult(
+                        status="success", source_url=url,
+                        metadata={"not_modified": True, "engine": "requests"},
+                    )
                 resp.raise_for_status()
                 pdf_links = self.extract_pdf_links(url, resp.text)
                 text = self._parse_html(url, resp.text)
                 result = self._build_success(url, text)
                 if pdf_links:
                     result.metadata["pdf_links"] = pdf_links
+                result.metadata["resp_etag"] = resp.headers.get("ETag")
+                result.metadata["resp_last_modified"] = resp.headers.get("Last-Modified")
                 return result
             except requests.exceptions.Timeout as exc:
                 last_exc = exc

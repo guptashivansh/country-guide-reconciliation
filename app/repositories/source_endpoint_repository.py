@@ -145,6 +145,21 @@ class TrustedSourceEndpointRepository:
         except Exception:
             pass
 
+        try:
+            c.execute("ALTER TABLE source_endpoints ADD COLUMN last_etag TEXT")
+        except Exception:
+            pass
+
+        try:
+            c.execute("ALTER TABLE source_endpoints ADD COLUMN last_modified_header TEXT")
+        except Exception:
+            pass
+
+        try:
+            c.execute("ALTER TABLE source_endpoints ADD COLUMN last_content_hash TEXT")
+        except Exception:
+            pass
+
         conn.commit()
 
         c.execute("SELECT COUNT(*) FROM source_countries")
@@ -665,6 +680,35 @@ class TrustedSourceEndpointRepository:
         conn.commit()
         conn.close()
         return {"id": endpoint_id, "deactivated_at": now}
+
+    def update_cache_headers(self, endpoint_id: str, etag: str = None,
+                             last_modified: str = None, content_hash: str = None):
+        conn = self.db.connect()
+        c = conn.cursor()
+        c.execute("""
+            UPDATE source_endpoints
+            SET last_etag = ?, last_modified_header = ?, last_content_hash = ?
+            WHERE id = ?
+        """, (etag, last_modified, content_hash, endpoint_id))
+        conn.commit()
+        conn.close()
+
+    def get_cache_headers(self, endpoint_id: str) -> dict:
+        conn = self.db.connect()
+        c = conn.cursor()
+        c.execute("""
+            SELECT last_etag, last_modified_header, last_content_hash
+            FROM source_endpoints WHERE id = ?
+        """, (endpoint_id,))
+        row = c.fetchone()
+        conn.close()
+        if not row:
+            return {}
+        return {
+            "etag": row[0],
+            "last_modified": row[1],
+            "content_hash": row[2],
+        }
 
     def update_crawl_timestamp(self, endpoint_id: str, success: bool):
         conn = self.db.connect()
