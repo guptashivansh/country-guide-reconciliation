@@ -165,10 +165,8 @@ class HtmlIngestionService:
             if result is not None:
                 return result
 
-        if got_403:
-            failure_type = "http_403"
-        elif isinstance(last_exc, requests.exceptions.HTTPError) and last_exc.response is not None:
-            failure_type = f"http_{last_exc.response.status_code}"
+        if isinstance(last_exc, requests.exceptions.HTTPError) and last_exc.response is not None:
+            failure_type = "http_error"
         elif isinstance(last_exc, requests.RequestException):
             failure_type = "network_error"
         else:

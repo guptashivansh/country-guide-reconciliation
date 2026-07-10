@@ -8,6 +8,7 @@ FailureType = Literal[
     "validation_error",
     "extraction_error",
     "network_error",
+    "http_error",
     "reconciliation_error",
     "configuration_error",
     "pdf_error",
