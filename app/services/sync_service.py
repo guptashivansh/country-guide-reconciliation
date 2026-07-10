@@ -5,6 +5,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from app.ingestion.notion_section_parser import canonical_country, parse_sections
 from app.services.endpoint_health import check_endpoints
+from app.ingestion.html_ingestion_service import HtmlIngestionService
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +14,8 @@ STAGE_ORDER = ["queued", "fetched", "normalized", "extracted", "reconciled"]
 
 def run_single_job(services, job_id, source_url, country, sections=None,
                    fetch_only=False, engine=None, js_heavy=False,
-                   resume_from="queued", existing_snapshot_id=None):
+                   resume_from="queued", existing_snapshot_id=None,
+                   content_language=None):
     ingestion_service = services["ingestion_service"]
     source_snapshot_service = services["source_snapshot_service"]
     ingestion_job_service = services["ingestion_job_service"]
@@ -36,6 +38,11 @@ def run_single_job(services, job_id, source_url, country, sections=None,
 
             ingestion_job_service.mark_fetched(job_id)
             content_hash = ingestion_result.content_hash
+
+            pdf_links = ingestion_result.metadata.get("pdf_links", [])
+            if pdf_links:
+                logger.info("Found %d PDF links in %s", len(pdf_links), source_url,
+                            extra={"stage": "sync", "pdf_links": [l["url"] for l in pdf_links]})
 
             prior = source_snapshot_service.get_latest_by_source_url(source_url)
             if prior and prior["content_hash"] == content_hash:
@@ -77,6 +84,7 @@ def run_single_job(services, job_id, source_url, country, sections=None,
                 source_url=source_url,
                 country=country,
                 sections=sections or (),
+                content_language=content_language,
             )
             if extraction_result.succeeded:
                 source_snapshot_service.mark_extraction_succeeded(snapshot_id, rules=extraction_result.rules)
@@ -190,6 +198,7 @@ def run_sync(services, countries=None, fetch_only=False, engine=None, on_progres
                 services, job_id, ep.url, ep.country, ep.sections,
                 fetch_only=fetch_only, engine=engine,
                 js_heavy=getattr(ep, 'is_javascript_heavy', False),
+                content_language=getattr(ep, 'content_language', None),
             )
         except Exception as e:
             with lock:
@@ -263,6 +272,71 @@ def run_sync(services, countries=None, fetch_only=False, engine=None, on_progres
         "skipped": skipped_count,
         "per_country": per_country,
     }
+
+
+def discover_landing_page_links(services, countries=None):
+    source_registry_service = services["source_registry_service"]
+    ep_repo = source_registry_service.source_endpoint_repository
+    all_endpoints = ep_repo.list_all_source_endpoints()
+    selected_countries = set(countries or [])
+    landing_eps = [
+        e for e in all_endpoints
+        if e.status == "landing_page"
+        and (not selected_countries or e.country in selected_countries)
+    ]
+
+    if not landing_eps:
+        print("  No landing page endpoints to scan")
+        return {"content_links": [], "pdf_links": []}
+
+    print(f"\n{'='*60}")
+    print(f"  LANDING PAGE DISCOVERY — scanning {len(landing_eps)} endpoints")
+    print(f"{'='*60}\n")
+
+    import requests as req
+    from app.ingestion.html_ingestion_service import _HEADERS
+
+    all_content_links = []
+    all_pdf_links = []
+
+    for ep in landing_eps:
+        short = ep.url.replace("https://", "").replace("http://", "")
+        try:
+            resp = req.get(ep.url, headers=_HEADERS, timeout=15, allow_redirects=True)
+            if resp.status_code != 200:
+                print(f"  SKIP {ep.country} — {short} (HTTP {resp.status_code})")
+                continue
+
+            content_links = HtmlIngestionService.discover_content_links(
+                ep.url, resp.text)
+            pdf_links = HtmlIngestionService.extract_pdf_links(
+                ep.url, resp.text)
+
+            for link in content_links:
+                link["country"] = ep.country
+                link["sections"] = ep.sections
+                link["content_language"] = ep.content_language
+                link["parent_url"] = ep.url
+            for link in pdf_links:
+                link["country"] = ep.country
+                link["sections"] = ep.sections
+                link["parent_url"] = ep.url
+
+            all_content_links.extend(content_links)
+            all_pdf_links.extend(pdf_links)
+
+            print(f"  {ep.country} — {short}: {len(content_links)} content links, {len(pdf_links)} PDF links")
+        except Exception as exc:
+            print(f"  SKIP {ep.country} — {short} ({exc})")
+
+    existing_urls = {e.url for e in all_endpoints}
+    new_content = [l for l in all_content_links if l["url"] not in existing_urls]
+    new_pdfs = [l for l in all_pdf_links if l["url"] not in existing_urls]
+
+    print(f"\n  Found {len(new_content)} new content links, {len(new_pdfs)} new PDF links")
+    print(f"{'='*60}\n")
+
+    return {"content_links": new_content, "pdf_links": new_pdfs}
 
 
 def run_notion_reconciliation(services):

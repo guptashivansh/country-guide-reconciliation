@@ -312,6 +312,34 @@ class TrustedSourceEndpointRepository:
 
         return [self._row_to_endpoint(r) for r in rows]
 
+    def list_all_source_endpoints(self) -> list[SourceEndpoint]:
+        conn = self.db.connect()
+        c = conn.cursor()
+        c.execute("""
+            SELECT
+                e.id, e.url, e.sections_covered, e.source_type, e.content_language,
+                e.authority_category, e.extraction_strategy, e.parser_key,
+                e.crawl_frequency, e.change_detection_strategy,
+                e.requires_authentication, e.is_javascript_heavy,
+                e.escalation_required, e.supports_replay, e.owner_team,
+                e.notes, e.status, e.name,
+                a.id, a.name, a.authority_type, a.website_url,
+                a.trust_level, a.precedence_rank, a.escalation_required,
+                a.supports_replay,
+                sc.id, sc.iso_code, sc.name,
+                e.parent_endpoint_id
+            FROM source_endpoints e
+            JOIN source_authorities a ON e.authority_id = a.id
+            JOIN source_countries sc ON a.country_id = sc.id
+            WHERE a.is_active = 1
+              AND sc.is_active = 1
+            ORDER BY sc.name, a.precedence_rank, e.name
+        """)
+        rows = c.fetchall()
+        conn.close()
+
+        return [self._row_to_endpoint(r) for r in rows]
+
     def list_endpoints_for_country(self, country_name: str) -> list[SourceEndpoint]:
         conn = self.db.connect()
         c = conn.cursor()

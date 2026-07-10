@@ -38,3 +38,7 @@ def log_aggregation_result(source_url, rule_count, status):
 
 def log_no_api_key(provider, env_var):
     logger.error("Extraction skipped — %s not configured (set %s)", provider, env_var)
+
+
+def log_extraction_skipped(source_url, reason):
+    logger.info("Extraction skipped — %s: %s", reason, source_url)

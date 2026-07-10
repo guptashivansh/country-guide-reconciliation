@@ -21,7 +21,8 @@ class OllamaExtractionService:
         self.aggregator = aggregator or EmploymentRuleAggregator()
         self.max_attempts = max_attempts
 
-    def extract_employment_rules(self, content, source_url, country, sections):
+    def extract_employment_rules(self, content, source_url, country, sections,
+                                 content_language=None):
         allowed_sections = tuple(sections)
         chunks = self.chunker.split(content)
         logger.info(

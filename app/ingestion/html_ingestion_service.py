@@ -138,8 +138,12 @@ class HtmlIngestionService:
                 )
                 resp = requests.get(url, headers=_HEADERS, timeout=self.timeout)
                 resp.raise_for_status()
+                pdf_links = self.extract_pdf_links(url, resp.text)
                 text = self._parse_html(url, resp.text)
-                return self._build_success(url, text)
+                result = self._build_success(url, text)
+                if pdf_links:
+                    result.metadata["pdf_links"] = pdf_links
+                return result
             except requests.exceptions.Timeout as exc:
                 last_exc = exc
                 logger.warning(
@@ -182,8 +186,12 @@ class HtmlIngestionService:
             resp = session.get(url, headers=_ALT_HEADERS, timeout=self.timeout,
                                allow_redirects=True)
             if resp.status_code == 200:
+                pdf_links = self.extract_pdf_links(url, resp.text)
                 text = self._parse_html(url, resp.text)
-                return self._build_success(url, text)
+                result = self._build_success(url, text)
+                if pdf_links:
+                    result.metadata["pdf_links"] = pdf_links
+                return result
         except Exception as exc:
             logger.debug("Alt-header retry also failed for %s: %s", url, exc)
         return None
@@ -195,6 +203,62 @@ class HtmlIngestionService:
         for tag in soup(["script", "style", "nav", "footer", "header", "aside"]):
             tag.decompose()
         return soup.get_text(separator="\n", strip=True)
+
+    @staticmethod
+    def extract_pdf_links(url, html_text):
+        from bs4 import BeautifulSoup
+        from urllib.parse import urljoin
+        soup = BeautifulSoup(html_text, "html.parser")
+        pdf_links = []
+        seen = set()
+        for a in soup.find_all("a", href=True):
+            href = a["href"].strip()
+            if not href.lower().endswith(".pdf") and "/pdf" not in href.lower():
+                continue
+            full = urljoin(url, href)
+            if full in seen:
+                continue
+            seen.add(full)
+            label = (a.get_text(strip=True) or "")[:120]
+            pdf_links.append({"url": full, "label": label})
+        return pdf_links
+
+    @staticmethod
+    def discover_content_links(url, html_text, keywords=None):
+        from bs4 import BeautifulSoup
+        from urllib.parse import urljoin, urlparse
+        if keywords is None:
+            keywords = [
+                "employment", "labour", "labor", "wage", "salary", "leave",
+                "tax", "immigration", "visa", "permit", "social security",
+                "pension", "termination", "notice period", "working hours",
+                "overtime", "maternity", "paternity", "probation", "contract",
+                "minimum wage", "benefits", "insurance", "contribution",
+                "employee", "employer", "regulation", "law", "act", "code",
+            ]
+        soup = BeautifulSoup(html_text, "html.parser")
+        base_domain = urlparse(url).netloc
+        links = []
+        seen = set()
+        for a in soup.find_all("a", href=True):
+            href = a["href"].strip()
+            if not href or href.startswith("#") or href.startswith("javascript:"):
+                continue
+            full = urljoin(url, href)
+            parsed = urlparse(full)
+            if parsed.netloc != base_domain:
+                continue
+            if full in seen or full == url:
+                continue
+            label = (a.get_text(strip=True) or "").lower()
+            href_lower = full.lower()
+            if any(kw in label or kw in href_lower for kw in keywords):
+                seen.add(full)
+                links.append({
+                    "url": full,
+                    "label": a.get_text(strip=True)[:120],
+                })
+        return links
 
     # -- shared helpers --------------------------------------------------------
 

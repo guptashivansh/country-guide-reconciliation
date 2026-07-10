@@ -6,7 +6,10 @@ import threading
 from flask import Blueprint, jsonify, request
 
 from app.services.endpoint_health import check_endpoints
-from app.services.sync_service import run_sync, run_single_job, run_notion_reconciliation
+from app.services.sync_service import (
+    run_sync, run_single_job, run_notion_reconciliation,
+    discover_landing_page_links,
+)
 from app.services.slack_service import send_sync_alert
 from app.utils.config import slack_webhook_url
 
@@ -138,6 +141,19 @@ def create_pipeline_blueprint(
             "broken": len(broken),
             "details": broken,
         })
+
+    @bp.route("/api/endpoints/discover", methods=["POST"])
+    @_limit("2 per minute")
+    def discover_links():
+        body = request.get_json(silent=True) or {}
+        selected_countries = body.get("countries")
+        services = {
+            "source_registry_service": source_registry_service,
+            "ingestion_service": ingestion_service,
+            "source_snapshot_service": source_snapshot_service,
+        }
+        result = discover_landing_page_links(services, countries=selected_countries)
+        return jsonify(result)
 
     @bp.route("/api/notion/pages")
     def notion_pages():

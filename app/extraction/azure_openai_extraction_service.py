@@ -8,7 +8,10 @@ from openai import AuthenticationError, RateLimitError
 from app.extraction.content_chunker import ContentChunker
 from app.extraction.employment_rule_parser import EmploymentRuleParser
 from app.extraction.employment_rule_aggregator import EmploymentRuleAggregator
-from app.extraction.extraction_schema import build_response_schema, EXTRACTION_PROMPT
+from app.extraction.extraction_schema import (
+    build_response_schema, EXTRACTION_PROMPT,
+    build_language_instruction, is_content_extractable,
+)
 from app.extraction import extraction_logger as log
 from app.models.workflow_results import ExtractionResult, FailureDetail
 
@@ -52,7 +55,8 @@ class AzureOpenAIExtractionService:
         if wait:
             time.sleep(wait)
 
-    def extract_employment_rules(self, content, source_url, country, sections):
+    def extract_employment_rules(self, content, source_url, country, sections,
+                                 content_language=None):
         if self.client is None:
             log.log_no_api_key("Azure OpenAI", "OPENAI_AZURE_API_KEY")
             return ExtractionResult(
@@ -65,6 +69,20 @@ class AzureOpenAIExtractionService:
                 ),
             )
 
+        extractable, reason = is_content_extractable(content)
+        if not extractable:
+            log.log_extraction_skipped(source_url, reason)
+            return ExtractionResult(
+                status="failed",
+                source_url=source_url,
+                failure=FailureDetail(
+                    type="extraction_error",
+                    reason=f"Content not extractable: {reason}",
+                    metadata={"stage": "extraction_precheck"},
+                ),
+            )
+
+        self._content_language = content_language
         allowed_sections = tuple(sections)
         chunks = self.chunker.split(content)
         log.log_chunks_ready(source_url, len(chunks))
@@ -129,6 +147,8 @@ class AzureOpenAIExtractionService:
         prompt = EXTRACTION_PROMPT.format(
             source_url=source_url,
             country=country,
+            language_instruction=build_language_instruction(
+                getattr(self, '_content_language', None)),
             chunk_index=chunk_index + 1,
             chunk_count=chunk_count,
             sections_str=", ".join(sections),
